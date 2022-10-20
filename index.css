@@ -67,3 +67,10 @@ li a:hover:not(.active) {
 .section_opleiding {
     color: #333;
 }
+
+.works_active {
+    margin: -20px;
+    padding: 20px;
+    padding-left: 50px;
+    background-color: #04AA6D;
+}
