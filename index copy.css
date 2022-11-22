@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    background-color: rgb(240, 240, 240);
+    font-family: 'Montserrat';
+    font-size: 18px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #04AA6D;
+}
+
+.header {
+    background-image: url("images/079A9012-PANO.jpg");
+    background-size: cover;
+    font-family: Lora;
+    font-size: larger;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.header-content {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.introduction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -60px;
+    color: #333;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 30px;
+}
+
+.introduction img {
+    width: 200px;
+    border-radius: 50%;
+    margin-top: 10px;
+}
+
+.tekst {
+    padding: 30px;
+    position: left;
+}
+
+.section_opleiding {
+    color: #333;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.works_active {
+    margin: -20px;
+    padding: 20px;
+    padding-left: 50px;
+    background-color: #04AA6D;
+}
