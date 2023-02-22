@@ -1,59 +1,133 @@
 /* algemene stijlen */
 body {
-	font-family: 'Open Sans', sans-serif;
-	font-size: 16px;
-	color: #333;
-}
-
-a {
-	color: #333;
-	text-decoration: none;
-}
-
-ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-/* header */
-header {
-	background-color: #eee;
-	padding: 20px;
-	box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-}
-
-header h1 {
-	margin: 0;
-}
-
-nav {
-	float: right;
-}
-
-nav li {
-	display: inline-block;
-	margin-left: 20px;
-}
-
-/* main */
-main {
-	max-width: 800px;
-	margin: 0 auto;
-	padding: 40px 20px;
-}
-
-section {
-	margin-bottom: 40px;
-}
-
-section h2 {
-	margin-top: 0;
-}
-
-/* footer */
-footer {
-	background-color: #ddd;
-	padding: 20px;
-	text-align: center;
-}
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  a {
+    color: #333;
+    text-decoration: none;
+  }
+  
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  /* header */
+  header {
+    background-color: #eee;
+    padding: 20px;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    height: 50px;
+    position: relative;
+  }
+  
+  nav {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+  }
+  
+  header h1 {
+    margin: 0;
+  }
+  
+  nav li {
+    display: inline-block;
+    margin-left: 20px;
+  }
+  
+  /* main */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  section {
+    margin-bottom: 40px;
+    text-align: left;
+  }
+  
+  section h2 {
+    margin-top: 0;
+  }
+  
+  /* footer */
+  footer {
+    background-color: #ddd;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .profile-picture {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 20px;
+    overflow: hidden;
+    border-radius: 50%;
+    float: left;
+    margin-right: 20px;
+  }
+  
+  .profile-picture img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  /* add styles for the "Educational master in physics" section */
+  .education {
+    clear: both;
+    text-align: left;
+  }
+  
+  .education h2 {
+    margin-top: 0;
+  }
+  
+  .education p {
+    margin-bottom: 0;
+  }
+  
+  /* add styles to display the first two sections next to the profile picture */
+  .container:before,
+  .container:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  .container section {
+    width: calc(50% - 20px);
+    float: left;
+    margin-right: 40px;
+  }
+  
+  .panorama {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .panorama img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    min-width: 100%;
+    min-height: 100%;
+  }
+  
