@@ -1,0 +1,8 @@
+plugins:
+  - jekyll-auth
+
+jekyll_auth:
+  github:
+    client_id: servaaswinder
+    client_secret: Willem!2
+    redirect_uri: https://servaaswinder.github.io/auth/github/callback
