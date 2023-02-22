@@ -1,4 +1,0 @@
-AuthType Basic
-AuthName "Protected Area"
-AuthUserFile beveiligd/.htpasswd
-Require valid-user
