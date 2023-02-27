@@ -13,6 +13,7 @@ body {
 }
 
 a {
+  display: block;
   color: #333;
   text-decoration: none;
 }
@@ -20,7 +21,9 @@ a {
 ul {
   margin: 0;
   padding: 0;
-  list-style: none;
+  list-style-type: none;
+  overflow: hidden;
+  position: sticky;
 }
 
 /* header */
@@ -29,13 +32,17 @@ header {
   padding: 20px;
   box-shadow: 0 2px 2px rgba(0,0,0,0.1);
   height: 70px;
-  position: relative;
+  position: sticky;
 }
 
 nav {
   position: absolute;
   top: 50px;
   right: 20px;
+}
+
+li a.active {
+  text-decoration: underline;
 }
 
 header h1 {
@@ -45,6 +52,9 @@ header h1 {
 nav li {
   display: inline-block;
   margin-left: 20px;
+  color: #333;
+  text-align: center;
+  text-decoration: none;
 }
 
 /* main */
@@ -134,20 +144,32 @@ footer {
 }
 
 @media only screen and (max-width: 600px) {
-  .menu-toggle {
-    display: block;
-  }
+  /* verberg de normale navigatielinks */
   nav ul {
     display: none;
   }
+
+  /* toon de menu-toggle knop */
+  nav .menu-toggle {
+    display: block;
+    font-size: 30px;
+    border: none;
+    background: none;
+    color: #333;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  /* toon de dropdown links wanneer de menu-toggle knop wordt aangeklikt */
   nav ul.is-open {
     display: block;
-  }
-}
-
-@media only screen and (min-width: 601px) {
-  nav ul {
-    display: block;
+    position: relative;
+    top: 50px;
+    right: 0;
+    width: 100%;
+    background-color: #eee;
+    padding: 10px;
   }
 }
 
