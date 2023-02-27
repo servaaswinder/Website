@@ -9,7 +9,15 @@
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  color: #333;
+  color: #6d6d6d;
+}
+
+h1 {
+  color:#333;
+}
+
+h2 {
+  color: #df4125;
 }
 
 a {
@@ -51,7 +59,7 @@ header h1 {
 
 nav li {
   display: inline-block;
-  margin-left: 20px;
+  margin: 20px;
   color: #333;
   text-align: center;
   text-decoration: none;
@@ -157,15 +165,15 @@ footer {
     background: none;
     color: #333;
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: -10px;
+    right: 10px;
   }
 
   /* toon de dropdown links wanneer de menu-toggle knop wordt aangeklikt */
   nav ul.is-open {
-    display: block;
+    display: flex;
     position: relative;
-    top: 50px;
+    top: 70px;
     right: 0;
     width: 100%;
     background-color: #eee;
