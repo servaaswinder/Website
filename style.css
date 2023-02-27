@@ -184,3 +184,36 @@ footer {
 /* nav ul.is-open {
   display: block;
 } */
+
+
+.gallery {
+  max-width: 1000px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  grid-gap: 20px;
+}
+
+.gallery li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.gallery img {
+  display: block;
+  height: auto;
+  width: 400px;
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+.gallery li img.horizontal {
+  width: 600px;
+  max-width: 100%;
+}
