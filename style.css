@@ -13,7 +13,7 @@ body {
 }
 
 h1 {
-  color:#333;
+  color: #333;
 }
 
 h2 {
@@ -38,7 +38,7 @@ ul {
 header {
   background-color: #eee;
   padding: 20px;
-  box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
   height: 70px;
   position: sticky;
 }
@@ -117,9 +117,9 @@ footer {
   content: "";
   display: table;
   clear: both;
-} */
+}
 
-.container section {
+*/ .container section {
   width: calc(50% - 20px);
   float: left;
   margin-right: 40px;
@@ -152,6 +152,7 @@ footer {
 }
 
 @media only screen and (max-width: 600px) {
+
   /* verberg de normale navigatielinks */
   nav ul {
     display: none;
@@ -210,10 +211,29 @@ footer {
   max-width: 100%;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .gallery li img.horizontal {
   width: 600px;
   max-width: 100%;
+}
+
+
+.klas_knop {
+  padding: 10px 15px;
+  /* Maakt de knoppen iets smaller */
+  background-color: #b33535;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-right: 10px;
+  /* Ruimte aan de rechterkant van elke knop */
+  margin-bottom: 10px;
+  /* Ruimte onder elke knop */
+}
+
+/* Als je wilt dat de knoppen een hover-effect hebben */
+.klas_knop:hover {
+  background-color: #a22a2a;
 }

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>Portfolio van Servaas Winder</title>
 	<link rel="stylesheet" href="style.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body class="portfolio">
 	<header>
 		<h1>Servaas Winder</h1>
@@ -12,31 +14,36 @@
 		<nav>
 			<button class="menu-toggle">&#9776;</button>
 			<ul>
-			  <li><a href="index.html">Home</a></li>
-			  <li><a class="active" href="portfolio.html">Portfolio</a></li>
-			  <li><a href="foto's.html">Fotografie</a></li>
+				<li><a href="index.html">Home</a></li>
+				<li><a href="klassen.html">Klassen</a></li>
+				<li><a class="active" href="portfolio.html">Portfolio</a></li>
+				<li><a href="foto's.html">Fotografie</a></li>
 			</ul>
-		  </nav>
-		  
-		  <script>
+		</nav>
+
+		<script>
 			// selecteer de hamburgerknop en het navigatiemenu
 			const menuToggle = document.querySelector('.menu-toggle');
 			const navigation = document.querySelector('nav ul');
-		  
+
 			// voeg een klikfunctie toe aan de hamburgerknop
-			menuToggle.addEventListener('click', function() {
-			  // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
-			  navigation.classList.toggle('is-open');
+			menuToggle.addEventListener('click', function () {
+				// voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
+				navigation.classList.toggle('is-open');
 			});
-		  </script>
+		</script>
 	</header>
 
 	<main>
 		<div class="section">
 			<h1>Welkom bij mijn portfolio!</h1>
-            <p>Op mijn portfolio vind je mijn werk en projecten. Klik op onderstaande knop om naar mijn portfolio te gaan:</p>
-            <a class="portfolio_knop" href="https://servaaswinder.stackstorage.com/s/eBMA0vYU2MhIcZkl" style="padding: 10px 20px; background-color: #b33535; color: white; border-radius: 5px; text-decoration: none;">Naar mijn portfolio</a>
-            <p>Let op: de bestanden zijn beveiligd met een wachtwoord. Neem contact met mij op als je toegang wilt krijgen tot de bestanden.</p>
+			<p>Op mijn portfolio vind je mijn werk en projecten. Klik op onderstaande knop om naar mijn portfolio te
+				gaan:</p>
+			<a class="portfolio_knop" href="https://servaaswinder.stackstorage.com/s/eBMA0vYU2MhIcZkl"
+				style="padding: 10px 20px; background-color: #b33535; color: white; border-radius: 5px; text-decoration: none;">Naar
+				mijn portfolio</a>
+			<p>Let op: de bestanden zijn beveiligd met een wachtwoord. Neem contact met mij op als je toegang wilt
+				krijgen tot de bestanden.</p>
 		</div>
 	</main>
 
@@ -44,4 +51,5 @@
 		<p>&copy; 2023 Servaas Winder</p>
 	</footer>
 </body>
+
 </html>
