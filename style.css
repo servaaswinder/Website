@@ -26,13 +26,6 @@ a {
   text-decoration: none;
 }
 
-aa {
-  display: block;
-  color: #333;
-  text-decoration: none;
-  display: inline;
-
-}
 
 ul {
   margin: 0;
@@ -47,31 +40,49 @@ header {
   background-color: #eee;
   padding: 20px;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-  height: 70px;
-  position: sticky;
-}
-
-nav {
-  position: absolute;
-  top: 50px;
-  right: 20px;
-}
-
-li a.active {
-  text-decoration: underline;
 }
 
 header h1 {
   margin: 0;
 }
 
-nav li {
-  display: inline-block;
-  margin: 20px;
-  color: #333;
-  text-align: center;
-  text-decoration: none;
+.menu-toggle {
+  display: none;
 }
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav li {
+  margin: 0 20px;
+}
+
+nav li a.active {
+  text-decoration: underline;
+}
+
+/* Voor mobiele schermen */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  nav #navbar {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+  }
+
+  nav li {
+    margin: 10px 0;
+  }
+}
+
 
 /* main */
 main {
