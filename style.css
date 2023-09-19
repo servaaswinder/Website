@@ -1,15 +1,15 @@
 /* algemene stijlen */
 
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  color: #6d6d6d;
+}
+
 @media only screen and (max-width: 600px) {
   body {
     font-size: 14px;
   }
-}
-
-body {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 16px;
-  color: #6d6d6d;
 }
 
 h1 {
@@ -25,7 +25,6 @@ a {
   color: #333;
   text-decoration: none;
 }
-
 
 ul {
   margin: 0;
@@ -45,12 +44,22 @@ header {
   align-items: center;
 }
 
-header h1 {
+header h1,
+header p {
   margin: 0;
+}
+
+nav {
+  position: relative;
 }
 
 .menu-toggle {
   display: none;
+  font-size: 30px;
+  border: none;
+  background: none;
+  color: #333;
+  cursor: pointer;
 }
 
 nav ul {
@@ -58,7 +67,6 @@ nav ul {
   margin: 0;
   padding: 0;
   display: flex;
-
 }
 
 nav li {
@@ -69,7 +77,6 @@ nav li a.active {
   text-decoration: underline;
 }
 
-/* Voor mobiele schermen */
 @media (max-width: 768px) {
   .menu-toggle {
     display: block;
@@ -78,12 +85,17 @@ nav li a.active {
   nav ul {
     display: none;
     flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
+    align-items: center;
+    width: 200%;
     position: absolute;
     background-color: #eee;
     top: 100%;
-    right: 0;
+    right: 5%;
+    transform: translateY(
+      30px
+    ); /* aanpassen op basis van de exacte positie die u wilt */
+    padding: 10px;
+    z-index: 1000; /* of een andere hoge waarde naar keuze */
   }
 
   nav ul.is-open {
@@ -93,10 +105,9 @@ nav li a.active {
   nav li {
     margin: 10px 0;
     width: 100%;
+    text-align: center;
   }
 }
-
-
 
 /* main */
 main {
@@ -121,12 +132,6 @@ footer {
   text-align: center;
 }
 
-/* .container {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-} */
-
 .profile-picture {
   width: 300px;
   height: 300px;
@@ -136,13 +141,6 @@ footer {
   float: left;
   margin-right: 20px;
 }
-
-/* .profile-picture img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-} */
-
 
 /* add styles to display the first two sections next to the profile picture */
 .container:before,
@@ -158,67 +156,10 @@ footer {
   margin-right: 40px;
 }
 
-/* voeg extra stijlen toe voor de portfolio-pagina */
-/* .portfolio-description {
-  text-align: left;
-} */
-
-/* .portfolio-description h2 {
-  margin-top: 0;
-} */
-
-/* .portfolio-description p {
-  margin-bottom: 0;
-} */
-
 .responsive-img {
   max-width: 100%;
   height: auto;
 }
-
-.menu-toggle {
-  display: none;
-  font-size: 30px;
-  border: none;
-  background: none;
-  color: #333;
-}
-
-@media only screen and (max-width: 600px) {
-
-  /* verberg de normale navigatielinks */
-  nav ul {
-    display: none;
-  }
-
-  /* toon de menu-toggle knop */
-  nav .menu-toggle {
-    display: block;
-    font-size: 30px;
-    border: none;
-    background: none;
-    color: #333;
-    position: absolute;
-    top: -10px;
-    right: 10px;
-  }
-
-  /* toon de dropdown links wanneer de menu-toggle knop wordt aangeklikt */
-  nav ul.is-open {
-    display: flex;
-    position: relative;
-    top: 70px;
-    right: 0;
-    width: 100%;
-    background-color: #eee;
-    padding: 10px;
-  }
-}
-
-/* nav ul.is-open {
-  display: block;
-} */
-
 
 .gallery {
   max-width: 1000px;
@@ -226,7 +167,10 @@ footer {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(400px, 1fr)
+  ); /* Voor individuele weergave van foto's */
   grid-gap: 20px;
 }
 
@@ -240,18 +184,29 @@ footer {
 .gallery img {
   display: block;
   height: auto;
-  width: 400px;
   max-width: 100%;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.gallery li img.horizontal {
-  width: 600px;
-  max-width: 100%;
+/* Specifieke stijl voor horizontale foto's op desktop */
+@media only screen and (min-width: 769px) {
+  .gallery li img.horizontal {
+    width: 600px;
+  }
 }
 
+/* Aanpassing voor kleinere schermen zodat afbeeldingen de volledige breedte innemen */
+@media only screen and (max-width: 768px) {
+  .gallery {
+    grid-template-columns: 1fr; /* Afbeeldingen worden gestapeld op mobiele schermen */
+  }
+
+  .gallery li img.horizontal {
+    max-width: 100%;
+  }
+}
 
 .klas_knop {
   padding: 10px 15px;
