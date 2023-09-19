@@ -20,6 +20,17 @@
                 <li><a href="fotos.html">Fotografie</a></li>
             </ul>
         </nav>
+        <script>
+            // selecteer de hamburgerknop en het navigatiemenu
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navigation = document.querySelector('nav ul');
+
+            // voeg een klikfunctie toe aan de hamburgerknop
+            menuToggle.addEventListener('click', function () {
+                // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
+                navigation.classList.toggle('is-open');
+            });
+        </script>
     </header>
 
     <main>
