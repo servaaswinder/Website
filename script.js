@@ -14,6 +14,5 @@ document.addEventListener("DOMContentLoaded", function () {
   const navbar = document.getElementById('navbar');
 
   menuToggle.addEventListener('click', function () {
-    navbar.style.display = navbar.style.display === 'flex' ? 'none' : 'flex';
+    navbar.classList.toggle('is-open');
   });
-});

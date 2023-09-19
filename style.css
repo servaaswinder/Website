@@ -40,6 +40,9 @@ header {
   background-color: #eee;
   padding: 20px;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 header h1 {
@@ -55,6 +58,7 @@ nav ul {
   margin: 0;
   padding: 0;
   display: flex;
+
 }
 
 nav li {
@@ -71,17 +75,27 @@ nav li a.active {
     display: block;
   }
 
-  nav #navbar {
+  nav ul {
     display: none;
     flex-direction: column;
+    align-items: flex-start;
     width: 100%;
-    text-align: center;
+    position: absolute;
+    background-color: #eee;
+    top: 100%;
+    right: 0;
+  }
+
+  nav ul.is-open {
+    display: flex;
   }
 
   nav li {
     margin: 10px 0;
+    width: 100%;
   }
 }
+
 
 
 /* main */
