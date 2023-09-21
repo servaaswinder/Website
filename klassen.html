@@ -1,55 +1,57 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Klassen van Servaas Winder</title>
-    <link rel="stylesheet" href="style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
 
-  <body class="portfolio">
-    <header>
-      <h1>Servaas Winder</h1>
-      <p>Docent Natuurkunde</p>
-      <nav>
-        <button class="menu-toggle">&#9776;</button>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a class="active" href="klassen.html">Klassen</a></li>
-          <li><a href="portfolio.html">Portfolio</a></li>
-          <li><a href="foto's.html">Fotografie</a></li>
-        </ul>
-      </nav>
+<head>
+  <title>Klassen van Servaas Winder</title>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-      <script>
-        // selecteer de hamburgerknop en het navigatiemenu
-        const menuToggle = document.querySelector(".menu-toggle");
-        const navigation = document.querySelector("nav ul");
+<body class="portfolio">
+  <header>
+    <h1>Servaas Winder</h1>
+    <p>Docent Natuurkunde</p>
+    <nav>
+      <button class="menu-toggle">&#9776;</button>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a class="active" href="klassen.html">Klassen</a></li>
+        <!-- <li><a href="portfolio.html">Portfolio</a></li> -->
+        <li><a href="foto's.html">Fotografie</a></li>
+      </ul>
+    </nav>
 
-        // voeg een klikfunctie toe aan de hamburgerknop
-        menuToggle.addEventListener("click", function () {
-          // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
-          navigation.classList.toggle("is-open");
-        });
-      </script>
-    </header>
+    <script>
+      // selecteer de hamburgerknop en het navigatiemenu
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navigation = document.querySelector("nav ul");
 
-    <main>
-      <div class="section">
-        <h1>Selecteer een klas:</h1>
-        <p>
-          Kies een van de onderstaande klassen om toegang te krijgen tot
-          oefenopgaven en andere leermaterialen.
-        </p>
-        <!-- <a class="klas_knop" href="4havo.html">4 Havo</a> -->
-        <a class="klas_knop" href="5havo.html">5 Havo</a>
-        <!-- <a class="klas_knop" href="4vwo.html">4 VWO</a> -->
-        <a class="klas_knop" href="5vwo.html">5 VWO</a>
-        <a class="klas_knop" href="6vwo.html">6 VWO</a>
-      </div>
-    </main>
+      // voeg een klikfunctie toe aan de hamburgerknop
+      menuToggle.addEventListener("click", function () {
+        // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
+        navigation.classList.toggle("is-open");
+      });
+    </script>
+  </header>
 
-    <footer>
-      <p>&copy; 2023 Servaas Winder</p>
-    </footer>
-  </body>
+  <main>
+    <div class="section">
+      <h1>Selecteer een klas:</h1>
+      <p>
+        Kies een van de onderstaande klassen om toegang te krijgen tot
+        oefenopgaven en andere leermaterialen.
+      </p>
+      <!-- <a class="klas_knop" href="4havo.html">4 Havo</a> -->
+      <a class="klas_knop" href="5havo.html">5 Havo</a>
+      <!-- <a class="klas_knop" href="4vwo.html">4 VWO</a> -->
+      <a class="klas_knop" href="5vwo.html">5 VWO</a>
+      <a class="klas_knop" href="6vwo.html">6 VWO</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 Servaas Winder</p>
+  </footer>
+</body>
+
 </html>
