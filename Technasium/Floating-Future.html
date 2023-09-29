@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Technasium</title>
+    <link rel="stylesheet" href="../style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      .projects-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+
+      .project {
+        flex: 1 1 calc(50% - 1rem); /* Hier zorgen we ervoor dat het project 50% van de container in beslag neemt, rekening houdend met de gap. */
+        box-sizing: border-box; /* Hiermee zorgen we ervoor dat padding en border binnen de opgegeven breedte van het element blijven. */
+      }
+
+      .project-image img {
+        width: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body class="portfolio">
+    <header>
+      <h1>Servaas Winder</h1>
+      <p>Docent Natuurkunde</p>
+      <nav>
+        <button class="menu-toggle">&#9776;</button>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../klassen.html">Klassen</a></li>
+          <li>
+            <a class="active" href="Technasium.html">Technasium</a>
+          </li>
+          <li><a href="../foto's.html">Fotografie</a></li>
+        </ul>
+      </nav>
+
+      <script>
+        // selecteer de hamburgerknop en het navigatiemenu
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navigation = document.querySelector("nav ul");
+
+        // voeg een klikfunctie toe aan de hamburgerknop
+        menuToggle.addEventListener("click", function () {
+          // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
+          navigation.classList.toggle("is-open");
+        });
+      </script>
+    </header>
+
+    <main>
+      <!-- Opdracht uitleggen -->
+
+      <div class="project-description">
+        <style>
+          .project-description {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          .project-description h2,
+          .project-description h3 {
+            color: #b33535;
+            margin-bottom: 20px;
+          }
+
+          .project-description p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+          }
+        </style>
+
+        <h2>Floating Future Project: Opdrachtomschrijving</h2>
+
+        <section class="introduction">
+          <h3>Inleiding:</h3>
+          <p>
+            In het Floating Future-project richten we ons op de uitdagingen van
+            stijgende zeeniveaus en hoe drijvende steden een potentiële
+            oplossing kunnen zijn. De leerlingen zullen onderzoeken hoe
+            drijvende structuren kunnen worden ontworpen om duurzaam, veilig en
+            leefbaar te zijn.
+          </p>
+        </section>
+
+        <section class="goal">
+          <h3>Doel:</h3>
+          <p>
+            Het doel is om leerlingen te leren over de effecten van
+            klimaatverandering en hoe technologie en innovatief ontwerp kunnen
+            bijdragen aan het aanpakken van wereldwijde uitdagingen. Ze zullen
+            de principes van drijvend bouwen verkennen en hun eigen concepten
+            voor drijvende steden ontwikkelen.
+          </p>
+        </section>
+
+        <section class="task">
+          <h3>Opdracht:</h3>
+          <p>
+            De taak van de leerlingen is om een prototype van een drijvende
+            structuur te ontwerpen die zowel milieuvriendelijk als bewoonbaar
+            is. Ze zullen rekening moeten houden met factoren zoals
+            materiaalkeuze, energiebronnen, en gemeenschapsplanning. Het
+            uiteindelijke ontwerp zal worden gepresenteerd aan een panel van
+            experts in stedelijke planning en duurzaamheid.
+          </p>
+        </section>
+      </div>
+
+      <!-- Fases doorlopen -->
+      <div class="project-phase">
+        <style>
+          .project-phase {
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+          }
+
+          .project-phase h2 {
+            color: #b33535;
+            margin-bottom: 20px;
+          }
+
+          .project-phase h3 {
+            margin-bottom: 15px;
+          }
+
+          .project-phase p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-style: italic; /* om te benadrukken dat dit voorbeeldsituaties zijn */
+          }
+
+          .project-phase ul {
+            list-style-type: disc;
+            margin-left: 20px;
+          }
+
+          .project-phase li {
+            margin-bottom: 10px;
+          }
+
+          .text-image-container {
+            display: flex; /* Maakt dit element een flex container */
+            align-items: center; /* Centreert items verticaal */
+            gap: 1rem; /* Ruimte tussen de tekst en de afbeelding */
+          }
+
+          .text-image-container img {
+            max-width: 150px; /* Aanpasbare breedte van de afbeelding */
+            height: auto; /* Behoud de aspectratio */
+          }
+        </style>
+
+        <h2>Uitwerking van de Projectfasen</h2>
+
+        <h3>1. Onderzoeksfase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> Leerlingen analyseren de gevolgen van
+              stijgende zeeniveaus in verschillende delen van de wereld en de
+              impact op gemeenschappen.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>b.</strong> Ze bestuderen bestaande drijvende structuren
+              en gemeenschappen, zoals het drijvende dorp in Cambodja of de
+              drijvende huizen in Nederland.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> De leerlingen onderzoeken verschillende
+              bouwmaterialen en hun duurzaamheid, evenals de impact op het
+              milieu.
+            </p>
+          </li>
+        </ul>
+
+        <h3>2. Ontwerpfase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> Groepjes leerlingen brainstormen over
+              verschillende designs voor drijvende structuren, rekening houdend
+              met zaken als duurzaamheid, leefbaarheid en impact op het milieu.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>b.</strong> Met behulp van 3D-modellering software of
+              maquettes werken ze hun ideeën uit in concrete ontwerpen.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> De leerlingen overwegen de energiebronnen voor
+              hun drijvende structuren, zoals zonne-energie, windenergie, enz.,
+              en hoe ze deze op een duurzame manier kunnen integreren.
+            </p>
+          </li>
+        </ul>
+
+        <h3>3. Testfase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> Met behulp van kleine prototypes testen de
+              leerlingen de drijfvermogen en stabiliteit van hun ontwerpen.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>b.</strong> Ze evalueren de efficiëntie van de
+              geïntegreerde energiebronnen in hun ontwerpen.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> Leerlingen verzamelen feedback van
+              medestudenten en experts om potentiële verbeterpunten in hun
+              ontwerpen te identificeren.
+            </p>
+          </li>
+        </ul>
+
+        <h3>4. Presentatiefase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> Elke groep bereidt een presentatie voor om hun
+              ontwerp en de gedachtegang erachter te tonen.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>b.</strong> Tijdens de presentatie delen ze hun
+              onderzoeksresultaten, ontwerpproces en de uitdagingen waarmee ze
+              werden geconfronteerd.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> Na elke presentatie is er een Q&A-sessie
+              waarin andere studenten en docenten vragen kunnen stellen en
+              feedback kunnen geven.
+            </p>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Reflectie op groep/individu -->
+      <div class="reflection">
+        <style>
+          .reflection {
+            background-color: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-top: 40px;
+            line-height: 1.5;
+          }
+
+          .reflection h2 {
+            color: #b33535;
+            margin-bottom: 20px;
+          }
+
+          .reflection p {
+            margin-bottom: 20px;
+            font-style: italic; /* om te benadrukken dat dit een reflectie is */
+          }
+        </style>
+
+        <h2>Reflectie op het 'Floating Future Project'</h2>
+
+        <p>
+          Het 'Floating Future Project' was een uitdagende maar verrijkende
+          ervaring. Het gaf ons de kans om de realiteit van klimaatverandering
+          en stijgende zeeniveaus te verkennen, en om praktische oplossingen te
+          bedenken voor deze urgente problemen.
+        </p>
+
+        <h3>Wat we goed deden:</h3>
+        <ul>
+          <li>
+            Onze groep heeft effectief samengewerkt en ieders sterke punten
+            benut.
+          </li>
+          <li>
+            We deden grondig onderzoek naar bestaande drijvende gemeenschappen
+            en bouwmaterialen, wat ons ontwerp sterk beïnvloedde.
+          </li>
+          <li>
+            Ons ontwerp was zowel innovatief als praktisch, waarbij we rekening
+            hielden met duurzaamheid en leefbaarheid.
+          </li>
+        </ul>
+
+        <h3>Wat we beter konden doen:</h3>
+        <ul>
+          <li>
+            We hadden meer tijd kunnen besteden aan het testen van ons prototype
+            om eventuele fouten vroeg te identificeren.
+          </li>
+          <li>
+            Hoewel ons ontwerp gericht was op duurzaamheid, hadden we meer
+            kunnen onderzoeken over de ecologische impact op mariene
+            ecosystemen.
+          </li>
+        </ul>
+
+        <h3>Toekomstige overwegingen:</h3>
+        <p>
+          Voor toekomstige projecten willen we nog meer samenwerken met experts
+          op het gebied van klimaatverandering en duurzaam bouwen. Dit zal ons
+          helpen om nog geïnformeerde en effectieve ontwerpen te maken. We
+          willen ook meer tijd besteden aan het verzamelen van feedback en het
+          itereren van ons ontwerp op basis van die feedback.
+        </p>
+
+        <h3>Conclusie:</h3>
+        <p>
+          Over het algemeen zijn we trots op wat we hebben bereikt met het
+          'Floating Future Project'. We hebben niet alleen waardevolle kennis
+          opgedaan, maar ook belangrijke vaardigheden ontwikkeld in teamwerk,
+          onderzoek en ontwerp. We kijken ernaar uit om deze vaardigheden in de
+          toekomst toe te passen op andere uitdagende projecten.
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2023 Servaas Winder</p>
+    </footer>
+  </body>
+</html>

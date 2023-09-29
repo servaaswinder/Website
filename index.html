@@ -1,105 +1,107 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Mijn website</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
 
-<head>
-  <title>Mijn website</title>
-  <link rel="stylesheet" href="style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
+  <body>
+    <header>
+      <h1>Servaas Winder</h1>
+      <p>Docent Natuurkunde</p>
+      <nav>
+        <button class="menu-toggle">&#9776;</button>
+        <ul>
+          <li><a class="active" href="index.html">Home</a></li>
+          <li><a href="klassen.html">Klassen</a></li>
+          <!-- <li><a href="portfolio.html">Portfolio</a></li> -->
+          <li><a href="foto's.html">Fotografie</a></li>
+        </ul>
+      </nav>
 
-<body>
-  <header>
-    <h1>Servaas Winder</h1>
-    <p>Docent Natuurkunde</p>
-    <nav>
-      <button class="menu-toggle">&#9776;</button>
-      <ul>
-        <li><a class="active" href="index.html">Home</a></li>
-        <li><a href="klassen.html">Klassen</a></li>
-        <!-- <li><a href="portfolio.html">Portfolio</a></li> -->
-        <li><a href="foto's.html">Fotografie</a></li>
-      </ul>
-    </nav>
+      <script>
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navigation = document.querySelector("nav ul");
 
-    <script>
-      const menuToggle = document.querySelector(".menu-toggle");
-      const navigation = document.querySelector("nav ul");
+        menuToggle.addEventListener("click", function () {
+          navigation.classList.toggle("is-open");
+        });
+      </script>
+    </header>
 
-      menuToggle.addEventListener("click", function () {
-        navigation.classList.toggle("is-open");
-      });
-    </script>
-  </header>
+    <main>
+      <div class="container">
+        <div class="profile-picture">
+          <img
+            src="images/Dual_exposure.jpg"
+            alt="Profielfoto"
+            class="responsive-img"
+          />
+        </div>
 
-  <main>
-    <div class="container">
-      <div class="profile-picture">
-        <img src="images/Dual_exposure.jpg" alt="Profielfoto" class="responsive-img" />
+        <section>
+          <h2>Welkom op mijn website</h2>
+          <p>
+            Op deze website kun je informatie vinden over mij en mijn werk als
+            leraar natuurkunde. Kijk gerust rond! Dit is nog een werk in
+            uitvoering, alles is computer gegenereerd.
+          </p>
+        </section>
+
+        <section>
+          <h2>Over mij</h2>
+          <p>
+            Mijn naam is Servaas Winder. Naast mijn specialisatie in
+            HAVO/VWO-natuurkunde en modelleren, geef ik ook les in
+            O&O/Technasium.
+          </p>
+          <p>
+            Naast mijn beroepsmatige passie voor natuurkunde, heb ik ook
+            persoonlijke interesses zoals fotografie, elektronica en
+            programmeren, motorrijden en scouting.
+          </p>
+        </section>
       </div>
 
-      <section>
-        <h2>Welkom op mijn website</h2>
+      <section class="clear-float">
+        <h2>Afgestudeerd met een master in Natuurkunde-onderwijs</h2>
         <p>
-          Op deze website kun je informatie vinden over mij en mijn werk als
-          leraar natuurkunde. Kijk gerust rond! Dit is nog een werk in
-          uitvoering, alles is computer gegenereerd.
+          Na het succesvol afronden van mijn bacheloropleiding
+          Natuurkunde-onderwijs aan de HvA, heb ik mijn masteropleiding
+          Natuurkunde-onderwijs aan Fontys Tilburg eveneens met succes afgerond.
+          Sinds deze zomer ben ik officieel afgestudeerd. Ik heb inmiddels 5
+          jaar ervaring als natuurkundeleraar op het Northgo College in
+          Noordwijk. Ik begon met het lesgeven in MAVO en heb mijn expertise
+          uitgebreid naar het VWO-niveau. Mijn specialisatie ligt momenteel op
+          het gebied van modelleren in VWO, wat ik buitengewoon interessant
+          vind. Daarnaast geef ik ook O&O/Technasium.
+        </p>
+
+        <p>
+          Hoewel ik geen wetenschappelijk onderzoek op universitair niveau heb
+          uitgevoerd, heb ik een didactisch ontwerponderzoek gedaan gericht op
+          het nabespreken van toetsen. Uit dit onderzoek bleek dat constructieve
+          feedback op toetsen een significante impact heeft op de leerresultaten
+          van studenten. Ik ben ervan overtuigd dat zorgvuldig geformuleerde
+          feedback een cruciale rol speelt in de persoonlijke en academische
+          ontwikkeling van studenten, en ik besteed daarom veel aandacht aan
+          post-testdiscussies in mijn lessen.
+        </p>
+
+        <p>
+          Een van de uitdagingen die ik waarneem onder mijn studenten is dat het
+          vak natuurkunde vaak als moeilijk wordt beschouwd, zelfs in
+          vergelijking met andere disciplines. Mijn doel is om dit stigma te
+          doorbreken en mijn studenten te helpen deze uitdagingen aan te gaan.
+          Ik moedig ze aan om te reflecteren op hun prestaties en denkwijzen om
+          zo hun begrip van het vak te vergroten.
         </p>
       </section>
+    </main>
 
-      <section>
-        <h2>Over mij</h2>
-        <p>
-          Mijn naam is Servaas Winder. Naast mijn specialisatie in
-          HAVO/VWO-natuurkunde en modelleren, geef ik ook les in
-          O&O/Technasium.
-        </p>
-        <p>
-          Naast mijn beroepsmatige passie voor natuurkunde, heb ik ook
-          persoonlijke interesses zoals fotografie, elektronica en
-          programmeren, motorrijden en scouting.
-        </p>
-      </section>
-    </div>
-
-    <section class="clear-float">
-      <h2>Afgestudeerd met een master in Natuurkunde-onderwijs</h2>
-      <p>
-        Na het succesvol afronden van mijn bacheloropleiding
-        Natuurkunde-onderwijs aan de HvA, heb ik mijn masteropleiding
-        Natuurkunde-onderwijs aan Fontys Tilburg eveneens met succes afgerond.
-        Sinds deze zomer ben ik officieel afgestudeerd. Ik heb inmiddels 5
-        jaar ervaring als natuurkundeleraar op het Northgo College in
-        Noordwijk. Ik begon met het lesgeven in MAVO en heb mijn expertise
-        uitgebreid naar het VWO-niveau. Mijn specialisatie ligt momenteel op
-        het gebied van modelleren in VWO, wat ik buitengewoon interessant
-        vind. Daarnaast geef ik ook O&O/Technasium.
-      </p>
-
-      <p>
-        Hoewel ik geen wetenschappelijk onderzoek op universitair niveau heb
-        uitgevoerd, heb ik een didactisch ontwerponderzoek gedaan gericht op
-        het nabespreken van toetsen. Uit dit onderzoek bleek dat constructieve
-        feedback op toetsen een significante impact heeft op de leerresultaten
-        van studenten. Ik ben ervan overtuigd dat zorgvuldig geformuleerde
-        feedback een cruciale rol speelt in de persoonlijke en academische
-        ontwikkeling van studenten, en ik besteed daarom veel aandacht aan
-        post-testdiscussies in mijn lessen.
-      </p>
-
-      <p>
-        Een van de uitdagingen die ik waarneem onder mijn studenten is dat het
-        vak natuurkunde vaak als moeilijk wordt beschouwd, zelfs in
-        vergelijking met andere disciplines. Mijn doel is om dit stigma te
-        doorbreken en mijn studenten te helpen deze uitdagingen aan te gaan.
-        Ik moedig ze aan om te reflecteren op hun prestaties en denkwijzen om
-        zo hun begrip van het vak te vergroten.
-      </p>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2023 Servaas Winder</p>
-  </footer>
-</body>
-
+    <footer>
+      <p>&copy; 2023 Servaas Winder</p>
+    </footer>
+  </body>
 </html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Technasium</title>
+    <link rel="stylesheet" href="../style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      .projects-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+
+      .project {
+        flex: 1 1 calc(50% - 1rem); /* Hier zorgen we ervoor dat het project 50% van de container in beslag neemt, rekening houdend met de gap. */
+        box-sizing: border-box; /* Hiermee zorgen we ervoor dat padding en border binnen de opgegeven breedte van het element blijven. */
+      }
+
+      .project-image img {
+        width: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body class="portfolio">
+    <header>
+      <h1>Servaas Winder</h1>
+      <p>Docent Natuurkunde</p>
+      <nav>
+        <button class="menu-toggle">&#9776;</button>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../klassen.html">Klassen</a></li>
+          <li>
+            <a class="active" href="Technasium.html">Technasium</a>
+          </li>
+          <li><a href="../foto's.html">Fotografie</a></li>
+        </ul>
+      </nav>
+
+      <script>
+        // selecteer de hamburgerknop en het navigatiemenu
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navigation = document.querySelector("nav ul");
+
+        // voeg een klikfunctie toe aan de hamburgerknop
+        menuToggle.addEventListener("click", function () {
+          // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
+          navigation.classList.toggle("is-open");
+        });
+      </script>
+    </header>
+
+    <main>
+      <!-- Opdracht uitleggen -->
+
+      <div class="project-description">
+        <style>
+          .project-description {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          .project-description h2,
+          .project-description h3 {
+            color: #b33535;
+            margin-bottom: 20px;
+          }
+
+          .project-description p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+          }
+        </style>
+
+        <h2>Prothese Project: Opdrachtomschrijving</h2>
+
+        <section class="introduction">
+          <h3>Inleiding:</h3>
+          <p>
+            De opdrachtgever, Robert Scheepmaker, ervaart problemen met een
+            beenprothese die niet altijd opgeladen is. Dit kan leiden tot
+            beperkingen in zijn mobiliteit en dagelijkse activiteiten. Het doel
+            van dit project is om de oorzaak van dit probleem te achterhalen en
+            een oplossing te bedenken. De leerlingen worden uitgedaagd om dit
+            probleem te onderzoeken en een oplossing te ontwerpen.
+          </p>
+        </section>
+
+        <section class="goal">
+          <h3>Doel:</h3>
+          <p>
+            Het doel van dit project is voor de leerlingen om te reflecteren op
+            de werking van protheses en de uitdagingen die komen kijken bij het
+            ontwerpen van een functionele en betrouwbare prothese. Daarnaast
+            zullen de leerlingen leren hoe ze een ontwerp kunnen presenteren en
+            hoe ze feedback kunnen toepassen om hun ontwerp te optimaliseren.
+          </p>
+        </section>
+
+        <section class="task">
+          <h3>Opdracht:</h3>
+          <p>
+            De taak van de leerlingen is om een oplossing te ontwerpen voor het
+            probleem waar Robert Scheepmaker mee kampt. Dit houdt in dat er
+            onderzoek gedaan moet worden naar de oorzaken van het probleem en
+            dat er mogelijke oplossingen bedacht moeten worden. Na het bedenken
+            van een oplossing, wordt van de leerlingen verwacht dat zij hun
+            ontwerp uitwerken en testen. Uiteindelijk zullen de leerlingen hun
+            ontwerp presenteren aan Robert Scheepmaker en zullen ze feedback
+            verzamelen om hun ontwerp te verbeteren, indien er tijd voor is.
+          </p>
+        </section>
+      </div>
+
+      <!-- Fases doorlopen -->
+      <div class="project-phase">
+        <style>
+          .project-phase {
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+          }
+
+          .project-phase h2 {
+            color: #b33535;
+            margin-bottom: 20px;
+          }
+
+          .project-phase h3 {
+            margin-bottom: 15px;
+          }
+
+          .project-phase p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-style: italic; /* om te benadrukken dat dit voorbeeldsituaties zijn */
+          }
+
+          .project-phase ul {
+            list-style-type: disc;
+            margin-left: 20px;
+          }
+
+          .project-phase li {
+            margin-bottom: 10px;
+          }
+
+          .text-image-container {
+            display: flex; /* Maakt dit element een flex container */
+            align-items: center; /* Centreert items verticaal */
+            gap: 1rem; /* Ruimte tussen de tekst en de afbeelding */
+          }
+
+          .text-image-container img {
+            max-width: 150px; /* Aanpasbare breedte van de afbeelding */
+            height: auto; /* Behoud de aspectratio */
+          }
+        </style>
+
+        <h2>Voorbeeld Uitwerking van de Projectfasen</h2>
+
+        <h3>1. Onderzoeksfase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> Tijdens het onderzoek kwamen de leerlingen
+              erachter dat een van de oorzaken waarom Robert Scheepmaker zijn
+              prothese niet altijd oplaadt, is omdat hij het simpelweg vergeet.
+              Een andere reden is dat de oplaadport geen standaardport is,
+              waardoor hij niet altijd een oplader bij de hand heeft.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>b.</strong> De leerlingen hebben verschillende bronnen
+              geraadpleegd om informatie te verzamelen over protheses en hoe ze
+              functioneren.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> Na het analyseren van de verzamelde informatie
+              hebben de leerlingen een aantal mogelijke oplossingen bedacht,
+              waaronder het gebruik van een universele oplaadport of een externe
+              powerbank.
+            </p>
+          </li>
+        </ul>
+
+        <h3>2. Ontwerpfase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> Als oplossing hebben de leerlingen een ontwerp
+              gemaakt voor een powerbank die aan de prothese kan worden geklikt.
+              Deze powerbank zou ervoor zorgen dat de prothese onderweg
+              opgeladen kan worden, ook als Robert geen toegang heeft tot een
+              stopcontact.
+            </p>
+          </li>
+          <li>
+            <div class="text-image-container">
+              <p>
+                <strong>b.</strong> Met behulp van schetsen en 3D-modellering
+                software, hebben de leerlingen een prototype van de powerbank
+                ontworpen.
+              </p>
+              <img src="accu.png" alt="Afbeelding van de powerbank" />
+            </div>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> Het prototype werd getest op een demoprothese,
+              waarbij de effectiviteit van het opladen werd geëvalueerd en de
+              gebruiksvriendelijkheid werd beoordeeld.
+            </p>
+          </li>
+        </ul>
+
+        <h3>3. Presentatiefase:</h3>
+        <ul>
+          <li>
+            <p>
+              <strong>a.</strong> De leerlingen hebben een presentatie
+              voorbereid waarin ze het proces van hun onderzoek en ontwerp
+              toelichtten.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>b.</strong> Tijdens de presentatie hebben ze hun oplossing
+              aan Robert Scheepmaker getoond, waarbij ze zowel de voordelen als
+              mogelijke nadelen bespraken.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>c.</strong> Robert Scheepmaker heeft waardevolle feedback
+              gegeven, die de leerlingen vervolgens hebben gebruikt om hun
+              ontwerp verder te verfijnen en te optimaliseren.
+            </p>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Reflectie op groep/individu -->
+      <div class="reflection">
+        <style>
+          .reflection {
+            background-color: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-top: 40px;
+            line-height: 1.5;
+          }
+
+          .reflection h2 {
+            color: #b33535;
+            margin-bottom: 20px;
+          }
+
+          .reflection p {
+            margin-bottom: 20px;
+            font-style: italic; /* om te benadrukken dat dit een reflectie is */
+          }
+        </style>
+
+        <h2>Voorbeeld Reflectie</h2>
+
+        <h3>Groepsniveau:</h3>
+        <p>
+          In het begin hadden we als groep wat moeite om een duidelijke
+          taakverdeling vast te stellen. Maar na een brainstormsessie en wat
+          discussie, vonden we een ritme waarin ieders vaardigheden het best
+          werden benut. Gedurende het project hebben we geleerd om effectief te
+          communiceren en feedback te geven zonder persoonlijk te worden. We
+          hebben elkaar gesteund en gemotiveerd, wat heeft geleid tot een
+          eindproduct waar we trots op zijn. Er waren zeker uitdagingen, zoals
+          meningsverschillen over het ontwerp en technische problemen, maar die
+          hebben we samen overwonnen.
+        </p>
+
+        <h3>Individueel niveau:</h3>
+        <p>
+          Op persoonlijk vlak heb ik veel geleerd tijdens dit project. Ik kwam
+          erachter dat mijn kracht ligt in het gedetailleerd uitwerken van
+          ideeën en het presenteren van onze bevindingen. Ik realiseerde me ook
+          dat ik soms de neiging heb om teveel op details te focussen en het
+          grotere plaatje uit het oog te verliezen. Feedback van mijn
+          groepsgenoten heeft me geholpen om dit in te zien en te verbeteren.
+          Dit project heeft mijn zelfbewustzijn en mijn vaardigheden op het
+          gebied van samenwerking vergroot.
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2023 Servaas Winder</p>
+    </footer>
+  </body>
+</html>
