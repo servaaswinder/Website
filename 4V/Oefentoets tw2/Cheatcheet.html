@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mijn PDF Document</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Dit voorkomt ongewenste schuifbalken */
+      }
+
+      embed {
+        display: block; /* Dit zorgt ervoor dat de embed het volledige blok vult */
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <embed
+      src="/4V/Oefentoets tw2/elektriciteit_begrippen_en_formules.pdf"
+      type="application/pdf"
+      width="100%"
+      height="100%"
+    />
+  </body>
+</html>
