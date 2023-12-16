@@ -210,15 +210,12 @@ footer {
 
 .klas_knop {
   padding: 10px 15px;
-  /* Maakt de knoppen iets smaller */
   background-color: #b33535;
   color: white;
   border-radius: 5px;
   text-decoration: none;
   margin-right: 10px;
-  /* Ruimte aan de rechterkant van elke knop */
   margin-bottom: 10px;
-  /* Ruimte onder elke knop */
 }
 
 .trippel_knop {
