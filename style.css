@@ -221,6 +221,22 @@ footer {
   /* Ruimte onder elke knop */
 }
 
+.trippel_knop {
+  display: flex;
+  justify-content: space-between;
+}
+
+.small {
+  flex: 1;
+  padding: 10px 15px;
+  background-color: #b33535;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
 /* Als je wilt dat de knoppen een hover-effect hebben */
 .klas_knop:hover {
   background-color: #a22a2a;
