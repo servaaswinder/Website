@@ -162,7 +162,7 @@ footer {
 }
 
 .gallery {
-  max-width: 1000px;
+  max-width: device-width;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -190,6 +190,14 @@ footer {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+@media only screen and (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(200px, 1fr)
+    ); /* Afbeeldingen worden naast elkaar weergegeven op kleinere schermen */
+  }
+}
 /* Specifieke stijl voor horizontale foto's op desktop */
 @media only screen and (min-width: 769px) {
   .gallery li img.horizontal {
