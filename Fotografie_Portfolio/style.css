@@ -1,0 +1,85 @@
+/* FILEPATH: /C:/Users/serva/Documents/GitHub/Website/Fotografie_Portfolio/style.css */
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  color: #6d6d6d;
+}
+
+/* FILEPATH: /C:/Users/serva/Documents/GitHub/Website/Fotografie_Portfolio/style.css */
+
+.header {
+  background-image: url("Foto's/079A4740-Pano.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 30px;
+  height: 300px;
+  text-align: center;
+  color: rgb(0, 83, 83);
+  display: flex;
+  flex-direction: column; /* Added */
+  align-items: center;
+  justify-content: center;
+}
+
+.header h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+.header h2 {
+  font-size: 24px; /* Added */
+  margin: 5px; /* Added */
+}
+
+.header p {
+  font-size: 18px;
+  margin: 5px;
+}
+
+/* FILEPATH: /C:/Users/serva/Documents/GitHub/Website/Fotografie_Portfolio/style.css */
+.main {
+  background-color: #eee;
+  padding: 20px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+  justify-content: flex-start; /* Updated */
+  align-items: center;
+  max-width: 1500px;
+  margin: 0 auto;
+  flex-direction: row-reverse;
+  flex-wrap: wrap; /* Nieuw */
+}
+
+.profielfoto {
+  flex: 0 0 50%;
+  max-width: 800px;
+  max-height: 100%;
+  display: block;
+  margin-left: auto;
+  float: right;
+  border-radius: 30px; /* Toegevoegd */
+}
+
+.introductie {
+  padding: 20px;
+  margin-right: 0px;
+  flex: 0 0 50%; /* Nieuw */
+  overflow: auto; /* Added */
+}
+
+@media (max-width: 600px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .profielfoto,
+  .introductie {
+    flex: 0 0 100%;
+  }
+}
+
+.introductie_tekst {
+  margin-right: 2em;
+  font-size: 20px; /* Updated */
+}
