@@ -287,3 +287,23 @@ footer {
     margin-bottom: 10px;
   }
 }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0; /* zorgt voor ruimte boven en onder de tabel */
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+/* ruimte onder de tabel, extra marge */
+table + .klas_knop {
+  margin-top: 20px;
+}
