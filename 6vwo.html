@@ -2,29 +2,31 @@
 <html>
   <head>
     <title>6 VWO - Servaas Winder</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="informatica.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
 
   <body class="klas">
-    <header>
-      <h1>6 VWO - Servaas Winder</h1>
-      <p>Docent Natuurkunde</p>
-      <nav>
-        <button class="menu-toggle">&#9776;</button>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a class="active" href="klassen.html">Klassen</a></li>
-        </ul>
-      </nav>
+        <header>
+      <div class="bar">
+        <div class="brand">
+          <h1>Servaas Winder</h1>
+          <p>Docent Northgo-College</p>
+        </div>
+        <nav>
+          <button class="menu-toggle">&#9776;</button>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="klassen.html">Natuurkunde</a></li>
+            <li><a href="informatica_home.html">Informatica</a></li>
+          </ul>
+        </nav>
+
       <script>
-        // selecteer de hamburgerknop en het navigatiemenu
         const menuToggle = document.querySelector(".menu-toggle");
         const navigation = document.querySelector("nav ul");
 
-        // voeg een klikfunctie toe aan de hamburgerknop
         menuToggle.addEventListener("click", function () {
-          // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
           navigation.classList.toggle("is-open");
         });
       </script>
@@ -32,14 +34,15 @@
 
     <main>
       <div class="section">
-        <h2>Periode 1</h2>
-        <p>
-        Hier vind je de benodigde materialen en informatie om je voor te
-        bereiden op Toetsweek 1.
-        </p>
+        <section class="inf-hero">
+          <h2>Periode 1</h2>
+          <p>
+            Hier vind je de benodigde materialen en informatie om je voor te
+            bereiden op Toetsweek 1.
+          </p>
 
 
-        <table border="1">
+        <table>
           <thead>
             <tr>
               <th>Week</th>
@@ -99,18 +102,32 @@
           </tbody>
         </table>
 
-                <a
-          class="klas_knop"
-          href="6V/Polaris K2 Geofysica 2e druk - uitwerkingen.pdf"
-          target="_blank"
-          >Uitwerkingen K2</a
-        >
-        <a
-          class="klas_knop"
-          href="6V/Polaris K2 Geofysica - werkbladen 2e druk.pdf"
-          target="_blank"
-          >Werkbladen K2</a
-        >
+        <div class="inf-actions">
+          <a
+            class="klas_knop"
+            href="6V/Polaris K2 Geofysica 2e druk - uitwerkingen.pdf"
+            target="_blank"
+            >Uitwerkingen K2</a
+          >
+          <a
+            class="klas_knop"
+            href="6V/Polaris K2 Geofysica - werkbladen 2e druk.pdf"
+            target="_blank"
+            >Werkbladen K2</a
+          >
+        </div>
+        <div class="inf-actions">
+          <a
+            class="klas_knop"
+            href="https://stralenpracticum.nl/voorbereiden/voorbereiding/"
+            target="_blank"
+            >ISP voorbereiden</a
+          >
+          <a class="klas_knop" href="https://natuurkundeuitgelegd.nl/examenopgaven.php?examenopgave=viool2022&index=1" target="_blank">Trillingen: Viool</a>
+          <a class="klas_knop" href="https://natuurkundeuitgelegd.nl/examenopgaven.php?examenopgave=looping&index=1" target="_blank">Energie: Looping</a>
+          <a class="klas_knop" href="https://natuurkundeuitgelegd.nl/examenopgaven.php?examenopgave=lisemeitner&index=1" target="_blank">Radioactiviteit: lise Meitner</a>
+        </div>
+        </section>
       </div>
     </main>
 
