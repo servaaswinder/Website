@@ -1,2 +1,5 @@
+url: "https://servaaswinder.nl"
+baseurl: ""
+
 exclude:
   - "niet gebruikt"
