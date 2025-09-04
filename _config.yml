@@ -1,9 +1,0 @@
-plugins:
-  - jekyll-auth
-
-jekyll_auth:
-  github:
-    client_id: f864741ed55f0f5be93d
-    client_secret: a6d1820a15578e79cc6f93dacc176eb678e005f8
-    redirect_uri: https://servaaswinder.github.io/auth/github/callback
-  ssl: true

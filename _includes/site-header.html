@@ -1,0 +1,27 @@
+<header>
+  <div class="bar">
+    <div class="brand">
+      <h1>Servaas Winder</h1>
+      <p>Docent Northgo-College</p>
+    </div>
+    <nav>
+      <button class="menu-toggle">&#9776;</button>
+      <ul>
+        <li><a href="{{ include.base }}index.html">Home</a></li>
+        <li><a href="{{ include.base }}klassen.html">Natuurkunde</a></li>
+        <li><a href="{{ include.base }}informatica_home.html">Informatica</a></li>
+      </ul>
+    </nav>
+
+    <script>
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navigation = document.querySelector("nav ul");
+      if (menuToggle && navigation) {
+        menuToggle.addEventListener("click", function () {
+          navigation.classList.toggle("is-open");
+        });
+      }
+    </script>
+  </div>
+</header>
+
