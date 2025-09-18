@@ -27,13 +27,13 @@ body {
 
 a { color: inherit; text-decoration: none; }
 
-.klas main a {
+.klas main a:not(.inf-button):not(.klas_knop):not(.square_button) {
   color: #1a4bb3;
   text-decoration: underline;
 }
 
-.klas main a:hover,
-.klas main a:focus {
+.klas main a:not(.inf-button):not(.klas_knop):not(.square_button):hover,
+.klas main a:not(.inf-button):not(.klas_knop):not(.square_button):focus {
   color: #0d2f7a;
 }
 
@@ -338,7 +338,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
   margin-top: 16px;
 }
 
-.inf-button {
+.inf-button,
+.inf-button:visited {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,19 +348,23 @@ main { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
   border: 1px solid var(--border);
   background: var(--bg-elev);
   color: var(--fg);
+  text-decoration: none;
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms;
   box-shadow: 0 2px 0 rgba(0,0,0,0.02);
 }
 
-.inf-button:hover {
+.inf-button:hover,
+.inf-button:focus {
   transform: translateY(-2px);
   border-color: #d9dfea;
   box-shadow: var(--shadow);
+  text-decoration: none;
 }
 
 .inf-button.primary {
   background: linear-gradient(180deg, #ffffff, #f7f9ff);
   border-color: #d7e3f8;
+  color: var(--fg);
 }
 
 /* Table */
@@ -396,7 +401,9 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 
 /* Buttons */
 .square_button,
-.klas_knop {
+.square_button:visited,
+.klas_knop,
+.klas_knop:visited {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -406,15 +413,19 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   border: 1px solid var(--border);
   background: var(--bg-elev);
   color: var(--fg);
+  text-decoration: none;
   box-shadow: 0 2px 0 rgba(0,0,0,0.02);
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms;
 }
 
 .square_button:hover,
-.klas_knop:hover {
+.square_button:focus,
+.klas_knop:hover,
+.klas_knop:focus {
   transform: translateY(-2px);
   border-color: #d9dfea;
   box-shadow: var(--shadow);
+  text-decoration: none;
 }
 
 /* Legacy responsive helpers */
