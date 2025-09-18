@@ -6,8 +6,6 @@
   --fg: #23262b;
   --muted: #6c7280;
   --border: #e6e8ee;
-  --accent: #4a74a8;
-  --accent-600: #3e6491;
   --accent-50: #e9f0fb;
   --shadow: 0 10px 25px rgba(20, 30, 60, 0.08);
 }
@@ -28,6 +26,16 @@ body {
 }
 
 a { color: inherit; text-decoration: none; }
+
+.klas main a {
+  color: #1a4bb3;
+  text-decoration: underline;
+}
+
+.klas main a:hover,
+.klas main a:focus {
+  color: #0d2f7a;
+}
 
 /* Header */
 header {
@@ -207,13 +215,7 @@ tbody tr:last-child td { border-bottom: none; }
 /* Footer */
 footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 
-/* --- Compatibility with existing components --- */
-.button_container {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
+/* Buttons */
 .square_button,
 .klas_knop {
   display: inline-flex;
@@ -247,9 +249,6 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   border-radius: 50%;
   box-shadow: var(--shadow);
 }
-
-.container:before,
-.container:after { content: ""; display: table; clear: both; }
 
 /* Gallery from photography pages */
 .gallery {
