@@ -146,6 +146,38 @@
 				<button type="button" id="create-student-btn">Account aanmaken</button>
 			</form>
 			<div id="admin-message" style="color: green"></div>
+			<h3>Leerlinggegevens aanpassen</h3>
+			<div id="student-edit-section" class="results">
+				<div>
+					<label for="student-lookup">Leerling UID of e-mail</label>
+					<input
+						type="text"
+						id="student-lookup"
+						placeholder="Bijv. UID of emailadres"
+					/>
+				</div>
+				<button type="button" id="find-student-btn">Zoek leerling</button>
+				<div id="student-edit-message" style="color: red; margin-top: 10px"></div>
+				<form id="edit-student-form" class="hidden">
+					<div>
+						<label for="edit-student-name">Leerling naam</label>
+						<input type="text" id="edit-student-name" />
+					</div>
+					<div>
+						<label for="edit-student-email">Leerling e-mail</label>
+						<input type="email" id="edit-student-email" />
+					</div>
+					<div>
+						<label for="edit-student-results">Resultaten (JSON)</label>
+						<textarea
+							id="edit-student-results"
+							rows="4"
+							placeholder='{"wiskunde": 8}'
+						></textarea>
+					</div>
+					<button type="button" id="save-student-btn">Wijzigingen opslaan</button>
+				</form>
+			</div>
 			<h3>Alle leerlingenrecords (alleen ter demonstratie)</h3>
 			<div id="all-students" class="results"></div>
 		</div>
@@ -182,6 +214,7 @@
 			firebase.initializeApp(firebaseConfig);
 			const auth = firebase.auth();
 			const db = firebase.firestore();
+			const FieldValue = firebase.firestore.FieldValue;
 
 			// Geef hier het administrator e-mailadres op. Alleen gebruikers met
 			// dit e-mailadres krijgen toegang tot het adminpaneel.
@@ -204,6 +237,17 @@
 			);
 			const logoutSection = document.getElementById("logout-section");
 			const logoutBtn = document.getElementById("logout-btn");
+			const studentLookupInput = document.getElementById("student-lookup");
+			const findStudentBtn = document.getElementById("find-student-btn");
+			const editStudentForm = document.getElementById("edit-student-form");
+			const editStudentNameInput = document.getElementById("edit-student-name");
+			const editStudentEmailInput = document.getElementById("edit-student-email");
+			const editStudentResultsInput = document.getElementById(
+				"edit-student-results"
+			);
+			const saveStudentBtn = document.getElementById("save-student-btn");
+			const studentEditMessage = document.getElementById("student-edit-message");
+			let currentEditDocId = null;
 
 			// Inlogformulier afhandelen
 			loginForm.addEventListener("submit", (e) => {
@@ -247,8 +291,12 @@
 						studentPassword
 					);
 					const newUser = userCredential.user;
-					// Sla naam en resultaten op in Firestore onder de UID van de nieuwe gebruiker
-					const dataToStore = { name: studentName, ...resultsData };
+					// Sla naam, e-mail en resultaten op in Firestore onder de UID van de nieuwe gebruiker
+					const dataToStore = {
+						name: studentName,
+						email: studentEmail,
+						...resultsData,
+					};
 					await db.collection("results").doc(newUser.uid).set(dataToStore);
 					adminMessage.textContent =
 						"Account voor " + studentEmail + " aangemaakt.";
@@ -257,6 +305,113 @@
 				} catch (err) {
 					console.error(err);
 					adminMessage.textContent = "Fout bij aanmaken: " + err.message;
+				}
+			});
+
+			findStudentBtn.addEventListener("click", async () => {
+				studentEditMessage.style.color = "red";
+				studentEditMessage.textContent = "";
+				editStudentForm.classList.add("hidden");
+				currentEditDocId = null;
+				const lookupValue = studentLookupInput.value.trim();
+				if (!lookupValue) {
+					studentEditMessage.textContent =
+						"Vul een UID of e-mailadres in om te zoeken.";
+					return;
+				}
+				studentEditMessage.style.color = "#555";
+				studentEditMessage.textContent = "Zoeken...";
+				try {
+					let foundDoc = null;
+					const docSnapshot = await db
+						.collection("results")
+						.doc(lookupValue)
+						.get();
+					if (docSnapshot.exists) {
+						foundDoc = docSnapshot;
+					} else if (lookupValue.includes("@")) {
+						const querySnapshot = await db
+							.collection("results")
+							.where("email", "==", lookupValue)
+							.limit(1)
+							.get();
+						if (!querySnapshot.empty) {
+							foundDoc = querySnapshot.docs[0];
+						}
+					}
+					if (!foundDoc) {
+						studentEditMessage.style.color = "red";
+						studentEditMessage.textContent = "Geen leerlingdocument gevonden.";
+						return;
+					}
+					const data = foundDoc.data() || {};
+					const { name = "", email = "", ...rest } = data;
+					editStudentNameInput.value = name;
+					editStudentEmailInput.value = email;
+					editStudentResultsInput.value =
+						Object.keys(rest).length > 0
+							? JSON.stringify(rest, null, 2)
+							: "";
+					currentEditDocId = foundDoc.id;
+					editStudentForm.classList.remove("hidden");
+					studentEditMessage.style.color = "green";
+					studentEditMessage.textContent =
+						"Leerling geladen (UID: " + foundDoc.id + ").";
+				} catch (err) {
+					console.error(err);
+					studentEditMessage.style.color = "red";
+					studentEditMessage.textContent = "Fout bij zoeken: " + err.message;
+				}
+			});
+
+			saveStudentBtn.addEventListener("click", async () => {
+				if (!currentEditDocId) {
+					studentEditMessage.style.color = "red";
+					studentEditMessage.textContent =
+						"Zoek eerst een leerling voordat je opslaat.";
+					return;
+				}
+				let parsedResults = {};
+				const resultsText = editStudentResultsInput.value.trim();
+				if (resultsText) {
+					try {
+						parsedResults = JSON.parse(resultsText);
+					} catch (err) {
+						studentEditMessage.style.color = "red";
+						studentEditMessage.textContent =
+							"Resultaten moeten geldige JSON zijn: " + err.message;
+						return;
+					}
+				}
+				delete parsedResults.name;
+				delete parsedResults.email;
+				const payload = { ...parsedResults };
+				const nameValue = editStudentNameInput.value.trim();
+				const emailValue = editStudentEmailInput.value.trim();
+				if (nameValue) {
+					payload.name = nameValue;
+				} else {
+					payload.name = FieldValue.delete();
+				}
+				if (emailValue) {
+					payload.email = emailValue;
+				} else {
+					payload.email = FieldValue.delete();
+				}
+				try {
+					await db
+						.collection("results")
+						.doc(currentEditDocId)
+						.set(payload, { merge: true });
+					studentEditMessage.style.color = "green";
+					studentEditMessage.textContent =
+						"Wijzigingen opgeslagen voor UID: " + currentEditDocId + ".";
+					await loadAllStudents();
+				} catch (err) {
+					console.error(err);
+					studentEditMessage.style.color = "red";
+					studentEditMessage.textContent =
+						"Opslaan mislukt: " + err.message;
 				}
 			});
 
@@ -293,6 +448,8 @@
 					const data = doc.data();
 					if (data.name) {
 						studentEmailDisplay.textContent = data.name;
+					} else if (data.email) {
+						studentEmailDisplay.textContent = data.email;
 					} else {
 						studentEmailDisplay.textContent = user.email;
 					}
