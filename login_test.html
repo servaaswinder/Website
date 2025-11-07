@@ -1,523 +1,476 @@
-<!--
-  login_test.html
+---
+---
 
-  This is a test page for demonstrating how to use Firebase Authentication
-  and Firestore with a static GitHub Pages site.  You should customize
-  the Firebase configuration below with your own project credentials.
-
-  The page implements a simple login form for both an administrator
-  (e.g. teacher) and students.  Once logged in, an admin can create
-  new student accounts and assign results/notes.  Students can log in
-  and view only their own results.  No database credentials or user
-  passwords are ever stored in the GitHub repository – the Firebase SDK
-  handles authentication via HTTPS in the browser.
-
-  IMPORTANT: Replace the values in the firebaseConfig object below
-  with the configuration for your Firebase project (found in the
-  Firebase console under Project Settings > General > Your apps).
--->
 <!DOCTYPE html>
 <html lang="nl">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Leerlingen Login Test</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				max-width: 800px;
-				margin: 0 auto;
-				padding: 20px;
-			}
-			h1,
-			h2 {
-				color: #333;
-			}
-			.hidden {
-				display: none;
-			}
-			form > div {
-				margin-bottom: 10px;
-			}
-			label {
-				display: block;
-				margin-bottom: 5px;
-			}
-			input,
-			textarea {
-				width: 100%;
-				padding: 8px;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				box-sizing: border-box;
-			}
-			button {
-				padding: 8px 12px;
-				border: none;
-				border-radius: 4px;
-				background-color: #007bff;
-				color: white;
-				cursor: pointer;
-			}
-			button:disabled {
-				background-color: #aaa;
-			}
-			.results {
-				border: 1px solid #ccc;
-				padding: 10px;
-				border-radius: 4px;
-				margin-top: 10px;
-			}
-			pre {
-				white-space: pre-wrap;
-			}
-		</style>
-		<!-- Load Firebase SDKs from CDN -->
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-	</head>
-	<body>
-		<h1>Leerlingen Portal – Testpagina</h1>
-		<p>
-			Deze pagina demonstreert hoe je Firebase-authenticatie en Firestore kunt
-			integreren op een statische site om inloggen en het bekijken van
-			persoonlijke resultaten mogelijk te maken. Vul eerst je
-			Firebase-configuratie in het script onderaan deze pagina in.
-		</p>
+        <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Leerlingen Login Test</title>
+                <link rel="stylesheet" href="style.css" />
+                <!-- Load Firebase SDKs from CDN -->
+                <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+                <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+                <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+        </head>
+        <body class="auth-page">
+                {% include site-header.html %}
 
-		<!-- Login form -->
-		<div id="login-section">
-			<h2>Inloggen</h2>
-			<form id="login-form">
-				<div>
-					<label for="login-email">E-mail</label>
-					<input type="email" id="login-email" required />
-				</div>
-				<div>
-					<label for="login-password">Wachtwoord</label>
-					<input type="password" id="login-password" required />
-				</div>
-				<button type="submit">Inloggen</button>
-			</form>
-			<div id="reset-password-box">
-				<h3>🔑 Wachtwoord vergeten?</h3>
-				<input type="email" id="reset-email" placeholder="Jouw e-mailadres" />
-				<button id="reset-btn">Stuur reset-link</button>
-				<p id="reset-message" style="color: green"></p>
-			</div>
+                <main>
+                        <div class="auth-layout">
+                                <section class="inf-hero auth-intro">
+                                        <h1>Leerlingenportal – Testomgeving</h1>
+                                        <p>
+                                                Deze pagina laat zien hoe je Firebase-authenticatie en Firestore kunt
+                                                gebruiken binnen een statische site. Vul eerst je eigen
+                                                Firebase-configuratie in onderaan deze pagina voordat je de login
+                                                functionaliteit live inzet.
+                                        </p>
+                                </section>
 
-			<p>Heb je nog geen account? Laat je docent een account aanmaken.</p>
-			<div id="login-error" style="color: red"></div>
-		</div>
+                                <div class="auth-panels">
+                                        <!-- Login form -->
+                                        <section id="login-section" class="auth-card">
+                                                <h2>Inloggen</h2>
+                                                <p>
+                                                        Log in met je e-mailadres en wachtwoord. Heb je nog geen account,
+                                                        vraag dan je docent om er één voor je aan te maken.
+                                                </p>
+                                                <form id="login-form">
+                                                        <div class="form-field">
+                                                                <label for="login-email">E-mail</label>
+                                                                <input type="email" id="login-email" required />
+                                                        </div>
+                                                        <div class="form-field">
+                                                                <label for="login-password">Wachtwoord</label>
+                                                                <input type="password" id="login-password" required />
+                                                        </div>
+                                                        <button type="submit" class="auth-button">Inloggen</button>
+                                                </form>
+                                                <div class="reset-box">
+                                                        <h3>🔑 Wachtwoord vergeten?</h3>
+                                                        <div class="form-field">
+                                                                <label for="reset-email">E-mail</label>
+                                                                <input
+                                                                        type="email"
+                                                                        id="reset-email"
+                                                                        placeholder="jouw@voorbeeld.nl"
+                                                                />
+                                                        </div>
+                                                        <button id="reset-btn" type="button" class="auth-button secondary">
+                                                                Stuur reset-link
+                                                        </button>
+                                                        <p id="reset-message" class="status-message"></p>
+                                                </div>
+                                                <div id="login-error" class="status-message error-message"></div>
+                                        </section>
 
-		<!-- Admin panel -->
-		<div id="admin-section" class="hidden">
-			<h2>Beheerderspaneel</h2>
-			<p>
-				Welkom, beheerder! Hier kun je nieuwe leerlingaccounts aanmaken en
-				resultaten invoeren. Voer het e-mailadres en wachtwoord voor de leerling
-				in, plus de resultaten/feedback. Klik vervolgens op "Account aanmaken"
-				om een gebruiker toe te voegen en de resultaten op te slaan.
-			</p>
-			<form id="admin-form">
-				<div>
-					<label for="student-name">Leerling naam</label>
-					<input type="text" id="student-name" required />
-				</div>
-				<div>
-					<label for="student-email">Leerling e-mail</label>
-					<input type="email" id="student-email" required />
-				</div>
-				<div>
-					<label for="student-password">Leerling wachtwoord</label>
-					<input type="password" id="student-password" required />
-				</div>
-				<div>
-					<label for="student-results"
-						>Cijfers / notities (JSON of tekst)</label
-					>
-					<textarea
-						id="student-results"
-						rows="4"
-						placeholder='{"wiskunde": 8, "biologie": 7.5, "opmerking": "Goed gedaan!"}'
-					></textarea>
-				</div>
-				<button type="button" id="create-student-btn">Account aanmaken</button>
-			</form>
-			<div id="admin-message" style="color: green"></div>
-			<h3>Leerlinggegevens aanpassen</h3>
-			<div id="student-edit-section" class="results">
-				<div>
-					<label for="student-lookup">Leerling UID of e-mail</label>
-					<input
-						type="text"
-						id="student-lookup"
-						placeholder="Bijv. UID of emailadres"
-					/>
-				</div>
-				<button type="button" id="find-student-btn">Zoek leerling</button>
-				<div id="student-edit-message" style="color: red; margin-top: 10px"></div>
-				<form id="edit-student-form" class="hidden">
-					<div>
-						<label for="edit-student-name">Leerling naam</label>
-						<input type="text" id="edit-student-name" />
-					</div>
-					<div>
-						<label for="edit-student-email">Leerling e-mail</label>
-						<input type="email" id="edit-student-email" />
-					</div>
-					<div>
-						<label for="edit-student-results">Resultaten (JSON)</label>
-						<textarea
-							id="edit-student-results"
-							rows="4"
-							placeholder='{"wiskunde": 8}'
-						></textarea>
-					</div>
-					<button type="button" id="save-student-btn">Wijzigingen opslaan</button>
-				</form>
-			</div>
-			<h3>Alle leerlingenrecords (alleen ter demonstratie)</h3>
-			<div id="all-students" class="results"></div>
-		</div>
+                                        <!-- Admin panel -->
+                                        <section id="admin-section" class="auth-card hidden">
+                                                <h2>Beheerderspaneel</h2>
+                                                <p>
+                                                        Welkom, beheerder! Maak nieuwe leerlingenaccounts aan, vul resultaten
+                                                        in en werk bestaande gegevens bij.
+                                                </p>
+                                                <form id="admin-form">
+                                                        <div class="form-field">
+                                                                <label for="student-name">Leerling naam</label>
+                                                                <input type="text" id="student-name" required />
+                                                        </div>
+                                                        <div class="form-field">
+                                                                <label for="student-email">Leerling e-mail</label>
+                                                                <input type="email" id="student-email" required />
+                                                        </div>
+                                                        <div class="form-field">
+                                                                <label for="student-password">Leerling wachtwoord</label>
+                                                                <input type="password" id="student-password" required />
+                                                        </div>
+                                                        <div class="form-field">
+                                                                <label for="student-results">Cijfers / notities (JSON of tekst)</label>
+                                                                <textarea
+                                                                        id="student-results"
+                                                                        rows="4"
+                                                                        placeholder='{"wiskunde": 8, "biologie": 7.5, "opmerking": "Goed gedaan!"}'
+                                                                ></textarea>
+                                                        </div>
+                                                        <button type="button" id="create-student-btn" class="auth-button">
+                                                                Account aanmaken
+                                                        </button>
+                                                </form>
+                                                <p id="admin-message" class="status-message"></p>
+                                                <div class="student-edit">
+                                                        <h3>Leerlinggegevens aanpassen</h3>
+                                                        <div class="form-field">
+                                                                <label for="student-lookup">Leerling UID of e-mail</label>
+                                                                <input
+                                                                        type="text"
+                                                                        id="student-lookup"
+                                                                        placeholder="Bijv. UID of e-mailadres"
+                                                                />
+                                                        </div>
+                                                        <button type="button" id="find-student-btn" class="auth-button secondary">
+                                                                Zoek leerling
+                                                        </button>
+                                                        <div id="student-edit-message" class="status-message"></div>
+                                                        <form id="edit-student-form" class="hidden">
+                                                                <div class="form-field">
+                                                                        <label for="edit-student-name">Leerling naam</label>
+                                                                        <input type="text" id="edit-student-name" />
+                                                                </div>
+                                                                <div class="form-field">
+                                                                        <label for="edit-student-email">Leerling e-mail</label>
+                                                                        <input type="email" id="edit-student-email" />
+                                                                </div>
+                                                                <div class="form-field">
+                                                                        <label for="edit-student-results">Resultaten (JSON)</label>
+                                                                        <textarea
+                                                                                id="edit-student-results"
+                                                                                rows="4"
+                                                                                placeholder='{"wiskunde": 8}'
+                                                                        ></textarea>
+                                                                </div>
+                                                                <button type="button" id="save-student-btn" class="auth-button">
+                                                                        Wijzigingen opslaan
+                                                                </button>
+                                                        </form>
+                                                </div>
+                                                <h3>Alle leerlingenrecords</h3>
+                                                <p class="status-message">
+                                                        Alleen zichtbaar voor demonstratiedoeleinden. In een productieomgeving
+                                                        zou je de lijst verbergen of beperken.
+                                                </p>
+                                                <div id="all-students" class="results"></div>
+                                        </section>
 
-		<!-- Student panel -->
-		<div id="student-section" class="hidden">
-			<h2>Mijn Resultaten</h2>
-			<p>
-				Welkom, <span id="student-email-display"></span>! Hieronder zie je je
-				persoonlijke resultaten en notities. Alleen jij en je docent kunnen deze
-				informatie bekijken.
-			</p>
-			<div id="student-results-display" class="results"></div>
-		</div>
+                                        <!-- Student panel -->
+                                        <section id="student-section" class="auth-card hidden">
+                                                <h2>Mijn resultaten</h2>
+                                                <p>
+                                                        Welkom, <span id="student-email-display"></span>! Bekijk hieronder je
+                                                        persoonlijke resultaten en notities.
+                                                </p>
+                                                <div id="student-results-display" class="results"></div>
+                                        </section>
 
-		<!-- Sign out button -->
-		<div id="logout-section" class="hidden">
-			<button id="logout-btn">Uitloggen</button>
-		</div>
+                                        <!-- Sign out button -->
+                                        <section id="logout-section" class="auth-card hidden">
+                                                <h2>Uitloggen</h2>
+                                                <p>
+                                                        Klaar met je sessie? Klik op de knop om veilig af te sluiten.
+                                                </p>
+                                                <button id="logout-btn" type="button" class="auth-button secondary">Uitloggen</button>
+                                        </section>
+                                </div>
+                        </div>
+                </main>
 
-		<script>
-			// TODO: Vervang deze configuratie door je eigen Firebase projectconfig. Gedaan
-			const firebaseConfig = {
-				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-				authDomain: "leerling-accounts.firebaseapp.com",
-				projectId: "leerling-accounts",
-				storageBucket: "leerling-accounts.firebasestorage.app",
-				messagingSenderId: "884081904341",
-				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-				measurementId: "G-9YY3856FBP",
-			};
+                <footer>
+                        <p>&copy; 2025 Servaas Winder</p>
+                </footer>
 
-			// Initialiseer Firebase
-			firebase.initializeApp(firebaseConfig);
-			const auth = firebase.auth();
-			const db = firebase.firestore();
-			const FieldValue = firebase.firestore.FieldValue;
+                <script>
+                        // Firebase configuratie voor de testomgeving (pas aan voor je eigen project)
+                        const firebaseConfig = {
+                                apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+                                authDomain: "leerling-accounts.firebaseapp.com",
+                                projectId: "leerling-accounts",
+                                storageBucket: "leerling-accounts.firebasestorage.app",
+                                messagingSenderId: "884081904341",
+                                appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+                                measurementId: "G-9YY3856FBP",
+                        };
 
-			// Geef hier het administrator e-mailadres op. Alleen gebruikers met
-			// dit e-mailadres krijgen toegang tot het adminpaneel.
-			const ADMIN_EMAIL = "servaas.winder@northgo-college.nl";
+                        // Initialiseer Firebase
+                        firebase.initializeApp(firebaseConfig);
+                        const auth = firebase.auth();
+                        const db = firebase.firestore();
+                        const FieldValue = firebase.firestore.FieldValue;
 
-			// HTML-elementen ophalen
-			const loginSection = document.getElementById("login-section");
-			const loginForm = document.getElementById("login-form");
-			const loginError = document.getElementById("login-error");
-			const adminSection = document.getElementById("admin-section");
-			const adminForm = document.getElementById("admin-form");
-			const adminMessage = document.getElementById("admin-message");
-			const allStudentsDiv = document.getElementById("all-students");
-			const studentSection = document.getElementById("student-section");
-			const studentEmailDisplay = document.getElementById(
-				"student-email-display"
-			);
-			const studentResultsDisplay = document.getElementById(
-				"student-results-display"
-			);
-			const logoutSection = document.getElementById("logout-section");
-			const logoutBtn = document.getElementById("logout-btn");
-			const studentLookupInput = document.getElementById("student-lookup");
-			const findStudentBtn = document.getElementById("find-student-btn");
-			const editStudentForm = document.getElementById("edit-student-form");
-			const editStudentNameInput = document.getElementById("edit-student-name");
-			const editStudentEmailInput = document.getElementById("edit-student-email");
-			const editStudentResultsInput = document.getElementById(
-				"edit-student-results"
-			);
-			const saveStudentBtn = document.getElementById("save-student-btn");
-			const studentEditMessage = document.getElementById("student-edit-message");
-			let currentEditDocId = null;
+                        // Geef hier het administrator e-mailadres op. Alleen gebruikers met
+                        // dit e-mailadres krijgen toegang tot het adminpaneel.
+                        const ADMIN_EMAIL = "servaas.winder@northgo-college.nl";
 
-			// Inlogformulier afhandelen
-			loginForm.addEventListener("submit", (e) => {
-				e.preventDefault();
-				const email = document.getElementById("login-email").value;
-				const password = document.getElementById("login-password").value;
-				loginError.textContent = "";
-				auth.signInWithEmailAndPassword(email, password).catch((err) => {
-					console.error(err);
-					loginError.textContent = "Fout bij inloggen: " + err.message;
-				});
-			});
+                        // HTML-elementen ophalen
+                        const loginSection = document.getElementById("login-section");
+                        const loginForm = document.getElementById("login-form");
+                        const loginError = document.getElementById("login-error");
+                        const adminSection = document.getElementById("admin-section");
+                        const adminForm = document.getElementById("admin-form");
+                        const adminMessage = document.getElementById("admin-message");
+                        const allStudentsDiv = document.getElementById("all-students");
+                        const studentSection = document.getElementById("student-section");
+                        const studentEmailDisplay = document.getElementById("student-email-display");
+                        const studentResultsDisplay = document.getElementById("student-results-display");
+                        const logoutSection = document.getElementById("logout-section");
+                        const logoutBtn = document.getElementById("logout-btn");
+                        const studentLookupInput = document.getElementById("student-lookup");
+                        const findStudentBtn = document.getElementById("find-student-btn");
+                        const editStudentForm = document.getElementById("edit-student-form");
+                        const editStudentNameInput = document.getElementById("edit-student-name");
+                        const editStudentEmailInput = document.getElementById("edit-student-email");
+                        const editStudentResultsInput = document.getElementById("edit-student-results");
+                        const saveStudentBtn = document.getElementById("save-student-btn");
+                        const studentEditMessage = document.getElementById("student-edit-message");
+                        let currentEditDocId = null;
 
-			// Creëer een nieuwe studentaccount en sla resultaten op
-			const createStudentBtn = document.getElementById("create-student-btn");
-			createStudentBtn.addEventListener("click", async () => {
-				adminMessage.textContent = "";
-				const studentName = document.getElementById("student-name").value;
-				const studentEmail = document.getElementById("student-email").value;
-				const studentPassword =
-					document.getElementById("student-password").value;
-				let resultsText = document
-					.getElementById("student-results")
-					.value.trim();
+                        // Inlogformulier afhandelen
+                        loginForm.addEventListener("submit", (e) => {
+                                e.preventDefault();
+                                const email = document.getElementById("login-email").value;
+                                const password = document.getElementById("login-password").value;
+                                loginError.textContent = "";
+                                auth.signInWithEmailAndPassword(email, password).catch((err) => {
+                                        console.error(err);
+                                        loginError.textContent = "Fout bij inloggen: " + err.message;
+                                });
+                        });
 
-				// Probeer de resultaten te parsen als JSON, maar als het faalt, sla het als tekst op
-				let resultsData;
-				if (resultsText) {
-					try {
-						resultsData = JSON.parse(resultsText);
-					} catch (e) {
-						resultsData = { tekst: resultsText };
-					}
-				} else {
-					resultsData = {};
-				}
-				try {
-					// Maak het account aan
-					const userCredential = await auth.createUserWithEmailAndPassword(
-						studentEmail,
-						studentPassword
-					);
-					const newUser = userCredential.user;
-					// Sla naam, e-mail en resultaten op in Firestore onder de UID van de nieuwe gebruiker
-					const dataToStore = {
-						name: studentName,
-						email: studentEmail,
-						...resultsData,
-					};
-					await db.collection("results").doc(newUser.uid).set(dataToStore);
-					adminMessage.textContent =
-						"Account voor " + studentEmail + " aangemaakt.";
-					adminForm.reset();
-					await loadAllStudents();
-				} catch (err) {
-					console.error(err);
-					adminMessage.textContent = "Fout bij aanmaken: " + err.message;
-				}
-			});
+                        // Creëer een nieuwe studentaccount en sla resultaten op
+                        const createStudentBtn = document.getElementById("create-student-btn");
+                        createStudentBtn.addEventListener("click", async () => {
+                                adminMessage.textContent = "";
+                                adminMessage.classList.remove("error-message", "success-message");
+                                const studentName = document.getElementById("student-name").value;
+                                const studentEmail = document.getElementById("student-email").value;
+                                const studentPassword = document.getElementById("student-password").value;
+                                let resultsText = document.getElementById("student-results").value.trim();
 
-			findStudentBtn.addEventListener("click", async () => {
-				studentEditMessage.style.color = "red";
-				studentEditMessage.textContent = "";
-				editStudentForm.classList.add("hidden");
-				currentEditDocId = null;
-				const lookupValue = studentLookupInput.value.trim();
-				if (!lookupValue) {
-					studentEditMessage.textContent =
-						"Vul een UID of e-mailadres in om te zoeken.";
-					return;
-				}
-				studentEditMessage.style.color = "#555";
-				studentEditMessage.textContent = "Zoeken...";
-				try {
-					let foundDoc = null;
-					const docSnapshot = await db
-						.collection("results")
-						.doc(lookupValue)
-						.get();
-					if (docSnapshot.exists) {
-						foundDoc = docSnapshot;
-					} else if (lookupValue.includes("@")) {
-						const querySnapshot = await db
-							.collection("results")
-							.where("email", "==", lookupValue)
-							.limit(1)
-							.get();
-						if (!querySnapshot.empty) {
-							foundDoc = querySnapshot.docs[0];
-						}
-					}
-					if (!foundDoc) {
-						studentEditMessage.style.color = "red";
-						studentEditMessage.textContent = "Geen leerlingdocument gevonden.";
-						return;
-					}
-					const data = foundDoc.data() || {};
-					const { name = "", email = "", ...rest } = data;
-					editStudentNameInput.value = name;
-					editStudentEmailInput.value = email;
-					editStudentResultsInput.value =
-						Object.keys(rest).length > 0
-							? JSON.stringify(rest, null, 2)
-							: "";
-					currentEditDocId = foundDoc.id;
-					editStudentForm.classList.remove("hidden");
-					studentEditMessage.style.color = "green";
-					studentEditMessage.textContent =
-						"Leerling geladen (UID: " + foundDoc.id + ").";
-				} catch (err) {
-					console.error(err);
-					studentEditMessage.style.color = "red";
-					studentEditMessage.textContent = "Fout bij zoeken: " + err.message;
-				}
-			});
+                                // Probeer de resultaten te parsen als JSON, maar als het faalt, sla het als tekst op
+                                let resultsData;
+                                if (resultsText) {
+                                        try {
+                                                resultsData = JSON.parse(resultsText);
+                                        } catch (e) {
+                                                resultsData = { tekst: resultsText };
+                                        }
+                                } else {
+                                        resultsData = {};
+                                }
+                                try {
+                                        // Maak het account aan
+                                        const userCredential = await auth.createUserWithEmailAndPassword(
+                                                studentEmail,
+                                                studentPassword
+                                        );
+                                        const newUser = userCredential.user;
+                                        // Sla naam, e-mail en resultaten op in Firestore onder de UID van de nieuwe gebruiker
+                                        const dataToStore = {
+                                                name: studentName,
+                                                email: studentEmail,
+                                                ...resultsData,
+                                        };
+                                        await db.collection("results").doc(newUser.uid).set(dataToStore);
+                                        adminMessage.textContent = "Account voor " + studentEmail + " aangemaakt.";
+                                        adminMessage.classList.add("success-message");
+                                        adminForm.reset();
+                                        await loadAllStudents();
+                                } catch (err) {
+                                        console.error(err);
+                                        adminMessage.textContent = "Fout bij aanmaken: " + err.message;
+                                        adminMessage.classList.add("error-message");
+                                }
+                        });
 
-			saveStudentBtn.addEventListener("click", async () => {
-				if (!currentEditDocId) {
-					studentEditMessage.style.color = "red";
-					studentEditMessage.textContent =
-						"Zoek eerst een leerling voordat je opslaat.";
-					return;
-				}
-				let parsedResults = {};
-				const resultsText = editStudentResultsInput.value.trim();
-				if (resultsText) {
-					try {
-						parsedResults = JSON.parse(resultsText);
-					} catch (err) {
-						studentEditMessage.style.color = "red";
-						studentEditMessage.textContent =
-							"Resultaten moeten geldige JSON zijn: " + err.message;
-						return;
-					}
-				}
-				delete parsedResults.name;
-				delete parsedResults.email;
-				const payload = { ...parsedResults };
-				const nameValue = editStudentNameInput.value.trim();
-				const emailValue = editStudentEmailInput.value.trim();
-				if (nameValue) {
-					payload.name = nameValue;
-				} else {
-					payload.name = FieldValue.delete();
-				}
-				if (emailValue) {
-					payload.email = emailValue;
-				} else {
-					payload.email = FieldValue.delete();
-				}
-				try {
-					await db
-						.collection("results")
-						.doc(currentEditDocId)
-						.set(payload, { merge: true });
-					studentEditMessage.style.color = "green";
-					studentEditMessage.textContent =
-						"Wijzigingen opgeslagen voor UID: " + currentEditDocId + ".";
-					await loadAllStudents();
-				} catch (err) {
-					console.error(err);
-					studentEditMessage.style.color = "red";
-					studentEditMessage.textContent =
-						"Opslaan mislukt: " + err.message;
-				}
-			});
+                        findStudentBtn.addEventListener("click", async () => {
+                                studentEditMessage.textContent = "";
+                                studentEditMessage.classList.remove("error-message", "success-message");
+                                editStudentForm.classList.add("hidden");
+                                currentEditDocId = null;
+                                const lookupValue = studentLookupInput.value.trim();
+                                if (!lookupValue) {
+                                        studentEditMessage.classList.add("error-message");
+                                        studentEditMessage.textContent = "Vul een UID of e-mailadres in om te zoeken.";
+                                        return;
+                                }
+                                studentEditMessage.textContent = "Zoeken...";
+                                try {
+                                        let foundDoc = null;
+                                        const docSnapshot = await db.collection("results").doc(lookupValue).get();
+                                        if (docSnapshot.exists) {
+                                                foundDoc = docSnapshot;
+                                        } else if (lookupValue.includes("@")) {
+                                                const querySnapshot = await db
+                                                        .collection("results")
+                                                        .where("email", "==", lookupValue)
+                                                        .limit(1)
+                                                        .get();
+                                                if (!querySnapshot.empty) {
+                                                        foundDoc = querySnapshot.docs[0];
+                                                }
+                                        }
+                                        if (!foundDoc) {
+                                                studentEditMessage.classList.add("error-message");
+                                                studentEditMessage.textContent = "Geen leerlingdocument gevonden.";
+                                                return;
+                                        }
+                                        const data = foundDoc.data() || {};
+                                        const { name = "", email = "", ...rest } = data;
+                                        editStudentNameInput.value = name;
+                                        editStudentEmailInput.value = email;
+                                        editStudentResultsInput.value =
+                                                Object.keys(rest).length > 0
+                                                        ? JSON.stringify(rest, null, 2)
+                                                        : "";
+                                        currentEditDocId = foundDoc.id;
+                                        editStudentForm.classList.remove("hidden");
+                                        studentEditMessage.classList.add("success-message");
+                                        studentEditMessage.textContent = "Leerling geladen (UID: " + foundDoc.id + ").";
+                                } catch (err) {
+                                        console.error(err);
+                                        studentEditMessage.classList.add("error-message");
+                                        studentEditMessage.textContent = "Fout bij zoeken: " + err.message;
+                                }
+                        });
 
-			// Laden van alle studenten (zichtbaar in adminpaneel)
-			async function loadAllStudents() {
-				allStudentsDiv.innerHTML = "";
-				const snapshot = await db.collection("results").get();
-				if (snapshot.empty) {
-					allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
-					return;
-				}
-				snapshot.forEach((doc) => {
-					const data = doc.data();
-					const naam = data.name || doc.id;
-					const p = document.createElement("p");
-					p.innerHTML = `<strong>${naam}</strong> (${doc.id})<pre>${JSON.stringify(
-						data,
-						null,
-						2
-					)}</pre>`;
-					allStudentsDiv.appendChild(p);
-				});
-			}
+                        saveStudentBtn.addEventListener("click", async () => {
+                                if (!currentEditDocId) {
+                                        studentEditMessage.classList.remove("success-message");
+                                        studentEditMessage.classList.add("error-message");
+                                        studentEditMessage.textContent = "Zoek eerst een leerling voordat je opslaat.";
+                                        return;
+                                }
+                                studentEditMessage.classList.remove("error-message", "success-message");
+                                let parsedResults = {};
+                                const resultsText = editStudentResultsInput.value.trim();
+                                if (resultsText) {
+                                        try {
+                                                parsedResults = JSON.parse(resultsText);
+                                        } catch (err) {
+                                                studentEditMessage.classList.add("error-message");
+                                                studentEditMessage.textContent =
+                                                        "Resultaten moeten geldige JSON zijn: " + err.message;
+                                                return;
+                                        }
+                                }
+                                delete parsedResults.name;
+                                delete parsedResults.email;
+                                const payload = { ...parsedResults };
+                                const nameValue = editStudentNameInput.value.trim();
+                                const emailValue = editStudentEmailInput.value.trim();
+                                if (nameValue) {
+                                        payload.name = nameValue;
+                                } else {
+                                        payload.name = FieldValue.delete();
+                                }
+                                if (emailValue) {
+                                        payload.email = emailValue;
+                                } else {
+                                        payload.email = FieldValue.delete();
+                                }
+                                try {
+                                        await db.collection("results").doc(currentEditDocId).set(payload, { merge: true });
+                                        studentEditMessage.classList.add("success-message");
+                                        studentEditMessage.textContent =
+                                                "Wijzigingen opgeslagen voor UID: " + currentEditDocId + ".";
+                                        await loadAllStudents();
+                                } catch (err) {
+                                        console.error(err);
+                                        studentEditMessage.classList.add("error-message");
+                                        studentEditMessage.textContent = "Opslaan mislukt: " + err.message;
+                                }
+                        });
 
-			// Laad de resultaten voor een ingelogde student
-			async function loadStudentResults(user) {
-				const docRef = db.collection("results").doc(user.uid);
-				const doc = await docRef.get();
-				if (!doc.exists) {
-					studentEmailDisplay.textContent = user.email;
-					studentResultsDisplay.textContent =
-						"Er zijn nog geen resultaten opgeslagen.";
-				} else {
-					const data = doc.data();
-					if (data.name) {
-						studentEmailDisplay.textContent = data.name;
-					} else if (data.email) {
-						studentEmailDisplay.textContent = data.email;
-					} else {
-						studentEmailDisplay.textContent = user.email;
-					}
-					studentResultsDisplay.innerHTML =
-						"<pre>" + JSON.stringify(data, null, 2) + "</pre>";
-				}
-			}
+                        // Laden van alle studenten (zichtbaar in adminpaneel)
+                        async function loadAllStudents() {
+                                allStudentsDiv.innerHTML = "";
+                                const snapshot = await db.collection("results").get();
+                                if (snapshot.empty) {
+                                        allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
+                                        return;
+                                }
+                                snapshot.forEach((doc) => {
+                                        const data = doc.data();
+                                        const naam = data.name || doc.id;
+                                        const entry = document.createElement("div");
+                                        entry.className = "results-entry";
+                                        entry.innerHTML = `<h4>${naam}</h4><span class="result-id">${doc.id}</span><pre>${JSON.stringify(
+                                                data,
+                                                null,
+                                                2
+                                        )}</pre>`;
+                                        allStudentsDiv.appendChild(entry);
+                                });
+                        }
 
-			// Toon/hide panelen afhankelijk van loginstatus
-			auth.onAuthStateChanged(async (user) => {
-				if (user) {
-					// Iemand is ingelogd
-					loginSection.classList.add("hidden");
-					logoutSection.classList.remove("hidden");
-					if (user.email === ADMIN_EMAIL) {
-						// Toon adminpaneel
-						adminSection.classList.remove("hidden");
-						studentSection.classList.add("hidden");
-						await loadAllStudents();
-					} else {
-						// Toon studentpaneel
-						adminSection.classList.add("hidden");
-						studentSection.classList.remove("hidden");
-						await loadStudentResults(user);
-					}
-				} else {
-					// Niemand ingelogd
-					loginSection.classList.remove("hidden");
-					adminSection.classList.add("hidden");
-					studentSection.classList.add("hidden");
-					logoutSection.classList.add("hidden");
-				}
-			});
+                        // Laad de resultaten voor een ingelogde student
+                        async function loadStudentResults(user) {
+                                const docRef = db.collection("results").doc(user.uid);
+                                const doc = await docRef.get();
+                                if (!doc.exists) {
+                                        studentEmailDisplay.textContent = user.email;
+                                        studentResultsDisplay.textContent = "Er zijn nog geen resultaten opgeslagen.";
+                                } else {
+                                        const data = doc.data();
+                                        if (data.name) {
+                                                studentEmailDisplay.textContent = data.name;
+                                        } else if (data.email) {
+                                                studentEmailDisplay.textContent = data.email;
+                                        } else {
+                                                studentEmailDisplay.textContent = user.email;
+                                        }
+                                        studentResultsDisplay.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+                                }
+                        }
 
-			// Functie om een wachtwoordreset-e-mail te sturen
-			function sendPasswordReset() {
-				const email = document.getElementById("reset-email").value;
-				const msg = document.getElementById("reset-message");
-				msg.textContent = "";
-				if (!email) {
-					msg.style.color = "red";
-					msg.textContent = "Vul een e-mailadres in.";
-					return;
-				}
-				auth
-					.sendPasswordResetEmail(email)
-					.then(() => {
-						msg.style.color = "green";
-						msg.textContent = "Reset-link is verstuurd naar " + email + ".";
-					})
-					.catch((error) => {
-						console.error("Wachtwoord reset fout:", error);
-						msg.style.color = "red";
-						msg.textContent = "Fout: " + error.message;
-					});
-			}
+                        // Toon/hide panelen afhankelijk van loginstatus
+                        auth.onAuthStateChanged(async (user) => {
+                                if (user) {
+                                        // Iemand is ingelogd
+                                        loginSection.classList.add("hidden");
+                                        logoutSection.classList.remove("hidden");
+                                        if (user.email === ADMIN_EMAIL) {
+                                                // Toon adminpaneel
+                                                adminSection.classList.remove("hidden");
+                                                studentSection.classList.add("hidden");
+                                                await loadAllStudents();
+                                        } else {
+                                                // Toon studentpaneel
+                                                adminSection.classList.add("hidden");
+                                                studentSection.classList.remove("hidden");
+                                                await loadStudentResults(user);
+                                        }
+                                } else {
+                                        // Niemand ingelogd
+                                        loginSection.classList.remove("hidden");
+                                        adminSection.classList.add("hidden");
+                                        studentSection.classList.add("hidden");
+                                        logoutSection.classList.add("hidden");
+                                }
+                        });
 
-			// Koppel de klik op de reset-knop aan de functie
-			document
-				.getElementById("reset-btn")
-				.addEventListener("click", sendPasswordReset);
+                        // Functie om een wachtwoordreset-e-mail te sturen
+                        function sendPasswordReset() {
+                                const email = document.getElementById("reset-email").value;
+                                const msg = document.getElementById("reset-message");
+                                msg.textContent = "";
+                                msg.classList.remove("error-message", "success-message");
+                                if (!email) {
+                                        msg.classList.add("error-message");
+                                        msg.textContent = "Vul een e-mailadres in.";
+                                        return;
+                                }
+                                auth
+                                        .sendPasswordResetEmail(email)
+                                        .then(() => {
+                                                msg.classList.add("success-message");
+                                                msg.textContent = "Reset-link is verstuurd naar " + email + ".";
+                                        })
+                                        .catch((error) => {
+                                                console.error("Wachtwoord reset fout:", error);
+                                                msg.classList.add("error-message");
+                                                msg.textContent = "Fout: " + error.message;
+                                        });
+                        }
 
-			// Uitloggen
-			logoutBtn.addEventListener("click", () => {
-				auth.signOut().catch((err) => {
-					console.error(err);
-				});
-			});
-		</script>
-	</body>
+                        // Koppel de klik op de reset-knop aan de functie
+                        document.getElementById("reset-btn").addEventListener("click", sendPasswordReset);
+
+                        // Uitloggen
+                        logoutBtn.addEventListener("click", () => {
+                                auth.signOut().catch((err) => {
+                                        console.error(err);
+                                });
+                        });
+                </script>
+        </body>
 </html>
