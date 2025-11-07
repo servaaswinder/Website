@@ -489,6 +489,10 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   box-shadow: var(--shadow);
 }
 
+.auth-card-full {
+  grid-column: 1 / -1;
+}
+
 .auth-card h2 {
   margin-top: 0;
   margin-bottom: 12px;
@@ -607,6 +611,26 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 
 .reset-box h3 {
   margin: 0 0 12px;
+}
+
+.panel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.panel-heading .panel-subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.panel-heading .panel-actions,
+.panel-heading .logout-button {
+  margin-top: 0;
+  white-space: nowrap;
 }
 
 .results {

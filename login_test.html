@@ -6,7 +6,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Leerlingen Login Test</title>
+		<title>Informatica Leerlingenportal</title>
 		<link rel="stylesheet" href="style.css" />
 		<!-- Load Firebase SDKs from CDN -->
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -20,12 +20,13 @@
 		<main>
 			<div class="auth-layout">
 				<section class="inf-hero auth-intro">
-					<h1>Leerlingenportal – Testomgeving</h1>
+					<h1>Leerlingenportal</h1>
 					<p>
-						Deze pagina laat zien hoe je Firebase-authenticatie en Firestore
-						kunt gebruiken binnen een statische site. Vul eerst je eigen
-						Firebase-configuratie in onderaan deze pagina voordat je de login
-						functionaliteit live inzet.
+						Hier vind je het officiële Informatica‑portaal voor leerlingen en
+						docenten. Log in om resultaten te bekijken of nieuwe leerlingen toe
+						te voegen. Deze omgeving gebruikt dezelfde gegevens als in de les,
+						dus alles wat je hier bijwerkt is direct zichtbaar voor alle
+						betrokkenen.
 					</p>
 				</section>
 
@@ -49,7 +50,7 @@
 							<button type="submit" class="auth-button">Inloggen</button>
 						</form>
 						<div class="reset-box">
-							<h3>🔑 Wachtwoord vergeten?</h3>
+							<h3>Wachtwoord vergeten?</h3>
 							<div class="form-field">
 								<label for="reset-email">E-mail</label>
 								<input
@@ -71,12 +72,23 @@
 					</section>
 
 					<!-- Admin panel -->
-					<section id="admin-section" class="auth-card hidden">
-						<h2>Beheerderspaneel</h2>
-						<p>
-							Welkom, beheerder! Maak nieuwe leerlingenaccounts aan, vul
-							resultaten in en werk bestaande gegevens bij.
-						</p>
+					<section id="admin-section" class="auth-card auth-card-full hidden">
+						<div class="panel-heading">
+							<div>
+								<h2>Beheerderspaneel</h2>
+								<p class="panel-subtitle">
+									Welkom, beheerder! Maak nieuwe leerlingenaccounts aan, vul
+									resultaten in en werk bestaande gegevens bij.
+								</p>
+							</div>
+							<button
+								type="button"
+								class="auth-button secondary logout-button"
+								id="logout-btn-admin"
+							>
+								Uitloggen
+							</button>
+						</div>
 						<div class="csv-sync">
 							<h3>Resultaten synchroniseren (CSV)</h3>
 							<p>
@@ -191,22 +203,22 @@
 					</section>
 
 					<!-- Student panel -->
-					<section id="student-section" class="auth-card hidden">
-						<h2>Mijn resultaten</h2>
+					<section id="student-section" class="auth-card auth-card-full hidden">
+						<div class="panel-heading">
+							<h2>Mijn resultaten</h2>
+							<button
+								type="button"
+								class="auth-button secondary logout-button"
+								id="logout-btn-student"
+							>
+								Uitloggen
+							</button>
+						</div>
 						<p>
 							Welkom, <span id="student-email-display"></span>! Bekijk hieronder
 							je persoonlijke resultaten en notities.
 						</p>
 						<div id="student-results-display" class="results"></div>
-					</section>
-
-					<!-- Sign out button -->
-					<section id="logout-section" class="auth-card hidden">
-						<h2>Uitloggen</h2>
-						<p>Klaar met je sessie? Klik op de knop om veilig af te sluiten.</p>
-						<button id="logout-btn" type="button" class="auth-button secondary">
-							Uitloggen
-						</button>
 					</section>
 				</div>
 			</div>
@@ -217,7 +229,7 @@
 		</footer>
 
 		<script>
-			// Firebase configuratie voor de testomgeving (pas aan voor je eigen project)
+			// Firebase configuratie (pas aan voor je eigen project)
 			const firebaseConfig = {
 				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
 				authDomain: "leerling-accounts.firebaseapp.com",
@@ -253,8 +265,7 @@
 			const studentResultsDisplay = document.getElementById(
 				"student-results-display"
 			);
-			const logoutSection = document.getElementById("logout-section");
-			const logoutBtn = document.getElementById("logout-btn");
+			const logoutButtons = document.querySelectorAll(".logout-button");
 			const studentLookupInput = document.getElementById("student-lookup");
 			const findStudentBtn = document.getElementById("find-student-btn");
 			const editStudentForm = document.getElementById("edit-student-form");
@@ -1280,7 +1291,6 @@
 			auth.onAuthStateChanged(async (user) => {
 				if (user) {
 					loginSection.classList.add("hidden");
-					logoutSection.classList.remove("hidden");
 					if (user.email === ADMIN_EMAIL) {
 						adminSection.classList.remove("hidden");
 						studentSection.classList.add("hidden");
@@ -1294,7 +1304,6 @@
 					loginSection.classList.remove("hidden");
 					adminSection.classList.add("hidden");
 					studentSection.classList.add("hidden");
-					logoutSection.classList.add("hidden");
 				}
 			});
 
@@ -1325,9 +1334,11 @@
 				.getElementById("reset-btn")
 				.addEventListener("click", sendPasswordReset);
 
-			logoutBtn.addEventListener("click", () => {
-				auth.signOut().catch((err) => {
-					console.error(err);
+			logoutButtons.forEach((button) => {
+				button.addEventListener("click", () => {
+					auth.signOut().catch((err) => {
+						console.error(err);
+					});
 				});
 			});
 		</script>

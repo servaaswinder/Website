@@ -42,29 +42,15 @@
 				</div>
 			</section>
 
-			<section class="results-section">
-				<div class="results-intro">
-					<h2>Resultaten Informatica</h2>
-					<p>
-						Leerlingen werken aan opdrachten die beoordeeld worden met een
-						rubric. Hieronder vind je de beoordelingen per opdracht met het
-						cijfer, de thema-score en feedback.
-					</p>
-					<div class="results-meta">
-						<span class="summary-chip" id="results-student-count"
-							>0 leerlingen</span
-						>
-						<span class="summary-chip" id="results-assignment-count"
-							>0 opdrachten</span
-						>
-						<span class="results-updated">
-							Laatste update:
-							<strong id="results-last-updated">wordt geladen…</strong>
-						</span>
-					</div>
-				</div>
-				<div id="informatica-results" class="student-grid">
-					<p class="loading-state">Resultaten worden geladen…</p>
+			<section class="inf-hero">
+				<h2>Leerlingenportal</h2>
+				<p style="color: var(--muted)">
+					Resultaten worden nu centraal beheerd in het nieuwe portal. Log in om
+					beoordelingen, feedback en CSV-synchronisaties te bekijken of bij te
+					werken.
+				</p>
+				<div class="inf-actions">
+					<a class="inf-button" href="login_test.html">Naar de loginpagina</a>
 				</div>
 			</section>
 
@@ -128,75 +114,6 @@
 		<footer>
 			<p>&copy; 2025 Servaas Winder</p>
 		</footer>
-
-		<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-                                const csvPath = "{{ 'data/Cijfers leerlingen 25-26 - Periode 1.csv' | relative_url }}";
-                                const resultsUrl = encodeURI(
-                                        csvPath && csvPath !== ""
-                                                ? csvPath
-                                                : "data/Cijfers leerlingen 25-26 - Periode 1.csv"
-                                );
-			        const container = document.getElementById("informatica-results");
-			        const studentCountLabel = document.getElementById("results-student-count");
-			        const assignmentCountLabel = document.getElementById(
-			                "results-assignment-count"
-			        );
-			        const lastUpdatedLabel = document.getElementById("results-last-updated");
-
-			        function setStatus(message, type) {
-			                container.innerHTML = "";
-			                const paragraph = document.createElement("p");
-			                paragraph.textContent = message;
-			                paragraph.className = type === "error" ? "error-state" : "loading-state";
-			                container.appendChild(paragraph);
-			        }
-
-			        function formatDateTime(value) {
-			                if (!value) return "n.v.t.";
-			                try {
-			                        return new Intl.DateTimeFormat("nl-NL", {
-			                                dateStyle: "long",
-			                                timeStyle: "short",
-			                        }).format(new Date(value));
-			                } catch (error) {
-			                        return new Date(value).toLocaleString();
-			                }
-			        }
-
-			        function parseGradeValue(value) {
-			                if (value === null || value === undefined) return "";
-			                const text = String(value).trim().replace(",", ".");
-			                const number = Number(text);
-			                if (Number.isFinite(number)) {
-			                        return number.toFixed(number % 1 === 0 ? 0 : 1);
-			                }
-			                return text;
-			        }
-
-			        function slugify(value) {
-			                return String(value || "")
-			                        .toLowerCase()
-			                        .normalize("NFD")
-			                        .replace(/\p{Diacritic}/gu, "")
-			                        .replace(/[^a-z0-9]+/g, "-")
-			                        .replace(/^-+|-+$/g, "");
-			        }
-
-			        function groupRecords(rows, headers) {
-			                const cleanedRows = rows.filter((row) =>
-			                        Object.values(row).some((value) => String(value || "").trim() !== "")
-			                );
-			                const headerList = headers && headers.length ? headers : Object.keys(rows[0] || {});
-			                const lowerHeaders = headerList.map((header) => header.toLowerCase().trim());
-			                const findHeader = (candidates) => {
-			                        for (const candidate of candidates) {
-			                                const index = lowerHeaders.findIndex((header) => header === candidate);
-			                                if (index >= 0) {
-			                                        return headerList[index];
-			                                }
-			                        }
 			                        return null;
 			                };
 
