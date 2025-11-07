@@ -12,6 +12,7 @@
                 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
                 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
                 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
         </head>
         <body class="auth-page">
                 {% include site-header.html %}
@@ -72,10 +73,48 @@
                                                         Welkom, beheerder! Maak nieuwe leerlingenaccounts aan, vul resultaten
                                                         in en werk bestaande gegevens bij.
                                                 </p>
+                                                <div class="csv-sync">
+                                                        <h3>Resultaten synchroniseren (CSV)</h3>
+                                                        <p>
+                                                                Selecteer het CSV-bestand met rubriccijfers en opmerkingen om
+                                                                de leerlingendatabase bij te werken. Bestaande leerlingen
+                                                                worden geüpdatet en nieuwe leerlingen worden automatisch
+                                                                toegevoegd.
+                                                        </p>
+                                                        <div class="form-field">
+                                                                <label for="results-file">CSV-bestand</label>
+                                                                <input
+                                                                        type="file"
+                                                                        id="results-file"
+                                                                        accept=".csv,text/csv"
+                                                                />
+                                                        </div>
+                                                        <div class="csv-actions">
+                                                                <button type="button" id="sync-csv-btn" class="auth-button">
+                                                                        Synchroniseer resultaten
+                                                                </button>
+                                                                <button
+                                                                        type="button"
+                                                                        id="clear-csv-btn"
+                                                                        class="auth-button secondary"
+                                                                >
+                                                                        Wis selectie
+                                                                </button>
+                                                        </div>
+                                                        <p id="csv-upload-message" class="status-message"></p>
+                                                        <div id="csv-preview" class="csv-preview hidden"></div>
+                                                        <p class="muted">
+                                                                Laatste synchronisatie: <span id="last-sync">n.v.t.</span>
+                                                        </p>
+                                                </div>
                                                 <form id="admin-form">
                                                         <div class="form-field">
                                                                 <label for="student-name">Leerling naam</label>
                                                                 <input type="text" id="student-name" required />
+                                                        </div>
+                                                        <div class="form-field">
+                                                                <label for="student-class">Klas / groep (optioneel)</label>
+                                                                <input type="text" id="student-class" placeholder="Bijv. 5V" />
                                                         </div>
                                                         <div class="form-field">
                                                                 <label for="student-email">Leerling e-mail</label>
@@ -86,11 +125,11 @@
                                                                 <input type="password" id="student-password" required />
                                                         </div>
                                                         <div class="form-field">
-                                                                <label for="student-results">Cijfers / notities (JSON of tekst)</label>
+                                                                <label for="student-results">Opmerking of notitie (optioneel)</label>
                                                                 <textarea
                                                                         id="student-results"
-                                                                        rows="4"
-                                                                        placeholder='{"wiskunde": 8, "biologie": 7.5, "opmerking": "Goed gedaan!"}'
+                                                                        rows="3"
+                                                                        placeholder="Bijvoorbeeld: Laatste opdracht is nagekeken."
                                                                 ></textarea>
                                                         </div>
                                                         <button type="button" id="create-student-btn" class="auth-button">
@@ -118,6 +157,10 @@
                                                                         <input type="text" id="edit-student-name" />
                                                                 </div>
                                                                 <div class="form-field">
+                                                                        <label for="edit-student-class">Klas / groep</label>
+                                                                        <input type="text" id="edit-student-class" />
+                                                                </div>
+                                                                <div class="form-field">
                                                                         <label for="edit-student-email">Leerling e-mail</label>
                                                                         <input type="email" id="edit-student-email" />
                                                                 </div>
@@ -126,7 +169,7 @@
                                                                         <textarea
                                                                                 id="edit-student-results"
                                                                                 rows="4"
-                                                                                placeholder='{"wiskunde": 8}'
+                                                                                placeholder='[{"title": "Opdracht 1", "grade": "7.8", "comment": "Netjes", "rubric": [{"theme": "Thema 1", "value": "Voldoende"}]}]'
                                                                         ></textarea>
                                                                 </div>
                                                                 <button type="button" id="save-student-btn" class="auth-button">
@@ -135,11 +178,11 @@
                                                         </form>
                                                 </div>
                                                 <h3>Alle leerlingenrecords</h3>
-                                                <p class="status-message">
+                                                <p class="status-message muted">
                                                         Alleen zichtbaar voor demonstratiedoeleinden. In een productieomgeving
                                                         zou je de lijst verbergen of beperken.
                                                 </p>
-                                                <div id="all-students" class="results"></div>
+                                                <div id="all-students" class="results student-grid"></div>
                                         </section>
 
                                         <!-- Student panel -->
@@ -169,308 +212,913 @@
                 </footer>
 
                 <script>
-                        // Firebase configuratie voor de testomgeving (pas aan voor je eigen project)
-                        const firebaseConfig = {
-                                apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-                                authDomain: "leerling-accounts.firebaseapp.com",
-                                projectId: "leerling-accounts",
-                                storageBucket: "leerling-accounts.firebasestorage.app",
-                                messagingSenderId: "884081904341",
-                                appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-                                measurementId: "G-9YY3856FBP",
+        // Firebase configuratie voor de testomgeving (pas aan voor je eigen project)
+        const firebaseConfig = {
+                apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+                authDomain: "leerling-accounts.firebaseapp.com",
+                projectId: "leerling-accounts",
+                storageBucket: "leerling-accounts.firebasestorage.app",
+                messagingSenderId: "884081904341",
+                appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+                measurementId: "G-9YY3856FBP",
+        };
+
+        // Initialiseer Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const FieldValue = firebase.firestore.FieldValue;
+
+        // Geef hier het administrator e-mailadres op. Alleen gebruikers met
+        // dit e-mailadres krijgen toegang tot het adminpaneel.
+        const ADMIN_EMAIL = "servaas.winder@northgo-college.nl";
+
+        // HTML-elementen ophalen
+        const loginSection = document.getElementById("login-section");
+        const loginForm = document.getElementById("login-form");
+        const loginError = document.getElementById("login-error");
+        const adminSection = document.getElementById("admin-section");
+        const adminForm = document.getElementById("admin-form");
+        const adminMessage = document.getElementById("admin-message");
+        const allStudentsDiv = document.getElementById("all-students");
+        const studentSection = document.getElementById("student-section");
+        const studentEmailDisplay = document.getElementById("student-email-display");
+        const studentResultsDisplay = document.getElementById("student-results-display");
+        const logoutSection = document.getElementById("logout-section");
+        const logoutBtn = document.getElementById("logout-btn");
+        const studentLookupInput = document.getElementById("student-lookup");
+        const findStudentBtn = document.getElementById("find-student-btn");
+        const editStudentForm = document.getElementById("edit-student-form");
+        const editStudentNameInput = document.getElementById("edit-student-name");
+        const editStudentClassInput = document.getElementById("edit-student-class");
+        const editStudentEmailInput = document.getElementById("edit-student-email");
+        const editStudentResultsInput = document.getElementById("edit-student-results");
+        const saveStudentBtn = document.getElementById("save-student-btn");
+        const studentEditMessage = document.getElementById("student-edit-message");
+        const studentClassInput = document.getElementById("student-class");
+        const csvFileInput = document.getElementById("results-file");
+        const syncCsvBtn = document.getElementById("sync-csv-btn");
+        const clearCsvBtn = document.getElementById("clear-csv-btn");
+        const csvUploadMessage = document.getElementById("csv-upload-message");
+        const csvPreview = document.getElementById("csv-preview");
+        const lastSyncLabel = document.getElementById("last-sync");
+        let currentEditDocId = null;
+        let parsedCsvData = null;
+
+        function setStatusMessage(element, message, type) {
+                if (!element) {
+                        return;
+                }
+                element.textContent = message;
+                element.classList.remove("error-message", "success-message");
+                if (type === "error") {
+                        element.classList.add("error-message");
+                } else if (type === "success") {
+                        element.classList.add("success-message");
+                }
+                if (!message) {
+                        element.classList.remove("error-message", "success-message");
+                }
+        }
+
+        function clearCsvSelection(resetMessage = true) {
+                if (csvFileInput) {
+                        csvFileInput.value = "";
+                }
+                parsedCsvData = null;
+                csvPreview.classList.add("hidden");
+                csvPreview.innerHTML = "";
+                if (resetMessage) {
+                        setStatusMessage(csvUploadMessage, "", null);
+                }
+        }
+
+        function renderCsvPreview(summary) {
+                if (!summary) {
+                        csvPreview.classList.add("hidden");
+                        csvPreview.innerHTML = "";
+                        return;
+                }
+                const detectedColumns = [];
+                if (summary.nameHeader) detectedColumns.push(`Naam: ${summary.nameHeader}`);
+                if (summary.emailHeader) detectedColumns.push(`E-mail: ${summary.emailHeader}`);
+                if (summary.classHeader) detectedColumns.push(`Klas: ${summary.classHeader}`);
+                csvPreview.innerHTML = `
+                        <ul>
+                                <li><strong>Leerlingen:</strong> ${summary.studentCount}</li>
+                                <li><strong>Opdrachten:</strong> ${summary.assignmentCount}</li>
+                                ${
+                                        detectedColumns.length
+                                                ? `<li><strong>Gedetecteerde kolommen:</strong> ${detectedColumns.join(", ")}</li>`
+                                                : ""
+                                }
+                        </ul>
+                `;
+                csvPreview.classList.remove("hidden");
+        }
+
+        function parseGradeValue(value) {
+                if (value === undefined || value === null) {
+                        return "";
+                }
+                const raw = String(value).trim();
+                if (!raw) {
+                        return "";
+                }
+                const normalized = raw.replace(",", ".");
+                const numeric = Number(normalized);
+                if (!Number.isNaN(numeric)) {
+                        return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(2);
+                }
+                return raw;
+        }
+
+        function sanitizeDocId(value) {
+                if (!value) {
+                        return `leerling-${Date.now()}`;
+                }
+                return value
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/gi, "-")
+                        .replace(/^-+|-+$/g, "")
+                        .slice(0, 120) || `leerling-${Date.now()}`;
+        }
+
+        function slugify(value) {
+                if (!value) return "";
+                return value
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/\p{Diacritic}/gu, "")
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/^-+|-+$/g, "");
+        }
+
+        function prepareCsvRecords(rows, headers) {
+                const cleanedRows = rows.filter((row) => {
+                        if (!row) return false;
+                        return Object.values(row).some((value) => String(value || "").trim() !== "");
+                });
+                if (cleanedRows.length === 0) {
+                        throw new Error("Het CSV-bestand bevat geen gegevens.");
+                }
+                const headerList = headers && headers.length ? headers : Object.keys(cleanedRows[0]);
+                const lowerHeaders = headerList.map((header) => header.toLowerCase().trim());
+                const findHeader = (candidates) => {
+                        for (const candidate of candidates) {
+                                const index = lowerHeaders.findIndex((header) => header === candidate);
+                                if (index >= 0) {
+                                        return headerList[index];
+                                }
+                        }
+                        return null;
+                };
+                const nameHeader = findHeader(["naam", "leerling", "student", "leerlingnaam"]);
+                const emailHeader = findHeader(["email", "e-mail", "mail", "e-mailadres", "adres"]);
+                const classHeader = findHeader(["klas", "groep", "class", "leerjaar"]);
+                const assignmentHeader = findHeader(["opdracht", "taak", "project", "werkstuk"]);
+                const gradeHeader = findHeader(["cijfer", "score", "beoordeling", "resultaat"]);
+                const commentHeader = findHeader(["opmerking", "feedback", "commentaar", "toelichting"]);
+                const themeHeaders = headerList.filter((header) => header.toLowerCase().startsWith("thema"));
+
+                const studentMap = new Map();
+                let assignmentCounter = 0;
+
+                cleanedRows.forEach((row, rowIndex) => {
+                        const name = nameHeader ? String(row[nameHeader] || "").trim() : "";
+                        const email = emailHeader ? String(row[emailHeader] || "").trim() : "";
+                        const className = classHeader ? String(row[classHeader] || "").trim() : "";
+                        const assignmentTitleRaw = assignmentHeader
+                                ? String(row[assignmentHeader] || "").trim()
+                                : "";
+                        const assignmentTitle = assignmentTitleRaw || `Opdracht ${rowIndex + 1}`;
+                        const grade = gradeHeader ? parseGradeValue(row[gradeHeader]) : "";
+                        const comment = commentHeader ? String(row[commentHeader] || "").trim() : "";
+
+                        const keyBase = email || `${name}-${className}` || `${name}-${rowIndex}`;
+                        const key = keyBase ? slugify(keyBase) : `leerling-${rowIndex}`;
+                        if (!studentMap.has(key)) {
+                                studentMap.set(key, {
+                                        key,
+                                        name,
+                                        email,
+                                        className,
+                                        assignments: [],
+                                });
+                        }
+                        const student = studentMap.get(key);
+                        const assignment = {
+                                title: assignmentTitle,
+                                grade,
+                                comment,
+                                rubric: [],
                         };
 
-                        // Initialiseer Firebase
-                        firebase.initializeApp(firebaseConfig);
-                        const auth = firebase.auth();
-                        const db = firebase.firestore();
-                        const FieldValue = firebase.firestore.FieldValue;
+                        const handledHeaders = new Set(
+                                [
+                                        nameHeader,
+                                        emailHeader,
+                                        classHeader,
+                                        assignmentHeader,
+                                        gradeHeader,
+                                        commentHeader,
+                                ].filter(Boolean)
+                        );
 
-                        // Geef hier het administrator e-mailadres op. Alleen gebruikers met
-                        // dit e-mailadres krijgen toegang tot het adminpaneel.
-                        const ADMIN_EMAIL = "servaas.winder@northgo-college.nl";
-
-                        // HTML-elementen ophalen
-                        const loginSection = document.getElementById("login-section");
-                        const loginForm = document.getElementById("login-form");
-                        const loginError = document.getElementById("login-error");
-                        const adminSection = document.getElementById("admin-section");
-                        const adminForm = document.getElementById("admin-form");
-                        const adminMessage = document.getElementById("admin-message");
-                        const allStudentsDiv = document.getElementById("all-students");
-                        const studentSection = document.getElementById("student-section");
-                        const studentEmailDisplay = document.getElementById("student-email-display");
-                        const studentResultsDisplay = document.getElementById("student-results-display");
-                        const logoutSection = document.getElementById("logout-section");
-                        const logoutBtn = document.getElementById("logout-btn");
-                        const studentLookupInput = document.getElementById("student-lookup");
-                        const findStudentBtn = document.getElementById("find-student-btn");
-                        const editStudentForm = document.getElementById("edit-student-form");
-                        const editStudentNameInput = document.getElementById("edit-student-name");
-                        const editStudentEmailInput = document.getElementById("edit-student-email");
-                        const editStudentResultsInput = document.getElementById("edit-student-results");
-                        const saveStudentBtn = document.getElementById("save-student-btn");
-                        const studentEditMessage = document.getElementById("student-edit-message");
-                        let currentEditDocId = null;
-
-                        // Inlogformulier afhandelen
-                        loginForm.addEventListener("submit", (e) => {
-                                e.preventDefault();
-                                const email = document.getElementById("login-email").value;
-                                const password = document.getElementById("login-password").value;
-                                loginError.textContent = "";
-                                auth.signInWithEmailAndPassword(email, password).catch((err) => {
-                                        console.error(err);
-                                        loginError.textContent = "Fout bij inloggen: " + err.message;
-                                });
+                        themeHeaders.forEach((themeHeader) => {
+                                const rawValue = row[themeHeader];
+                                if (rawValue !== undefined && rawValue !== null) {
+                                        const text = String(rawValue).trim();
+                                        if (text) {
+                                                assignment.rubric.push({
+                                                        theme: themeHeader.trim(),
+                                                        value: text,
+                                                });
+                                                handledHeaders.add(themeHeader);
+                                        }
+                                }
                         });
 
-                        // Creëer een nieuwe studentaccount en sla resultaten op
-                        const createStudentBtn = document.getElementById("create-student-btn");
-                        createStudentBtn.addEventListener("click", async () => {
-                                adminMessage.textContent = "";
-                                adminMessage.classList.remove("error-message", "success-message");
-                                const studentName = document.getElementById("student-name").value;
-                                const studentEmail = document.getElementById("student-email").value;
-                                const studentPassword = document.getElementById("student-password").value;
-                                let resultsText = document.getElementById("student-results").value.trim();
-
-                                // Probeer de resultaten te parsen als JSON, maar als het faalt, sla het als tekst op
-                                let resultsData;
-                                if (resultsText) {
-                                        try {
-                                                resultsData = JSON.parse(resultsText);
-                                        } catch (e) {
-                                                resultsData = { tekst: resultsText };
-                                        }
-                                } else {
-                                        resultsData = {};
+                        headerList.forEach((header) => {
+                                if (handledHeaders.has(header)) {
+                                        return;
                                 }
+                                const value = row[header];
+                                if (value !== undefined && value !== null) {
+                                        const text = String(value).trim();
+                                        if (text) {
+                                                assignment.rubric.push({
+                                                        theme: header.trim(),
+                                                        value: text,
+                                                });
+                                        }
+                                }
+                        });
+
+                        if (
+                                assignment.rubric.length > 0 ||
+                                assignment.grade ||
+                                assignment.comment
+                        ) {
+                                student.assignments.push(assignment);
+                                assignmentCounter += 1;
+                        }
+                });
+
+                return {
+                        students: Array.from(studentMap.values()),
+                        summary: {
+                                studentCount: studentMap.size,
+                                assignmentCount: assignmentCounter,
+                                nameHeader,
+                                emailHeader,
+                                classHeader,
+                        },
+                };
+        }
+
+        async function persistCsvRecords(students) {
+                const snapshot = await db.collection("results").get();
+                const emailMap = new Map();
+                const nameMap = new Map();
+                snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        if (data && data.email) {
+                                emailMap.set(String(data.email).toLowerCase(), doc.id);
+                        }
+                        const nameKey = slugify(`${(data && data.name) || ''}-${(data && (data.class || data.klas)) || ''}`);
+                        if (nameKey) {
+                                nameMap.set(nameKey, doc.id);
+                        }
+                });
+
+                const batch = db.batch();
+                const resultsCollection = db.collection("results");
+                const serverTimestamp = FieldValue.serverTimestamp();
+
+                students.forEach((student) => {
+                        const emailKey = student.email ? student.email.toLowerCase() : "";
+                        let docId = emailKey && emailMap.has(emailKey) ? emailMap.get(emailKey) : null;
+                        if (!docId) {
+                                const nameKey = slugify(`${student.name || ''}-${student.className || ''}`);
+                                if (nameKey && nameMap.has(nameKey)) {
+                                        docId = nameMap.get(nameKey);
+                                }
+                        }
+                        if (!docId) {
+                                docId = sanitizeDocId(student.email || `${student.name}-${student.key}`);
+                        }
+                        const docRef = resultsCollection.doc(docId);
+                        const payload = {
+                                name: student.name || FieldValue.delete(),
+                                email: student.email || FieldValue.delete(),
+                                class: student.className || FieldValue.delete(),
+                                assignments: student.assignments,
+                                lastSyncedAt: serverTimestamp,
+                        };
+                        batch.set(docRef, payload, { merge: true });
+                });
+
+                await batch.commit();
+        }
+
+        function handleCsvSelection() {
+                if (!csvFileInput) {
+                        return;
+                }
+                setStatusMessage(csvUploadMessage, "Bestand wordt gelezen...", null);
+                csvPreview.classList.add("hidden");
+                csvPreview.innerHTML = "";
+                const file = csvFileInput.files && csvFileInput.files[0];
+                if (!file) {
+                        setStatusMessage(csvUploadMessage, "Geen bestand geselecteerd.", "error");
+                        return;
+                }
+                Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: (results) => {
                                 try {
-                                        // Maak het account aan
-                                        const userCredential = await auth.createUserWithEmailAndPassword(
-                                                studentEmail,
-                                                studentPassword
+                                        const payload = prepareCsvRecords(results.data, results.meta.fields || []);
+                                        parsedCsvData = payload;
+                                        renderCsvPreview(payload.summary);
+                                        setStatusMessage(
+                                                csvUploadMessage,
+                                                `Bestand klaar om te synchroniseren: ${payload.summary.studentCount} leerlingen, ${payload.summary.assignmentCount} opdrachten.`,
+                                                "success"
                                         );
-                                        const newUser = userCredential.user;
-                                        // Sla naam, e-mail en resultaten op in Firestore onder de UID van de nieuwe gebruiker
-                                        const dataToStore = {
-                                                name: studentName,
-                                                email: studentEmail,
-                                                ...resultsData,
-                                        };
-                                        await db.collection("results").doc(newUser.uid).set(dataToStore);
-                                        adminMessage.textContent = "Account voor " + studentEmail + " aangemaakt.";
-                                        adminMessage.classList.add("success-message");
-                                        adminForm.reset();
-                                        await loadAllStudents();
-                                } catch (err) {
-                                        console.error(err);
-                                        adminMessage.textContent = "Fout bij aanmaken: " + err.message;
-                                        adminMessage.classList.add("error-message");
+                                } catch (error) {
+                                        console.error(error);
+                                        parsedCsvData = null;
+                                        renderCsvPreview(null);
+                                        setStatusMessage(
+                                                csvUploadMessage,
+                                                `CSV kon niet verwerkt worden: ${error.message}`,
+                                                "error"
+                                        );
                                 }
-                        });
+                        },
+                        error: (error) => {
+                                console.error(error);
+                                parsedCsvData = null;
+                                renderCsvPreview(null);
+                                setStatusMessage(csvUploadMessage, `CSV-fout: ${error.message}`, "error");
+                        },
+                });
+        }
 
-                        findStudentBtn.addEventListener("click", async () => {
-                                studentEditMessage.textContent = "";
-                                studentEditMessage.classList.remove("error-message", "success-message");
-                                editStudentForm.classList.add("hidden");
-                                currentEditDocId = null;
-                                const lookupValue = studentLookupInput.value.trim();
-                                if (!lookupValue) {
-                                        studentEditMessage.classList.add("error-message");
-                                        studentEditMessage.textContent = "Vul een UID of e-mailadres in om te zoeken.";
-                                        return;
-                                }
-                                studentEditMessage.textContent = "Zoeken...";
-                                try {
-                                        let foundDoc = null;
-                                        const docSnapshot = await db.collection("results").doc(lookupValue).get();
-                                        if (docSnapshot.exists) {
-                                                foundDoc = docSnapshot;
-                                        } else if (lookupValue.includes("@")) {
-                                                const querySnapshot = await db
-                                                        .collection("results")
-                                                        .where("email", "==", lookupValue)
-                                                        .limit(1)
-                                                        .get();
-                                                if (!querySnapshot.empty) {
-                                                        foundDoc = querySnapshot.docs[0];
-                                                }
-                                        }
-                                        if (!foundDoc) {
-                                                studentEditMessage.classList.add("error-message");
-                                                studentEditMessage.textContent = "Geen leerlingdocument gevonden.";
-                                                return;
-                                        }
-                                        const data = foundDoc.data() || {};
-                                        const { name = "", email = "", ...rest } = data;
-                                        editStudentNameInput.value = name;
-                                        editStudentEmailInput.value = email;
-                                        editStudentResultsInput.value =
-                                                Object.keys(rest).length > 0
-                                                        ? JSON.stringify(rest, null, 2)
-                                                        : "";
-                                        currentEditDocId = foundDoc.id;
-                                        editStudentForm.classList.remove("hidden");
-                                        studentEditMessage.classList.add("success-message");
-                                        studentEditMessage.textContent = "Leerling geladen (UID: " + foundDoc.id + ").";
-                                } catch (err) {
-                                        console.error(err);
-                                        studentEditMessage.classList.add("error-message");
-                                        studentEditMessage.textContent = "Fout bij zoeken: " + err.message;
-                                }
-                        });
+        async function syncCsvData() {
+                if (!parsedCsvData || !parsedCsvData.students.length) {
+                        setStatusMessage(csvUploadMessage, "Selecteer eerst een geldig CSV-bestand.", "error");
+                        return;
+                }
+                try {
+                        syncCsvBtn.disabled = true;
+                        clearCsvBtn.disabled = true;
+                        setStatusMessage(csvUploadMessage, "Resultaten worden gesynchroniseerd...", null);
+                        await persistCsvRecords(parsedCsvData.students);
+                        setStatusMessage(
+                                csvUploadMessage,
+                                `Synchronisatie voltooid voor ${parsedCsvData.students.length} leerlingen.`,
+                                "success"
+                        );
+                        await loadAllStudents();
+                } catch (error) {
+                        console.error(error);
+                        setStatusMessage(csvUploadMessage, "Synchroniseren mislukt: " + error.message, "error");
+                } finally {
+                        syncCsvBtn.disabled = false;
+                        clearCsvBtn.disabled = false;
+                }
+        }
 
-                        saveStudentBtn.addEventListener("click", async () => {
-                                if (!currentEditDocId) {
-                                        studentEditMessage.classList.remove("success-message");
-                                        studentEditMessage.classList.add("error-message");
-                                        studentEditMessage.textContent = "Zoek eerst een leerling voordat je opslaat.";
-                                        return;
-                                }
-                                studentEditMessage.classList.remove("error-message", "success-message");
-                                let parsedResults = {};
-                                const resultsText = editStudentResultsInput.value.trim();
-                                if (resultsText) {
-                                        try {
-                                                parsedResults = JSON.parse(resultsText);
-                                        } catch (err) {
-                                                studentEditMessage.classList.add("error-message");
-                                                studentEditMessage.textContent =
-                                                        "Resultaten moeten geldige JSON zijn: " + err.message;
-                                                return;
-                                        }
-                                }
-                                delete parsedResults.name;
-                                delete parsedResults.email;
-                                const payload = { ...parsedResults };
-                                const nameValue = editStudentNameInput.value.trim();
-                                const emailValue = editStudentEmailInput.value.trim();
-                                if (nameValue) {
-                                        payload.name = nameValue;
-                                } else {
-                                        payload.name = FieldValue.delete();
-                                }
-                                if (emailValue) {
-                                        payload.email = emailValue;
-                                } else {
-                                        payload.email = FieldValue.delete();
-                                }
-                                try {
-                                        await db.collection("results").doc(currentEditDocId).set(payload, { merge: true });
-                                        studentEditMessage.classList.add("success-message");
-                                        studentEditMessage.textContent =
-                                                "Wijzigingen opgeslagen voor UID: " + currentEditDocId + ".";
-                                        await loadAllStudents();
-                                } catch (err) {
-                                        console.error(err);
-                                        studentEditMessage.classList.add("error-message");
-                                        studentEditMessage.textContent = "Opslaan mislukt: " + err.message;
-                                }
-                        });
+        if (csvFileInput) {
+                csvFileInput.addEventListener("change", handleCsvSelection);
+        }
+        if (clearCsvBtn) {
+                clearCsvBtn.addEventListener("click", () => clearCsvSelection());
+        }
+        if (syncCsvBtn) {
+                syncCsvBtn.addEventListener("click", syncCsvData);
+        }
 
-                        // Laden van alle studenten (zichtbaar in adminpaneel)
-                        async function loadAllStudents() {
-                                allStudentsDiv.innerHTML = "";
-                                const snapshot = await db.collection("results").get();
-                                if (snapshot.empty) {
-                                        allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
-                                        return;
-                                }
-                                snapshot.forEach((doc) => {
-                                        const data = doc.data();
-                                        const naam = data.name || doc.id;
-                                        const entry = document.createElement("div");
-                                        entry.className = "results-entry";
-                                        entry.innerHTML = `<h4>${naam}</h4><span class="result-id">${doc.id}</span><pre>${JSON.stringify(
-                                                data,
-                                                null,
-                                                2
-                                        )}</pre>`;
-                                        allStudentsDiv.appendChild(entry);
-                                });
-                        }
+        // Inlogformulier afhandelen
+        loginForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const email = document.getElementById("login-email").value;
+                const password = document.getElementById("login-password").value;
+                loginError.textContent = "";
+                auth.signInWithEmailAndPassword(email, password).catch((err) => {
+                        console.error(err);
+                        loginError.textContent = "Fout bij inloggen: " + err.message;
+                });
+        });
 
-                        // Laad de resultaten voor een ingelogde student
-                        async function loadStudentResults(user) {
-                                const docRef = db.collection("results").doc(user.uid);
-                                const doc = await docRef.get();
-                                if (!doc.exists) {
-                                        studentEmailDisplay.textContent = user.email;
-                                        studentResultsDisplay.textContent = "Er zijn nog geen resultaten opgeslagen.";
-                                } else {
-                                        const data = doc.data();
-                                        if (data.name) {
-                                                studentEmailDisplay.textContent = data.name;
-                                        } else if (data.email) {
-                                                studentEmailDisplay.textContent = data.email;
-                                        } else {
-                                                studentEmailDisplay.textContent = user.email;
-                                        }
-                                        studentResultsDisplay.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+        // Creëer een nieuwe studentaccount en sla resultaten op
+        const createStudentBtn = document.getElementById("create-student-btn");
+        createStudentBtn.addEventListener("click", async () => {
+                adminMessage.textContent = "";
+                adminMessage.classList.remove("error-message", "success-message");
+                const studentName = document.getElementById("student-name").value.trim();
+                const studentEmail = document.getElementById("student-email").value.trim();
+                const studentPassword = document.getElementById("student-password").value;
+                const studentClassValue = studentClassInput ? studentClassInput.value.trim() : "";
+                const noteText = document.getElementById("student-results").value.trim();
+
+                try {
+                        const userCredential = await auth.createUserWithEmailAndPassword(
+                                studentEmail,
+                                studentPassword
+                        );
+                        const newUser = userCredential.user;
+                        const assignments = noteText
+                                ? [
+                                          {
+                                                  title: "Opmerking docent",
+                                                  grade: "",
+                                                  comment: noteText,
+                                                  rubric: [],
+                                          },
+                                  ]
+                                : [];
+                        const dataToStore = {
+                                name: studentName,
+                                email: studentEmail,
+                                class: studentClassValue || FieldValue.delete(),
+                                assignments,
+                                lastSyncedAt: FieldValue.serverTimestamp(),
+                        };
+                        await db.collection("results").doc(newUser.uid).set(dataToStore, { merge: true });
+                        adminMessage.textContent = "Account voor " + studentEmail + " aangemaakt.";
+                        adminMessage.classList.add("success-message");
+                        adminForm.reset();
+                        await loadAllStudents();
+                } catch (err) {
+                        console.error(err);
+                        adminMessage.textContent = "Fout bij aanmaken: " + err.message;
+                        adminMessage.classList.add("error-message");
+                }
+        });
+
+        findStudentBtn.addEventListener("click", async () => {
+                studentEditMessage.textContent = "";
+                studentEditMessage.classList.remove("error-message", "success-message");
+                editStudentForm.classList.add("hidden");
+                currentEditDocId = null;
+                const lookupValue = studentLookupInput.value.trim();
+                if (!lookupValue) {
+                        studentEditMessage.classList.add("error-message");
+                        studentEditMessage.textContent = "Vul een UID of e-mailadres in om te zoeken.";
+                        return;
+                }
+                studentEditMessage.textContent = "Zoeken...";
+                try {
+                        let foundDoc = null;
+                        const docSnapshot = await db.collection("results").doc(lookupValue).get();
+                        if (docSnapshot.exists) {
+                                foundDoc = docSnapshot;
+                        } else if (lookupValue.includes("@")) {
+                                const querySnapshot = await db
+                                        .collection("results")
+                                        .where("email", "==", lookupValue)
+                                        .limit(1)
+                                        .get();
+                                if (!querySnapshot.empty) {
+                                        foundDoc = querySnapshot.docs[0];
                                 }
                         }
-
-                        // Toon/hide panelen afhankelijk van loginstatus
-                        auth.onAuthStateChanged(async (user) => {
-                                if (user) {
-                                        // Iemand is ingelogd
-                                        loginSection.classList.add("hidden");
-                                        logoutSection.classList.remove("hidden");
-                                        if (user.email === ADMIN_EMAIL) {
-                                                // Toon adminpaneel
-                                                adminSection.classList.remove("hidden");
-                                                studentSection.classList.add("hidden");
-                                                await loadAllStudents();
-                                        } else {
-                                                // Toon studentpaneel
-                                                adminSection.classList.add("hidden");
-                                                studentSection.classList.remove("hidden");
-                                                await loadStudentResults(user);
-                                        }
-                                } else {
-                                        // Niemand ingelogd
-                                        loginSection.classList.remove("hidden");
-                                        adminSection.classList.add("hidden");
-                                        studentSection.classList.add("hidden");
-                                        logoutSection.classList.add("hidden");
-                                }
-                        });
-
-                        // Functie om een wachtwoordreset-e-mail te sturen
-                        function sendPasswordReset() {
-                                const email = document.getElementById("reset-email").value;
-                                const msg = document.getElementById("reset-message");
-                                msg.textContent = "";
-                                msg.classList.remove("error-message", "success-message");
-                                if (!email) {
-                                        msg.classList.add("error-message");
-                                        msg.textContent = "Vul een e-mailadres in.";
-                                        return;
-                                }
-                                auth
-                                        .sendPasswordResetEmail(email)
-                                        .then(() => {
-                                                msg.classList.add("success-message");
-                                                msg.textContent = "Reset-link is verstuurd naar " + email + ".";
-                                        })
-                                        .catch((error) => {
-                                                console.error("Wachtwoord reset fout:", error);
-                                                msg.classList.add("error-message");
-                                                msg.textContent = "Fout: " + error.message;
-                                        });
+                        if (!foundDoc) {
+                                studentEditMessage.classList.add("error-message");
+                                studentEditMessage.textContent = "Geen leerlingdocument gevonden.";
+                                return;
                         }
+                        const normalized = normalizeStudentData(foundDoc.id, foundDoc.data() || {});
+                        editStudentNameInput.value = normalized.name || "";
+                        editStudentClassInput.value = normalized.className || "";
+                        editStudentEmailInput.value = normalized.email || "";
+                        editStudentResultsInput.value =
+                                normalized.assignments.length > 0
+                                        ? JSON.stringify(normalized.assignments, null, 2)
+                                        : "";
+                        currentEditDocId = foundDoc.id;
+                        editStudentForm.classList.remove("hidden");
+                        studentEditMessage.classList.add("success-message");
+                        studentEditMessage.textContent = "Leerling geladen (ID: " + foundDoc.id + ").";
+                } catch (err) {
+                        console.error(err);
+                        studentEditMessage.classList.add("error-message");
+                        studentEditMessage.textContent = "Fout bij zoeken: " + err.message;
+                }
+        });
 
-                        // Koppel de klik op de reset-knop aan de functie
-                        document.getElementById("reset-btn").addEventListener("click", sendPasswordReset);
+        saveStudentBtn.addEventListener("click", async () => {
+                if (!currentEditDocId) {
+                        studentEditMessage.classList.remove("success-message");
+                        studentEditMessage.classList.add("error-message");
+                        studentEditMessage.textContent = "Zoek eerst een leerling voordat je opslaat.";
+                        return;
+                }
+                studentEditMessage.classList.remove("error-message", "success-message");
+                const resultsText = editStudentResultsInput.value.trim();
+                let assignmentsPayload;
+                if (resultsText) {
+                        try {
+                                const parsed = JSON.parse(resultsText);
+                                if (!Array.isArray(parsed)) {
+                                        throw new Error("Resultaten moeten een array van opdrachten zijn.");
+                                }
+                                assignmentsPayload = parsed;
+                        } catch (err) {
+                                studentEditMessage.classList.add("error-message");
+                                studentEditMessage.textContent =
+                                        "Resultaten moeten geldige JSON zijn: " + err.message;
+                                return;
+                        }
+                }
+                const payload = {};
+                const nameValue = editStudentNameInput.value.trim();
+                const emailValue = editStudentEmailInput.value.trim();
+                const classValue = editStudentClassInput.value.trim();
+                payload.name = nameValue ? nameValue : FieldValue.delete();
+                payload.email = emailValue ? emailValue : FieldValue.delete();
+                payload.class = classValue ? classValue : FieldValue.delete();
+                if (assignmentsPayload !== undefined) {
+                        payload.assignments = assignmentsPayload;
+                }
+                payload.lastSyncedAt = FieldValue.serverTimestamp();
+                try {
+                        await db.collection("results").doc(currentEditDocId).set(payload, { merge: true });
+                        studentEditMessage.classList.add("success-message");
+                        studentEditMessage.textContent =
+                                "Wijzigingen opgeslagen voor ID: " + currentEditDocId + ".";
+                        await loadAllStudents();
+                } catch (err) {
+                        console.error(err);
+                        studentEditMessage.classList.add("error-message");
+                        studentEditMessage.textContent = "Opslaan mislukt: " + err.message;
+                }
+        });
 
-                        // Uitloggen
-                        logoutBtn.addEventListener("click", () => {
-                                auth.signOut().catch((err) => {
-                                        console.error(err);
-                                });
+        function normalizeAssignment(rawAssignment) {
+                if (!rawAssignment || typeof rawAssignment !== "object") {
+                        return null;
+                }
+                const title = rawAssignment.title ? String(rawAssignment.title) : "Opdracht";
+                const grade = rawAssignment.grade !== undefined ? String(rawAssignment.grade || "") : "";
+                const comment = rawAssignment.comment ? String(rawAssignment.comment) : "";
+                const rubricItems = Array.isArray(rawAssignment.rubric)
+                        ? rawAssignment.rubric
+                                  .map((item) => {
+                                          if (!item || typeof item !== "object") {
+                                                  return null;
+                                          }
+                                          const theme = item.theme ? String(item.theme) : "";
+                                          const value = item.value !== undefined ? String(item.value) : "";
+                                          if (!theme && !value) {
+                                                  return null;
+                                          }
+                                          return { theme, value };
+                                  })
+                                  .filter(Boolean)
+                        : [];
+                return {
+                        title,
+                        grade,
+                        comment,
+                        rubric: rubricItems,
+                };
+        }
+
+        function convertLegacyAssignments(data) {
+                const ignoredKeys = new Set([
+                        "name",
+                        "email",
+                        "class",
+                        "klas",
+                        "lastSyncedAt",
+                        "lastUpdated",
+                        "uid",
+                ]);
+                let grade = "";
+                let comment = "";
+                if (data.cijfer !== undefined) {
+                        grade = parseGradeValue(data.cijfer);
+                        ignoredKeys.add("cijfer");
+                }
+                if (data.score !== undefined) {
+                        grade = parseGradeValue(data.score);
+                        ignoredKeys.add("score");
+                }
+                if (data.opmerking !== undefined) {
+                        comment = String(data.opmerking);
+                        ignoredKeys.add("opmerking");
+                }
+                if (data.comment !== undefined) {
+                        comment = String(data.comment);
+                        ignoredKeys.add("comment");
+                }
+                const rubric = Object.entries(data)
+                        .filter(([key, value]) => !ignoredKeys.has(key) && value !== undefined && value !== null)
+                        .map(([key, value]) => ({ theme: key, value: String(value) }))
+                        .filter((item) => item.value.trim() !== "");
+                if (!rubric.length && !grade && !comment) {
+                        return [];
+                }
+                return [
+                        {
+                                title: "Resultaten",
+                                grade,
+                                comment,
+                                rubric,
+                        },
+                ];
+        }
+
+        function normalizeStudentData(id, data) {
+                const assignments = Array.isArray(data.assignments)
+                        ? data.assignments
+                                  .map((assignment) => normalizeAssignment(assignment))
+                                  .filter(Boolean)
+                        : convertLegacyAssignments(data);
+                const className = data.class || data.klas || "";
+                return {
+                        id,
+                        name: data.name || "",
+                        email: data.email || "",
+                        className,
+                        assignments,
+                        lastSyncedAt: data.lastSyncedAt || data.lastUpdated || null,
+                };
+        }
+
+        function formatDate(value) {
+                if (!value) {
+                        return null;
+                }
+                const date = value.toDate ? value.toDate() : new Date(value);
+                if (Number.isNaN(date.getTime())) {
+                        return null;
+                }
+                try {
+                        return new Intl.DateTimeFormat("nl-NL", {
+                                dateStyle: "long",
+                                timeStyle: "short",
+                        }).format(date);
+                } catch (e) {
+                        return date.toLocaleString();
+                }
+        }
+
+        function updateLastSyncDisplay(latestDate) {
+                if (!lastSyncLabel) {
+                        return;
+                }
+                const formatted = formatDate(latestDate);
+                lastSyncLabel.textContent = formatted || "n.v.t.";
+        }
+
+        function createRubricList(rubric) {
+                if (!rubric || !rubric.length) {
+                        return null;
+                }
+                const list = document.createElement("dl");
+                list.className = "rubric-grid";
+                rubric.forEach((item) => {
+                        const term = document.createElement("dt");
+                        term.textContent = item.theme;
+                        const description = document.createElement("dd");
+                        description.textContent = item.value;
+                        list.appendChild(term);
+                        list.appendChild(description);
+                });
+                return list;
+        }
+
+        function createAssignmentSection(assignment) {
+                const section = document.createElement("article");
+                section.className = "assignment-card";
+                const header = document.createElement("header");
+                header.className = "assignment-header";
+                const title = document.createElement("h4");
+                title.textContent = assignment.title || "Opdracht";
+                header.appendChild(title);
+                if (assignment.grade) {
+                        const gradeBadge = document.createElement("span");
+                        gradeBadge.className = "assignment-grade";
+                        gradeBadge.textContent = `Cijfer: ${assignment.grade}`;
+                        header.appendChild(gradeBadge);
+                }
+                section.appendChild(header);
+                if (assignment.comment) {
+                        const comment = document.createElement("p");
+                        comment.className = "assignment-comment";
+                        comment.textContent = assignment.comment;
+                        section.appendChild(comment);
+                }
+                const rubricList = createRubricList(assignment.rubric);
+                if (rubricList) {
+                        section.appendChild(rubricList);
+                }
+                return section;
+        }
+
+        function createStudentCard(student) {
+                const card = document.createElement("article");
+                card.className = "student-card";
+                const header = document.createElement("header");
+                header.className = "student-card-header";
+                const title = document.createElement("h3");
+                title.textContent = student.name || student.email || student.id;
+                header.appendChild(title);
+                const meta = document.createElement("p");
+                meta.className = "student-meta";
+                const metaParts = [];
+                if (student.className) metaParts.push(student.className);
+                if (student.email) metaParts.push(student.email);
+                if (student.id) metaParts.push(`ID: ${student.id}`);
+                meta.textContent = metaParts.join(" • ");
+                header.appendChild(meta);
+                const syncInfo = formatDate(student.lastSyncedAt);
+                if (syncInfo) {
+                        const syncText = document.createElement("p");
+                        syncText.className = "student-sync";
+                        syncText.textContent = `Bijgewerkt op ${syncInfo}`;
+                        header.appendChild(syncText);
+                }
+                card.appendChild(header);
+                const body = document.createElement("div");
+                body.className = "student-card-body";
+                if (!student.assignments.length) {
+                        const empty = document.createElement("p");
+                        empty.className = "empty-state";
+                        empty.textContent = "Er zijn nog geen opdrachten voor deze leerling.";
+                        body.appendChild(empty);
+                } else {
+                        student.assignments.forEach((assignment) => {
+                                body.appendChild(createAssignmentSection(assignment));
                         });
-                </script>
+                }
+                card.appendChild(body);
+                return card;
+        }
+
+        function renderStudentPanel(container, student) {
+                if (!container) {
+                        return;
+                }
+                container.innerHTML = "";
+                if (!student) {
+                        const empty = document.createElement("p");
+                        empty.className = "empty-state";
+                        empty.textContent = "Er zijn geen resultaten gevonden.";
+                        container.appendChild(empty);
+                        return;
+                }
+                const summary = document.createElement("div");
+                summary.className = "student-summary";
+                if (student.className) {
+                        const classInfo = document.createElement("p");
+                        classInfo.textContent = `Klas: ${student.className}`;
+                        summary.appendChild(classInfo);
+                }
+                const syncInfo = formatDate(student.lastSyncedAt);
+                if (syncInfo) {
+                        const syncText = document.createElement("p");
+                        syncText.textContent = `Laatste update: ${syncInfo}`;
+                        summary.appendChild(syncText);
+                }
+                container.appendChild(summary);
+                if (!student.assignments.length) {
+                        const empty = document.createElement("p");
+                        empty.className = "empty-state";
+                        empty.textContent = "Er zijn nog geen opdrachten voor deze leerling.";
+                        container.appendChild(empty);
+                        return;
+                }
+                student.assignments.forEach((assignment) => {
+                        container.appendChild(createAssignmentSection(assignment));
+                });
+        }
+
+        // Laden van alle studenten (zichtbaar in adminpaneel)
+        async function loadAllStudents() {
+                allStudentsDiv.innerHTML = "";
+                const snapshot = await db.collection("results").get();
+                if (snapshot.empty) {
+                        allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
+                        updateLastSyncDisplay(null);
+                        return;
+                }
+                const students = [];
+                snapshot.forEach((doc) => {
+                        students.push(normalizeStudentData(doc.id, doc.data() || {}));
+                });
+                students.sort((a, b) => {
+                        const nameA = (a.name || a.email || a.id || "").toLowerCase();
+                        const nameB = (b.name || b.email || b.id || "").toLowerCase();
+                        return nameA.localeCompare(nameB, "nl");
+                });
+                let latest = null;
+                const fragment = document.createDocumentFragment();
+                students.forEach((student) => {
+                        fragment.appendChild(createStudentCard(student));
+                        const date = student.lastSyncedAt && student.lastSyncedAt.toDate
+                                ? student.lastSyncedAt.toDate()
+                                : student.lastSyncedAt
+                                ? new Date(student.lastSyncedAt)
+                                : null;
+                        if (date && !Number.isNaN(date.getTime())) {
+                                if (!latest || date > latest) {
+                                        latest = date;
+                                }
+                        }
+                });
+                allStudentsDiv.appendChild(fragment);
+                updateLastSyncDisplay(latest);
+        }
+
+        // Laad de resultaten voor een ingelogde student
+        async function loadStudentResults(user) {
+                let doc = await db.collection("results").doc(user.uid).get();
+                if (!doc.exists) {
+                        const querySnapshot = await db
+                                .collection("results")
+                                .where("email", "==", user.email)
+                                .limit(1)
+                                .get();
+                        if (!querySnapshot.empty) {
+                                doc = querySnapshot.docs[0];
+                        }
+                }
+                if (!doc || !doc.exists) {
+                        studentEmailDisplay.textContent = user.email;
+                        renderStudentPanel(studentResultsDisplay, null);
+                        return;
+                }
+                const student = normalizeStudentData(doc.id, doc.data() || {});
+                if (student.name) {
+                        studentEmailDisplay.textContent = student.name;
+                } else if (student.email) {
+                        studentEmailDisplay.textContent = student.email;
+                } else {
+                        studentEmailDisplay.textContent = user.email;
+                }
+                renderStudentPanel(studentResultsDisplay, student);
+        }
+
+        // Toon/hide panelen afhankelijk van loginstatus
+        auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                        loginSection.classList.add("hidden");
+                        logoutSection.classList.remove("hidden");
+                        if (user.email === ADMIN_EMAIL) {
+                                adminSection.classList.remove("hidden");
+                                studentSection.classList.add("hidden");
+                                await loadAllStudents();
+                        } else {
+                                adminSection.classList.add("hidden");
+                                studentSection.classList.remove("hidden");
+                                await loadStudentResults(user);
+                        }
+                } else {
+                        loginSection.classList.remove("hidden");
+                        adminSection.classList.add("hidden");
+                        studentSection.classList.add("hidden");
+                        logoutSection.classList.add("hidden");
+                }
+        });
+
+        function sendPasswordReset() {
+                const email = document.getElementById("reset-email").value;
+                const msg = document.getElementById("reset-message");
+                msg.textContent = "";
+                msg.classList.remove("error-message", "success-message");
+                if (!email) {
+                        msg.classList.add("error-message");
+                        msg.textContent = "Vul een e-mailadres in.";
+                        return;
+                }
+                auth
+                        .sendPasswordResetEmail(email)
+                        .then(() => {
+                                msg.classList.add("success-message");
+                                msg.textContent = "Reset-link is verstuurd naar " + email + ".";
+                        })
+                        .catch((error) => {
+                                console.error("Wachtwoord reset fout:", error);
+                                msg.classList.add("error-message");
+                                msg.textContent = "Fout: " + error.message;
+                        });
+        }
+
+        document.getElementById("reset-btn").addEventListener("click", sendPasswordReset);
+
+        logoutBtn.addEventListener("click", () => {
+                auth.signOut().catch((err) => {
+                        console.error(err);
+                });
+        });
+
+</script>
         </body>
 </html>

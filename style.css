@@ -582,6 +582,13 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   color: var(--muted);
 }
 
+.status-message.muted,
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 12px;
+}
+
 .error-message {
   color: #d64545;
 }
@@ -603,11 +610,12 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 }
 
 .results {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--bg-elev);
-  padding: 18px;
-  box-shadow: 0 6px 18px rgba(20, 30, 60, 0.08);
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .results pre {
@@ -616,6 +624,221 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   border-radius: 12px;
   background: #f7f9ff;
   overflow-x: auto;
+}
+
+.csv-sync {
+  margin-top: 24px;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px dashed rgba(66, 104, 214, 0.35);
+  background: rgba(66, 104, 214, 0.04);
+}
+
+.csv-sync p {
+  margin-top: 0;
+  color: var(--muted);
+}
+
+.csv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.csv-preview {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #f2f6ff;
+  border: 1px solid rgba(66, 104, 214, 0.18);
+  color: var(--fg);
+}
+
+.csv-preview ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.results-section {
+  margin-top: 64px;
+  display: grid;
+  gap: 24px;
+}
+
+.results-intro {
+  display: grid;
+  gap: 12px;
+}
+
+.results-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.results-meta strong {
+  color: var(--fg);
+}
+
+.results-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(66, 104, 214, 0.26);
+  background: rgba(66, 104, 214, 0.12);
+  color: #1f3f9c;
+  font-weight: 600;
+}
+
+.loading-state,
+.error-state {
+  margin: 0;
+  font-size: 15px;
+}
+
+.loading-state {
+  color: var(--muted);
+}
+
+.error-state {
+  color: #c62828;
+}
+
+.student-grid {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 900px) {
+  .student-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+.student-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.student-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.student-card-header h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.student-meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.student-sync {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.student-card-body {
+  display: grid;
+  gap: 16px;
+}
+
+.assignment-card {
+  border-radius: 16px;
+  border: 1px solid rgba(66, 104, 214, 0.2);
+  background: linear-gradient(180deg, rgba(241, 245, 255, 0.7), #ffffff 60%);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.assignment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assignment-header h4 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.assignment-grade {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(66, 104, 214, 0.12);
+  color: #1f3f9c;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.assignment-comment {
+  margin: 0;
+  color: var(--fg);
+}
+
+.rubric-grid {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.5fr);
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.rubric-grid dt {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.rubric-grid dd {
+  margin: 0;
+  color: var(--fg);
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.student-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+#student-results-display {
+  display: grid;
+  gap: 18px;
 }
 
 .results-entry + .results-entry {
