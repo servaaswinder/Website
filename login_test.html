@@ -1,0 +1,317 @@
+<!--
+  login_test.html
+
+  This is a test page for demonstrating how to use Firebase Authentication
+  and Firestore with a static GitHub Pages site.  You should customize
+  the Firebase configuration below with your own project credentials.
+
+  The page implements a simple login form for both an administrator
+  (e.g. teacher) and students.  Once logged in, an admin can create
+  new student accounts and assign results/notes.  Students can log in
+  and view only their own results.  No database credentials or user
+  passwords are ever stored in the GitHub repository – the Firebase SDK
+  handles authentication via HTTPS in the browser.
+
+  IMPORTANT: Replace the values in the firebaseConfig object below
+  with the configuration for your Firebase project (found in the
+  Firebase console under Project Settings > General > Your apps).
+-->
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Leerlingen Login Test</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+			h1,
+			h2 {
+				color: #333;
+			}
+			.hidden {
+				display: none;
+			}
+			form > div {
+				margin-bottom: 10px;
+			}
+			label {
+				display: block;
+				margin-bottom: 5px;
+			}
+			input,
+			textarea {
+				width: 100%;
+				padding: 8px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				box-sizing: border-box;
+			}
+			button {
+				padding: 8px 12px;
+				border: none;
+				border-radius: 4px;
+				background-color: #007bff;
+				color: white;
+				cursor: pointer;
+			}
+			button:disabled {
+				background-color: #aaa;
+			}
+			.results {
+				border: 1px solid #ccc;
+				padding: 10px;
+				border-radius: 4px;
+				margin-top: 10px;
+			}
+			pre {
+				white-space: pre-wrap;
+			}
+		</style>
+		<!-- Load Firebase SDKs from CDN -->
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+	</head>
+	<body>
+		<h1>Leerlingen Portal – Testpagina</h1>
+		<p>
+			Deze pagina demonstreert hoe je Firebase-authenticatie en Firestore kunt
+			integreren op een statische site om inloggen en het bekijken van
+			persoonlijke resultaten mogelijk te maken. Vul eerst je
+			Firebase-configuratie in het script onderaan deze pagina in.
+		</p>
+
+		<!-- Login form -->
+		<div id="login-section">
+			<h2>Inloggen</h2>
+			<form id="login-form">
+				<div>
+					<label for="login-email">E-mail</label>
+					<input type="email" id="login-email" required />
+				</div>
+				<div>
+					<label for="login-password">Wachtwoord</label>
+					<input type="password" id="login-password" required />
+				</div>
+				<button type="submit">Inloggen</button>
+			</form>
+			<p>Heb je nog geen account? Laat je docent een account aanmaken.</p>
+			<div id="login-error" style="color: red"></div>
+		</div>
+
+		<!-- Admin panel -->
+		<div id="admin-section" class="hidden">
+			<h2>Beheerderspaneel</h2>
+			<p>
+				Welkom, beheerder! Hier kun je nieuwe leerlingaccounts aanmaken en
+				resultaten invoeren. Voer het e-mailadres en wachtwoord voor de leerling
+				in, plus de resultaten/feedback. Klik vervolgens op "Account aanmaken"
+				om een gebruiker toe te voegen en de resultaten op te slaan.
+			</p>
+			<form id="admin-form">
+				<div>
+					<label for="student-email">Leerling e-mail</label>
+					<input type="email" id="student-email" required />
+				</div>
+				<div>
+					<label for="student-password">Leerling wachtwoord</label>
+					<input type="password" id="student-password" required />
+				</div>
+				<div>
+					<label for="student-results"
+						>Cijfers / notities (JSON of tekst)</label
+					>
+					<textarea
+						id="student-results"
+						rows="4"
+						placeholder='{"wiskunde": 8, "biologie": 7.5, "opmerking": "Goed gedaan!"}'
+					></textarea>
+				</div>
+				<button type="button" id="create-student-btn">Account aanmaken</button>
+			</form>
+			<div id="admin-message" style="color: green"></div>
+			<h3>Alle leerlingenrecords (alleen ter demonstratie)</h3>
+			<div id="all-students" class="results"></div>
+		</div>
+
+		<!-- Student panel -->
+		<div id="student-section" class="hidden">
+			<h2>Mijn Resultaten</h2>
+			<p>
+				Welkom, <span id="student-email-display"></span>! Hieronder zie je je
+				persoonlijke resultaten en notities. Alleen jij en je docent kunnen deze
+				informatie bekijken.
+			</p>
+			<div id="student-results-display" class="results"></div>
+		</div>
+
+		<!-- Sign out button -->
+		<div id="logout-section" class="hidden">
+			<button id="logout-btn">Uitloggen</button>
+		</div>
+
+		<script>
+			// TODO: Vervang deze configuratie door je eigen Firebase projectconfig. Gedaan
+			const firebaseConfig = {
+				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+				authDomain: "leerling-accounts.firebaseapp.com",
+				projectId: "leerling-accounts",
+				storageBucket: "leerling-accounts.firebasestorage.app",
+				messagingSenderId: "884081904341",
+				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+				measurementId: "G-9YY3856FBP",
+			};
+
+			// Initialiseer Firebase
+			firebase.initializeApp(firebaseConfig);
+			const auth = firebase.auth();
+			const db = firebase.firestore();
+
+			// Geef hier het administrator e-mailadres op. Alleen gebruikers met
+			// dit e-mailadres krijgen toegang tot het adminpaneel.
+			const ADMIN_EMAIL = "servaas.winder@northgo-college.nl";
+
+			// HTML-elementen ophalen
+			const loginSection = document.getElementById("login-section");
+			const loginForm = document.getElementById("login-form");
+			const loginError = document.getElementById("login-error");
+			const adminSection = document.getElementById("admin-section");
+			const adminForm = document.getElementById("admin-form");
+			const adminMessage = document.getElementById("admin-message");
+			const allStudentsDiv = document.getElementById("all-students");
+			const studentSection = document.getElementById("student-section");
+			const studentEmailDisplay = document.getElementById(
+				"student-email-display"
+			);
+			const studentResultsDisplay = document.getElementById(
+				"student-results-display"
+			);
+			const logoutSection = document.getElementById("logout-section");
+			const logoutBtn = document.getElementById("logout-btn");
+
+			// Inlogformulier afhandelen
+			loginForm.addEventListener("submit", (e) => {
+				e.preventDefault();
+				const email = document.getElementById("login-email").value;
+				const password = document.getElementById("login-password").value;
+				loginError.textContent = "";
+				auth.signInWithEmailAndPassword(email, password).catch((err) => {
+					console.error(err);
+					loginError.textContent = "Fout bij inloggen: " + err.message;
+				});
+			});
+
+			// Creëer een nieuwe studentaccount en sla resultaten op
+			const createStudentBtn = document.getElementById("create-student-btn");
+			createStudentBtn.addEventListener("click", async () => {
+				adminMessage.textContent = "";
+				const studentEmail = document.getElementById("student-email").value;
+				const studentPassword =
+					document.getElementById("student-password").value;
+				let resultsText = document
+					.getElementById("student-results")
+					.value.trim();
+
+				// Probeer de resultaten te parsen als JSON, maar als het faalt, sla het als tekst op
+				let resultsData;
+				if (resultsText) {
+					try {
+						resultsData = JSON.parse(resultsText);
+					} catch (e) {
+						resultsData = { tekst: resultsText };
+					}
+				} else {
+					resultsData = {};
+				}
+				try {
+					// Maak het account aan
+					const userCredential = await auth.createUserWithEmailAndPassword(
+						studentEmail,
+						studentPassword
+					);
+					const newUser = userCredential.user;
+					// Sla resultaten op in Firestore onder de UID van de nieuwe gebruiker
+					await db.collection("results").doc(newUser.uid).set(resultsData);
+					adminMessage.textContent =
+						"Account voor " + studentEmail + " aangemaakt.";
+					adminForm.reset();
+					await loadAllStudents();
+				} catch (err) {
+					console.error(err);
+					adminMessage.textContent = "Fout bij aanmaken: " + err.message;
+				}
+			});
+
+			// Laden van alle studenten (zichtbaar in adminpaneel)
+			async function loadAllStudents() {
+				allStudentsDiv.innerHTML = "";
+				const snapshot = await db.collection("results").get();
+				if (snapshot.empty) {
+					allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
+					return;
+				}
+				snapshot.forEach((doc) => {
+					const p = document.createElement("p");
+					p.innerHTML = `<strong>${doc.id}</strong>: <pre>${JSON.stringify(
+						doc.data(),
+						null,
+						2
+					)}</pre>`;
+					allStudentsDiv.appendChild(p);
+				});
+			}
+
+			// Laad de resultaten voor een ingelogde student
+			async function loadStudentResults(user) {
+				studentEmailDisplay.textContent = user.email;
+				const docRef = db.collection("results").doc(user.uid);
+				const doc = await docRef.get();
+				if (!doc.exists) {
+					studentResultsDisplay.textContent =
+						"Er zijn nog geen resultaten opgeslagen.";
+				} else {
+					studentResultsDisplay.innerHTML =
+						"<pre>" + JSON.stringify(doc.data(), null, 2) + "</pre>";
+				}
+			}
+
+			// Toon/hide panelen afhankelijk van loginstatus
+			auth.onAuthStateChanged(async (user) => {
+				if (user) {
+					// Iemand is ingelogd
+					loginSection.classList.add("hidden");
+					logoutSection.classList.remove("hidden");
+					if (user.email === ADMIN_EMAIL) {
+						// Toon adminpaneel
+						adminSection.classList.remove("hidden");
+						studentSection.classList.add("hidden");
+						await loadAllStudents();
+					} else {
+						// Toon studentpaneel
+						adminSection.classList.add("hidden");
+						studentSection.classList.remove("hidden");
+						await loadStudentResults(user);
+					}
+				} else {
+					// Niemand ingelogd
+					loginSection.classList.remove("hidden");
+					adminSection.classList.add("hidden");
+					studentSection.classList.add("hidden");
+					logoutSection.classList.add("hidden");
+				}
+			});
+
+			// Uitloggen
+			logoutBtn.addEventListener("click", () => {
+				auth.signOut().catch((err) => {
+					console.error(err);
+				});
+			});
+		</script>
+	</body>
+</html>
