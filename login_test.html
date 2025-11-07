@@ -100,6 +100,13 @@
 				</div>
 				<button type="submit">Inloggen</button>
 			</form>
+			<div id="reset-password-box">
+				<h3>🔑 Wachtwoord vergeten?</h3>
+				<input type="email" id="reset-email" placeholder="Jouw e-mailadres" />
+				<button id="reset-btn">Stuur reset-link</button>
+				<p id="reset-message" style="color: green"></p>
+			</div>
+
 			<p>Heb je nog geen account? Laat je docent een account aanmaken.</p>
 			<div id="login-error" style="color: red"></div>
 		</div>
@@ -305,6 +312,34 @@
 					logoutSection.classList.add("hidden");
 				}
 			});
+
+			// Functie om een wachtwoordreset-e-mail te sturen
+			function sendPasswordReset() {
+				const email = document.getElementById("reset-email").value;
+				const msg = document.getElementById("reset-message");
+				msg.textContent = "";
+				if (!email) {
+					msg.style.color = "red";
+					msg.textContent = "Vul een e-mailadres in.";
+					return;
+				}
+				auth
+					.sendPasswordResetEmail(email)
+					.then(() => {
+						msg.style.color = "green";
+						msg.textContent = "Reset-link is verstuurd naar " + email + ".";
+					})
+					.catch((error) => {
+						console.error("Wachtwoord reset fout:", error);
+						msg.style.color = "red";
+						msg.textContent = "Fout: " + error.message;
+					});
+			}
+
+			// Koppel de klik op de reset-knop aan de functie
+			document
+				.getElementById("reset-btn")
+				.addEventListener("click", sendPasswordReset);
 
 			// Uitloggen
 			logoutBtn.addEventListener("click", () => {
