@@ -129,11 +129,6 @@
 					<label for="student-email">Leerling e-mail</label>
 					<input type="email" id="student-email" required />
 				</div>
-
-				<div>
-					<label for="student-email">Leerling e-mail</label>
-					<input type="email" id="student-email" required />
-				</div>
 				<div>
 					<label for="student-password">Leerling wachtwoord</label>
 					<input type="password" id="student-password" required />
@@ -226,6 +221,7 @@
 			const createStudentBtn = document.getElementById("create-student-btn");
 			createStudentBtn.addEventListener("click", async () => {
 				adminMessage.textContent = "";
+				const studentName = document.getElementById("student-name").value;
 				const studentEmail = document.getElementById("student-email").value;
 				const studentPassword =
 					document.getElementById("student-password").value;
@@ -251,8 +247,9 @@
 						studentPassword
 					);
 					const newUser = userCredential.user;
-					// Sla resultaten op in Firestore onder de UID van de nieuwe gebruiker
-					await db.collection("results").doc(newUser.uid).set(resultsData);
+					// Sla naam en resultaten op in Firestore onder de UID van de nieuwe gebruiker
+					const dataToStore = { name: studentName, ...resultsData };
+					await db.collection("results").doc(newUser.uid).set(dataToStore);
 					adminMessage.textContent =
 						"Account voor " + studentEmail + " aangemaakt.";
 					adminForm.reset();
@@ -272,9 +269,11 @@
 					return;
 				}
 				snapshot.forEach((doc) => {
+					const data = doc.data();
+					const naam = data.name || doc.id;
 					const p = document.createElement("p");
-					p.innerHTML = `<strong>${doc.id}</strong>: <pre>${JSON.stringify(
-						doc.data(),
+					p.innerHTML = `<strong>${naam}</strong> (${doc.id})<pre>${JSON.stringify(
+						data,
 						null,
 						2
 					)}</pre>`;
@@ -284,15 +283,21 @@
 
 			// Laad de resultaten voor een ingelogde student
 			async function loadStudentResults(user) {
-				studentEmailDisplay.textContent = user.email;
 				const docRef = db.collection("results").doc(user.uid);
 				const doc = await docRef.get();
 				if (!doc.exists) {
+					studentEmailDisplay.textContent = user.email;
 					studentResultsDisplay.textContent =
 						"Er zijn nog geen resultaten opgeslagen.";
 				} else {
+					const data = doc.data();
+					if (data.name) {
+						studentEmailDisplay.textContent = data.name;
+					} else {
+						studentEmailDisplay.textContent = user.email;
+					}
 					studentResultsDisplay.innerHTML =
-						"<pre>" + JSON.stringify(doc.data(), null, 2) + "</pre>";
+						"<pre>" + JSON.stringify(data, null, 2) + "</pre>";
 				}
 			}
 
