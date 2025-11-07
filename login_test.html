@@ -393,6 +393,52 @@
 					.replace(/^-+|-+$/g, "");
 			}
 
+			const CLASS_PRIORITY = [
+				{ key: "4havo", order: 0 },
+				{ key: "4vwo", order: 1 },
+				{ key: "5havo", order: 2 },
+				{ key: "5vwo", order: 3 },
+			];
+
+			function normalizeClassCode(value) {
+				return (value || "")
+					.toLowerCase()
+					.replace(/\s+/g, "")
+					.replace(/[^a-z0-9]/g, "");
+			}
+
+			function getClassSortInfo(className) {
+				const normalized = normalizeClassCode(className);
+				if (!normalized) {
+					return { order: CLASS_PRIORITY.length + 1, normalized: "" };
+				}
+				for (const entry of CLASS_PRIORITY) {
+					if (
+						normalized.includes(entry.key) ||
+						entry.key.includes(normalized)
+					) {
+						return { order: entry.order, normalized };
+					}
+				}
+				return { order: CLASS_PRIORITY.length, normalized };
+			}
+
+			function getSortableLastName(student) {
+				if (student && student.name) {
+					const parts = student.name.trim().split(/\s+/);
+					if (parts.length) {
+						return parts[parts.length - 1].toLowerCase();
+					}
+				}
+				if (student && student.email) {
+					const localPart = student.email.split("@")[0];
+					if (localPart) {
+						return localPart.toLowerCase();
+					}
+				}
+				return student && student.id ? student.id.toLowerCase() : "";
+			}
+
 			const COMMENT_HEADER_KEYWORDS = [
 				"opmerking",
 				"opmerkingen",
@@ -1234,9 +1280,30 @@
 					students.push(normalizeStudentData(doc.id, doc.data() || {}));
 				});
 				students.sort((a, b) => {
-					const nameA = (a.name || a.email || a.id || "").toLowerCase();
-					const nameB = (b.name || b.email || b.id || "").toLowerCase();
-					return nameA.localeCompare(nameB, "nl");
+					const classA = getClassSortInfo(a.className);
+					const classB = getClassSortInfo(b.className);
+					if (classA.order !== classB.order) {
+						return classA.order - classB.order;
+					}
+					const classNameCompare = (a.className || "").localeCompare(
+						b.className || "",
+						"nl",
+						{ sensitivity: "base" }
+					);
+					if (classNameCompare !== 0) {
+						return classNameCompare;
+					}
+					const lastA = getSortableLastName(a);
+					const lastB = getSortableLastName(b);
+					const lastCompare = lastA.localeCompare(lastB, "nl", {
+						sensitivity: "base",
+					});
+					if (lastCompare !== 0) {
+						return lastCompare;
+					}
+					const fullA = (a.name || a.email || a.id || "").toLowerCase();
+					const fullB = (b.name || b.email || b.id || "").toLowerCase();
+					return fullA.localeCompare(fullB, "nl");
 				});
 				let latest = null;
 				const fragment = document.createDocumentFragment();

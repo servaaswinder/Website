@@ -743,13 +743,8 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 
 .student-grid {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 20px;
-}
-
-@media (min-width: 900px) {
-  .student-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  }
 }
 
 .student-card {
