@@ -200,6 +200,21 @@
 							productieomgeving zou je de lijst verbergen of beperken.
 						</p>
 						<div id="all-students" class="results student-grid"></div>
+						<div class="danger-zone">
+							<h3>Resultaten opschonen</h3>
+							<p class="status-message muted">
+								Verwijder alle opgeslagen resultaten uit het systeem. Leerlingaccounts
+								en wachtwoorden blijven ongewijzigd.
+							</p>
+							<button
+								type="button"
+								class="auth-button danger"
+								id="reset-results-btn"
+							>
+								Verwijder alle resultaten
+							</button>
+							<p id="reset-results-message" class="status-message"></p>
+						</div>
 					</section>
 
 					<!-- Student panel -->
@@ -288,6 +303,8 @@
 			const csvUploadMessage = document.getElementById("csv-upload-message");
 			const csvPreview = document.getElementById("csv-preview");
 			const lastSyncLabel = document.getElementById("last-sync");
+			const resetResultsBtn = document.getElementById("reset-results-btn");
+			const resetResultsMessage = document.getElementById("reset-results-message");
 			let currentEditDocId = null;
 			let parsedCsvData = null;
 
@@ -829,6 +846,9 @@
 			if (syncCsvBtn) {
 				syncCsvBtn.addEventListener("click", syncCsvData);
 			}
+			if (resetResultsBtn) {
+				resetResultsBtn.addEventListener("click", clearAllResults);
+			}
 
 			// Inlogformulier afhandelen
 			loginForm.addEventListener("submit", (e) => {
@@ -1323,6 +1343,46 @@
 				});
 				allStudentsDiv.appendChild(fragment);
 				updateLastSyncDisplay(latest);
+			}
+
+			async function clearAllResults() {
+				if (
+					!resetResultsBtn ||
+					!window.confirm(
+						"Weet je zeker dat je alle resultaten wilt verwijderen? Leerlingaccounts blijven bestaan."
+					)
+				) {
+					return;
+				}
+				resetResultsBtn.disabled = true;
+				setStatusMessage(resetResultsMessage, "Resultaten worden verwijderd...", null);
+				try {
+					const snapshot = await db.collection("results").get();
+					if (snapshot.empty) {
+						setStatusMessage(resetResultsMessage, "Er zijn geen resultaten om te verwijderen.", null);
+						resetResultsBtn.disabled = false;
+						return;
+					}
+					const batch = db.batch();
+					snapshot.forEach((doc) => {
+						batch.set(
+							doc.ref,
+							{
+								assignments: [],
+								lastSyncedAt: FieldValue.delete(),
+							},
+							{ merge: true }
+						);
+					});
+					await batch.commit();
+					setStatusMessage(resetResultsMessage, "Alle resultaten zijn verwijderd. Leerlingaccounts zijn behouden.", "success");
+					await loadAllStudents();
+				} catch (error) {
+					console.error(error);
+					setStatusMessage(resetResultsMessage, "Verwijderen mislukt: " + error.message, "error");
+				} finally {
+					resetResultsBtn.disabled = false;
+				}
 			}
 
 			// Laad de resultaten voor een ingelogde student
