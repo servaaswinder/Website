@@ -6,7 +6,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Informatica Leerlingenportal</title>
+		<title>Informatica Leerlingenportaal</title>
 		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
 		<!-- Load Firebase SDKs from CDN -->
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -20,7 +20,7 @@
 		<main>
 			<div class="auth-layout">
 				<section class="inf-hero auth-intro">
-					<h1>Leerlingenportal</h1>
+					<h1>Leerlingenportaal</h1>
 					<p>
 						Hier vind je het officiële Informatica‑portaal voor leerlingen en
 						docenten. Log in om resultaten te bekijken of nieuwe leerlingen toe
@@ -286,8 +286,8 @@
 						<div class="danger-zone">
 							<h3>Resultaten opschonen</h3>
 							<p class="status-message muted">
-								Verwijder alle opgeslagen resultaten uit het systeem. Leerlingaccounts
-								en wachtwoorden blijven ongewijzigd.
+								Verwijder alle opgeslagen resultaten uit het systeem.
+								Leerlingaccounts en wachtwoorden blijven ongewijzigd.
 							</p>
 							<button
 								type="button"
@@ -439,11 +439,16 @@
 			const csvPreview = document.getElementById("csv-preview");
 			const lastSyncLabel = document.getElementById("last-sync");
 			const csvPeriodSelector = document.getElementById("csv-period-selector");
-			const adminPeriodFilterEl = document.getElementById("admin-period-filter");
-			const studentPeriodFilterEl =
-				document.getElementById("student-period-filter");
+			const adminPeriodFilterEl = document.getElementById(
+				"admin-period-filter"
+			);
+			const studentPeriodFilterEl = document.getElementById(
+				"student-period-filter"
+			);
 			const resetResultsBtn = document.getElementById("reset-results-btn");
-			const resetResultsMessage = document.getElementById("reset-results-message");
+			const resetResultsMessage = document.getElementById(
+				"reset-results-message"
+			);
 			let currentEditDocId = null;
 			let parsedCsvData = null;
 
@@ -716,7 +721,9 @@
 				}
 				return rows
 					.map((row) =>
-						Array.isArray(row) ? row.map((cell) => normalizeCellValue(cell)) : []
+						Array.isArray(row)
+							? row.map((cell) => normalizeCellValue(cell))
+							: []
 					)
 					.filter((row) => row.some((cell) => cell));
 			}
@@ -844,16 +851,12 @@
 						const gradeValue =
 							grade
 								.map((col) =>
-									parseGradeValue(
-										col.index < row.length ? row[col.index] : ""
-									)
+									parseGradeValue(col.index < row.length ? row[col.index] : "")
 								)
 								.find((value) => value) || "";
 						const commentValue =
 							comment
-								.map((col) =>
-									col.index < row.length ? row[col.index] : ""
-								)
+								.map((col) => (col.index < row.length ? row[col.index] : ""))
 								.find((value) => value) || "";
 						const rubricValues = [];
 						rubric.forEach((col) => {
@@ -897,7 +900,9 @@
 				});
 
 				if (!students.length) {
-					throw new Error("Er zijn geen leerlingen gevonden in het CSV-bestand.");
+					throw new Error(
+						"Er zijn geen leerlingen gevonden in het CSV-bestand."
+					);
 				}
 
 				return {
@@ -1473,10 +1478,7 @@
 				return section;
 			}
 
-			function createStudentCard(
-				student,
-				periodFilter = ALL_PERIOD_VALUE
-			) {
+			function createStudentCard(student, periodFilter = ALL_PERIOD_VALUE) {
 				const card = document.createElement("article");
 				card.className = "student-card";
 				const header = document.createElement("header");
@@ -1655,11 +1657,19 @@
 					return;
 				}
 				resetResultsBtn.disabled = true;
-				setStatusMessage(resetResultsMessage, "Resultaten worden verwijderd...", null);
+				setStatusMessage(
+					resetResultsMessage,
+					"Resultaten worden verwijderd...",
+					null
+				);
 				try {
 					const snapshot = await db.collection("results").get();
 					if (snapshot.empty) {
-						setStatusMessage(resetResultsMessage, "Er zijn geen resultaten om te verwijderen.", null);
+						setStatusMessage(
+							resetResultsMessage,
+							"Er zijn geen resultaten om te verwijderen.",
+							null
+						);
 						resetResultsBtn.disabled = false;
 						return;
 					}
@@ -1675,11 +1685,19 @@
 						);
 					});
 					await batch.commit();
-					setStatusMessage(resetResultsMessage, "Alle resultaten zijn verwijderd. Leerlingaccounts zijn behouden.", "success");
+					setStatusMessage(
+						resetResultsMessage,
+						"Alle resultaten zijn verwijderd. Leerlingaccounts zijn behouden.",
+						"success"
+					);
 					await loadAllStudents();
 				} catch (error) {
 					console.error(error);
-					setStatusMessage(resetResultsMessage, "Verwijderen mislukt: " + error.message, "error");
+					setStatusMessage(
+						resetResultsMessage,
+						"Verwijderen mislukt: " + error.message,
+						"error"
+					);
 				} finally {
 					resetResultsBtn.disabled = false;
 				}
