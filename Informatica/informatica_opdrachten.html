@@ -3,24 +3,417 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Informatica – Opdrachtenboom</title>
-		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	</head>
-	<body>
-		{% include site-header.html %}
-		<main>
-			<section>
-				<h2>Overzicht</h2>
-				<p>
-					Hier komt de opdrachtenboom. Voeg hier secties/links toe naar
-					opdrachten per periode of thema.
-				</p>
-			</section>
-		</main>
-		<footer>
-			<p>&copy; 2025 Servaas Winder</p>
-		</footer>
-	</body>
+        <head>
+                <title>Informatica – Opdrachtenboom</title>
+                <link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <style>
+                        .assignments-hero {
+                                background: linear-gradient(180deg, var(--accent-50), rgba(255, 255, 255, 0));
+                                border: 1px solid var(--border);
+                                border-radius: 20px;
+                                padding: 32px;
+                                box-shadow: var(--shadow);
+                                margin-bottom: 32px;
+                        }
+
+                        .assignments-hero h1 {
+                                margin: 0 0 12px;
+                                font-size: clamp(28px, 4vw, 38px);
+                                line-height: 1.15;
+                        }
+
+                        .assignments-hero p {
+                                margin: 0;
+                                max-width: 680px;
+                                color: var(--muted);
+                                font-size: 17px;
+                                line-height: 1.55;
+                        }
+
+                        .tree-wrapper {
+                                border: 1px solid var(--border);
+                                border-radius: 22px;
+                                background: var(--bg-elev);
+                                box-shadow: var(--shadow);
+                                padding: clamp(20px, 4vw, 32px);
+                        }
+
+                        .tree-wrapper h2 {
+                                margin-top: 0;
+                                margin-bottom: 18px;
+                                font-size: clamp(26px, 3.4vw, 32px);
+                                text-align: center;
+                        }
+
+                        .tree-wrapper p.tree-caption {
+                                margin: 0 auto 22px;
+                                max-width: 680px;
+                                text-align: center;
+                                color: var(--muted);
+                                line-height: 1.6;
+                        }
+
+                        .tree-scroller {
+                                overflow-x: auto;
+                                padding-bottom: 16px;
+                        }
+
+                        .tree-scroller::-webkit-scrollbar {
+                                height: 10px;
+                        }
+
+                        .tree-scroller::-webkit-scrollbar-thumb {
+                                background: rgba(36, 52, 84, 0.2);
+                                border-radius: 999px;
+                        }
+
+                        .tree-scroller::-webkit-scrollbar-track {
+                                background: rgba(36, 52, 84, 0.08);
+                                border-radius: 999px;
+                        }
+
+                        .tree-canvas {
+                                min-width: 1080px;
+                                margin: 0 auto;
+                        }
+
+                        .assignment-tree {
+                                width: 100%;
+                                height: auto;
+                        }
+
+                        .assignment-tree line,
+                        .assignment-tree path {
+                                stroke: rgba(32, 46, 76, 0.38);
+                                stroke-width: 3;
+                                fill: none;
+                        }
+
+                        .tree-node {
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                gap: 10px;
+                                border-radius: 18px;
+                                padding: 18px;
+                                text-align: center;
+                                font-size: 17px;
+                                line-height: 1.45;
+                                color: var(--fg);
+                                border: 2px solid rgba(32, 46, 76, 0.12);
+                                box-shadow: 0 12px 26px rgba(20, 36, 64, 0.12);
+                                overflow-wrap: anywhere;
+                                background: white;
+                        }
+
+                        .tree-node h3 {
+                                margin: 0;
+                                font-size: 18px;
+                                font-weight: 600;
+                                line-height: 1.25;
+                        }
+
+                        .tree-node p {
+                                margin: 0;
+                                font-size: 15px;
+                                color: rgba(28, 38, 54, 0.78);
+                        }
+
+                        .phase-start { background: #fee28f; }
+                        .phase-research { background: #ffe9a8; }
+                        .phase-model { background: #fbd3a4; }
+                        .phase-build { background: #bcead2; }
+                        .phase-test { background: #d1e4ff; }
+                        .phase-security { background: #ddbff6; }
+                        .phase-rollout { background: #f6c1dd; }
+
+                        .tree-legend {
+                                margin-top: 26px;
+                                display: grid;
+                                gap: 16px;
+                                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                        }
+
+                        .legend-item {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding: 12px 14px;
+                                border-radius: 14px;
+                                border: 1px solid rgba(32, 46, 76, 0.12);
+                                background: rgba(255, 255, 255, 0.65);
+                        }
+
+                        .legend-color {
+                                width: 18px;
+                                height: 18px;
+                                border-radius: 6px;
+                                box-shadow: inset 0 0 0 1px rgba(32, 46, 76, 0.15);
+                        }
+
+                        .legend-label {
+                                margin: 0;
+                                font-weight: 500;
+                                color: rgba(28, 38, 54, 0.84);
+                        }
+
+                        @media (max-width: 760px) {
+                                .tree-wrapper {
+                                        padding: 22px 18px;
+                                }
+
+                                .tree-legend {
+                                        grid-template-columns: 1fr;
+                                }
+                        }
+                </style>
+        </head>
+        <body>
+                {% include site-header.html %}
+                <main>
+                        <section class="assignments-hero">
+                                <h1>Leerpad Informatica</h1>
+                                <p>
+                                        Start bovenaan bij de portfoliostartopdracht en werk daarna langs de
+                                        horizontale takken. Elke kleur laat een ander soort activiteit zien;
+                                        samen vormen ze de volledige opdrachtenboom voor dit schooljaar.
+                                </p>
+                        </section>
+                        <section class="tree-wrapper" aria-labelledby="opdrachtenboom-title">
+                                <h2 id="opdrachtenboom-title">Opdrachtenboom</h2>
+                                <p class="tree-caption">
+                                        De lijnen tonen de volgorde waarin leerlingen doorgaans de opdrachten
+                                        doorlopen. Werk van boven naar beneden en neem horizontaal de
+                                        vervolgstappen mee.
+                                </p>
+                                <div class="tree-scroller" role="group" aria-label="Opdrachtenboom visualisatie">
+                                        <div class="tree-canvas">
+                                                <svg
+                                                        class="assignment-tree"
+                                                        viewBox="0 0 1200 1280"
+                                                        role="img"
+                                                        aria-describedby="tree-description"
+                                                >
+                                                        <desc id="tree-description">
+                                                                Visualisatie van de informatica-opdrachten. Leerlingen starten
+                                                                bovenaan en volgen de lijnen naar beneden voor de volgende
+                                                                taken.
+                                                        </desc>
+                                                        <!-- Verbindingen -->
+                                                        <g class="tree-links">
+                                                                <line x1="600" y1="150" x2="600" y2="240" />
+                                                                <line x1="600" y1="380" x2="600" y2="470" />
+                                                                <line x1="600" y1="550" x2="600" y2="640" />
+                                                                <line x1="600" y1="720" x2="600" y2="810" />
+                                                                <line x1="600" y1="900" x2="600" y2="990" />
+                                                                <line x1="600" y1="1080" x2="600" y2="1170" />
+
+                                                                <line x1="600" y1="240" x2="300" y2="240" />
+                                                                <line x1="300" y1="240" x2="300" y2="330" />
+                                                                <line x1="300" y1="420" x2="300" y2="510" />
+                                                                <line x1="300" y1="600" x2="300" y2="690" />
+                                                                <line x1="300" y1="780" x2="300" y2="870" />
+                                                                <line x1="300" y1="960" x2="160" y2="1050" />
+                                                                <line x1="300" y1="960" x2="300" y2="1050" />
+                                                                <line x1="300" y1="960" x2="440" y2="1050" />
+
+                                                                <line x1="600" y1="240" x2="900" y2="240" />
+                                                                <line x1="900" y1="240" x2="900" y2="330" />
+                                                                <line x1="900" y1="420" x2="900" y2="510" />
+                                                                <line x1="900" y1="600" x2="900" y2="690" />
+                                                                <line x1="900" y1="780" x2="900" y2="870" />
+                                                                <line x1="900" y1="960" x2="1020" y2="1050" />
+                                                                <line x1="900" y1="960" x2="900" y2="1050" />
+
+                                                                <line x1="600" y1="900" x2="1020" y2="900" />
+                                                                <line x1="1020" y1="900" x2="1020" y2="990" />
+                                                        </g>
+
+                                                        <!-- Knoop: Portfolio start -->
+                                                        <foreignObject x="480" y="30" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-start">
+                                                                        <h3>Portfolio startopdracht (A0)</h3>
+                                                                        <p>Maak je eigen website en licht je leerdoelen toe.</p>
+                                                                </div>
+                                                        </foreignObject>
+
+                                                        <!-- Linker tak -->
+                                                        <foreignObject x="180" y="210" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-research">
+                                                                        <h3>Communicatie (A1)</h3>
+                                                                        <p>Ontwerp een persona van je doelgroep en beschrijf behoeften.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="180" y="390" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-research">
+                                                                        <h3>Oriëntatie (A2)</h3>
+                                                                        <p>Onderzoek drie vergelijkbare sites en noteer je inzichten.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="180" y="570" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-research">
+                                                                        <h3>Onderzoek (A3)</h3>
+                                                                        <p>Verken dataverzamelingsmethoden die bij je project passen.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="180" y="750" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-research">
+                                                                        <h3>Analyse (A4)</h3>
+                                                                        <p>Analyseer de data en vertaal bevindingen naar eisen.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="180" y="930" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-security">
+                                                                        <h3>Security (A5)</h3>
+                                                                        <p>Voer een security check uit en documenteer risico’s.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="60" y="1110" width="220" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-security">
+                                                                        <h3>Security sprint (A6)</h3>
+                                                                        <p>Richt je threat model in en bepaal prioriteiten.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="180" y="1110" width="220" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-security">
+                                                                        <h3>Security plan (A7)</h3>
+                                                                        <p>Schrijf maatregelen uit en wijs taken toe.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="300" y="1110" width="220" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-security">
+                                                                        <h3>Security review (A8)</h3>
+                                                                        <p>Test je oplossing en rapporteer bevindingen.</p>
+                                                                </div>
+                                                        </foreignObject>
+
+                                                        <!-- Midden tak -->
+                                                        <foreignObject x="480" y="210" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-research">
+                                                                        <h3>Cursus leren modelleren</h3>
+                                                                        <p>Leer processen schetsen met BPMN en scenario’s.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="480" y="390" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-model">
+                                                                        <h3>Conceptontwerp (B1)</h3>
+                                                                        <p>Maak wireframes en bepaal de gebruikersstromen.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="480" y="570" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-model">
+                                                                        <h3>Procesmodel (B2)</h3>
+                                                                        <p>Werk het stappenplan van je systeem volledig uit.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="480" y="750" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-build">
+                                                                        <h3>Datamodel (B3)</h3>
+                                                                        <p>Vertaal je proces naar entiteiten, relaties en attributen.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="480" y="930" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-build">
+                                                                        <h3>Database bouwen (B4)</h3>
+                                                                        <p>Implementeer de tabellen en valideer je ontwerp.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="480" y="1110" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-build">
+                                                                        <h3>Dashboard (B5)</h3>
+                                                                        <p>Maak visualisaties die je conclusies ondersteunen.</p>
+                                                                </div>
+                                                        </foreignObject>
+
+                                                        <!-- Rechter tak -->
+                                                        <foreignObject x="780" y="210" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-build">
+                                                                        <h3>Introductie HTML (C1)</h3>
+                                                                        <p>Herbouw je pagina met semantische HTML en nettere CSS.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="780" y="390" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-build">
+                                                                        <h3>Algoritmen (C2)</h3>
+                                                                        <p>Beschrijf je logica in pseudocode en testcases.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="780" y="570" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-build">
+                                                                        <h3>Datastructuren (C3)</h3>
+                                                                        <p>Leg vast hoe je gegevens worden opgeslagen en opgehaald.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="780" y="750" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-test">
+                                                                        <h3>Implementatie (C4)</h3>
+                                                                        <p>Bouw de functionaliteit en controleer de werking.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="780" y="930" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-test">
+                                                                        <h3>Testen (C5)</h3>
+                                                                        <p>Laat klasgenoten testen en verwerk hun feedback.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="900" y="1110" width="220" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-rollout">
+                                                                        <h3>Gebruikersfeedback (C6)</h3>
+                                                                        <p>Interview eindgebruikers en noteer verbeterpunten.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="1020" y="1110" width="220" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-rollout">
+                                                                        <h3>Portfolio update (C7)</h3>
+                                                                        <p>Werk je portfolio bij met resultaten, iteraties en reflectie.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                        <foreignObject x="900" y="990" width="240" height="120">
+                                                                <div xmlns="http://www.w3.org/1999/xhtml" class="tree-node phase-rollout">
+                                                                        <h3>Oplevering (C5+)</h3>
+                                                                        <p>Bereid de release voor en plan een overdracht met je team.</p>
+                                                                </div>
+                                                        </foreignObject>
+                                                </svg>
+                                        </div>
+                                </div>
+                                <div class="tree-legend" aria-label="Legenda van kleuren">
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #fee28f"></span>
+                                                <p class="legend-label">Startopdracht</p>
+                                        </div>
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #ffe9a8"></span>
+                                                <p class="legend-label">Onderzoek &amp; analyse</p>
+                                        </div>
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #fbd3a4"></span>
+                                                <p class="legend-label">Modelleren</p>
+                                        </div>
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #bcead2"></span>
+                                                <p class="legend-label">Ontwikkelen &amp; bouwen</p>
+                                        </div>
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #d1e4ff"></span>
+                                                <p class="legend-label">Testen</p>
+                                        </div>
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #ddbff6"></span>
+                                                <p class="legend-label">Security</p>
+                                        </div>
+                                        <div class="legend-item">
+                                                <span class="legend-color" style="background: #f6c1dd"></span>
+                                                <p class="legend-label">Oplevering &amp; reflectie</p>
+                                        </div>
+                                </div>
+                        </section>
+                </main>
+                <footer>
+                        <p>&copy; 2025 Servaas Winder</p>
+                </footer>
+        </body>
 </html>
