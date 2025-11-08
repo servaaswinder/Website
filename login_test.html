@@ -100,6 +100,44 @@
 								<label for="results-file">CSV-bestand</label>
 								<input type="file" id="results-file" accept=".csv,text/csv" />
 							</div>
+							<div
+								class="period-toggle"
+								id="csv-period-selector"
+								role="group"
+								aria-label="Kies periode voor deze resultaten"
+							>
+								<span class="toggle-label">Periode</span>
+								<div class="toggle-options">
+									<button
+										type="button"
+										class="period-option is-active"
+										data-period-value="P1"
+									>
+										P1
+									</button>
+									<button
+										type="button"
+										class="period-option"
+										data-period-value="P2"
+									>
+										P2
+									</button>
+									<button
+										type="button"
+										class="period-option"
+										data-period-value="P3"
+									>
+										P3
+									</button>
+									<button
+										type="button"
+										class="period-option"
+										data-period-value="P4"
+									>
+										P4
+									</button>
+								</div>
+							</div>
 							<div class="csv-actions">
 								<button type="button" id="sync-csv-btn" class="auth-button">
 									Synchroniseer resultaten
@@ -199,6 +237,51 @@
 							Alleen zichtbaar voor demonstratiedoeleinden. In een
 							productieomgeving zou je de lijst verbergen of beperken.
 						</p>
+						<div
+							class="period-toggle compact"
+							id="admin-period-filter"
+							role="group"
+							aria-label="Filter resultaten op periode"
+						>
+							<span class="toggle-label">Filter op periode</span>
+							<div class="toggle-options">
+								<button
+									type="button"
+									class="period-option period-option-wide is-active"
+									data-period-value="ALL"
+								>
+									Alle
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P1"
+								>
+									P1
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P2"
+								>
+									P2
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P3"
+								>
+									P3
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P4"
+								>
+									P4
+								</button>
+							</div>
+						</div>
 						<div id="all-students" class="results student-grid"></div>
 						<div class="danger-zone">
 							<h3>Resultaten opschonen</h3>
@@ -233,6 +316,51 @@
 							Welkom, <span id="student-email-display"></span>! Bekijk hieronder
 							je persoonlijke resultaten en notities.
 						</p>
+						<div
+							class="period-toggle compact"
+							id="student-period-filter"
+							role="group"
+							aria-label="Filter jouw resultaten op periode"
+						>
+							<span class="toggle-label">Filter op periode</span>
+							<div class="toggle-options">
+								<button
+									type="button"
+									class="period-option period-option-wide is-active"
+									data-period-value="ALL"
+								>
+									Alle
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P1"
+								>
+									P1
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P2"
+								>
+									P2
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P3"
+								>
+									P3
+								</button>
+								<button
+									type="button"
+									class="period-option"
+									data-period-value="P4"
+								>
+									P4
+								</button>
+							</div>
+						</div>
 						<div id="student-results-display" class="results"></div>
 					</section>
 				</div>
@@ -260,6 +388,13 @@
 			const auth = firebase.auth();
 			const db = firebase.firestore();
 			const FieldValue = firebase.firestore.FieldValue;
+			const PERIOD_OPTIONS = ["P1", "P2", "P3", "P4"];
+			const ALL_PERIOD_VALUE = "ALL";
+			let selectedCsvPeriod = PERIOD_OPTIONS[0];
+			let adminPeriodFilter = ALL_PERIOD_VALUE;
+			let studentPeriodFilter = ALL_PERIOD_VALUE;
+			let cachedStudents = [];
+			let cachedStudentData = null;
 
 			// Geef hier het administrator e-mailadres op. Alleen gebruikers met
 			// dit e-mailadres krijgen toegang tot het adminpaneel.
@@ -303,10 +438,42 @@
 			const csvUploadMessage = document.getElementById("csv-upload-message");
 			const csvPreview = document.getElementById("csv-preview");
 			const lastSyncLabel = document.getElementById("last-sync");
+			const csvPeriodSelector = document.getElementById("csv-period-selector");
+			const adminPeriodFilterEl = document.getElementById("admin-period-filter");
+			const studentPeriodFilterEl =
+				document.getElementById("student-period-filter");
 			const resetResultsBtn = document.getElementById("reset-results-btn");
 			const resetResultsMessage = document.getElementById("reset-results-message");
 			let currentEditDocId = null;
 			let parsedCsvData = null;
+
+			selectedCsvPeriod = initPeriodToggle(
+				csvPeriodSelector,
+				selectedCsvPeriod,
+				(value) => {
+					selectedCsvPeriod = value;
+					if (parsedCsvData && parsedCsvData.summary) {
+						parsedCsvData.summary.period = value;
+						renderCsvPreview(parsedCsvData.summary);
+					}
+				}
+			);
+			adminPeriodFilter = initPeriodToggle(
+				adminPeriodFilterEl,
+				adminPeriodFilter,
+				(value) => {
+					adminPeriodFilter = value;
+					renderAllStudents();
+				}
+			);
+			studentPeriodFilter = initPeriodToggle(
+				studentPeriodFilterEl,
+				studentPeriodFilter,
+				(value) => {
+					studentPeriodFilter = value;
+					renderStudentPanel(studentResultsDisplay, cachedStudentData);
+				}
+			);
 
 			function setStatusMessage(element, message, type) {
 				if (!element) {
@@ -322,6 +489,49 @@
 				if (!message) {
 					element.classList.remove("error-message", "success-message");
 				}
+			}
+
+			function initPeriodToggle(container, initialValue, onChange) {
+				if (!container) {
+					return initialValue;
+				}
+				let currentValue = initialValue;
+				const buttons = Array.from(
+					container.querySelectorAll("[data-period-value]")
+				).filter((button) => button instanceof HTMLElement);
+
+				const activate = (value) => {
+					buttons.forEach((button) => {
+						const optionValue = button.getAttribute("data-period-value");
+						button.classList.toggle("is-active", optionValue === value);
+					});
+				};
+
+				if (
+					!buttons.some(
+						(btn) => btn.getAttribute("data-period-value") === currentValue
+					)
+				) {
+					currentValue =
+						(buttons[0] && buttons[0].getAttribute("data-period-value")) ||
+						currentValue;
+				}
+
+				activate(currentValue);
+
+				buttons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const value = button.getAttribute("data-period-value");
+						if (!value || value === currentValue) {
+							return;
+						}
+						currentValue = value;
+						activate(currentValue);
+						onChange(currentValue);
+					});
+				});
+
+				return currentValue;
 			}
 
 			function clearCsvSelection(resetMessage = true) {
@@ -356,6 +566,9 @@
 																}</li>
                                 <li><strong>Opdrachten:</strong> ${
 																	summary.assignmentCount
+																}</li>
+                                <li><strong>Periode:</strong> ${
+																	summary.period || selectedCsvPeriod
 																}</li>
                                 ${
 																	detectedColumns.length
@@ -408,6 +621,14 @@
 					.replace(/\p{Diacritic}/gu, "")
 					.replace(/[^a-z0-9]+/g, "-")
 					.replace(/^-+|-+$/g, "");
+			}
+
+			function normalizePeriodValue(value) {
+				if (!value) {
+					return "";
+				}
+				const upper = String(value).trim().toUpperCase();
+				return PERIOD_OPTIONS.includes(upper) ? upper : "";
 			}
 
 			const CLASS_PRIORITY = [
@@ -689,6 +910,7 @@
 							(emailColumnIndex >= 0 && columnRow[emailColumnIndex]) ||
 							"Kolom 2 (e-mail)",
 						classHeader: "Groepsregel (bijv. Havo 4)",
+						period: null,
 					},
 				};
 			}
@@ -770,6 +992,9 @@
 						try {
 							const payload = prepareCsvRecords(results.data);
 							parsedCsvData = payload;
+							if (parsedCsvData.summary) {
+								parsedCsvData.summary.period = selectedCsvPeriod;
+							}
 							renderCsvPreview(payload.summary);
 							setStatusMessage(
 								csvUploadMessage,
@@ -817,7 +1042,15 @@
 						"Resultaten worden gesynchroniseerd...",
 						null
 					);
-					await persistCsvRecords(parsedCsvData.students);
+					const period = selectedCsvPeriod;
+					const studentsWithPeriod = parsedCsvData.students.map((student) => ({
+						...student,
+						assignments: student.assignments.map((assignment) => ({
+							...assignment,
+							period,
+						})),
+					}));
+					await persistCsvRecords(studentsWithPeriod);
 					setStatusMessage(
 						csvUploadMessage,
 						`Synchronisatie voltooid voor ${parsedCsvData.students.length} leerlingen.`,
@@ -1064,11 +1297,13 @@
 							})
 							.filter(Boolean)
 					: [];
+				const period = normalizePeriodValue(rawAssignment.period);
 				return {
 					title,
 					grade,
 					comment,
 					rubric: rubricItems,
+					period,
 				};
 			}
 
@@ -1116,6 +1351,7 @@
 						grade,
 						comment,
 						rubric,
+						period: normalizePeriodValue(data.period),
 					},
 				];
 			}
@@ -1180,6 +1416,23 @@
 				return list;
 			}
 
+			function filterAssignmentsByPeriod(assignments, period) {
+				if (!Array.isArray(assignments) || !assignments.length) {
+					return [];
+				}
+				const normalizedFilter =
+					period && period !== ALL_PERIOD_VALUE
+						? period.toUpperCase()
+						: ALL_PERIOD_VALUE;
+				if (normalizedFilter === ALL_PERIOD_VALUE) {
+					return assignments;
+				}
+				return assignments.filter((assignment) => {
+					const assignmentPeriod = normalizePeriodValue(assignment.period);
+					return assignmentPeriod === normalizedFilter;
+				});
+			}
+
 			function createAssignmentSection(assignment) {
 				const section = document.createElement("article");
 				section.className = "assignment-card";
@@ -1188,11 +1441,23 @@
 				const title = document.createElement("h4");
 				title.textContent = assignment.title || "Opdracht";
 				header.appendChild(title);
+				const meta = document.createElement("div");
+				meta.className = "assignment-header-meta";
+				const periodLabel = normalizePeriodValue(assignment.period);
+				if (periodLabel) {
+					const periodBadge = document.createElement("span");
+					periodBadge.className = "assignment-period";
+					periodBadge.textContent = periodLabel;
+					meta.appendChild(periodBadge);
+				}
 				if (assignment.grade) {
 					const gradeBadge = document.createElement("span");
 					gradeBadge.className = "assignment-grade";
 					gradeBadge.textContent = `Cijfer: ${assignment.grade}`;
-					header.appendChild(gradeBadge);
+					meta.appendChild(gradeBadge);
+				}
+				if (meta.childElementCount > 0) {
+					header.appendChild(meta);
 				}
 				section.appendChild(header);
 				if (assignment.comment) {
@@ -1208,7 +1473,10 @@
 				return section;
 			}
 
-			function createStudentCard(student) {
+			function createStudentCard(
+				student,
+				periodFilter = ALL_PERIOD_VALUE
+			) {
 				const card = document.createElement("article");
 				card.className = "student-card";
 				const header = document.createElement("header");
@@ -1234,18 +1502,41 @@
 				card.appendChild(header);
 				const body = document.createElement("div");
 				body.className = "student-card-body";
-				if (!student.assignments.length) {
+				const assignmentsToRender = filterAssignmentsByPeriod(
+					student.assignments,
+					periodFilter
+				);
+				if (!assignmentsToRender.length) {
 					const empty = document.createElement("p");
 					empty.className = "empty-state";
-					empty.textContent = "Er zijn nog geen opdrachten voor deze leerling.";
+					empty.textContent =
+						periodFilter === ALL_PERIOD_VALUE
+							? "Er zijn nog geen opdrachten voor deze leerling."
+							: "Er zijn geen resultaten voor deze periode.";
 					body.appendChild(empty);
 				} else {
-					student.assignments.forEach((assignment) => {
+					assignmentsToRender.forEach((assignment) => {
 						body.appendChild(createAssignmentSection(assignment));
 					});
 				}
 				card.appendChild(body);
 				return card;
+			}
+
+			function renderAllStudents() {
+				if (!allStudentsDiv) {
+					return;
+				}
+				if (!cachedStudents.length) {
+					allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
+					return;
+				}
+				allStudentsDiv.innerHTML = "";
+				const fragment = document.createDocumentFragment();
+				cachedStudents.forEach((student) => {
+					fragment.appendChild(createStudentCard(student, adminPeriodFilter));
+				});
+				allStudentsDiv.appendChild(fragment);
 			}
 
 			function renderStudentPanel(container, student) {
@@ -1274,30 +1565,54 @@
 					summary.appendChild(syncText);
 				}
 				container.appendChild(summary);
-				if (!student.assignments.length) {
+				const assignmentsToRender = filterAssignmentsByPeriod(
+					student.assignments,
+					studentPeriodFilter
+				);
+				if (!assignmentsToRender.length) {
 					const empty = document.createElement("p");
 					empty.className = "empty-state";
-					empty.textContent = "Er zijn nog geen opdrachten voor deze leerling.";
+					empty.textContent =
+						studentPeriodFilter === ALL_PERIOD_VALUE
+							? "Er zijn nog geen opdrachten voor deze leerling."
+							: "Er zijn geen resultaten voor deze periode.";
 					container.appendChild(empty);
 					return;
 				}
-				student.assignments.forEach((assignment) => {
+				assignmentsToRender.forEach((assignment) => {
 					container.appendChild(createAssignmentSection(assignment));
 				});
 			}
 
 			// Laden van alle studenten (zichtbaar in adminpaneel)
 			async function loadAllStudents() {
+				if (!allStudentsDiv) {
+					return;
+				}
 				allStudentsDiv.innerHTML = "";
 				const snapshot = await db.collection("results").get();
 				if (snapshot.empty) {
+					cachedStudents = [];
 					allStudentsDiv.textContent = "Geen resultaten beschikbaar.";
 					updateLastSyncDisplay(null);
 					return;
 				}
 				const students = [];
+				let latest = null;
 				snapshot.forEach((doc) => {
-					students.push(normalizeStudentData(doc.id, doc.data() || {}));
+					const normalized = normalizeStudentData(doc.id, doc.data() || {});
+					students.push(normalized);
+					const date =
+						normalized.lastSyncedAt && normalized.lastSyncedAt.toDate
+							? normalized.lastSyncedAt.toDate()
+							: normalized.lastSyncedAt
+							? new Date(normalized.lastSyncedAt)
+							: null;
+					if (date && !Number.isNaN(date.getTime())) {
+						if (!latest || date > latest) {
+							latest = date;
+						}
+					}
 				});
 				students.sort((a, b) => {
 					const classA = getClassSortInfo(a.className);
@@ -1325,23 +1640,8 @@
 					const fullB = (b.name || b.email || b.id || "").toLowerCase();
 					return fullA.localeCompare(fullB, "nl");
 				});
-				let latest = null;
-				const fragment = document.createDocumentFragment();
-				students.forEach((student) => {
-					fragment.appendChild(createStudentCard(student));
-					const date =
-						student.lastSyncedAt && student.lastSyncedAt.toDate
-							? student.lastSyncedAt.toDate()
-							: student.lastSyncedAt
-							? new Date(student.lastSyncedAt)
-							: null;
-					if (date && !Number.isNaN(date.getTime())) {
-						if (!latest || date > latest) {
-							latest = date;
-						}
-					}
-				});
-				allStudentsDiv.appendChild(fragment);
+				cachedStudents = students;
+				renderAllStudents();
 				updateLastSyncDisplay(latest);
 			}
 
@@ -1400,6 +1700,7 @@
 				}
 				if (!doc || !doc.exists) {
 					studentEmailDisplay.textContent = user.email;
+					cachedStudentData = null;
 					renderStudentPanel(studentResultsDisplay, null);
 					return;
 				}
@@ -1411,6 +1712,7 @@
 				} else {
 					studentEmailDisplay.textContent = user.email;
 				}
+				cachedStudentData = student;
 				renderStudentPanel(studentResultsDisplay, student);
 			}
 
@@ -1419,10 +1721,12 @@
 				if (user) {
 					loginSection.classList.add("hidden");
 					if (user.email === ADMIN_EMAIL) {
+						cachedStudentData = null;
 						adminSection.classList.remove("hidden");
 						studentSection.classList.add("hidden");
 						await loadAllStudents();
 					} else {
+						cachedStudents = [];
 						adminSection.classList.add("hidden");
 						studentSection.classList.remove("hidden");
 						await loadStudentResults(user);
@@ -1431,6 +1735,15 @@
 					loginSection.classList.remove("hidden");
 					adminSection.classList.add("hidden");
 					studentSection.classList.add("hidden");
+					cachedStudents = [];
+					cachedStudentData = null;
+					if (allStudentsDiv) {
+						allStudentsDiv.innerHTML = "";
+					}
+					if (studentResultsDisplay) {
+						studentResultsDisplay.innerHTML = "";
+					}
+					updateLastSyncDisplay(null);
 				}
 			});
 
