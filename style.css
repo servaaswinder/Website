@@ -742,14 +742,15 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 }
 
 .student-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
 .auth-card .student-grid,
 .results.student-grid {
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
 }
 
 .student-card {
