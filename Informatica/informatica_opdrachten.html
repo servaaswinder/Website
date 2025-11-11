@@ -3,577 +3,703 @@
 
 <!DOCTYPE html>
 <html>
-        <head>
-                <title>Informatica – Opdrachtenboom</title>
-                <link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <style>
-                        .assignments-hero {
-                                background: linear-gradient(180deg, var(--accent-50), rgba(255, 255, 255, 0));
-                                border: 1px solid var(--border);
-                                border-radius: 20px;
-                                padding: 32px;
-                                box-shadow: var(--shadow);
-                                margin-bottom: 32px;
-                        }
+	<head>
+		<title>Informatica – Opdrachtenboom</title>
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			.assignments-hero {
+				background: linear-gradient(
+					180deg,
+					var(--accent-50),
+					rgba(255, 255, 255, 0)
+				);
+				border: 1px solid var(--border);
+				border-radius: 20px;
+				padding: 32px;
+				box-shadow: var(--shadow);
+				margin-bottom: 32px;
+			}
 
-                        .assignments-hero h1 {
-                                margin: 0 0 12px;
-                                font-size: clamp(28px, 5vw, 40px);
-                                line-height: 1.1;
-                        }
+			.assignments-hero h1 {
+				margin: 0 0 12px;
+				font-size: clamp(28px, 5vw, 40px);
+				line-height: 1.1;
+			}
 
-                        .assignments-hero p {
-                                margin: 0;
-                                max-width: 760px;
-                                color: rgba(18, 28, 48, 0.72);
-                                line-height: 1.6;
-                        }
+			.assignments-hero p {
+				margin: 0;
+				max-width: 760px;
+				color: rgba(18, 28, 48, 0.72);
+				line-height: 1.6;
+			}
 
-                        .tabs-card {
-                                background: rgba(255, 255, 255, 0.9);
-                                border-radius: 24px;
-                                border: 1px solid var(--tab-border);
-                                box-shadow: 0 18px 42px rgba(18, 32, 58, 0.1);
-                                padding: clamp(20px, 3.6vw, 36px);
-                        }
+			.tabs-card {
+				background: rgba(255, 255, 255, 0.9);
+				border-radius: 24px;
+				border: 1px solid var(--tab-border);
+				box-shadow: 0 18px 42px rgba(18, 32, 58, 0.1);
+				padding: clamp(20px, 3.6vw, 36px);
+			}
 
-                        .tab-buttons {
-                                display: flex;
-                                flex-wrap: wrap;
-                                gap: 12px;
-                                margin-bottom: clamp(20px, 3vw, 32px);
-                                border-bottom: 1px solid var(--tab-border);
-                                padding-bottom: 16px;
-                        }
+			.tab-buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 12px;
+				margin-bottom: clamp(20px, 3vw, 32px);
+				border-bottom: 1px solid var(--tab-border);
+				padding-bottom: 16px;
+			}
 
-                        .tab-button {
-                                appearance: none;
-                                border: 1px solid transparent;
-                                background: transparent;
-                                color: rgba(18, 30, 52, 0.68);
-                                font-size: 16px;
-                                font-weight: 600;
-                                letter-spacing: 0.2px;
-                                padding: 10px 18px;
-                                border-radius: 14px;
-                                cursor: pointer;
-                                transition: all 0.18s ease;
-                        }
+			.tab-button {
+				appearance: none;
+				border: 1px solid transparent;
+				background: transparent;
+				color: rgba(18, 30, 52, 0.68);
+				font-size: 16px;
+				font-weight: 600;
+				letter-spacing: 0.2px;
+				padding: 10px 18px;
+				border-radius: 14px;
+				cursor: pointer;
+				transition: all 0.18s ease;
+			}
 
-                        .tab-button:hover {
-                                background: var(--tab-bg);
-                                color: rgba(18, 30, 52, 0.88);
-                        }
+			.tab-button:hover {
+				background: var(--tab-bg);
+				color: rgba(18, 30, 52, 0.88);
+			}
 
-                        .tab-button.is-active {
-                                background: rgba(32, 46, 76, 0.12);
-                                border-color: var(--tab-border);
-                                color: rgba(18, 30, 52, 0.95);
-                        }
+			.tab-button.is-active {
+				background: rgba(32, 46, 76, 0.12);
+				border-color: var(--tab-border);
+				color: rgba(18, 30, 52, 0.95);
+			}
 
-                        .tab-panel {
-                                display: none;
-                                gap: 24px;
-                        }
+			.tab-panel {
+				display: none;
+				gap: 24px;
+			}
 
-                        .tab-panel.is-active {
-                                display: grid;
-                        }
+			.tab-panel.is-active {
+				display: grid;
+			}
 
-                        .panel-header {
-                                margin-bottom: 18px;
-                        }
+			.panel-header {
+				margin-bottom: 18px;
+			}
 
-                        .panel-header h2 {
-                                margin: 0 0 6px;
-                                font-size: clamp(24px, 3.2vw, 32px);
-                        }
+			.panel-header h2 {
+				margin: 0 0 6px;
+				font-size: clamp(24px, 3.2vw, 32px);
+			}
 
-                        .panel-header p {
-                                margin: 0;
-                                color: rgba(18, 28, 48, 0.72);
-                                max-width: 640px;
-                                line-height: 1.55;
-                        }
+			.panel-header p {
+				margin: 0;
+				color: rgba(18, 28, 48, 0.72);
+				max-width: 640px;
+				line-height: 1.55;
+			}
 
-                        .skill-tree,
-                        .skill-tree ul {
-                                list-style: none;
-                                margin: 0;
-                                padding-left: 24px;
-                                position: relative;
-                        }
+			.skill-tree,
+			.skill-tree ul {
+				list-style: none;
+				margin: 0;
+				padding-left: 24px;
+				position: relative;
+			}
 
-                        .skill-tree > li {
-                                margin-bottom: 22px;
-                                padding-left: 0;
-                        }
+			.skill-tree > li {
+				margin-bottom: 22px;
+				padding-left: 0;
+			}
 
-                        .skill-tree li {
-                                position: relative;
-                                margin: 14px 0;
-                        }
+			.skill-tree li {
+				position: relative;
+				margin: 14px 0;
+			}
 
-                        .skill-tree ul::before {
-                                content: "";
-                                position: absolute;
-                                top: 12px;
-                                bottom: 12px;
-                                left: 10px;
-                                width: 2px;
-                                background: var(--connector);
-                        }
+			.skill-tree ul::before {
+				content: "";
+				position: absolute;
+				top: 12px;
+				bottom: 12px;
+				left: 10px;
+				width: 2px;
+				background: var(--connector);
+			}
 
-                        .skill-tree ul > li::before {
-                                content: "";
-                                position: absolute;
-                                top: 26px;
-                                left: -14px;
-                                width: 24px;
-                                height: 2px;
-                                background: var(--connector);
-                        }
+			.skill-tree ul > li::before {
+				content: "";
+				position: absolute;
+				top: 26px;
+				left: -14px;
+				width: 24px;
+				height: 2px;
+				background: var(--connector);
+			}
 
-                        .node-card {
-                                display: inline-flex;
-                                flex-direction: column;
-                                gap: 6px;
-                                min-width: min(320px, 90%);
-                                max-width: 420px;
-                                border-radius: 16px;
-                                padding: 16px 18px;
-                                border: 2px solid rgba(32, 46, 76, 0.12);
-                                box-shadow: 0 12px 26px rgba(18, 32, 58, 0.12);
-                                color: rgba(16, 26, 46, 0.92);
-                                background: white;
-                        }
+			.node-card {
+				display: inline-flex;
+				flex-direction: column;
+				gap: 6px;
+				min-width: min(320px, 90%);
+				max-width: 420px;
+				border-radius: 16px;
+				padding: 16px 18px;
+				border: 2px solid rgba(32, 46, 76, 0.12);
+				box-shadow: 0 12px 26px rgba(18, 32, 58, 0.12);
+				color: rgba(16, 26, 46, 0.92);
+				background: white;
+			}
 
-                        .node-card strong {
-                                font-size: 17px;
-                                line-height: 1.35;
-                        }
+			.node-card strong {
+				font-size: 17px;
+				line-height: 1.35;
+			}
 
-                        .node-card span {
-                                font-size: 15px;
-                                line-height: 1.4;
-                                color: rgba(18, 28, 48, 0.68);
-                        }
+			.node-card span {
+				font-size: 15px;
+				line-height: 1.4;
+				color: rgba(18, 28, 48, 0.68);
+			}
 
-                        .phase-a {
-                                background: #fee28f;
-                                border-color: rgba(224, 168, 55, 0.36);
-                        }
+			.phase-a {
+				background: #fee28f;
+				border-color: rgba(224, 168, 55, 0.36);
+			}
 
-                        .phase-b {
-                                background: #bcead2;
-                                border-color: rgba(58, 160, 115, 0.3);
-                        }
+			.phase-b {
+				background: #bcead2;
+				border-color: rgba(58, 160, 115, 0.3);
+			}
 
-                        .phase-c {
-                                background: #d1e4ff;
-                                border-color: rgba(86, 133, 209, 0.3);
-                        }
+			.phase-c {
+				background: #d1e4ff;
+				border-color: rgba(86, 133, 209, 0.3);
+			}
 
-                        .phase-d {
-                                background: #ddbff6;
-                                border-color: rgba(142, 103, 204, 0.32);
-                        }
+			.phase-d {
+				background: #ddbff6;
+				border-color: rgba(142, 103, 204, 0.32);
+			}
 
-                        .phase-e {
-                                background: #fbd3a4;
-                                border-color: rgba(225, 136, 66, 0.34);
-                        }
+			.phase-e {
+				background: #fbd3a4;
+				border-color: rgba(225, 136, 66, 0.34);
+			}
 
-                        .phase-f {
-                                background: #f6c1dd;
-                                border-color: rgba(215, 106, 156, 0.32);
-                        }
+			.phase-f {
+				background: #f6c1dd;
+				border-color: rgba(215, 106, 156, 0.32);
+			}
 
-                        .legend {
-                                display: grid;
-                                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                                gap: 14px;
-                                margin-top: 32px;
-                        }
+			.legend {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 14px;
+				margin-top: 32px;
+			}
 
-                        .legend-item {
-                                display: flex;
-                                align-items: center;
-                                gap: 10px;
-                                padding: 12px 14px;
-                                border-radius: 14px;
-                                border: 1px solid var(--tab-border);
-                                background: rgba(255, 255, 255, 0.7);
-                        }
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 12px 14px;
+				border-radius: 14px;
+				border: 1px solid var(--tab-border);
+				background: rgba(255, 255, 255, 0.7);
+			}
 
-                        .legend-swatch {
-                                width: 18px;
-                                height: 18px;
-                                border-radius: 6px;
-                                box-shadow: inset 0 0 0 1px rgba(32, 46, 76, 0.18);
-                        }
+			.legend-swatch {
+				width: 18px;
+				height: 18px;
+				border-radius: 6px;
+				box-shadow: inset 0 0 0 1px rgba(32, 46, 76, 0.18);
+			}
 
-                        @media (max-width: 720px) {
-                                .node-card {
-                                        min-width: 0;
-                                        width: 100%;
-                                }
+			@media (max-width: 720px) {
+				.node-card {
+					min-width: 0;
+					width: 100%;
+				}
 
-                                .skill-tree,
-                                .skill-tree ul {
-                                        padding-left: 18px;
-                                }
+				.skill-tree,
+				.skill-tree ul {
+					padding-left: 18px;
+				}
 
-                                .skill-tree ul::before {
-                                        left: 8px;
-                                }
+				.skill-tree ul::before {
+					left: 8px;
+				}
 
-                                .skill-tree ul > li::before {
-                                        left: -12px;
-                                        width: 20px;
-                                }
-                        }
-                </style>
-        </head>
-        <body>
-                {% include site-header.html %}
-                <main class="site-content">
-                        <section class="assignments-hero">
-                                <h1>Opdrachtenoverzicht Informatica</h1>
-                                <p>
-                                        Gebruik de tabbladen om te navigeren tussen de thematische takken van de
-                                        opdrachtenboom. Binnen elk thema werk je van boven naar beneden: rond eerst de
-                                        opdracht aan de top af en volg vervolgens de vertakkingen naar keuze.
-                                </p>
-                        </section>
+				.skill-tree ul > li::before {
+					left: -12px;
+					width: 20px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		{% include site-header.html %}
+		<main class="site-content">
+			<section class="assignments-hero">
+				<h1>Opdrachtenoverzicht Informatica</h1>
+				<p>
+					Gebruik de tabbladen om te navigeren tussen de thematische takken van
+					de opdrachtenboom. Binnen elk thema werk je van boven naar beneden:
+					rond eerst de opdracht aan de top af en volg vervolgens de
+					vertakkingen naar keuze.
+				</p>
+			</section>
 
-                        <section class="tabs-card">
-                                <div class="tab-buttons" role="tablist">
-                                        <button class="tab-button is-active" role="tab" aria-selected="true" aria-controls="theme-1" id="tab-theme-1">
-                                                Thema 1: Maatschappij
-                                        </button>
-                                        <button class="tab-button" role="tab" aria-selected="false" aria-controls="theme-2" id="tab-theme-2">
-                                                Thema 2: Code
-                                        </button>
-                                        <button class="tab-button" role="tab" aria-selected="false" aria-controls="theme-3" id="tab-theme-3">
-                                                Thema 3: Online
-                                        </button>
-                                        <button class="tab-button" role="tab" aria-selected="false" aria-controls="theme-4" id="tab-theme-4">
-                                                Thema 4: Binair Begrip
-                                        </button>
-                                        <button class="tab-button" role="tab" aria-selected="false" aria-controls="theme-5" id="tab-theme-5">
-                                                Thema 5: Hardware
-                                        </button>
-                                </div>
+			<section class="tabs-card">
+				<div class="tab-buttons" role="tablist">
+					<button
+						class="tab-button is-active"
+						role="tab"
+						aria-selected="true"
+						aria-controls="theme-1"
+						id="tab-theme-1"
+					>
+						Thema 1: Maatschappij
+					</button>
+					<button
+						class="tab-button"
+						role="tab"
+						aria-selected="false"
+						aria-controls="theme-2"
+						id="tab-theme-2"
+					>
+						Thema 2: Code
+					</button>
+					<button
+						class="tab-button"
+						role="tab"
+						aria-selected="false"
+						aria-controls="theme-3"
+						id="tab-theme-3"
+					>
+						Thema 3: Online
+					</button>
+					<button
+						class="tab-button"
+						role="tab"
+						aria-selected="false"
+						aria-controls="theme-4"
+						id="tab-theme-4"
+					>
+						Thema 4: Binair Begrip
+					</button>
+					<button
+						class="tab-button"
+						role="tab"
+						aria-selected="false"
+						aria-controls="theme-5"
+						id="tab-theme-5"
+					>
+						Thema 5: Hardware
+					</button>
+				</div>
 
-                                <div class="tab-panel is-active" role="tabpanel" id="theme-1" aria-labelledby="tab-theme-1">
-                                        <div class="panel-header">
-                                                <h2>Communiceren en maatschappelijke context</h2>
-                                                <p>
-                                                        Deze tak draait om communiceren, onderzoeken en het verkennen van
-                                                        maatschappelijke aspecten van informatica. Volg de vertakkingen
-                                                        om je vaardigheden steeds verder uit te bouwen.
-                                                </p>
-                                        </div>
-                                        <ul class="skill-tree">
-                                                <li>
-                                                        <div class="node-card phase-a">
-                                                                <strong>Communiceren (A2)</strong>
-                                                                <span>Startpunt voor samenwerken en presenteren binnen dit thema.</span>
-                                                        </div>
-                                                        <ul>
-                                                                <li>
-                                                                        <div class="node-card phase-a">
-                                                                                <strong>Onderzoeken (A5)</strong>
-                                                                                <span>Verdiep je in onderzoeksmethoden en het verzamelen van betrouwbare informatie.</span>
-                                                                        </div>
-                                                                        <ul>
-                                                                                <li>
-                                                                                        <div class="node-card phase-f">
-                                                                                                <strong>Maatschappelijke aspecten (F2)</strong>
-                                                                                                <span>Breng je bevindingen in verband met de impact op de samenleving.</span>
-                                                                                        </div>
-                                                                                </li>
-                                                                        </ul>
-                                                                </li>
-                                                                <li>
-                                                                        <div class="node-card phase-a">
-                                                                                <strong>Informatievaardigheden (A1)</strong>
-                                                                                <span>Leer informatie effectief zoeken, beoordelen en verwerken.</span>
-                                                                        </div>
-                                                                        <ul>
-                                                                                <li>
-                                                                                        <div class="node-card phase-a">
-                                                                                                <strong>Waarderen en oordelen (A7)</strong>
-                                                                                                <span>Ontwikkel een kritische blik op bronnen en resultaten.</span>
-                                                                                        </div>
-                                                                                </li>
-                                                                                <li>
-                                                                                        <div class="node-card phase-e">
-                                                                                                <strong>Security (E2)</strong>
-                                                                                                <span>Onderzoek hoe je gegevens en systemen veilig houdt.</span>
-                                                                                        </div>
-                                                                                        <ul>
-                                                                                                <li>
-                                                                                                        <div class="node-card phase-f">
-                                                                                                                <strong>Security (F4)</strong>
-                                                                                                                <span>Pas beveiligingsmaatregelen praktisch toe in casussen.</span>
-                                                                                                        </div>
-                                                                                                        <ul>
-                                                                                                                <li>
-                                                                                                                        <div class="node-card phase-f">
-                                                                                                                                <strong>Security (F3)</strong>
-                                                                                                                                <span>Reflecteer op beveiligingskeuzes en verbeter waar nodig.</span>
-                                                                                                                        </div>
-                                                                                                                </li>
-                                                                                                        </ul>
-                                                                                                </li>
-                                                                                        </ul>
-                                                                                </li>
-                                                                        </ul>
-                                                                </li>
-                                                        </ul>
-                                                </li>
-                                        </ul>
-                                </div>
+				<div
+					class="tab-panel is-active"
+					role="tabpanel"
+					id="theme-1"
+					aria-labelledby="tab-theme-1"
+				>
+					<div class="panel-header">
+						<h2>Communiceren en maatschappelijke context</h2>
+						<p>
+							Deze tak draait om communiceren, onderzoeken en het verkennen van
+							maatschappelijke aspecten van informatica. Volg de vertakkingen om
+							je vaardigheden steeds verder uit te bouwen.
+						</p>
+					</div>
+					<ul class="skill-tree">
+						<li>
+							<div class="node-card phase-a">
+								<strong>Communiceren (A2)</strong>
+								<span
+									>Startpunt voor samenwerken en presenteren binnen dit
+									thema.</span
+								>
+							</div>
+							<ul>
+								<li>
+									<div class="node-card phase-a">
+										<strong>Onderzoeken (A5)</strong>
+										<span
+											>Verdiep je in onderzoeksmethoden en het verzamelen van
+											betrouwbare informatie.</span
+										>
+									</div>
+									<ul>
+										<li>
+											<div class="node-card phase-f">
+												<strong>Maatschappelijke aspecten (F2)</strong>
+												<span
+													>Breng je bevindingen in verband met de impact op de
+													samenleving.</span
+												>
+											</div>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<div class="node-card phase-a">
+										<strong>Informatievaardigheden (A1)</strong>
+										<span
+											>Leer informatie effectief zoeken, beoordelen en
+											verwerken.</span
+										>
+									</div>
+									<ul>
+										<li>
+											<div class="node-card phase-a">
+												<strong>Waarderen en oordelen (A7)</strong>
+												<span
+													>Ontwikkel een kritische blik op bronnen en
+													resultaten.</span
+												>
+											</div>
+										</li>
+										<li>
+											<div class="node-card phase-e">
+												<strong>Security (E2)</strong>
+												<span
+													>Onderzoek hoe je gegevens en systemen veilig
+													houdt.</span
+												>
+											</div>
+											<ul>
+												<li>
+													<div class="node-card phase-f">
+														<strong>Security (F4)</strong>
+														<span
+															>Pas beveiligingsmaatregelen praktisch toe in
+															casussen.</span
+														>
+													</div>
+													<ul>
+														<li>
+															<div class="node-card phase-f">
+																<strong>Security (F3)</strong>
+																<span
+																	>Reflecteer op beveiligingskeuzes en verbeter
+																	waar nodig.</span
+																>
+															</div>
+														</li>
+													</ul>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
 
-                                <div class="tab-panel" role="tabpanel" id="theme-2" aria-labelledby="tab-theme-2" hidden="true">
-                                        <div class="panel-header">
-                                                <h2>Modelleren en programmeren</h2>
-                                                <p>
-                                                        In dit thema werk je aan de cursus leren modelleren en leer je stap voor stap
-                                                        hoe je abstracties omzet naar code en algoritmes.
-                                                </p>
-                                        </div>
-                                        <ul class="skill-tree">
-                                                <li>
-                                                        <div class="node-card phase-a">
-                                                                <strong>Cursus Leren Modelleren</strong>
-                                                                <span>Introductie op het modelleren van systemen en processen.</span>
-                                                        </div>
-                                                        <ul>
-                                                                <li>
-                                                                        <div class="node-card phase-a">
-                                                                                <strong>Modelleren (A6)</strong>
-                                                                                <span>Leer modellen opstellen die de werkelijkheid beschrijven.</span>
-                                                                        </div>
-                                                                        <ul>
-                                                                                <li>
-                                                                                        <div class="node-card phase-c">
-                                                                                                <strong>Gestructureerde data (C5)</strong>
-                                                                                                <span>Organiseer data zodat je er efficiënt mee kunt werken.</span>
-                                                                                        </div>
-                                                                                        <ul>
-                                                                                                <li>
-                                                                                                        <div class="node-card phase-c">
-                                                                                                                <strong>Warming stripes (C1)</strong>
-                                                                                                                <span>Visualiseer datasets om patronen te ontdekken.</span>
-                                                                                                        </div>
-                                                                                                </li>
-                                                                                                <li>
-                                                                                                        <div class="node-card phase-c">
-                                                                                                                <strong>Identificeren (C2)</strong>
-                                                                                                                <span>Analyseer data om kenmerken en trends te benoemen.</span>
-                                                                                                        </div>
-                                                                                                </li>
-                                                                                        </ul>
-                                                                                </li>
-                                                                                <li>
-                                                                                        <div class="node-card phase-c">
-                                                                                                <strong>Identificeren (C3)</strong>
-                                                                                                <span>Herken structuren en relaties binnen je model.</span>
-                                                                                        </div>
-                                                                                        <ul>
-                                                                                                <li>
-                                                                                                        <div class="node-card phase-d">
-                                                                                                                <strong>Ontwikkelen (D1)</strong>
-                                                                                                                <span>Vertaal je model naar een werkend ontwerp of prototype.</span>
-                                                                                                        </div>
-                                                                                                        <ul>
-                                                                                                                <li>
-                                                                                                                        <div class="node-card phase-d">
-                                                                                                                                <strong>Inspecteren en aanpassen (D2)</strong>
-                                                                                                                                <span>Test je oplossing en verbeter waar nodig.</span>
-                                                                                                                        </div>
-                                                                                                                </li>
-                                                                                                        </ul>
-                                                                                                </li>
-                                                                                        </ul>
-                                                                                </li>
-                                                                                <li>
-                                                                                        <div class="node-card phase-b">
-                                                                                                <strong>Automaten (B3)</strong>
-                                                                                                <span>Verken toestandsdiagrammen en logica.</span>
-                                                                                        </div>
-                                                                                        <ul>
-                                                                                                <li>
-                                                                                                        <div class="node-card phase-b">
-                                                                                                                <strong>Algoritme (B1)</strong>
-                                                                                                                <span>Ontwikkel stappenplannen voor oplossingen.</span>
-                                                                                                        </div>
-                                                                                                        <ul>
-                                                                                                                <li>
-                                                                                                                        <div class="node-card phase-b">
-                                                                                                                                <strong>Datastructuren (B2)</strong>
-                                                                                                                                <span>Kies de juiste datastructuur voor je algoritme.</span>
-                                                                                                                        </div>
-                                                                                                                </li>
-                                                                                                        </ul>
-                                                                                                </li>
-                                                                                        </ul>
-                                                                                </li>
-                                                                        </ul>
-                                                                </li>
-                                                        </ul>
-                                                </li>
-                                        </ul>
-                                </div>
+				<div
+					class="tab-panel"
+					role="tabpanel"
+					id="theme-2"
+					aria-labelledby="tab-theme-2"
+					hidden="true"
+				>
+					<div class="panel-header">
+						<h2>Modelleren en programmeren</h2>
+						<p>
+							In dit thema werk je aan de cursus leren modelleren en leer je
+							stap voor stap hoe je abstracties omzet naar code en algoritmes.
+						</p>
+					</div>
+					<ul class="skill-tree">
+						<li>
+							<div class="node-card phase-a">
+								<strong>Cursus Leren Modelleren</strong>
+								<span
+									>Introductie op het modelleren van systemen en
+									processen.</span
+								>
+							</div>
+							<ul>
+								<li>
+									<div class="node-card phase-a">
+										<strong>Modelleren (A6)</strong>
+										<span
+											>Leer modellen opstellen die de werkelijkheid
+											beschrijven.</span
+										>
+									</div>
+									<ul>
+										<li>
+											<div class="node-card phase-c">
+												<strong>Gestructureerde data (C5)</strong>
+												<span
+													>Organiseer data zodat je er efficiënt mee kunt
+													werken.</span
+												>
+											</div>
+											<ul>
+												<li>
+													<div class="node-card phase-c">
+														<strong>Warming stripes (C1)</strong>
+														<span
+															>Visualiseer datasets om patronen te
+															ontdekken.</span
+														>
+													</div>
+												</li>
+												<li>
+													<div class="node-card phase-c">
+														<strong>Identificeren (C2)</strong>
+														<span
+															>Analyseer data om kenmerken en trends te
+															benoemen.</span
+														>
+													</div>
+												</li>
+											</ul>
+										</li>
+										<li>
+											<div class="node-card phase-c">
+												<strong>Identificeren (C3)</strong>
+												<span
+													>Herken structuren en relaties binnen je model.</span
+												>
+											</div>
+											<ul>
+												<li>
+													<div class="node-card phase-d">
+														<strong>Ontwikkelen (D1)</strong>
+														<span
+															>Vertaal je model naar een werkend ontwerp of
+															prototype.</span
+														>
+													</div>
+													<ul>
+														<li>
+															<div class="node-card phase-d">
+																<strong>Inspecteren en aanpassen (D2)</strong>
+																<span
+																	>Test je oplossing en verbeter waar
+																	nodig.</span
+																>
+															</div>
+														</li>
+													</ul>
+												</li>
+											</ul>
+										</li>
+										<li>
+											<div class="node-card phase-b">
+												<strong>Automaten (B3)</strong>
+												<span>Verken toestandsdiagrammen en logica.</span>
+											</div>
+											<ul>
+												<li>
+													<div class="node-card phase-b">
+														<strong>Algoritme (B1)</strong>
+														<span
+															>Ontwikkel stappenplannen voor oplossingen.</span
+														>
+													</div>
+													<ul>
+														<li>
+															<div class="node-card phase-b">
+																<strong>Datastructuren (B2)</strong>
+																<span
+																	>Kies de juiste datastructuur voor je
+																	algoritme.</span
+																>
+															</div>
+														</li>
+													</ul>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
 
-                                <div class="tab-panel" role="tabpanel" id="theme-3" aria-labelledby="tab-theme-3" hidden="true">
-                                        <div class="panel-header">
-                                                <h2>Werken aan het web</h2>
-                                                <p>
-                                                        Binnen dit thema staat het bouwen en verbeteren van online ervaringen centraal.
-                                                        Je oefent met HTML, structuur en gebruiksvriendelijkheid.
-                                                </p>
-                                        </div>
-                                        <ul class="skill-tree">
-                                                <li>
-                                                        <div class="node-card phase-b">
-                                                                <strong>Introductie HTML (B4)</strong>
-                                                                <span>Leer de basis van webpagina's opbouwen.</span>
-                                                        </div>
-                                                        <ul>
-                                                                <li>
-                                                                        <div class="node-card phase-b">
-                                                                                <strong>Datastructuren (B2)</strong>
-                                                                                <span>Pas gestructureerde gegevens toe binnen een webcontext.</span>
-                                                                        </div>
-                                                                </li>
-                                                                <li>
-                                                                        <div class="node-card phase-f">
-                                                                                <strong>Usability (F1)</strong>
-                                                                                <span>Zorg dat je webpagina prettig te gebruiken is.</span>
-                                                                        </div>
-                                                                        <ul>
-                                                                                <li>
-                                                                                        <div class="node-card phase-d">
-                                                                                                <strong>Inspecteren en aanpassen (D2)</strong>
-                                                                                                <span>Test je ontwerp en voer verbeteringen door.</span>
-                                                                                        </div>
-                                                                                </li>
-                                                                        </ul>
-                                                                </li>
-                                                        </ul>
-                                                </li>
-                                        </ul>
-                                </div>
+				<div
+					class="tab-panel"
+					role="tabpanel"
+					id="theme-3"
+					aria-labelledby="tab-theme-3"
+					hidden="true"
+				>
+					<div class="panel-header">
+						<h2>Werken aan het web</h2>
+						<p>
+							Binnen dit thema staat het bouwen en verbeteren van online
+							ervaringen centraal. Je oefent met HTML, structuur en
+							gebruiksvriendelijkheid.
+						</p>
+					</div>
+					<ul class="skill-tree">
+						<li>
+							<div class="node-card phase-b">
+								<strong>Introductie HTML (B4)</strong>
+								<span>Leer de basis van webpagina's opbouwen.</span>
+							</div>
+							<ul>
+								<li>
+									<div class="node-card phase-b">
+										<strong>Datastructuren (B2)</strong>
+										<span
+											>Pas gestructureerde gegevens toe binnen een
+											webcontext.</span
+										>
+									</div>
+								</li>
+								<li>
+									<div class="node-card phase-f">
+										<strong>Usability (F1)</strong>
+										<span>Zorg dat je webpagina prettig te gebruiken is.</span>
+									</div>
+									<ul>
+										<li>
+											<div class="node-card phase-d">
+												<strong>Inspecteren en aanpassen (D2)</strong>
+												<span>Test je ontwerp en voer verbeteringen door.</span>
+											</div>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
 
-                                <div class="tab-panel" role="tabpanel" id="theme-4" aria-labelledby="tab-theme-4" hidden="true">
-                                        <div class="panel-header">
-                                                <h2>Binair begrip</h2>
-                                                <p>
-                                                        Deze tak zoomt in op representaties van data en het begrijpen van binaire systemen.
-                                                </p>
-                                        </div>
-                                        <ul class="skill-tree">
-                                                <li>
-                                                        <div class="node-card phase-c">
-                                                                <strong>Standaard representaties (C4)</strong>
-                                                                <span>Leer hoe computers informatie coderen en opslaan.</span>
-                                                        </div>
-                                                </li>
-                                        </ul>
-                                </div>
+				<div
+					class="tab-panel"
+					role="tabpanel"
+					id="theme-4"
+					aria-labelledby="tab-theme-4"
+					hidden="true"
+				>
+					<div class="panel-header">
+						<h2>Binair begrip</h2>
+						<p>
+							Deze tak zoomt in op representaties van data en het begrijpen van
+							binaire systemen.
+						</p>
+					</div>
+					<ul class="skill-tree">
+						<li>
+							<div class="node-card phase-c">
+								<strong>Standaard representaties (C4)</strong>
+								<span>Leer hoe computers informatie coderen en opslaan.</span>
+							</div>
+						</li>
+					</ul>
+				</div>
 
-                                <div class="tab-panel" role="tabpanel" id="theme-5" aria-labelledby="tab-theme-5" hidden="true">
-                                        <div class="panel-header">
-                                                <h2>Hardware en systemen</h2>
-                                                <p>
-                                                        Richt je op het ontleden van systemen en het begrijpen van hardwarecomponenten.
-                                                </p>
-                                        </div>
-                                        <ul class="skill-tree">
-                                                <li>
-                                                        <div class="node-card phase-e">
-                                                                <strong>Decompositie (E1)</strong>
-                                                                <span>Breek complexe systemen op in overzichtelijke onderdelen.</span>
-                                                        </div>
-                                                </li>
-                                        </ul>
-                                </div>
+				<div
+					class="tab-panel"
+					role="tabpanel"
+					id="theme-5"
+					aria-labelledby="tab-theme-5"
+					hidden="true"
+				>
+					<div class="panel-header">
+						<h2>Hardware en systemen</h2>
+						<p>
+							Richt je op het ontleden van systemen en het begrijpen van
+							hardwarecomponenten.
+						</p>
+					</div>
+					<ul class="skill-tree">
+						<li>
+							<div class="node-card phase-e">
+								<strong>Decompositie (E1)</strong>
+								<span
+									>Breek complexe systemen op in overzichtelijke
+									onderdelen.</span
+								>
+							</div>
+						</li>
+					</ul>
+				</div>
 
-                                <div class="legend" aria-label="Legenda kleurcodering">
-                                        <div class="legend-item">
-                                                <span class="legend-swatch" style="background: #fee28f"></span>
-                                                <span>Serie A – Basisvaardigheden en communicatie</span>
-                                        </div>
-                                        <div class="legend-item">
-                                                <span class="legend-swatch" style="background: #bcead2"></span>
-                                                <span>Serie B – Structuren en programmeren</span>
-                                        </div>
-                                        <div class="legend-item">
-                                                <span class="legend-swatch" style="background: #d1e4ff"></span>
-                                                <span>Serie C – Data en representaties</span>
-                                        </div>
-                                        <div class="legend-item">
-                                                <span class="legend-swatch" style="background: #ddbff6"></span>
-                                                <span>Serie D – Ontwikkelen en verbeteren</span>
-                                        </div>
-                                        <div class="legend-item">
-                                                <span class="legend-swatch" style="background: #fbd3a4"></span>
-                                                <span>Serie E – Toepassing en veiligheid</span>
-                                        </div>
-                                        <div class="legend-item">
-                                                <span class="legend-swatch" style="background: #f6c1dd"></span>
-                                                <span>Serie F – Reflectie en maatschappij</span>
-                                        </div>
-                                </div>
-                        </section>
-                </main>
+				<div class="legend" aria-label="Legenda kleurcodering">
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #fee28f"></span>
+						<span>Serie A – Basisvaardigheden en communicatie</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #bcead2"></span>
+						<span>Serie B – Structuren en programmeren</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #d1e4ff"></span>
+						<span>Serie C – Data en representaties</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #ddbff6"></span>
+						<span>Serie D – Ontwikkelen en verbeteren</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #fbd3a4"></span>
+						<span>Serie E – Toepassing en veiligheid</span>
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #f6c1dd"></span>
+						<span>Serie F – Reflectie en maatschappij</span>
+					</div>
+				</div>
+			</section>
+		</main>
 
-                <script>
-                        (function () {
-                                const buttons = Array.from(document.querySelectorAll('.tab-button'));
-                                const panels = Array.from(document.querySelectorAll('.tab-panel'));
+		<script>
+			(function () {
+				const buttons = Array.from(document.querySelectorAll(".tab-button"));
+				const panels = Array.from(document.querySelectorAll(".tab-panel"));
 
-                                function activateTab(targetId) {
-                                        buttons.forEach((btn) => {
-                                                const isActive = btn.getAttribute('aria-controls') === targetId;
-                                                btn.classList.toggle('is-active', isActive);
-                                                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-                                        });
+				function activateTab(targetId) {
+					buttons.forEach((btn) => {
+						const isActive = btn.getAttribute("aria-controls") === targetId;
+						btn.classList.toggle("is-active", isActive);
+						btn.setAttribute("aria-selected", isActive ? "true" : "false");
+					});
 
-                                        panels.forEach((panel) => {
-                                                const isActive = panel.id === targetId;
-                                                panel.classList.toggle('is-active', isActive);
-                                                if (isActive) {
-                                                        panel.removeAttribute('hidden');
-                                                } else {
-                                                        panel.setAttribute('hidden', 'true');
-                                                }
-                                        });
-                                }
+					panels.forEach((panel) => {
+						const isActive = panel.id === targetId;
+						panel.classList.toggle("is-active", isActive);
+						if (isActive) {
+							panel.removeAttribute("hidden");
+						} else {
+							panel.setAttribute("hidden", "true");
+						}
+					});
+				}
 
-                                buttons.forEach((button) => {
-                                        button.addEventListener('click', () => {
-                                                activateTab(button.getAttribute('aria-controls'));
-                                        });
+				buttons.forEach((button) => {
+					button.addEventListener("click", () => {
+						activateTab(button.getAttribute("aria-controls"));
+					});
 
-                                        button.addEventListener('keydown', (event) => {
-                                                if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-                                                        event.preventDefault();
-                                                        const currentIndex = buttons.indexOf(button);
-                                                        const offset = event.key === 'ArrowRight' ? 1 : -1;
-                                                        const nextIndex = (currentIndex + offset + buttons.length) % buttons.length;
-                                                        const nextButton = buttons[nextIndex];
-                                                        nextButton.focus();
-                                                        activateTab(nextButton.getAttribute('aria-controls'));
-                                                }
-                                        });
-                                });
-                        })();
-                </script>
-        </body>
+					button.addEventListener("keydown", (event) => {
+						if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+							event.preventDefault();
+							const currentIndex = buttons.indexOf(button);
+							const offset = event.key === "ArrowRight" ? 1 : -1;
+							const nextIndex =
+								(currentIndex + offset + buttons.length) % buttons.length;
+							const nextButton = buttons[nextIndex];
+							nextButton.focus();
+							activateTab(nextButton.getAttribute("aria-controls"));
+						}
+					});
+				});
+			})();
+		</script>
+	</body>
 </html>
