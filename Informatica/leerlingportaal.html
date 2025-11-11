@@ -636,6 +636,50 @@
 				return PERIOD_OPTIONS.includes(upper) ? upper : "";
 			}
 
+			function normalizeClassLabel(value) {
+				if (!value) {
+					return "";
+				}
+				const cleaned = String(value).replace(/\s+/g, " ").trim();
+				return cleaned
+					.split(" ")
+					.filter(Boolean)
+					.map(
+						(part, index) =>
+							index === 0
+								? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+								: part
+					)
+					.join(" ");
+			}
+
+			function detectGroupHeaderRow(row) {
+				if (!row || !row.length) {
+					return null;
+				}
+				const name = (row[0] || "").trim();
+				if (!name || !GROUP_HEADER_REGEX.test(name)) {
+					return null;
+				}
+				const nonEmptyCells = row
+					.slice(1)
+					.map((cell) => (cell || "").trim())
+					.filter(Boolean);
+				if (!nonEmptyCells.length) {
+					return normalizeClassLabel(name);
+				}
+				const hasContactInfo = nonEmptyCells.some((cell) =>
+					/@|https?:\/\//i.test(cell)
+				);
+				if (hasContactInfo) {
+					return null;
+				}
+				if (nonEmptyCells.length <= 3) {
+					return normalizeClassLabel(name);
+				}
+				return null;
+			}
+
 			const CLASS_PRIORITY = [
 				{ key: "4havo", order: 0 },
 				{ key: "4vwo", order: 1 },
@@ -824,12 +868,13 @@
 				let currentGroup = "";
 
 				dataRows.forEach((row, rowIndex) => {
-					const name = row[0] || "";
-					const restHasData = row.slice(1).some((cell) => cell);
-					if (name && !restHasData && GROUP_HEADER_REGEX.test(name)) {
-						currentGroup = name;
+					const detectedGroup = detectGroupHeaderRow(row);
+					if (detectedGroup) {
+						currentGroup = detectedGroup;
 						return;
 					}
+					const name = row[0] || "";
+					const restHasData = row.slice(1).some((cell) => cell);
 					if (!name || !restHasData) {
 						return;
 					}
