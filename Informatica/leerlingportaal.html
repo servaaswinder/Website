@@ -920,12 +920,14 @@
 				};
 			}
 
-			async function persistCsvRecords(students) {
+			async function persistCsvRecords(students, periodValue) {
 				const snapshot = await db.collection("results").get();
 				const emailMap = new Map();
 				const nameMap = new Map();
+				const existingDocs = new Map();
 				snapshot.forEach((doc) => {
-					const data = doc.data();
+					const data = doc.data() || {};
+					existingDocs.set(doc.id, data);
 					if (data && data.email) {
 						emailMap.set(String(data.email).toLowerCase(), doc.id);
 					}
@@ -942,6 +944,7 @@
 				const batch = db.batch();
 				const resultsCollection = db.collection("results");
 				const serverTimestamp = FieldValue.serverTimestamp();
+				const normalizedPeriod = normalizePeriodValue(periodValue);
 
 				students.forEach((student) => {
 					const emailKey = student.email ? student.email.toLowerCase() : "";
@@ -961,11 +964,41 @@
 						);
 					}
 					const docRef = resultsCollection.doc(docId);
+					const existingData = existingDocs.get(docId) || {};
+					const existingAssignments = Array.isArray(existingData.assignments)
+						? existingData.assignments
+								.map((assignment) => normalizeAssignment(assignment))
+								.filter(Boolean)
+						: [];
+					const csvAssignments = Array.isArray(student.assignments)
+						? student.assignments
+								.map((assignment) =>
+									normalizeAssignment({
+										...assignment,
+										period:
+											normalizePeriodValue(assignment.period) ||
+											normalizedPeriod,
+									})
+								)
+								.filter(Boolean)
+						: [];
+					let mergedAssignments;
+					if (normalizedPeriod) {
+						const otherPeriods = existingAssignments.filter(
+							(assignment) =>
+								normalizePeriodValue(assignment.period) !== normalizedPeriod
+						);
+						mergedAssignments = otherPeriods.concat(csvAssignments);
+					} else if (csvAssignments.length) {
+						mergedAssignments = csvAssignments;
+					} else {
+						mergedAssignments = existingAssignments;
+					}
 					const payload = {
 						name: student.name || FieldValue.delete(),
 						email: student.email || FieldValue.delete(),
 						class: student.className || FieldValue.delete(),
-						assignments: student.assignments,
+						assignments: mergedAssignments,
 						lastSyncedAt: serverTimestamp,
 					};
 					batch.set(docRef, payload, { merge: true });
@@ -1055,7 +1088,7 @@
 							period,
 						})),
 					}));
-					await persistCsvRecords(studentsWithPeriod);
+					await persistCsvRecords(studentsWithPeriod, period);
 					setStatusMessage(
 						csvUploadMessage,
 						`Synchronisatie voltooid voor ${parsedCsvData.students.length} leerlingen.`,
