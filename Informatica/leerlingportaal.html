@@ -1013,7 +1013,7 @@
 
 			async function ensureAuthAccountsForStudents(students) {
 				if (!Array.isArray(students) || !students.length) {
-					return { created: 0, failed: [] };
+					return { created: 0, failed: [], createdAccounts: new Map() };
 				}
 				const seenEmails = new Set();
 				const targetEmails = [];
@@ -1033,6 +1033,7 @@
 
 				let createdCount = 0;
 				const failed = [];
+				const createdAccounts = new Map();
 
 				for (const email of targetEmails) {
 					let shouldCreate = true;
@@ -1053,7 +1054,10 @@
 					}
 					try {
 						const tempPassword = generateTemporaryPassword(email);
-						await createAuthUserSilently(email, tempPassword);
+						const result = await createAuthUserSilently(email, tempPassword);
+						if (result && result.localId) {
+							createdAccounts.set(email.toLowerCase(), result.localId);
+						}
 						createdCount += 1;
 					} catch (error) {
 						if (error && error.code === "EMAIL_EXISTS") {
@@ -1067,10 +1071,10 @@
 					}
 				}
 
-				return { created: createdCount, failed };
+				return { created: createdCount, failed, createdAccounts };
 			}
 
-			async function persistCsvRecords(students, periodValue) {
+			async function persistCsvRecords(students, periodValue, preferredAccounts) {
 				const snapshot = await db.collection("results").get();
 				const emailMap = new Map();
 				const nameMap = new Map();
@@ -1091,15 +1095,39 @@
 					}
 				});
 
+				const preferredDocIds = new Map();
+				if (preferredAccounts instanceof Map) {
+					preferredAccounts.forEach((uid, email) => {
+						if (email && uid) {
+							preferredDocIds.set(email.toLowerCase(), uid);
+						}
+					});
+				} else if (
+					preferredAccounts &&
+					typeof preferredAccounts === "object"
+				) {
+					Object.entries(preferredAccounts).forEach(([email, uid]) => {
+						if (email && uid) {
+							preferredDocIds.set(email.toLowerCase(), uid);
+						}
+					});
+				}
+
 				const batch = db.batch();
 				const resultsCollection = db.collection("results");
 				const serverTimestamp = FieldValue.serverTimestamp();
 				const normalizedPeriod = normalizePeriodValue(periodValue);
+				const docsToDelete = new Set();
 
 				students.forEach((student) => {
 					const emailKey = student.email ? student.email.toLowerCase() : "";
-					let docId =
+					const preferredDocId =
+						emailKey && preferredDocIds.has(emailKey)
+							? preferredDocIds.get(emailKey)
+							: null;
+					const existingEmailDocId =
 						emailKey && emailMap.has(emailKey) ? emailMap.get(emailKey) : null;
+					let docId = existingEmailDocId || null;
 					if (!docId) {
 						const nameKey = slugify(
 							`${student.name || ""}-${student.className || ""}`
@@ -1108,13 +1136,19 @@
 							docId = nameMap.get(nameKey);
 						}
 					}
+					if (preferredDocId) {
+						docId = preferredDocId;
+					}
 					if (!docId) {
 						docId = sanitizeDocId(
 							student.email || `${student.name}-${student.key}`
 						);
 					}
 					const docRef = resultsCollection.doc(docId);
-					const existingData = existingDocs.get(docId) || {};
+					const existingData =
+						(existingEmailDocId && existingDocs.get(existingEmailDocId)) ||
+						existingDocs.get(docId) ||
+						{};
 					const existingAssignments = Array.isArray(existingData.assignments)
 						? existingData.assignments
 								.map((assignment) => normalizeAssignment(assignment))
@@ -1152,9 +1186,28 @@
 						lastSyncedAt: serverTimestamp,
 					};
 					batch.set(docRef, payload, { merge: true });
+					if (
+						preferredDocId &&
+						existingEmailDocId &&
+						preferredDocId !== existingEmailDocId
+					) {
+						docsToDelete.add(existingEmailDocId);
+					}
 				});
 
 				await batch.commit();
+
+				if (docsToDelete.size) {
+					const ids = Array.from(docsToDelete);
+					while (ids.length) {
+						const chunk = ids.splice(0, 400);
+						const deleteBatch = db.batch();
+						chunk.forEach((docId) => {
+							deleteBatch.delete(resultsCollection.doc(docId));
+						});
+						await deleteBatch.commit();
+					}
+				}
 			}
 
 			function handleCsvSelection() {
@@ -1238,9 +1291,13 @@
 							period,
 						})),
 					}));
-					await persistCsvRecords(studentsWithPeriod, period);
 					const accountResult = await ensureAuthAccountsForStudents(
 						parsedCsvData.students
+					);
+					await persistCsvRecords(
+						studentsWithPeriod,
+						period,
+						accountResult.createdAccounts
 					);
 					let summaryAddition = "";
 					if (accountResult.created) {
