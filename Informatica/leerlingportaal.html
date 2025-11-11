@@ -965,6 +965,111 @@
 				};
 			}
 
+			function generateTemporaryPassword(email) {
+				const prefix = (email || "")
+					.split("@")[0]
+					.replace(/[^a-zA-Z0-9]/g, "")
+					.slice(0, 8);
+				const safePrefix = prefix || "leerling";
+				const randomPart = Math.random().toString(36).slice(-6);
+				return `${safePrefix}-${randomPart}-${new Date().getFullYear()}`;
+			}
+
+			async function createAuthUserSilently(email, password) {
+				if (!email || !password) {
+					return;
+				}
+				const endpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`;
+				const response = await fetch(endpoint, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email,
+						password,
+						returnSecureToken: false,
+					}),
+				});
+				let data = {};
+				try {
+					data = await response.json();
+				} catch (error) {
+					// Response zonder body
+				}
+				if (!response.ok) {
+					const message =
+						(data && data.error && data.error.message) ||
+						response.statusText ||
+						"Account aanmaken mislukt.";
+					const err = new Error(message);
+					if (data && data.error && data.error.message) {
+						err.code = data.error.message;
+					}
+					throw err;
+				}
+				return data;
+			}
+
+			async function ensureAuthAccountsForStudents(students) {
+				if (!Array.isArray(students) || !students.length) {
+					return { created: 0, failed: [] };
+				}
+				const seenEmails = new Set();
+				const targetEmails = [];
+				students.forEach((student) => {
+					const email =
+						student && student.email ? student.email.trim() : "";
+					if (!email) {
+						return;
+					}
+					const key = email.toLowerCase();
+					if (seenEmails.has(key)) {
+						return;
+					}
+					seenEmails.add(key);
+					targetEmails.push(email);
+				});
+
+				let createdCount = 0;
+				const failed = [];
+
+				for (const email of targetEmails) {
+					let shouldCreate = true;
+					try {
+						const methods = await auth.fetchSignInMethodsForEmail(email);
+						if (Array.isArray(methods) && methods.length) {
+							shouldCreate = false;
+						}
+					} catch (error) {
+						console.warn(
+							"Kon bestaande auth-methoden niet ophalen voor",
+							email,
+							error
+						);
+					}
+					if (!shouldCreate) {
+						continue;
+					}
+					try {
+						const tempPassword = generateTemporaryPassword(email);
+						await createAuthUserSilently(email, tempPassword);
+						createdCount += 1;
+					} catch (error) {
+						if (error && error.code === "EMAIL_EXISTS") {
+							continue;
+						}
+						console.error("Account aanmaken mislukt voor", email, error);
+						failed.push({
+							email,
+							message: error && error.message ? error.message : "Onbekende fout",
+						});
+					}
+				}
+
+				return { created: createdCount, failed };
+			}
+
 			async function persistCsvRecords(students, periodValue) {
 				const snapshot = await db.collection("results").get();
 				const emailMap = new Map();
@@ -1134,10 +1239,20 @@
 						})),
 					}));
 					await persistCsvRecords(studentsWithPeriod, period);
+					const accountResult = await ensureAuthAccountsForStudents(
+						parsedCsvData.students
+					);
+					let summaryAddition = "";
+					if (accountResult.created) {
+						summaryAddition += ` ${accountResult.created} nieuwe accounts aangemaakt.`;
+					}
+					if (accountResult.failed && accountResult.failed.length) {
+						summaryAddition += ` ${accountResult.failed.length} account(s) mislukt; zie console voor details.`;
+					}
 					setStatusMessage(
 						csvUploadMessage,
-						`Synchronisatie voltooid voor ${parsedCsvData.students.length} leerlingen.`,
-						"success"
+						`Synchronisatie voltooid voor ${parsedCsvData.students.length} leerlingen.${summaryAddition}`,
+						accountResult.failed && accountResult.failed.length ? "error" : "success"
 					);
 					await loadAllStudents();
 				} catch (error) {
