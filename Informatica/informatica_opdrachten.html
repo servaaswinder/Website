@@ -520,23 +520,23 @@
 		
 				<script>
 					(function () {
-						const buttons = Array.from(document.querySelectorAll(".tab-button"));
-						const panels = Array.from(document.querySelectorAll(".tab-panel"));
-		
+						const buttons = Array.from(document.querySelectorAll('.tab-button'));
+						const panels = Array.from(document.querySelectorAll('.tab-panel'));
+
 						function activateTab(targetId) {
 							buttons.forEach((btn) => {
-								const isActive = btn.getAttribute("aria-controls") === targetId;
-								btn.classList.toggle("is-active", isActive);
-								btn.setAttribute("aria-selected", isActive ? "true" : "false");
+								const isActive = btn.getAttribute('aria-controls') === targetId;
+								btn.classList.toggle('is-active', isActive);
+								btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
 							});
-		
+
 							panels.forEach((panel) => {
 								const isActive = panel.id === targetId;
-								panel.classList.toggle("is-active", isActive);
+								panel.classList.toggle('is-active', isActive);
 								if (isActive) {
-									panel.removeAttribute("hidden");
+									panel.removeAttribute('hidden');
 								} else {
-									panel.setAttribute("hidden", "true");
+									panel.setAttribute('hidden', 'true');
 								}
 							});
 							// Redraw connectors for the newly activated panel
@@ -545,75 +545,103 @@
 								drawConnectorsForPanel(activePanel);
 							}
 						}
-		
+
 						buttons.forEach((button) => {
-							button.addEventListener("click", () => {
-								activateTab(button.getAttribute("aria-controls"));
+							button.addEventListener('click', () => {
+								activateTab(button.getAttribute('aria-controls'));
 							});
-		
-							button.addEventListener("keydown", (event) => {
-								if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+
+							button.addEventListener('keydown', (event) => {
+								if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
 									event.preventDefault();
 									const currentIndex = buttons.indexOf(button);
-									const offset = event.key === "ArrowRight" ? 1 : -1;
+									const offset = event.key === 'ArrowRight' ? 1 : -1;
 									const nextIndex =
 										(currentIndex + offset + buttons.length) % buttons.length;
 									const nextButton = buttons[nextIndex];
 									nextButton.focus();
-									activateTab(nextButton.getAttribute("aria-controls"));
+									activateTab(nextButton.getAttribute('aria-controls'));
 								}
 							});
 						});
-		
+
+						function createPath(d) {
+							const path = document.createElementNS(
+								'http://www.w3.org/2000/svg',
+								'path'
+							);
+							path.setAttribute('d', d);
+							path.setAttribute('stroke', '#ccc');
+							path.setAttribute('stroke-width', '2');
+							path.setAttribute('fill', 'none');
+							return path;
+						}
+
 						function drawConnectorsForPanel(panel) {
-							const svg = panel.querySelector(".connector-canvas");
+							const svg = panel.querySelector('.connector-canvas');
+							if (!svg) return;
 							const panelRect = panel.getBoundingClientRect();
-							svg.innerHTML = ""; // Clear previous connectors
-		
-							const parents = panel.querySelectorAll("li > .node-card + ul");
-		
-							parents.forEach((childList) => {
+							svg.innerHTML = ''; // Clear previous connectors
+
+							const parentConnections = panel.querySelectorAll(
+								'li > .node-card + ul'
+							);
+
+							parentConnections.forEach((childList) => {
 								const parentCard = childList.previousElementSibling;
+								const children = Array.from(
+									childList.querySelectorAll('li > .node-card')
+								);
+
+								if (!parentCard || children.length === 0) return;
+
 								const parentRect = parentCard.getBoundingClientRect();
-								const parentX =
+								const startX =
 									parentRect.left + parentRect.width / 2 - panelRect.left;
-								const parentY = parentRect.bottom - panelRect.top;
-		
-								const children = childList.querySelectorAll("li > .node-card");
-								const childY = parentY + 50; // Vertical space from margin-top
-		
-								children.forEach((childCard) => {
-									const childRect = childCard.getBoundingClientRect();
-									const childX =
-										childRect.left + childRect.width / 2 - panelRect.left;
-		
-									const path = document.createElementNS(
-										"http://www.w3.org/2000/svg",
-										"path"
+								const startY = parentRect.bottom - panelRect.top;
+
+								const firstChildRect = children[0].getBoundingClientRect();
+								const connectionY = firstChildRect.top - panelRect.top - 25;
+
+								// Draw vertical stem from parent to the connection line
+								svg.appendChild(createPath(`M ${startX} ${startY} V ${connectionY}`));
+
+								const xCoords = children.map((child) => {
+									const rect = child.getBoundingClientRect();
+									return rect.left + rect.width / 2 - panelRect.left;
+								});
+
+								if (children.length > 1) {
+									// Draw horizontal bar for branching
+									const minX = Math.min(...xCoords);
+									const maxX = Math.max(...xCoords);
+									svg.appendChild(createPath(`M ${minX} ${connectionY} H ${maxX}`));
+								}
+
+								// Draw vertical lines from connection line to each child
+								xCoords.forEach((childX, index) => {
+									const childRect = children[index].getBoundingClientRect();
+									const childY = childRect.top - panelRect.top;
+									// The horizontal bar is the connection point for branches
+									const horizontalPoint = children.length > 1 ? childX : startX;
+									svg.appendChild(
+										createPath(`M ${horizontalPoint} ${connectionY} V ${childY}`)
 									);
-									const d = `M ${parentX} ${parentY} V ${
-										childY - 25
-									} H ${childX} V ${childY}`;
-									path.setAttribute("d", d);
-									path.setAttribute("stroke", "#ccc");
-									path.setAttribute("stroke-width", "2");
-									path.setAttribute("fill", "none");
-									svg.appendChild(path);
 								});
 							});
 						}
-		
+
 						function drawAllConnectors() {
 							panels.forEach((panel) => {
-								if (panel.classList.contains("is-active")) {
+								if (panel.classList.contains('is-active')) {
 									drawConnectorsForPanel(panel);
 								}
 							});
 						}
-		
-						// Initial draw
-						window.addEventListener("DOMContentLoaded", drawAllConnectors);
-						window.addEventListener("resize", drawAllConnectors);
+
+						// Initial draw and redraw on resize
+						window.addEventListener('DOMContentLoaded', drawAllConnectors);
+						window.addEventListener('resize', drawAllConnectors);
 					})();
 				</script>
 			</body>
