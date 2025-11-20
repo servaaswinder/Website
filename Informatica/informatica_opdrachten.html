@@ -7,6 +7,146 @@
 		<title>Informatica – Opdrachtenboom</title>
 		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			.skill-tree,
+			.skill-tree ul {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			.skill-tree {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin: 2em 0;
+			}
+
+			.skill-tree ul {
+				display: flex;
+				justify-content: center;
+				margin-top: 40px; /* Space for connectors */
+				position: relative;
+			}
+
+			.skill-tree li {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 0 1em;
+				position: relative;
+			}
+
+			.node-card {
+				padding: 10px 15px;
+				border-radius: 8px;
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+				display: inline-block;
+				min-width: 180px;
+				text-align: center;
+				background: #fff;
+				border: 1px solid #ddd;
+				position: relative;
+			}
+
+			.node-card strong {
+				display: block;
+				margin-bottom: 5px;
+				font-size: 1em;
+			}
+
+			.node-card span {
+				font-size: 0.85em;
+				color: #555;
+				line-height: 1.3;
+			}
+
+			/* --- Connectors --- */
+
+			/* Vertical line coming down from a parent node */
+			.skill-tree li > .node-card + ul::before {
+				content: "";
+				position: absolute;
+				bottom: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 2px;
+				height: 20px;
+				background: #ccc;
+			}
+
+			/* Horizontal line connecting a group of children */
+			.skill-tree ul::before {
+				content: "";
+				position: absolute;
+				top: -20px;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background: #ccc;
+			}
+
+			/* Vertical line going up from a child to the horizontal line */
+			.skill-tree ul > li::before {
+				content: "";
+				position: absolute;
+				top: -20px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 2px;
+				height: 20px;
+				background: #ccc;
+			}
+
+			/* --- Clean up connectors for edge cases --- */
+
+			/* For a single child, no need for the long horizontal line */
+			.skill-tree ul > li:only-child::before {
+				background: none; /* Hide vertical connector */
+			}
+			.skill-tree ul > li:only-child::parent::before {
+				display: none;
+			}
+
+			/* For multiple children, trim the ends of the horizontal line */
+			.skill-tree ul > li:first-child:not(:only-child)::after,
+			.skill-tree ul > li:last-child:not(:only-child)::after {
+				content: "";
+				position: absolute;
+				top: -20px;
+				height: 2px;
+				width: 50%;
+				background: #fff; /* This should match the tab panel's background */
+			}
+
+			.skill-tree ul > li:first-child:not(:only-child)::after {
+				left: 0;
+			}
+
+			.skill-tree ul > li:last-child:not(:only-child)::after {
+				right: 0;
+			}
+
+			/* Phase colors from the legend */
+			.phase-a {
+				background-color: #fee28f;
+			}
+			.phase-b {
+				background-color: #bcead2;
+			}
+			.phase-c {
+				background-color: #d1e4ff;
+			}
+			.phase-d {
+				background-color: #ddbff6;
+			}
+			.phase-e {
+				background-color: #fbd3a4;
+			}
+			.phase-f {
+				background-color: #f6c1dd;
+			}
+		</style>
 	</head>
 	<body>
 		{% include site-header.html %}
