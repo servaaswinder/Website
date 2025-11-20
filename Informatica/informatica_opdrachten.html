@@ -7,297 +7,247 @@
 		<title>Informatica – Opdrachtenboom</title>
 		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<style>
-			.skill-tree,
-			.skill-tree ul {
-				list-style: none;
-				padding: 0;
-				margin: 0;
-			}
-
-			.skill-tree {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				margin: 2em 0;
-			}
-
-			.skill-tree ul {
-				display: flex;
-				justify-content: center;
-				margin-top: 40px; /* Space for connectors */
-				position: relative;
-			}
-
-			.skill-tree li {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				padding: 0 1em;
-				position: relative;
-			}
-
-			.node-card {
-				padding: 10px 15px;
-				border-radius: 8px;
-				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-				display: inline-block;
-				min-width: 180px;
-				text-align: center;
-				background: #fff;
-				border: 1px solid #ddd;
-				position: relative;
-			}
-
-			.node-card strong {
-				display: block;
-				margin-bottom: 5px;
-				font-size: 1em;
-			}
-
-			.node-card span {
-				font-size: 0.85em;
-				color: #555;
-				line-height: 1.3;
-			}
-
-			/* --- Connectors --- */
-
-			/* Vertical line coming down from a parent node */
-			.skill-tree li > .node-card + ul::before {
-				content: "";
-				position: absolute;
-				bottom: 100%;
-				left: 50%;
-				transform: translateX(-50%);
-				width: 2px;
-				height: 20px;
-				background: #ccc;
-			}
-
-			/* Horizontal line connecting a group of children */
-			.skill-tree ul::before {
-				content: "";
-				position: absolute;
-				top: -20px;
-				left: 0;
-				width: 100%;
-				height: 2px;
-				background: #ccc;
-			}
-
-			/* Vertical line going up from a child to the horizontal line */
-			.skill-tree ul > li::before {
-				content: "";
-				position: absolute;
-				top: -20px;
-				left: 50%;
-				transform: translateX(-50%);
-				width: 2px;
-				height: 20px;
-				background: #ccc;
-			}
-
-			/* --- Clean up connectors for edge cases --- */
-
-			/* For a single child, no need for the long horizontal line */
-			.skill-tree ul > li:only-child::before {
-				background: none; /* Hide vertical connector */
-			}
-			.skill-tree ul > li:only-child::parent::before {
-				display: none;
-			}
-
-			/* For multiple children, trim the ends of the horizontal line */
-			.skill-tree ul > li:first-child:not(:only-child)::after,
-			.skill-tree ul > li:last-child:not(:only-child)::after {
-				content: "";
-				position: absolute;
-				top: -20px;
-				height: 2px;
-				width: 50%;
-				background: #fff; /* This should match the tab panel's background */
-			}
-
-			.skill-tree ul > li:first-child:not(:only-child)::after {
-				left: 0;
-			}
-
-			.skill-tree ul > li:last-child:not(:only-child)::after {
-				right: 0;
-			}
-
-			/* Phase colors from the legend */
-			.phase-a {
-				background-color: #fee28f;
-			}
-			.phase-b {
-				background-color: #bcead2;
-			}
-			.phase-c {
-				background-color: #d1e4ff;
-			}
-			.phase-d {
-				background-color: #ddbff6;
-			}
-			.phase-e {
-				background-color: #fbd3a4;
-			}
-			.phase-f {
-				background-color: #f6c1dd;
-			}
-		</style>
-	</head>
-	<body>
-		{% include site-header.html %}
-		<main class="site-content">
-			<section class="assignments-hero">
-				<h1>Opdrachtenoverzicht Informatica</h1>
-				<p>
-					Gebruik de tabbladen om te navigeren tussen de thematische takken van
-					de opdrachtenboom. Binnen elk thema werk je van boven naar beneden:
-					rond eerst de opdracht aan de top af en volg vervolgens de
-					vertakkingen naar keuze.
-				</p>
-			</section>
-
-			<section class="tabs-card">
-				<div class="tab-buttons" role="tablist">
-					<button
-						class="tab-button is-active"
-						role="tab"
-						aria-selected="true"
-						aria-controls="theme-1"
-						id="tab-theme-1"
-					>
-						Thema 1: Maatschappij
-					</button>
-					<button
-						class="tab-button"
-						role="tab"
-						aria-selected="false"
-						aria-controls="theme-2"
-						id="tab-theme-2"
-					>
-						Thema 2: Code
-					</button>
-					<button
-						class="tab-button"
-						role="tab"
-						aria-selected="false"
-						aria-controls="theme-3"
-						id="tab-theme-3"
-					>
-						Thema 3: Online
-					</button>
-					<button
-						class="tab-button"
-						role="tab"
-						aria-selected="false"
-						aria-controls="theme-4"
-						id="tab-theme-4"
-					>
-						Thema 4: Binair Begrip
-					</button>
-					<button
-						class="tab-button"
-						role="tab"
-						aria-selected="false"
-						aria-controls="theme-5"
-						id="tab-theme-5"
-					>
-						Thema 5: Hardware
-					</button>
-				</div>
-
-				<div
-					class="tab-panel is-active"
-					role="tabpanel"
-					id="theme-1"
-					aria-labelledby="tab-theme-1"
-				>
-					<div class="panel-header">
-						<h2>Communiceren en maatschappelijke context</h2>
+				<style>
+					.tab-panel {
+						position: relative;
+					}
+					.connector-canvas {
+						position: absolute;
+						top: 0;
+						left: 0;
+						width: 100%;
+						height: 100%;
+						pointer-events: none;
+						z-index: 0;
+					}
+					.skill-tree,
+					.skill-tree ul {
+						list-style: none;
+						padding: 0;
+						margin: 0;
+					}
+		
+					.skill-tree {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						margin: 2em 0;
+					}
+		
+					.skill-tree ul {
+						display: flex;
+						justify-content: center;
+						margin-top: 50px; /* Space for connectors */
+						position: relative;
+					}
+		
+					.skill-tree li {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						padding: 0 1em;
+						position: relative;
+					}
+		
+					.node-card {
+						padding: 10px 15px;
+						border-radius: 8px;
+						box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+						display: inline-block;
+						min-width: 180px;
+						text-align: center;
+						background: #fff;
+						border: 1px solid #ddd;
+						position: relative;
+						z-index: 1;
+					}
+		
+					.node-card strong {
+						display: block;
+						margin-bottom: 5px;
+						font-size: 1em;
+					}
+		
+					.node-card span {
+						font-size: 0.85em;
+						color: #555;
+						line-height: 1.3;
+					}
+		
+					/* Phase colors from the legend */
+					.phase-a {
+						background-color: #fee28f;
+					}
+					.phase-b {
+						background-color: #bcead2;
+					}
+					.phase-c {
+						background-color: #d1e4ff;
+					}
+					.phase-d {
+						background-color: #ddbff6;
+					}
+					.phase-e {
+						background-color: #fbd3a4;
+					}
+					.phase-f {
+						background-color: #f6c1dd;
+					}
+				</style>
+			</head>
+			<body>
+				{% include site-header.html %}
+				<main class="site-content">
+					<section class="assignments-hero">
+						<h1>Opdrachtenoverzicht Informatica</h1>
 						<p>
-							Deze tak draait om communiceren, onderzoeken en het verkennen van
-							maatschappelijke aspecten van informatica. Volg de vertakkingen om
-							je vaardigheden steeds verder uit te bouwen.
+							Gebruik de tabbladen om te navigeren tussen de thematische takken van
+							de opdrachtenboom. Binnen elk thema werk je van boven naar beneden:
+							rond eerst de opdracht aan de top af en volg vervolgens de
+							vertakkingen naar keuze.
 						</p>
-					</div>
-					<ul class="skill-tree">
-						<li>
-							<div class="node-card phase-a">
-								<strong>Communiceren (A2)</strong>
-								<span
-									>Startpunt voor samenwerken en presenteren binnen dit
-									thema.</span
-								>
+					</section>
+		
+					<section class="tabs-card">
+						<div class="tab-buttons" role="tablist">
+							<button
+								class="tab-button is-active"
+								role="tab"
+								aria-selected="true"
+								aria-controls="theme-1"
+								id="tab-theme-1"
+							>
+								Thema 1: Maatschappij
+							</button>
+							<button
+								class="tab-button"
+								role="tab"
+								aria-selected="false"
+								aria-controls="theme-2"
+								id="tab-theme-2"
+							>
+								Thema 2: Code
+							</button>
+							<button
+								class="tab-button"
+								role="tab"
+								aria-selected="false"
+								aria-controls="theme-3"
+								id="tab-theme-3"
+							>
+								Thema 3: Online
+							</button>
+							<button
+								class="tab-button"
+								role="tab"
+								aria-selected="false"
+								aria-controls="theme-4"
+								id="tab-theme-4"
+							>
+								Thema 4: Binair Begrip
+							</button>
+							<button
+								class="tab-button"
+								role="tab"
+								aria-selected="false"
+								aria-controls="theme-5"
+								id="tab-theme-5"
+							>
+								Thema 5: Hardware
+							</button>
+						</div>
+		
+						<div
+							class="tab-panel is-active"
+							role="tabpanel"
+							id="theme-1"
+							aria-labelledby="tab-theme-1"
+						>
+							<svg class="connector-canvas"></svg>
+							<div class="panel-header">
+								<h2>Communiceren en maatschappelijke context</h2>
+								<p>
+									Deze tak draait om communiceren, onderzoeken en het verkennen van
+									maatschappelijke aspecten van informatica. Volg de vertakkingen om
+									je vaardigheden steeds verder uit te bouwen.
+								</p>
 							</div>
-							<ul>
+							<ul class="skill-tree">
 								<li>
-									<div class="node-card phase-a">
-										<strong>Onderzoeken (A5)</strong>
+									<div class="node-card phase-a" data-node-id="A2">
+										<strong>Communiceren (A2)</strong>
 										<span
-											>Verdiep je in onderzoeksmethoden en het verzamelen van
-											betrouwbare informatie.</span
+											>Startpunt voor samenwerken en presenteren binnen dit
+											thema.</span
 										>
 									</div>
 									<ul>
 										<li>
-											<div class="node-card phase-f">
-												<strong>Maatschappelijke aspecten (F2)</strong>
+											<div class="node-card phase-a" data-node-id="A5">
+												<strong>Onderzoeken (A5)</strong>
 												<span
-													>Breng je bevindingen in verband met de impact op de
-													samenleving.</span
-												>
-											</div>
-										</li>
-									</ul>
-								</li>
-								<li>
-									<div class="node-card phase-a">
-										<strong>Informatievaardigheden (A1)</strong>
-										<span
-											>Leer informatie effectief zoeken, beoordelen en
-											verwerken.</span
-										>
-									</div>
-									<ul>
-										<li>
-											<div class="node-card phase-a">
-												<strong>Waarderen en oordelen (A7)</strong>
-												<span
-													>Ontwikkel een kritische blik op bronnen en
-													resultaten.</span
-												>
-											</div>
-										</li>
-										<li>
-											<div class="node-card phase-e">
-												<strong>Security (E2)</strong>
-												<span
-													>Onderzoek hoe je gegevens en systemen veilig
-													houdt.</span
+													>Verdiep je in onderzoeksmethoden en het verzamelen van
+													betrouwbare informatie.</span
 												>
 											</div>
 											<ul>
 												<li>
-													<div class="node-card phase-f">
-														<strong>Security (F4)</strong>
+													<div class="node-card phase-f" data-node-id="F2">
+														<strong>Maatschappelijke aspecten (F2)</strong>
 														<span
-															>Pas beveiligingsmaatregelen praktisch toe in
-															casussen.</span
+															>Breng je bevindingen in verband met de impact op de
+															samenleving.</span
+														>
+													</div>
+												</li>
+											</ul>
+										</li>
+										<li>
+											<div class="node-card phase-a" data-node-id="A1">
+												<strong>Informatievaardigheden (A1)</strong>
+												<span
+													>Leer informatie effectief zoeken, beoordelen en
+													verwerken.</span
+												>
+											</div>
+											<ul>
+												<li>
+													<div class="node-card phase-a" data-node-id="A7">
+														<strong>Waarderen en oordelen (A7)</strong>
+														<span
+															>Ontwikkel een kritische blik op bronnen en
+															resultaten.</span
+														>
+													</div>
+												</li>
+												<li>
+													<div class="node-card phase-e" data-node-id="E2">
+														<strong>Security (E2)</strong>
+														<span
+															>Onderzoek hoe je gegevens en systemen veilig
+															houdt.</span
 														>
 													</div>
 													<ul>
 														<li>
-															<div class="node-card phase-f">
-																<strong>Security (F3)</strong>
+															<div class="node-card phase-f" data-node-id="F4">
+																<strong>Security (F4)</strong>
 																<span
-																	>Reflecteer op beveiligingskeuzes en verbeter
-																	waar nodig.</span
+																	>Pas beveiligingsmaatregelen praktisch toe in
+																	casussen.</span
 																>
 															</div>
+															<ul>
+																<li>
+																	<div class="node-card phase-f" data-node-id="F3">
+																		<strong>Security (F3)</strong>
+																		<span
+																			>Reflecteer op beveiligingskeuzes en verbeter
+																			waar nodig.</span
+																		>
+																	</div>
+																</li>
+															</ul>
 														</li>
 													</ul>
 												</li>
@@ -306,124 +256,125 @@
 									</ul>
 								</li>
 							</ul>
-						</li>
-					</ul>
-				</div>
-
-				<div
-					class="tab-panel"
-					role="tabpanel"
-					id="theme-2"
-					aria-labelledby="tab-theme-2"
-					hidden="true"
-				>
-					<div class="panel-header">
-						<h2>Modelleren en programmeren</h2>
-						<p>
-							In dit thema werk je aan de cursus leren modelleren en leer je
-							stap voor stap hoe je abstracties omzet naar code en algoritmes.
-						</p>
-					</div>
-					<ul class="skill-tree">
-						<li>
-							<div class="node-card phase-a">
-								<strong>Cursus Leren Modelleren</strong>
-								<span
-									>Introductie op het modelleren van systemen en
-									processen.</span
-								>
+						</div>
+		
+						<div
+							class="tab-panel"
+							role="tabpanel"
+							id="theme-2"
+							aria-labelledby="tab-theme-2"
+							hidden="true"
+						>
+							<svg class="connector-canvas"></svg>
+							<div class="panel-header">
+								<h2>Modelleren en programmeren</h2>
+								<p>
+									In dit thema werk je aan de cursus leren modelleren en leer je
+									stap voor stap hoe je abstracties omzet naar code en algoritmes.
+								</p>
 							</div>
-							<ul>
+							<ul class="skill-tree">
 								<li>
-									<div class="node-card phase-a">
-										<strong>Modelleren (A6)</strong>
+									<div class="node-card phase-a" data-node-id="Leren Modelleren">
+										<strong>Cursus Leren Modelleren</strong>
 										<span
-											>Leer modellen opstellen die de werkelijkheid
-											beschrijven.</span
+											>Introductie op het modelleren van systemen en
+											processen.</span
 										>
 									</div>
 									<ul>
 										<li>
-											<div class="node-card phase-c">
-												<strong>Gestructureerde data (C5)</strong>
+											<div class="node-card phase-a" data-node-id="A6">
+												<strong>Modelleren (A6)</strong>
 												<span
-													>Organiseer data zodat je er efficiënt mee kunt
-													werken.</span
+													>Leer modellen opstellen die de werkelijkheid
+													beschrijven.</span
 												>
 											</div>
 											<ul>
 												<li>
-													<div class="node-card phase-c">
-														<strong>Warming stripes (C1)</strong>
+													<div class="node-card phase-c" data-node-id="C5">
+														<strong>Gestructureerde data (C5)</strong>
 														<span
-															>Visualiseer datasets om patronen te
-															ontdekken.</span
-														>
-													</div>
-												</li>
-												<li>
-													<div class="node-card phase-c">
-														<strong>Identificeren (C2)</strong>
-														<span
-															>Analyseer data om kenmerken en trends te
-															benoemen.</span
-														>
-													</div>
-												</li>
-											</ul>
-										</li>
-										<li>
-											<div class="node-card phase-c">
-												<strong>Identificeren (C3)</strong>
-												<span
-													>Herken structuren en relaties binnen je model.</span
-												>
-											</div>
-											<ul>
-												<li>
-													<div class="node-card phase-d">
-														<strong>Ontwikkelen (D1)</strong>
-														<span
-															>Vertaal je model naar een werkend ontwerp of
-															prototype.</span
+															>Organiseer data zodat je er efficiënt mee kunt
+															werken.</span
 														>
 													</div>
 													<ul>
 														<li>
-															<div class="node-card phase-d">
-																<strong>Inspecteren en aanpassen (D2)</strong>
+															<div class="node-card phase-c" data-node-id="C1">
+																<strong>Warming stripes (C1)</strong>
 																<span
-																	>Test je oplossing en verbeter waar
-																	nodig.</span
+																	>Visualiseer datasets om patronen te
+																	ontdekken.</span
+																>
+															</div>
+														</li>
+														<li>
+															<div class="node-card phase-c" data-node-id="C2">
+																<strong>Identificeren (C2)</strong>
+																<span
+																	>Analyseer data om kenmerken en trends te
+																	benoemen.</span
 																>
 															</div>
 														</li>
 													</ul>
 												</li>
-											</ul>
-										</li>
-										<li>
-											<div class="node-card phase-b">
-												<strong>Automaten (B3)</strong>
-												<span>Verken toestandsdiagrammen en logica.</span>
-											</div>
-											<ul>
 												<li>
-													<div class="node-card phase-b">
-														<strong>Algoritme (B1)</strong>
+													<div class="node-card phase-c" data-node-id="C3">
+														<strong>Identificeren (C3)</strong>
 														<span
-															>Ontwikkel stappenplannen voor oplossingen.</span
+															>Herken structuren en relaties binnen je model.</span
 														>
 													</div>
 													<ul>
 														<li>
-															<div class="node-card phase-b">
-																<strong>Datastructuren (B2)</strong>
+															<div class="node-card phase-d" data-node-id="D1">
+																<strong>Ontwikkelen (D1)</strong>
 																<span
-																	>Kies de juiste datastructuur voor je
-																	algoritme.</span
+																	>Vertaal je model naar een werkend ontwerp of
+																	prototype.</span
 																>
 															</div>
+															<ul>
+																<li>
+																	<div class="node-card phase-d" data-node-id="D2-1">
+																		<strong>Inspecteren en aanpassen (D2)</strong>
+																		<span
+																			>Test je oplossing en verbeter waar
+																			nodig.</span
+																		>
+																	</div>
+																</li>
+															</ul>
+														</li>
+													</ul>
+												</li>
+												<li>
+													<div class="node-card phase-b" data-node-id="B3">
+														<strong>Automaten (B3)</strong>
+														<span>Verken toestandsdiagrammen en logica.</span>
+													</div>
+													<ul>
+														<li>
+															<div class="node-card phase-b" data-node-id="B1">
+																<strong>Algoritme (B1)</strong>
+																<span
+																	>Ontwikkel stappenplannen voor oplossingen.</span
+																>
+															</div>
+															<ul>
+																<li>
+																	<div class="node-card phase-b" data-node-id="B2-1">
+																		<strong>Datastructuren (B2)</strong>
+																		<span
+																			>Kies de juiste datastructuur voor je
+																			algoritme.</span
+																		>
+																	</div>
+																</li>
+															</ul>
 														</li>
 													</ul>
 												</li>
@@ -432,182 +383,239 @@
 									</ul>
 								</li>
 							</ul>
-						</li>
-					</ul>
-				</div>
-
-				<div
-					class="tab-panel"
-					role="tabpanel"
-					id="theme-3"
-					aria-labelledby="tab-theme-3"
-					hidden="true"
-				>
-					<div class="panel-header">
-						<h2>Werken aan het web</h2>
-						<p>
-							Binnen dit thema staat het bouwen en verbeteren van online
-							ervaringen centraal. Je oefent met HTML, structuur en
-							gebruiksvriendelijkheid.
-						</p>
-					</div>
-					<ul class="skill-tree">
-						<li>
-							<div class="node-card phase-b">
-								<strong>Introductie HTML (B4)</strong>
-								<span>Leer de basis van webpagina's opbouwen.</span>
+						</div>
+		
+						<div
+							class="tab-panel"
+							role="tabpanel"
+							id="theme-3"
+							aria-labelledby="tab-theme-3"
+							hidden="true"
+						>
+							<svg class="connector-canvas"></svg>
+							<div class="panel-header">
+								<h2>Werken aan het web</h2>
+								<p>
+									Binnen dit thema staat het bouwen en verbeteren van online
+									ervaringen centraal. Je oefent met HTML, structuur en
+									gebruiksvriendelijkheid.
+								</p>
 							</div>
-							<ul>
+							<ul class="skill-tree">
 								<li>
-									<div class="node-card phase-b">
-										<strong>Datastructuren (B2)</strong>
-										<span
-											>Pas gestructureerde gegevens toe binnen een
-											webcontext.</span
-										>
-									</div>
-								</li>
-								<li>
-									<div class="node-card phase-f">
-										<strong>Usability (F1)</strong>
-										<span>Zorg dat je webpagina prettig te gebruiken is.</span>
+									<div class="node-card phase-b" data-node-id="B4">
+										<strong>Introductie HTML (B4)</strong>
+										<span>Leer de basis van webpagina's opbouwen.</span>
 									</div>
 									<ul>
 										<li>
-											<div class="node-card phase-d">
-												<strong>Inspecteren en aanpassen (D2)</strong>
-												<span>Test je ontwerp en voer verbeteringen door.</span>
+											<div class="node-card phase-b" data-node-id="B2-2">
+												<strong>Datastructuren (B2)</strong>
+												<span
+													>Pas gestructureerde gegevens toe binnen een
+													webcontext.</span
+												>
 											</div>
+										</li>
+										<li>
+											<div class="node-card phase-f" data-node-id="F1">
+												<strong>Usability (F1)</strong>
+												<span>Zorg dat je webpagina prettig te gebruiken is.</span>
+											</div>
+											<ul>
+												<li>
+													<div class="node-card phase-d" data-node-id="D2-2">
+														<strong>Inspecteren en aanpassen (D2)</strong>
+														<span>Test je ontwerp en voer verbeteringen door.</span>
+													</div>
+												</li>
+											</ul>
 										</li>
 									</ul>
 								</li>
 							</ul>
-						</li>
-					</ul>
-				</div>
-
-				<div
-					class="tab-panel"
-					role="tabpanel"
-					id="theme-4"
-					aria-labelledby="tab-theme-4"
-					hidden="true"
-				>
-					<div class="panel-header">
-						<h2>Binair begrip</h2>
-						<p>
-							Deze tak zoomt in op representaties van data en het begrijpen van
-							binaire systemen.
-						</p>
-					</div>
-					<ul class="skill-tree">
-						<li>
-							<div class="node-card phase-c">
-								<strong>Standaard representaties (C4)</strong>
-								<span>Leer hoe computers informatie coderen en opslaan.</span>
+						</div>
+		
+						<div
+							class="tab-panel"
+							role="tabpanel"
+							id="theme-4"
+							aria-labelledby="tab-theme-4"
+							hidden="true"
+						>
+							<svg class="connector-canvas"></svg>
+							<div class="panel-header">
+								<h2>Binair begrip</h2>
+								<p>
+									Deze tak zoomt in op representaties van data en het begrijpen van
+									binaire systemen.
+								</p>
 							</div>
-						</li>
-					</ul>
-				</div>
-
-				<div
-					class="tab-panel"
-					role="tabpanel"
-					id="theme-5"
-					aria-labelledby="tab-theme-5"
-					hidden="true"
-				>
-					<div class="panel-header">
-						<h2>Hardware en systemen</h2>
-						<p>
-							Richt je op het ontleden van systemen en het begrijpen van
-							hardwarecomponenten.
-						</p>
-					</div>
-					<ul class="skill-tree">
-						<li>
-							<div class="node-card phase-e">
-								<strong>Decompositie (E1)</strong>
-								<span
-									>Breek complexe systemen op in overzichtelijke
-									onderdelen.</span
-								>
+							<ul class="skill-tree">
+								<li>
+									<div class="node-card phase-c" data-node-id="C4">
+										<strong>Standaard representaties (C4)</strong>
+										<span>Leer hoe computers informatie coderen en opslaan.</span>
+									</div>
+								</li>
+							</ul>
+						</div>
+		
+						<div
+							class="tab-panel"
+							role="tabpanel"
+							id="theme-5"
+							aria-labelledby="tab-theme-5"
+							hidden="true"
+						>
+							<svg class="connector-canvas"></svg>
+							<div class="panel-header">
+								<h2>Hardware en systemen</h2>
+								<p>
+									Richt je op het ontleden van systemen en het begrijpen van
+									hardwarecomponenten.
+								</p>
 							</div>
-						</li>
-					</ul>
-				</div>
-
-				<div class="legend" aria-label="Legenda kleurcodering">
-					<div class="legend-item">
-						<span class="legend-swatch" style="background: #fee28f"></span>
-						<span>Serie A – Basisvaardigheden en communicatie</span>
-					</div>
-					<div class="legend-item">
-						<span class="legend-swatch" style="background: #bcead2"></span>
-						<span>Serie B – Structuren en programmeren</span>
-					</div>
-					<div class="legend-item">
-						<span class="legend-swatch" style="background: #d1e4ff"></span>
-						<span>Serie C – Data en representaties</span>
-					</div>
-					<div class="legend-item">
-						<span class="legend-swatch" style="background: #ddbff6"></span>
-						<span>Serie D – Ontwikkelen en verbeteren</span>
-					</div>
-					<div class="legend-item">
-						<span class="legend-swatch" style="background: #fbd3a4"></span>
-						<span>Serie E – Toepassing en veiligheid</span>
-					</div>
-					<div class="legend-item">
-						<span class="legend-swatch" style="background: #f6c1dd"></span>
-						<span>Serie F – Reflectie en maatschappij</span>
-					</div>
-				</div>
-			</section>
-		</main>
-
-		<script>
-			(function () {
-				const buttons = Array.from(document.querySelectorAll(".tab-button"));
-				const panels = Array.from(document.querySelectorAll(".tab-panel"));
-
-				function activateTab(targetId) {
-					buttons.forEach((btn) => {
-						const isActive = btn.getAttribute("aria-controls") === targetId;
-						btn.classList.toggle("is-active", isActive);
-						btn.setAttribute("aria-selected", isActive ? "true" : "false");
-					});
-
-					panels.forEach((panel) => {
-						const isActive = panel.id === targetId;
-						panel.classList.toggle("is-active", isActive);
-						if (isActive) {
-							panel.removeAttribute("hidden");
-						} else {
-							panel.setAttribute("hidden", "true");
+							<ul class="skill-tree">
+								<li>
+									<div class="node-card phase-e" data-node-id="E1">
+										<strong>Decompositie (E1)</strong>
+										<span
+											>Breek complexe systemen op in overzichtelijke
+											onderdelen.</span
+										>
+									</div>
+								</li>
+							</ul>
+						</div>
+		
+						<div class="legend" aria-label="Legenda kleurcodering">
+							<div class="legend-item">
+								<span class="legend-swatch" style="background: #fee28f"></span>
+								<span>Serie A – Basisvaardigheden en communicatie</span>
+							</div>
+							<div class="legend-item">
+								<span class="legend-swatch" style="background: #bcead2"></span>
+								<span>Serie B – Structuren en programmeren</span>
+							</div>
+							<div class="legend-item">
+								<span class="legend-swatch" style="background: #d1e4ff"></span>
+								<span>Serie C – Data en representaties</span>
+							</div>
+							<div class="legend-item">
+								<span class="legend-swatch" style="background: #ddbff6"></span>
+								<span>Serie D – Ontwikkelen en verbeteren</span>
+							</div>
+							<div class="legend-item">
+								<span class="legend-swatch" style="background: #fbd3a4"></span>
+								<span>Serie E – Toepassing en veiligheid</span>
+							</div>
+							<div class="legend-item">
+								<span class="legend-swatch" style="background: #f6c1dd"></span>
+								<span>Serie F – Reflectie en maatschappij</span>
+							</div>
+						</div>
+					</section>
+				</main>
+		
+				<script>
+					(function () {
+						const buttons = Array.from(document.querySelectorAll(".tab-button"));
+						const panels = Array.from(document.querySelectorAll(".tab-panel"));
+		
+						function activateTab(targetId) {
+							buttons.forEach((btn) => {
+								const isActive = btn.getAttribute("aria-controls") === targetId;
+								btn.classList.toggle("is-active", isActive);
+								btn.setAttribute("aria-selected", isActive ? "true" : "false");
+							});
+		
+							panels.forEach((panel) => {
+								const isActive = panel.id === targetId;
+								panel.classList.toggle("is-active", isActive);
+								if (isActive) {
+									panel.removeAttribute("hidden");
+								} else {
+									panel.setAttribute("hidden", "true");
+								}
+							});
+							// Redraw connectors for the newly activated panel
+							const activePanel = document.getElementById(targetId);
+							if (activePanel) {
+								drawConnectorsForPanel(activePanel);
+							}
 						}
-					});
-				}
-
-				buttons.forEach((button) => {
-					button.addEventListener("click", () => {
-						activateTab(button.getAttribute("aria-controls"));
-					});
-
-					button.addEventListener("keydown", (event) => {
-						if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-							event.preventDefault();
-							const currentIndex = buttons.indexOf(button);
-							const offset = event.key === "ArrowRight" ? 1 : -1;
-							const nextIndex =
-								(currentIndex + offset + buttons.length) % buttons.length;
-							const nextButton = buttons[nextIndex];
-							nextButton.focus();
-							activateTab(nextButton.getAttribute("aria-controls"));
+		
+						buttons.forEach((button) => {
+							button.addEventListener("click", () => {
+								activateTab(button.getAttribute("aria-controls"));
+							});
+		
+							button.addEventListener("keydown", (event) => {
+								if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+									event.preventDefault();
+									const currentIndex = buttons.indexOf(button);
+									const offset = event.key === "ArrowRight" ? 1 : -1;
+									const nextIndex =
+										(currentIndex + offset + buttons.length) % buttons.length;
+									const nextButton = buttons[nextIndex];
+									nextButton.focus();
+									activateTab(nextButton.getAttribute("aria-controls"));
+								}
+							});
+						});
+		
+						function drawConnectorsForPanel(panel) {
+							const svg = panel.querySelector(".connector-canvas");
+							const panelRect = panel.getBoundingClientRect();
+							svg.innerHTML = ""; // Clear previous connectors
+		
+							const parents = panel.querySelectorAll("li > .node-card + ul");
+		
+							parents.forEach((childList) => {
+								const parentCard = childList.previousElementSibling;
+								const parentRect = parentCard.getBoundingClientRect();
+								const parentX =
+									parentRect.left + parentRect.width / 2 - panelRect.left;
+								const parentY = parentRect.bottom - panelRect.top;
+		
+								const children = childList.querySelectorAll("li > .node-card");
+								const childY = parentY + 50; // Vertical space from margin-top
+		
+								children.forEach((childCard) => {
+									const childRect = childCard.getBoundingClientRect();
+									const childX =
+										childRect.left + childRect.width / 2 - panelRect.left;
+		
+									const path = document.createElementNS(
+										"http://www.w3.org/2000/svg",
+										"path"
+									);
+									const d = `M ${parentX} ${parentY} V ${
+										childY - 25
+									} H ${childX} V ${childY}`;
+									path.setAttribute("d", d);
+									path.setAttribute("stroke", "#ccc");
+									path.setAttribute("stroke-width", "2");
+									path.setAttribute("fill", "none");
+									svg.appendChild(path);
+								});
+							});
 						}
-					});
-				});
-			})();
-		</script>
-	</body>
-</html>
+		
+						function drawAllConnectors() {
+							panels.forEach((panel) => {
+								if (panel.classList.contains("is-active")) {
+									drawConnectorsForPanel(panel);
+								}
+							});
+						}
+		
+						// Initial draw
+						window.addEventListener("DOMContentLoaded", drawAllConnectors);
+						window.addEventListener("resize", drawAllConnectors);
+					})();
+				</script>
+			</body>
+		</html>
+		
