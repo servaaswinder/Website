@@ -574,6 +574,7 @@
 							path.setAttribute('stroke', '#ccc');
 							path.setAttribute('stroke-width', '2');
 							path.setAttribute('fill', 'none');
+							path.setAttribute('stroke-linecap', 'round');
 							return path;
 						}
 
@@ -589,9 +590,10 @@
 
 							parentConnections.forEach((childList) => {
 								const parentCard = childList.previousElementSibling;
-								const children = Array.from(
-									childList.querySelectorAll('li > .node-card')
-								);
+								// Correctly select only direct child nodes
+								const children = Array.from(childList.children)
+									.map((li) => li.querySelector('.node-card'))
+									.filter(Boolean);
 
 								if (!parentCard || children.length === 0) return;
 
