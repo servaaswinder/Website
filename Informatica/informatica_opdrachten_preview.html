@@ -4,19 +4,56 @@
 		<title>Informatica – Opdrachtenboom</title>
 		<link rel="stylesheet" href="../style.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+		<script
+			type="text/javascript"
+			src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+		></script>
 		<style>
-            #mynetwork {
-                width: 100%;
-                height: 80vh; /* Uses 80% of the viewport height */
-                border: 1px solid lightgray;
-                background-color: #f9f9f9;
-            }
-            
-            /* Ensure full width for wide trees */
-            html, body {
-                min-width: fit-content;
-            }
+			#mynetwork {
+				width: 100%;
+				height: 80vh; /* Uses 80% of the viewport height */
+				border: 1px solid lightgray;
+				background-color: #f9f9f9;
+			}
+
+			main.site-content {
+				max-width: none;
+				width: 100%;
+				padding: 40px clamp(20px, 5vw, 80px);
+			}
+
+			.tree-container {
+				max-width: none;
+			}
+
+			.network-tooltip {
+				position: absolute;
+				padding: 0.4rem 0.6rem;
+				background: rgba(34, 34, 34, 0.9);
+				color: #fff;
+				border-radius: 4px;
+				font-size: 0.85rem;
+				pointer-events: none;
+				white-space: nowrap;
+				opacity: 0;
+				transition: opacity 0.15s ease;
+				z-index: 10;
+			}
+
+			.network-tooltip.is-visible {
+				opacity: 1;
+			}
+
+			#mynetwork.node-hover,
+			#mynetwork.node-hover canvas {
+				cursor: pointer !important;
+			}
+
+			/* Ensure full width for wide trees */
+			html,
+			body {
+				min-width: fit-content;
+			}
 		</style>
 	</head>
 	<body>
@@ -34,16 +71,16 @@
 							<a href="../Natuurkunde/klassen.html">Natuurkunde</a>
 						</li>
 						<li>
-							<a href="../Informatica/informatica_home.html"
-								>Informatica</a
-							>
+							<a href="../Informatica/informatica_home.html">Informatica</a>
 						</li>
 						<li>
-							<a href="../Informatica/informatica_opdrachten.html">Opdrachten</a>
+							<a href="../Informatica/informatica_opdrachten.html"
+								>Opdrachten</a
+							>
 						</li>
 					</ul>
 				</nav>
-		
+
 				<script>
 					const menuToggle = document.querySelector(".menu-toggle");
 					const navigation = document.querySelector("nav ul");
@@ -60,142 +97,458 @@
 			<section class="assignments-hero">
 				<h1>Opdrachtenoverzicht Informatica</h1>
 				<p>
-					Hieronder vind je de opdrachtenboom (skill tree). Werk van boven naar beneden:
-					begin bij de startopdracht en volg de lijnen naar de vervolgopdrachten.
-                    Sleep om te bewegen, scroll om te zoomen.
+					Hieronder vind je de opdrachtenboom (skill tree). Werk van boven naar
+					beneden: begin bij de startopdracht en volg de lijnen naar de
+					vervolgopdrachten. Sleep om te bewegen, scroll om te zoomen.
 				</p>
 			</section>
 
 			<section class="tree-container">
-                <div id="mynetwork"></div>
-            </section>
-            
-            <script type="text/javascript">
-                // Create an array with nodes
-                var nodes = new vis.DataSet([
-                    // Root
-                    {id: 'A3', label: '<b>Portfoliostartopdracht (A3)</b>\nMaak je eigen website', title: 'Hier komt uitleg over de portfoliostartopdracht...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    
-                    // Thema 1: Communiceren
-                    {id: 'A2', label: '<b>Communiceren (A2)</b>\nSamenwerken', title: 'Hier komt uitleg over communiceren...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'A5', label: '<b>Onderzoeken (A5)</b>\nOnderzoeksmethoden', title: 'Hier komt uitleg over onderzoeken...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'F2', label: '<b>Maatschappelijke aspecten (F2)</b>\nImpact op samenleving', title: 'Hier komt uitleg over maatschappelijke aspecten...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'A4', label: '<b>Oriënteren op studie en beroep (A4)</b>\nToekomstoriëntatie', title: 'Hier komt uitleg over oriënteren op studie en beroep...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'A1', label: '<b>Informatievaardigheden (A1)</b>\nInfo zoeken', title: 'Hier komt uitleg over informatievaardigheden...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'A7', label: '<b>Waarderen en oordelen (A7)</b>\nKritische blik', title: 'Hier komt uitleg over waarderen en oordelen...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'E2', label: '<b>Security (E2)</b>\nGegevens veilig houden', title: 'Hier komt uitleg over security...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'F4', label: '<b>Security (F4)</b>\nMaatregelen toepassen', title: 'Hier komt uitleg over security maatregelen...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'F3', label: '<b>Privacy (F3)</b>\nReflecteren', title: 'Hier komt uitleg over privacy...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-            
-                    // Thema 2: Modelleren
-                    {id: 'ModIntro', label: '<b>Cursus Leren Modelleren</b>\nIntroductie', title: 'Hier komt uitleg over de cursus leren modelleren...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'A6', label: '<b>Modelleren (A6)</b>\nModellen opstellen', title: 'Hier komt uitleg over modelleren...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'C5', label: '<b>Gestructureerde data (C5)</b>\nData organiseren', title: 'Hier komt uitleg over gestructureerde data...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'C1', label: '<b>Warming stripes (C1)</b>\nVisualiseren', title: 'Hier komt uitleg over warming stripes...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'C2', label: '<b>Identificeren (C2)</b>\nAnalyseren', title: 'Hier komt uitleg over identificeren...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'B3', label: '<b>Automaten (B3)</b>\nToestandsdiagrammen', title: 'Hier komt uitleg over automaten...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'B1', label: '<b>Algoritme (B1)</b>\nStappenplannen', title: 'Hier komt uitleg over algoritmes...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'B2', label: '<b>Datastructuren (B2)</b>\nKies structuur', title: 'Hier komt uitleg over datastructuren...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'C3', label: '<b>Representateren (C3)</b>\nStructuren herkennen', title: 'Hier komt uitleg over representateren...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'D1', label: '<b>Ontwikkelen (D1)</b>\nVertaal naar ontwerp', title: 'Hier komt uitleg over ontwikkelen...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'D2', label: '<b>Inspecteren en aanpassen (D2)</b>\nTesten', title: 'Hier komt uitleg over inspecteren en aanpassen...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-            
-                    // Thema 3: HTML
-                    {id: 'B4', label: '<b>Introductie HTML (B4)</b>\nNieuwe website', title: 'Hier komt uitleg over HTML...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-                    {id: 'F1', label: '<b>Usability (F1)</b>\nGebruiksvriendelijkheid', title: 'Hier komt uitleg over usability...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-            
-                    // Thema 4: Standaard-representaties
-                    {id: 'C4', label: '<b>Standaard-representaties (C4)</b>\nBinair en decimaal', title: 'Hier komt uitleg over standaard-representaties...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}},
-            
-                    // Thema 5: Decompositie
-                    {id: 'E1', label: '<b>Decompositie (E1)</b>\nHardware componenten', title: 'Hier komt uitleg over decompositie...', shape: 'box', color: {background: '#fff', border: '#ccc'}, font: {multi: 'html'}}
-                ]);
-            
-                // Create an array with edges
-                var edges = new vis.DataSet([
-                    // Root connections
-                    {from: 'A3', to: 'A2'},
-                    {from: 'A3', to: 'ModIntro'},
-                    {from: 'A3', to: 'B4'},
-                    {from: 'A3', to: 'C4'},
-                    {from: 'A3', to: 'E1'},
-                    
-                    // Thema 1: Communiceren
-                    {from: 'A2', to: 'A5'},
-                    {from: 'A2', to: 'A4'},
-                    {from: 'A2', to: 'A1'},
-                    {from: 'A5', to: 'F2'},
-                    {from: 'A1', to: 'A7'},
-                    {from: 'A1', to: 'E2'},
-                    {from: 'E2', to: 'F4'},
-                    {from: 'F4', to: 'F3'},
-            
-                    // Thema 2: Modelleren
-                    {from: 'ModIntro', to: 'A6'},
-                    {from: 'A6', to: 'C5'},
-                    {from: 'A6', to: 'B3'},
-                    {from: 'A6', to: 'C3'},
-                    {from: 'C5', to: 'C1'},
-                    {from: 'C5', to: 'C2'},
-                    {from: 'B3', to: 'B1'},
-                    {from: 'B1', to: 'B2'},
-                    {from: 'C3', to: 'D1'},
-                    {from: 'D1', to: 'D2'},
-            
-                    // Thema 3: HTML
-                    {from: 'B4', to: 'F1'},
-                    
-                    // Cross-links (Multi-parent)
-                    {from: 'B4', to: 'B2', color: {color: 'red', dash: [5, 5]}}, 
-                    {from: 'F1', to: 'D2', color: {color: 'red', dash: [5, 5]}},
-                    {from: 'B4', to: 'F1'} // Duplicate in list? "Introductie HTML (B4) --> Usability (F1)" is already there.
-                ]);
-            
-                // Create a network
-                var container = document.getElementById('mynetwork');
-                var data = {
-                    nodes: nodes,
-                    edges: edges
-                };
-                var options = {
-                    layout: {
-                        hierarchical: {
-                            direction: 'UD', // Up-Down
-                            sortMethod: 'directed', // Crucial for multi-parents
-                            nodeSpacing: 250, // Increased spacing for wider nodes
-                            levelSeparation: 150,
-                            shakeTowards: 'roots'
-                        }
-                    },
-                    edges: {
-                        smooth: {
-                            type: 'cubicBezier',
-                            forceDirection: 'vertical',
-                            roundness: 0.4
-                        },
-                        arrows: {
-                            to: {enabled: true, scaleFactor: 0.5}
-                        },
-                        color: {
-                            color: '#ccc',
-                            highlight: '#94a0b4'
-                        }
-                    },
-                    nodes: {
-                        borderWidth: 2,
-                        shadow: true,
-                        margin: 10,
-                        font: {
-                            face: 'Segoe UI',
-                            size: 14,
-                            color: '#333'
-                        },
-                        widthConstraint: { maximum: 200 } // Limit width to prevent super wide nodes
-                    },
-                    physics: false
-                };
-                var network = new vis.Network(container, data, options);
-            </script>
+				<div id="mynetwork"></div>
+			</section>
+
+			<script type="text/javascript">
+				// Create an array with nodes
+				var nodes = new vis.DataSet([
+					// Root
+					{
+						id: "A3",
+						label: "<b>Portfoliostartopdracht (A3)</b>\nMaak je eigen website",
+						title:
+							"Bouw je eigen portfolio-site, voeg achtergrondinformatie toe en deel de link met je docenten.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/portfoliostartopdracht_a3.html",
+					},
+
+					// Thema 1: Communiceren
+					{
+						id: "A2",
+						label: "<b>Communiceren (A2)</b>\nSamenwerken",
+						title: "Hier komt uitleg over communiceren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a2_communiceren.html",
+					},
+					{
+						id: "A5",
+						label: "<b>Onderzoeken (A5)</b>\nOnderzoeksmethoden",
+						title: "Hier komt uitleg over onderzoeken...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a5_onderzoeken.html",
+					},
+					{
+						id: "F2",
+						label:
+							"<b>Maatschappelijke aspecten (F2)</b>\nImpact op samenleving",
+						title: "Hier komt uitleg over maatschappelijke aspecten...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f2_maatschappij.html",
+					},
+					{
+						id: "A4",
+						label:
+							"<b>Oriënteren op studie en beroep (A4)</b>\nToekomstoriëntatie",
+						title: "Hier komt uitleg over oriënteren op studie en beroep...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a4_orienteren.html",
+					},
+					{
+						id: "A1",
+						label: "<b>Informatievaardigheden (A1)</b>\nInfo zoeken",
+						title: "Hier komt uitleg over informatievaardigheden...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a1_informatievaardigheden.html",
+					},
+					{
+						id: "A7",
+						label: "<b>Waarderen en oordelen (A7)</b>\nKritische blik",
+						title: "Hier komt uitleg over waarderen en oordelen...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a7_waarderen.html",
+					},
+					{
+						id: "E2",
+						label: "<b>Security (E2)</b>\nGegevens veilig houden",
+						title: "Hier komt uitleg over security...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/e2_security.html",
+					},
+					{
+						id: "F4",
+						label: "<b>Security (F4)</b>\nMaatregelen toepassen",
+						title: "Hier komt uitleg over security maatregelen...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f4_security.html",
+					},
+					{
+						id: "F3",
+						label: "<b>Privacy (F3)</b>\nReflecteren",
+						title: "Hier komt uitleg over privacy...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f3_privacy.html",
+					},
+
+					// Thema 2: Modelleren
+					{
+						id: "ModIntro",
+						label: "<b>Cursus Leren Modelleren</b>\nIntroductie",
+						title: "Hier komt uitleg over de cursus leren modelleren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/modintro_leren_modelleren.html",
+					},
+					{
+						id: "A6",
+						label: "<b>Modelleren (A6)</b>\nModellen opstellen",
+						title: "Hier komt uitleg over modelleren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a6_modelleren.html",
+					},
+					{
+						id: "C5",
+						label: "<b>Gestructureerde data (C5)</b>\nData organiseren",
+						title: "Hier komt uitleg over gestructureerde data...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c5_gestructureerde_data.html",
+					},
+					{
+						id: "C1",
+						label: "<b>Warming stripes (C1)</b>\nVisualiseren",
+						title: "Hier komt uitleg over warming stripes...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c1_warming_stripes.html",
+					},
+					{
+						id: "C2",
+						label: "<b>Identificeren (C2)</b>\nAnalyseren",
+						title: "Hier komt uitleg over identificeren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c2_identificeren.html",
+					},
+					{
+						id: "B3",
+						label: "<b>Automaten (B3)</b>\nToestandsdiagrammen",
+						title: "Hier komt uitleg over automaten...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b3_automaten.html",
+					},
+					{
+						id: "B1",
+						label: "<b>Algoritme (B1)</b>\nStappenplannen",
+						title: "Hier komt uitleg over algoritmes...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b1_algoritme.html",
+					},
+					{
+						id: "B2",
+						label: "<b>Datastructuren (B2)</b>\nKies structuur",
+						title: "Hier komt uitleg over datastructuren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b2_datastructuren.html",
+					},
+					{
+						id: "C3",
+						label: "<b>Representateren (C3)</b>\nStructuren herkennen",
+						title: "Hier komt uitleg over representateren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c3_representeren.html",
+					},
+					{
+						id: "D1",
+						label: "<b>Ontwikkelen (D1)</b>\nVertaal naar ontwerp",
+						title: "Hier komt uitleg over ontwikkelen...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/d1_ontwikkelen.html",
+					},
+					{
+						id: "D2",
+						label: "<b>Inspecteren en aanpassen (D2)</b>\nTesten",
+						title: "Hier komt uitleg over inspecteren en aanpassen...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/d2_inspecteren.html",
+					},
+
+					// Thema 3: HTML
+					{
+						id: "B4",
+						label: "<b>Introductie HTML (B4)</b>\nNieuwe website",
+						title: "Hier komt uitleg over HTML...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b4_introductie_html.html",
+					},
+					{
+						id: "F1",
+						label: "<b>Usability (F1)</b>\nGebruiksvriendelijkheid",
+						title: "Hier komt uitleg over usability...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f1_usability.html",
+					},
+
+					// Thema 4: Standaard-representaties
+					{
+						id: "C4",
+						label: "<b>Standaard-representaties (C4)</b>\nBinair en decimaal",
+						title: "Hier komt uitleg over standaard-representaties...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c4_standaard_representaties.html",
+					},
+
+					// Thema 5: Decompositie
+					{
+						id: "E1",
+						label: "<b>Decompositie (E1)</b>\nHardware componenten",
+						title: "Hier komt uitleg over decompositie...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/e1_decompositie.html",
+					},
+			]);
+					var STATUS_STYLES = {
+						locked: {
+							background: "#eff1f5",
+							border: "#c9cedb",
+							label: "🔒 Vergrendeld",
+						},
+						unlocked: {
+							background: "#fff7e3",
+							border: "#f5c461",
+							label: "🔓 Vrij",
+						},
+						completed: {
+							background: "#e6f5ec",
+							border: "#2d8f5b",
+							label: "✔️ Voltooid",
+						},
+					};
+
+				var startNodeId = "A3";
+				var unlockedAfterStart = ["A2", "ModIntro", "B4", "C4", "E1"];
+
+				var nodeStatusMap = {};
+				nodes.get().forEach(function (node) {
+					nodeStatusMap[node.id] = "locked";
+				});
+				nodeStatusMap[startNodeId] = "completed";
+				unlockedAfterStart.forEach(function (id) {
+					if (nodeStatusMap[id] !== "completed") {
+						nodeStatusMap[id] = "unlocked";
+					}
+				});
+
+					function applyStatusStyles() {
+						nodes.get().forEach(function (node) {
+							var status = nodeStatusMap[node.id] || "locked";
+							var config = STATUS_STYLES[status] || STATUS_STYLES.locked;
+							var baseLabel = node.baseLabel || node.label;
+							var badge = "\n" + config.label;
+							var font = Object.assign({}, node.font || {});
+							font.multi = "html";
+							font.color = "#333";
+							nodes.update({
+								id: node.id,
+								baseLabel: baseLabel,
+								label: baseLabel + badge,
+								color: {
+									background: config.background,
+									border: config.border,
+								},
+								font: font,
+								status: status,
+							});
+						});
+					}
+
+				applyStatusStyles();
+
+				// Create an array with edges
+				var edges = new vis.DataSet([
+					// Root connections
+					{ from: "A3", to: "A2" },
+					{ from: "A3", to: "ModIntro" },
+					{ from: "A3", to: "B4" },
+					{ from: "A3", to: "C4" },
+					{ from: "A3", to: "E1" },
+
+					// Thema 1: Communiceren
+					{ from: "A2", to: "A5" },
+					{ from: "A2", to: "A4" },
+					{ from: "A2", to: "A1" },
+					{ from: "A5", to: "F2" },
+					{ from: "A1", to: "A7" },
+					{ from: "A1", to: "E2" },
+					{ from: "E2", to: "F4" },
+					{ from: "F4", to: "F3" },
+
+					// Thema 2: Modelleren
+					{ from: "ModIntro", to: "A6" },
+					{ from: "A6", to: "C5" },
+					{ from: "A6", to: "B3" },
+					{ from: "A6", to: "C3" },
+					{ from: "C5", to: "C1" },
+					{ from: "C5", to: "C2" },
+					{ from: "B3", to: "B1" },
+					{ from: "B1", to: "B2" },
+					{ from: "C3", to: "D1" },
+					{ from: "D1", to: "D2" },
+
+					// Thema 3: HTML
+					{ from: "B4", to: "F1" },
+
+					// Cross-links (Multi-parent)
+					{ from: "B4", to: "B2" },
+					{ from: "F1", to: "D2" },
+					{ from: "B4", to: "F1" }, // Duplicate in list? "Introductie HTML (B4) --> Usability (F1)" is already there.
+				]);
+
+				// Create a network
+				var container = document.getElementById("mynetwork");
+				var data = {
+					nodes: nodes,
+					edges: edges,
+				};
+				var options = {
+					layout: {
+						hierarchical: {
+							direction: "UD", // Up-Down
+							sortMethod: "directed", // Crucial for multi-parents
+							nodeSpacing: 250, // Increased spacing for wider nodes
+							levelSeparation: 150,
+							shakeTowards: "roots",
+						},
+					},
+					edges: {
+						smooth: {
+							type: "cubicBezier",
+							forceDirection: "vertical",
+							roundness: 0.4,
+						},
+						arrows: {
+							to: { enabled: true, scaleFactor: 0.5 },
+						},
+						color: {
+							color: "#ccc",
+							highlight: "#94a0b4",
+						},
+					},
+					nodes: {
+						borderWidth: 2,
+						shadow: true,
+						margin: 10,
+						font: {
+							face: "Segoe UI",
+							size: 14,
+							color: "#333",
+						},
+						widthConstraint: { maximum: 200 }, // Limit width to prevent super wide nodes
+					},
+					physics: false,
+					interaction: {
+						dragNodes: false,
+						hover: true,
+					},
+				};
+				var network = new vis.Network(container, data, options);
+
+				// Tooltip that appears when hovering nodes
+				var tooltip = document.createElement("div");
+				tooltip.className = "network-tooltip";
+				document.body.appendChild(tooltip);
+				var hoveredNodeId = null;
+
+				function setTooltipPosition(pointer) {
+					var rect = container.getBoundingClientRect();
+					tooltip.style.left = rect.left + pointer.x + 15 + "px";
+					tooltip.style.top = rect.top + pointer.y - 10 + "px";
+				}
+
+				function hideTooltip() {
+					hoveredNodeId = null;
+					tooltip.classList.remove("is-visible");
+					container.classList.remove("node-hover");
+				}
+
+				network.on("hoverNode", function (params) {
+					hoveredNodeId = params.node;
+					var nodeData = nodes.get(params.node) || {};
+					var tooltipContent =
+						nodeData.title || "Hier komt later meer info over deze opdracht.";
+					tooltip.textContent = tooltipContent;
+					setTooltipPosition(params.event.pointer.DOM);
+					tooltip.classList.add("is-visible");
+					container.classList.add("node-hover");
+				});
+
+				network.on("pointerMove", function (params) {
+					if (hoveredNodeId !== null) {
+						setTooltipPosition(params.pointer.DOM);
+					}
+				});
+
+				network.on("blurNode", hideTooltip);
+				network.on("dragStart", hideTooltip);
+				network.on("zoom", hideTooltip);
+
+				// Placeholder click handler that can later navigate to assignment detail pages
+				network.on("click", function (params) {
+					if (params.nodes.length === 0) {
+						return;
+					}
+					var nodeId = params.nodes[0];
+					var nodeData = nodes.get(nodeId) || {};
+					if (nodeData.url) {
+						window.open(nodeData.url, "_blank");
+					} else {
+						console.log("Klik op node:", nodeData.label || nodeId);
+					}
+				});
+			</script>
 		</main>
 	</body>
 </html>
