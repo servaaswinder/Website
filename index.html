@@ -21,8 +21,22 @@
 								src="images/Dual_exposure.jpg"
 								alt="Profielfoto"
 								class="responsive-img"
+								id="profile-pic"
 							/>
 						</div>
+						<script>
+							const profilePic = document.getElementById("profile-pic");
+							if (profilePic) {
+								profilePic.addEventListener("click", function () {
+									// Remove class if it exists to restart animation
+									profilePic.classList.remove("rotate-360");
+									// Force reflow
+									void profilePic.offsetWidth;
+									// Add class back
+									profilePic.classList.add("rotate-360");
+								});
+							}
+						</script>
 						<div class="intro-copy">
 							<h1>Welkom op mijn lesportaal</h1>
 							<p>

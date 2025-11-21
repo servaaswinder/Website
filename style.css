@@ -975,6 +975,21 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   overflow: hidden;
   border-radius: 50%;
   box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.profile-picture:hover {
+  transform: scale(1.05);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rotate-360 {
+  animation: spin 1s ease-in-out;
 }
 
 /* Gallery from photography pages */
