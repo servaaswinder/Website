@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang='nl'>
+<head>
+<meta charset='utf-8' />
+<title>Modelleren (A6)</title>
+<link rel='stylesheet' href='../../style.css' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+</head>
+<body>
+<header>
+<div class='bar'>
+<div class='brand'>
+<h1>Servaas Winder</h1>
+<p>Docent Northgo-College</p>
+</div>
+<nav>
+<button class='menu-toggle'>&#9776;</button>
+<ul>
+<li><a href='../../index.html'>Home</a></li>
+<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
+<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
+<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
+</ul>
+</nav>
+<script>
+const menuToggle = document.querySelector('.menu-toggle');
+const navigation = document.querySelector('nav ul');
+if (menuToggle && navigation) {
+    menuToggle.addEventListener('click', function () {
+        navigation.classList.toggle('is-open');
+    });
+}
+</script>
+</div>
+</header>
+<main class='site-content'>
+<section class='assignment-hero'>
+<h1>Modelleren (A6)</h1>
+<p><strong>Modellen opstellen</strong></p>
+<p>Pas de stappen van modelleren toe op de casus rond Terschelling.</p>
+</section>
+<section class='instructions'>
+<h2>Materialen</h2>
+<ul>
+<li><a href='../../Leerling opdrachten/A opdrachten/Modelleer opdracht Terschelling (A6).docx' target='_blank' rel='noopener'>Modelleeropdracht Terschelling (docx)</a></li>
+</ul>
+</section>
+</main>
+</body>
+</html>

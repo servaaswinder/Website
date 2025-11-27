@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Klassen van Servaas Winder</title>
+		<link rel="stylesheet" href="/style.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+
+	<body class="portfolio">
+		<header>
+	<div class="bar">
+		<div class="brand">
+			<h1><a href="/index.html" style="text-decoration: none; color: inherit;">Servaas Winder</a></h1>
+			<p>Docent Northgo-College</p>
+		</div>
+		<nav>
+			<button class="menu-toggle">&#9776;</button>
+			<ul>
+				<li><a href="/index.html">Home</a></li>
+				<li>
+					<a href="/Natuurkunde/klassen.html">Natuurkunde</a>
+				</li>
+				<li>
+					<a href="/Informatica/informatica_home.html"
+						>Informatica</a
+					>
+				</li>
+                                <li>
+                                        <a href="/Informatica/informatica_opdrachten.html">Opdrachten</a>
+                                </li>
+			</ul>
+		</nav>
+
+		<script>
+			const menuToggle = document.querySelector(".menu-toggle");
+			const navigation = document.querySelector("nav ul");
+			if (menuToggle && navigation) {
+				menuToggle.addEventListener("click", function () {
+					navigation.classList.toggle("is-open");
+				});
+			}
+		</script>
+	</div>
+</header>
+
+
+		<main>
+			<section class="inf-hero">
+				<h1>Selecteer een klas:</h1>
+				<p>
+					Kies een van de onderstaande klassen om toegang te krijgen tot
+					oefenopgaven en andere leermaterialen.
+				</p>
+				<div class="inf-actions">
+					<a class="klas_knop" href="3havo.html">3 Havo</a>
+					<!-- <a class="klas_knop" href="4havo.html">4 Havo oud</a> -->
+					<a class="klas_knop" href="5havo.html">5 Havo</a>
+					<a class="klas_knop" href="4vwo.html">4 VWO</a>
+					<!-- <a class="klas_knop" href="5vwo.html">5 VWO oud</a> -->
+					<a class="klas_knop" href="6vwo.html">6 VWO</a>
+				</div>
+			</section>
+			<section class="inf-hero">
+				<h1>Verslagen</h1>
+				<p></p>
+				<div class="inf-actions">
+					<a class="klas_knop" href="Verslagen/Verslagen.html">Verslagen</a>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			<p>&copy; 2025 Servaas Winder</p>
+		</footer>
+	</body>
+</html>
