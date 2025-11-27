@@ -1,4 +1,14 @@
 # misc
 .DS_Store
 *.pem
+
+# Jekyll build artifacts
 _site/
+.jekyll-cache/
+.sass-cache/
+.jekyll-metadata
+
+# Local Ruby gems (installed by bundle install)
+vendor/
+.bundle/
+
