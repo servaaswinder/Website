@@ -8,6 +8,10 @@
 			type="text/javascript"
 			src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
 		></script>
+		<!-- Load Firebase SDKs from CDN -->
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 		<style>
 			#mynetwork {
 				width: 100%;
@@ -96,6 +100,8 @@
 			<section class="tree-container">
 				<div id="mynetwork"></div>
 			</section>
+
+
 
 			<script type="text/javascript">
 				// Create an array with nodes
@@ -359,39 +365,182 @@
 					},
 				};
 
+				// Default logic for visitors (non-logged in)
 				var startNodeId = "A3";
-				var unlockedAfterStart = ["A2", "ModIntro", "B4", "C4", "E1"];
-
+				var unlockedAfterStart = ["A2", "B4", "C4", "E1"]; // ModIntro removed as it is now completed
 				var nodeStatusMap = {};
+				
+				// Initialize default status
 				nodes.get().forEach(function (node) {
 					nodeStatusMap[node.id] = "locked";
 				});
 				nodeStatusMap[startNodeId] = "completed";
+				nodeStatusMap["ModIntro"] = "completed"; // Always completed
+
 				unlockedAfterStart.forEach(function (id) {
 					if (nodeStatusMap[id] !== "completed") {
 						nodeStatusMap[id] = "unlocked";
 					}
 				});
 
+				// Firebase configuratie
+				const firebaseConfig = {
+					apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+					authDomain: "leerling-accounts.firebaseapp.com",
+					projectId: "leerling-accounts",
+					storageBucket: "leerling-accounts.firebasestorage.app",
+					messagingSenderId: "884081904341",
+					appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+					measurementId: "G-9YY3856FBP",
+				};
+
+				// Initialiseer Firebase
+				firebase.initializeApp(firebaseConfig);
+				const auth = firebase.auth();
+				const db = firebase.firestore();
+
+				// Haal studentdata op en update de boom
+				async function loadStudentProgress(user) {
+					try {
+						let doc = await db.collection("results").doc(user.uid).get();
+						if (!doc.exists) {
+							const querySnapshot = await db
+								.collection("results")
+								.where("email", "==", user.email)
+								.limit(1)
+								.get();
+							if (!querySnapshot.empty) {
+								doc = querySnapshot.docs[0];
+							}
+						}
+
+						if (doc && doc.exists) {
+							const data = doc.data();
+							const assignments = Array.isArray(data.assignments)
+								? data.assignments
+								: []; 
+							updateTreeWithProgress(assignments);
+						}
+					} catch (error) {
+						console.error("Fout bij ophalen voortgang:", error);
+					}
+				}
+
+				function updateTreeWithProgress(assignments) {
+					const completedMap = new Map();
+					assignments.forEach((a) => {
+						if (a.title) {
+							const cleanTitle = String(a.title).trim();
+							completedMap.set(cleanTitle, a);
+						}
+					});
+
+					// Force ModIntro to be completed for everyone, without grade
+					completedMap.set("ModIntro", { title: "ModIntro", grade: null });
+
+					// Bouw een map van parent-relaties om dependencies te checken
+					const parentsMap = {}; // childId -> [parentIds]
+					nodes.getIds().forEach((id) => {
+						parentsMap[id] = [];
+					});
+					edges.get().forEach((edge) => {
+						if (parentsMap[edge.to]) {
+							parentsMap[edge.to].push(edge.from);
+						}
+					});
+
+					// Bepaal status voor elke node
+					const updates = [];
+					nodes.get().forEach((node) => {
+						let status = "locked";
+						let grade = null;
+
+						if (completedMap.has(node.id)) {
+							status = "completed";
+							const assignment = completedMap.get(node.id);
+							if (assignment && assignment.grade) {
+								grade = assignment.grade;
+							}
+						} else {
+							// Check of alle parents voltooid zijn
+							const parents = parentsMap[node.id];
+							if (parents.length === 0) {
+								status = "unlocked";
+							} else {
+								const allParentsCompleted = parents.every((parentId) =>
+									completedMap.has(parentId)
+								);
+								if (allParentsCompleted) {
+									status = "unlocked";
+								}
+							}
+						}
+
+						const config = STATUS_STYLES[status] || STATUS_STYLES.locked;
+						
+						let currentBaseLabel = node.baseLabel;
+						if (!currentBaseLabel) {
+							currentBaseLabel = node.label; 
+						}
+						
+						const badge = "\n" + config.label;
+						
+						updates.push({
+							id: node.id,
+							label: currentBaseLabel + badge,
+							shape: 'box', // Revert to box
+							image: undefined, // Clear image
+							color: {
+								background: config.background,
+								border: config.border,
+							},
+							status: status,
+							baseLabel: currentBaseLabel,
+							grade: grade // Store grade for canvas drawing
+						});
+					});
+
+					nodes.update(updates);
+				}
+
+				// Luister naar auth status
+				auth.onAuthStateChanged((user) => {
+					if (user) {
+						console.log("Ingelogd: " + user.email);
+						loadStudentProgress(user);
+					} else {
+						applyStatusStyles(); 
+					}
+				});
+
 				function applyStatusStyles() {
 					nodes.get().forEach(function (node) {
-						var status = nodeStatusMap[node.id] || "locked";
+						var status = node.status || nodeStatusMap[node.id] || "locked";
 						var config = STATUS_STYLES[status] || STATUS_STYLES.locked;
-						var baseLabel = node.baseLabel || node.label;
+						
+						var baseLabel = node.baseLabel;
+						if (!baseLabel) {
+							baseLabel = node.label;
+						}
+
 						var badge = "\n" + config.label;
 						var font = Object.assign({}, node.font || {});
 						font.multi = "html";
 						font.color = "#333";
+						
 						nodes.update({
 							id: node.id,
 							baseLabel: baseLabel,
 							label: baseLabel + badge,
+							shape: 'box',
+							image: undefined,
 							color: {
 								background: config.background,
 								border: config.border,
 							},
 							font: font,
 							status: status,
+							grade: null
 						});
 					});
 				}
@@ -535,6 +684,58 @@
 					if (nodeData.url) {
 						window.location.href = nodeData.url;
 					}
+				});
+
+				// Custom drawing for grade badges
+				network.on("afterDrawing", function (ctx) {
+					nodes.get().forEach(function (node) {
+						if (node.status === "completed" && node.grade) {
+							var box = network.getBoundingBox(node.id);
+							// box contains top, left, right, bottom in canvas coordinates (simulation space)
+							// We need to draw relative to these coordinates.
+							
+							var x = box.right;
+							var y = box.top;
+							
+							// Draw badge background (blue circle/pill)
+							ctx.fillStyle = "#007bff";
+							ctx.beginPath();
+							// Draw a circle or rounded rect at top-right corner
+							// Let's do a pill shape if grade is long, or circle if short.
+							// For simplicity, a rounded rect.
+							var text = String(node.grade);
+							var padding = 6;
+							var fontSize = 12;
+							ctx.font = "bold " + fontSize + "px Arial";
+							var textWidth = ctx.measureText(text).width;
+							var badgeWidth = textWidth + padding * 2;
+							var badgeHeight = fontSize + padding;
+							
+							// Center the badge on the corner
+							var badgeX = x - badgeWidth / 2;
+							var badgeY = y - badgeHeight / 2;
+							
+							// Draw rounded rect
+							var r = 8;
+							ctx.beginPath();
+							ctx.moveTo(badgeX + r, badgeY);
+							ctx.lineTo(badgeX + badgeWidth - r, badgeY);
+							ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + r);
+							ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - r);
+							ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - r, badgeY + badgeHeight);
+							ctx.lineTo(badgeX + r, badgeY + badgeHeight);
+							ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - r);
+							ctx.lineTo(badgeX, badgeY + r);
+							ctx.quadraticCurveTo(badgeX, badgeY, badgeX + r, badgeY);
+							ctx.fill();
+							
+							// Draw text
+							ctx.fillStyle = "#ffffff";
+							ctx.textAlign = "center";
+							ctx.textBaseline = "middle";
+							ctx.fillText(text, badgeX + badgeWidth / 2, badgeY + badgeHeight / 2);
+						}
+					});
 				});
 			</script>
 		</main>
