@@ -1,49 +1,85 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Security (F4)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Poster – Tips voor veilige wachtwoorden (F4)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Security (F4)</h1>
-<p><strong>Maatregelen toepassen</strong></p>
-<p>Zet best practices rond wachtwoorden en toegangsbeheer om in begrijpelijke tips.</p>
+<h1>Poster – Tips voor veilige wachtwoorden</h1>
+<p class="subtitle">Security (F4)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
+    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Domein:</strong> F4</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<ul>
-<li><a href='../../Leerling opdrachten/F opdrachten/Poster___Tips_voor_veilige_wachtwoorden__F4_.pdf' target='_blank' rel='noopener'>Poster tips voor veilige wachtwoorden (pdf)</a></li>
-</ul>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je leert welke maatregelen je kunt nemen om wachtwoorden veilig te maken en te houden. Je verwerkt deze informatie in een aantrekkelijke en duidelijke poster.</p>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Onderzoek:</strong> Zoek informatie op over minimaal vijf tips om wachtwoorden veilig te houden. Denk aan:
+        <ul>
+            <li>Lengte van het wachtwoord</li>
+            <li>Gebruik van speciale tekens</li>
+            <li>Unieke wachtwoorden per account</li>
+            <li>Gebruik van een wachtwoordmanager</li>
+            <li>Tweestapsverificatie</li>
+        </ul>
+        Gebruik minimaal twee betrouwbare bronnen (bijvoorbeeld overheidssites of bekende securityblogs).
+    </li>
+    <li><strong>Poster ontwerpen:</strong> Maak een poster met een duidelijke titel en korte, krachtige tips. Gebruik kleuren, pictogrammen en een duidelijke lay-out om de boodschap visueel aantrekkelijk te maken. De poster moet geschikt zijn om op school op te hangen of online te delen.</li>
+    <li><strong>Bronvermelding:</strong> Vermeld onderaan de poster welke bronnen je hebt gebruikt. Gebruik APA-stijl.</li>
+    <li><strong>Publiceren:</strong> Plaats de poster op je portfolio-website met een korte tekst (50–100 woorden) over wat je hebt geleerd.</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inhoud (weging 2)</strong></td>
+            <td style="padding: 12px;">Geen of onjuiste tips.</td>
+            <td style="padding: 12px;">Enkele juiste tips, maar onvolledig.</td>
+            <td style="padding: 12px;">Minimaal 5 juiste, duidelijke tips.</td>
+            <td style="padding: 12px;">Minimaal 5 juiste tips, volledig en actueel.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving</strong></td>
+            <td style="padding: 12px;">Rommelig en onduidelijk.</td>
+            <td style="padding: 12px;">Enigszins gestructureerd.</td>
+            <td style="padding: 12px;">Overzichtelijk en aantrekkelijk.</td>
+            <td style="padding: 12px;">Zeer professioneel, uitnodigend en creatief.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Bronvermelding</strong></td>
+            <td style="padding: 12px;">Geen bronnen.</td>
+            <td style="padding: 12px;">Bronnen genoemd maar onduidelijk.</td>
+            <td style="padding: 12px;">Bronnen correct vermeld.</td>
+            <td style="padding: 12px;">Bronnen correct in APA-stijl en relevant.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 12) × 9 + 1</p>
 </section>
 </main>
 </body>

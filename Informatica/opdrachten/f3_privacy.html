@@ -1,49 +1,90 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Privacy (F3)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Analyse van een privacyschending (F3)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Privacy (F3)</h1>
-<p><strong>Reflecteren</strong></p>
-<p>Onderzoek een privacy-incident en beschrijf lessen voor verantwoord datagebruik.</p>
+<h1>Analyse van een privacyschending</h1>
+<p class="subtitle">Privacy (F3)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 3 uur</span> |
+    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Domein:</strong> F3</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<ul>
-<li><a href='../../Leerling opdrachten/F opdrachten/Analyse_van_een_privacyschending__F3_.pdf' target='_blank' rel='noopener'>Analyse van een privacyschending (pdf)</a></li>
-</ul>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je leert hoe je een privacyschending herkent, onderzoekt wat er is gebeurd en welke maatregelen getroffen hadden kunnen worden om deze te voorkomen.</p>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Kies een nieuwsbericht:</strong> Zoek een recent (maximaal 2 jaar oud) nieuwsbericht over een privacyschending in Nederland of internationaal. Het bericht moet afkomstig zijn van een betrouwbare bron (nieuwssite, overheidsrapport of beveiligingsblog).</li>
+    <li><strong>Analyseer de gebeurtenis:</strong> Beschrijf in eigen woorden:
+        <ul>
+            <li>Wat er is gebeurd (wie, wat, waar, wanneer, hoe)?</li>
+            <li>Welke persoonsgegevens zijn betrokken?</li>
+            <li>Wat waren de gevolgen voor de betrokkenen?</li>
+        </ul>
+    </li>
+    <li><strong>Bepaal oorzaken:</strong> Analyseer wat er misging: was het een technisch probleem, menselijke fout of opzet? Leg uit waarom deze fout kon gebeuren.</li>
+    <li><strong>Stel maatregelen voor:</strong> Beschrijf minimaal drie concrete maatregelen die deze privacyschending hadden kunnen voorkomen of beperken. Licht bij elke maatregel toe waarom die effectief is.</li>
+    <li><strong>Publiceer op je portfolio:</strong> Schrijf een kort artikel (200–300 woorden) met je analyse en maatregelen. Voeg de link naar het originele nieuwsbericht toe.</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inhoud (weging 2)</strong></td>
+            <td style="padding: 12px;">Onvolledig of niet relevant.</td>
+            <td style="padding: 12px;">Beschrijving is correct maar mist belangrijke details.</td>
+            <td style="padding: 12px;">Duidelijke beschrijving met oorzaken en gevolgen.</td>
+            <td style="padding: 12px;">Uitgebreide beschrijving met oorzaken, gevolgen en context.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Analyse</strong></td>
+            <td style="padding: 12px;">Geen analyse.</td>
+            <td style="padding: 12px;">Oppervlakkig, weinig onderbouwing.</td>
+            <td style="padding: 12px;">Degelijke analyse met enkele verbeterpunten.</td>
+            <td style="padding: 12px;">Diepgaande analyse met duidelijke onderbouwing.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Maatregelen</strong></td>
+            <td style="padding: 12px;">Geen maatregelen.</td>
+            <td style="padding: 12px;">1–2 algemene maatregelen.</td>
+            <td style="padding: 12px;">Minimaal 3 concrete maatregelen.</td>
+            <td style="padding: 12px;">Minimaal 3 concrete, goed onderbouwde maatregelen.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving</strong></td>
+            <td style="padding: 12px;">Slordig en onoverzichtelijk.</td>
+            <td style="padding: 12px;">Basisstructuur aanwezig.</td>
+            <td style="padding: 12px;">Overzichtelijk en leesbaar.</td>
+            <td style="padding: 12px;">Professionele opmaak, goed gestructureerd.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 15) × 9 + 1</p>
 </section>
 </main>
 </body>

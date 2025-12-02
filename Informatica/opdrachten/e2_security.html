@@ -1,49 +1,83 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Security (E2)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Cyberdreigingen (E2)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Security (E2)</h1>
-<p><strong>Gegevens veilig houden</strong></p>
-<p>Analyseer veelvoorkomende cyberdreigingen en leer hoe je systemen weerbaar maakt.</p>
+<h1>Cyberdreigingen</h1>
+<p class="subtitle">Security (E2)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 4 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> E2</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<ul>
-<li><a href='../../Leerling opdrachten/E opdrachten/Overzicht_van_veelvoorkomende_cyberdreigingen.pdf' target='_blank' rel='noopener'>Overzicht van veelvoorkomende cyberdreigingen (pdf)</a></li>
-</ul>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je leert welke cyberdreigingen er bestaan, hoe ze werken en welke maatregelen je kunt nemen om je ertegen te beschermen. Je presenteert deze informatie in een duidelijk en visueel aantrekkelijk overzicht.</p>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Onderzoek:</strong> Zoek informatie op over minimaal vijf veelvoorkomende cyberdreigingen (bijv. phishing, malware zoals ransomware/spyware/trojans, DDoS, social engineering, datalekken). Noteer per dreiging:
+        <ul>
+            <li>Wat het is</li>
+            <li>Hoe het werkt</li>
+            <li>Een recent voorbeeld</li>
+            <li>Maatregelen om het te voorkomen</li>
+        </ul>
+    </li>
+    <li><strong>Bronnen controleren:</strong> Gebruik minimaal drie betrouwbare bronnen (overheid, bekende securitybedrijven, nieuwsmedia) en noteer ze volgens de APA-stijl.</li>
+    <li><strong>Overzicht maken:</strong> Maak een tabel of infographic waarin je alle dreigingen naast elkaar zet. Houd het kort maar compleet en voeg visuele elementen toe (icoontjes, schema’s, kleuren).</li>
+    <li><strong>Publicatie:</strong> Plaats je overzicht op je portfolio-website en voeg een korte inleiding (50–100 woorden) toe waarin je uitlegt waarom dit onderwerp belangrijk is.</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inhoud (weging 2)</strong></td>
+            <td style="padding: 12px;">Onjuist of incompleet.</td>
+            <td style="padding: 12px;">Juist, maar beperkt aantal dreigingen.</td>
+            <td style="padding: 12px;">Juist en minimaal 5 dreigingen beschreven.</td>
+            <td style="padding: 12px;">Juist, volledig, met actuele voorbeelden en preventietips.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving</strong></td>
+            <td style="padding: 12px;">Onleesbaar of rommelig.</td>
+            <td style="padding: 12px;">Beperkte structuur, weinig visueel.</td>
+            <td style="padding: 12px;">Overzichtelijk, enkele visuele elementen.</td>
+            <td style="padding: 12px;">Duidelijk, professioneel en visueel aantrekkelijk.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Bronvermelding</strong></td>
+            <td style="padding: 12px;">Geen bronnen.</td>
+            <td style="padding: 12px;">Bronnen onvolledig.</td>
+            <td style="padding: 12px;">Bronnen correct volgens APA.</td>
+            <td style="padding: 12px;">Bronnen correct volgens APA + korte toelichting op betrouwbaarheid.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 12) × 9 + 1</p>
 </section>
 </main>
 </body>

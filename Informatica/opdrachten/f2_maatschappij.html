@@ -1,49 +1,100 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Maatschappelijke aspecten (F2)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Sociale media en relaties (F2)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Maatschappelijke aspecten (F2)</h1>
-<p><strong>Impact op samenleving</strong></p>
-<p>Reflecteer op de invloed van informatica op relaties en samenleving.</p>
+<h1>Sociale media en relaties</h1>
+<p class="subtitle">Maatschappij (F2)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 3 tot 5 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> F2</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<ul>
-<li><a href='../../Leerling opdrachten/F opdrachten/De_invloed_van_sociale_media_op_persoonlijke_relaties F2.pdf' target='_blank' rel='noopener'>De invloed van sociale media op persoonlijke relaties (pdf)</a></li>
-</ul>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je onderzoekt hoe sociale media persoonlijke relaties beïnvloeden en leert deze informatie gestructureerd te presenteren in een verslag. Daarbij gebruik je betrouwbare bronnen en verwerk je zowel feitelijke informatie als je eigen analyse.</p>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Onderzoeksvraag opstellen:</strong> Formuleer een duidelijke hoofdvraag, bijvoorbeeld: "Op welke manieren beïnvloedt het gebruik van sociale media de kwaliteit van persoonlijke relaties bij jongeren?"</li>
+    <li><strong>Bronnenonderzoek:</strong>
+        <ul>
+            <li>Zoek minimaal drie betrouwbare bronnen (nieuwsartikelen, wetenschappelijke publicaties, onderzoeken).</li>
+            <li>Let op actualiteit en betrouwbaarheid.</li>
+            <li>Noteer de gegevens volgens de APA-regels.</li>
+        </ul>
+    </li>
+    <li><strong>Informatie verwerken:</strong> Maak een overzicht van de belangrijkste bevindingen per bron. Beschrijf zowel positieve als negatieve invloeden.</li>
+    <li><strong>Analyse en eigen mening:</strong> Vergelijk de informatie uit je bronnen en beschrijf in 1–2 alinea’s jouw interpretatie. Formuleer een onderbouwde conclusie.</li>
+    <li><strong>Verslag schrijven:</strong> Schrijf een verslag van 500–800 woorden met:
+        <ul>
+            <li>Titelpagina (titel, naam, datum).</li>
+            <li>Inleiding met onderzoeksvraag en aanpak.</li>
+            <li>Resultaten met samenvatting van de bevindingen.</li>
+            <li>Analyse en conclusie.</li>
+            <li>Bronnenlijst in APA-stijl.</li>
+            <li>Voeg minimaal één afbeelding of diagram toe die je zelf maakt of aanpast (bron vermelden).</li>
+        </ul>
+    </li>
+    <li><strong>Publiceren:</strong> Plaats het verslag als pdf op je portfolio-website met een korte introductietekst (max. 100 woorden).</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inhoud (weging 2)</strong></td>
+            <td style="padding: 12px;">Geen relevante informatie.</td>
+            <td style="padding: 12px;">Informatie is summier of grotendeels onjuist.</td>
+            <td style="padding: 12px;">Informatie is juist en bevat zowel positieve als negatieve invloeden.</td>
+            <td style="padding: 12px;">Informatie is volledig, goed onderbouwd en met actuele voorbeelden.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Analyse</strong></td>
+            <td style="padding: 12px;">Geen analyse.</td>
+            <td style="padding: 12px;">Analyse is oppervlakkig of niet onderbouwd.</td>
+            <td style="padding: 12px;">Analyse is juist maar beperkt.</td>
+            <td style="padding: 12px;">Analyse is volledig, kritisch en goed onderbouwd.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving</strong></td>
+            <td style="padding: 12px;">Geen structuur of opmaak.</td>
+            <td style="padding: 12px;">Structuur is onduidelijk, slordige opmaak.</td>
+            <td style="padding: 12px;">Duidelijke structuur, nette opmaak.</td>
+            <td style="padding: 12px;">Professionele opmaak met visuele ondersteuning.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Bronvermelding</strong></td>
+            <td style="padding: 12px;">Geen bronnen.</td>
+            <td style="padding: 12px;">Bronnen genoemd maar niet volgens APA.</td>
+            <td style="padding: 12px;">Bronnen correct vermeld volgens APA.</td>
+            <td style="padding: 12px;">Bronnen correct vermeld + extra toelichting over betrouwbaarheid.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 15) × 9 + 1</p>
 </section>
 </main>
 </body>
