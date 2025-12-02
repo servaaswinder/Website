@@ -1,47 +1,151 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Usability (F1)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Usability & Toegankelijkheid (F1)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Usability (F1)</h1>
-<p><strong>Gebruiksvriendelijkheid</strong></p>
-<p>Evalueer de gebruikservaring van je website en noteer verbeterkansen.</p>
+<h1>Design voor Iedereen: Usability & Toegankelijkheid</h1>
+<p class="subtitle">Subdomein F1: Usability</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 3 lessen</span> |
+    <span><strong>Niveau:</strong> 2/3</span> |
+    <span><strong>Domein:</strong> F1</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<p>Gebruik je eigen website als casus en beschrijf minimaal drie concrete verbeteringen. Ondersteun met screenshots.</p>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+
+<h2>Inleiding</h2>
+<p>Usability (gebruiksvriendelijkheid) gaat niet alleen over of een website er mooi uitziet. Het gaat erom of de website werkt voor <strong>iedereen</strong>. Denk hierbij aan mensen die kleurenblind zijn, slechtziend zijn, of hun muis niet kunnen gebruiken vanwege een motorische beperking.</p>
+<p>In deze opdracht kruip je in de huid van deze gebruikers. Je gaat ervaren hoe frustrerend slecht design is, je leert hoe je websites kunt 'keuren' (auditen) en je past je eigen portfolio aan zodat deze <em>handicap-proof</em> is.</p>
+
+
+
+<h2>Voorkennis</h2>
+<p>Voor deze opdracht heb je basiskennis nodig van:</p>
+<ul>
+    <li>HTML (structuur en tags zoals <code>&lt;h1&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;img&gt;</code>).</li>
+    <li>CSS (kleuren, fonts en states zoals <code>:hover</code>).</li>
+    <li>De browser 'Inspecteur' (DevTools).</li>
+</ul>
+
+<h2>Deel 1: De Frustratie Zone</h2>
+<p><strong>Doel:</strong> Ervaar zelf hoe belangrijk goede usability is.</p>
+
+<h3>Opdracht A: The User Inyerface Game</h3>
+<p>Ga naar <a href="https://userinyerface.com/" target="_blank" rel="noopener">UserInyerface.com</a>. Dit is een 'spel' ontworpen om zo irritant mogelijk te zijn.</p>
+<ol>
+    <li>Probeer het formulier zo snel mogelijk in te vullen.</li>
+    <li>Noteer 2 dingen die je mateloos irriteerden (bijv. onduidelijke knoppen, trage pop-ups).</li>
+</ol>
+
+<h3>Opdracht B: De "Cognitieve Overload"</h3>
+<p>Bekijk een beruchte website zoals <a href="https://arngren.net/" target="_blank" rel="noopener">Arngren.net</a>. Probeer de prijs van een specifiek product te vinden.</p>
+<p>Vergelijk jouw ervaring met de afbeelding hieronder. Zie je hoe een gebrek aan witruimte en structuur zorgt voor chaos in je hoofd?</p>
+
+
+
+<h2>Deel 2: De Audit (Keuring)</h2>
+<p><strong>Doel:</strong> Analyseer je eigen portfolio (of een schoolsite) met professionele tools.</p>
+<p>Open je eigen portfolio in Google Chrome en voer de volgende checks uit.</p>
+
+<h3>Stap 1: De Kleurenblinden-check</h3>
+<p>Chrome heeft een ingebouwde simulator voor visuele beperkingen. Zo kun je zien of je rode foutmeldingen wel zichtbaar zijn voor iemand die geen rood ziet.</p>
+<ol>
+    <li>Rechtermuisklik op je pagina &rarr; <strong>Inspecteren</strong>.</li>
+    <li>Open het commando-menu met <code>Ctrl+Shift+P</code> (Windows) of <code>Cmd+Shift+P</code> (Mac).</li>
+    <li>Typ "Rendering" en selecteer <em>Show Rendering</em>.</li>
+    <li>Scroll naar beneden naar <strong>Emulate vision deficiencies</strong> en kies 'Protanopia' of 'Blurred vision'.</li>
+</ol>
+
+
+
+<h3>Stap 2: Contrast & Kleur</h3>
+<p>Tekst moet voldoende contrast hebben met de achtergrond. Lichtgrijs op wit is bijvoorbeeld onleesbaar voor veel mensen.</p>
+<ul>
+    <li>Gebruik de <a href="https://webaim.org/resources/contrastchecker/" target="_blank" rel="noopener">WebAIM Contrast Checker</a>.</li>
+    <li>Vul de HEX-code van je tekst en je achtergrond in.</li>
+    <li>Je moet minimaal de score <strong>AA (Pass)</strong> halen.</li>
+</ul>
+
+<h3>Stap 3: De Muisloze test</h3>
+<p>Leg je muis weg. Gebruik alleen de <code>Tab</code>-toets en <code>Enter</code>. Kun je door je menu navigeren? Zie je aan welk linkje je selecteert?</p>
+
+<h2>Deel 3: Het Redesign</h2>
+<p><strong>Doel:</strong> Pas je portfolio aan op basis van de audit.</p>
+
+<p>Zorg dat jouw code voldoet aan de volgende vier eisen. Als je nog geen portfolio hebt, maak dan een mock-up/ontwerp die hieraan voldoet.</p>
+
+<ol>
+    <li><strong>Semantische HTML:</strong> Gebruik <code>&lt;button&gt;</code> voor knoppen en <code>&lt;a&gt;</code> voor links. Gebruik koppen (h1-h6) in de juiste volgorde.</li>
+    <li><strong>Alt-teksten:</strong> Voeg aan elk plaatje een beschrijving toe:
+<pre><code class="language-html">&lt;img src="foto.jpg" alt="Portretfoto van Jan met een laptop"&gt;</code></pre>
+    </li>
+    <li><strong>Focus States:</strong> Zorg dat gebruikers zien waar ze zijn als ze tabben. Dit doe je met CSS:
+<pre><code class="language-css">a:focus, button:focus {
+    outline: 3px solid blue;
+    background-color: #f0f0f0;
+}</code></pre>
+    </li>
+    <li><strong>Contrast:</strong> Pas je kleuren aan zodat ze slagen voor de WebAIM test.</li>
+</ol>
+
+
+
+<h2>Deel 4: Verantwoording</h2>
+<p>Lever een PDF in met de volgende onderdelen:</p>
+<ul>
+    <li><strong>Voor & Na:</strong> Screenshots van je oude (foute) ontwerp en je nieuwe (toegankelijke) ontwerp.</li>
+    <li><strong>De Oplossing:</strong> Leg uit wat je technisch hebt aangepast (bijv. "Ik heb de kleur geel donkerder gemaakt voor beter contrast").</li>
+    <li><strong>Lighthouse Score:</strong> Draai in Chrome Inspecteur een 'Lighthouse' rapport. Maak een screenshot van je score op het kopje 'Accessibility' (streef naar 90-100).</li>
+</ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 Punten</th>
+            <th style="padding: 12px; text-align: left;">1 Punt</th>
+            <th style="padding: 12px; text-align: left;">2 Punten</th>
+            <th style="padding: 12px; text-align: left;">3 Punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Analyse (Deel 1 & 2)</strong></td>
+            <td style="padding: 12px;">Geen analyse aanwezig.</td>
+            <td style="padding: 12px;">Problemen vaag omschreven ("het was lelijk").</td>
+            <td style="padding: 12px;">Problemen gekoppeld aan usability, maar tools niet gebruikt.</td>
+            <td style="padding: 12px;">Diepe analyse met screenshots van DevTools/WebAIM.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Toepassing (Deel 3)</strong></td>
+            <td style="padding: 12px;">Geen aanpassingen gedaan.</td>
+            <td style="padding: 12px;">Contrast verbeterd, maar code (HTML) is rommelig.</td>
+            <td style="padding: 12px;">Contrast en HTML zijn goed, focus-states ontbreken.</td>
+            <td style="padding: 12px;">Site is volledig toegankelijk (Contrast, HTML, Focus, Alt-tags).</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Verantwoording</strong></td>
+            <td style="padding: 12px;">Ontbreekt.</td>
+            <td style="padding: 12px;">Alleen screenshots, geen tekst.</td>
+            <td style="padding: 12px;">Goede uitleg, maar bewijs (Lighthouse score) ontbreekt.</td>
+            <td style="padding: 12px;">Helder verslag met voor/na bewijs en perfecte Lighthouse score.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (Totaal aantal punten / 9) * 9 + 1</p>
 </section>
 </main>
 </body>
