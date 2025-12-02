@@ -1,49 +1,112 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Standaard-representaties (C4)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Binair rekenen (C4)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Standaard-representaties (C4)</h1>
-<p><strong>Binair en decimaal</strong></p>
-<p>Oefen met het omrekenen tussen binaire en decimale systemen.</p>
+<h1>Binair rekenen</h1>
+<p class="subtitle">Standaard representaties (C4)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 3 uur</span> |
+    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Domein:</strong> C4</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Het doel van deze opdracht is dat je leert hoe het binaire stelsel werkt en hoe je eenvoudige berekeningen kunt uitvoeren in binair. Je oefent met het omzetten tussen decimaal en binair en maakt daarna een eigen uitlegpagina op je portfolio-website.</p>
+
+<h2>Opdracht</h2>
+
+<h3>1. Theorie leren</h3>
 <ul>
-<li><a href='../../Leerling opdrachten/C opdrachten/Binair rekenen C4.docx' target='_blank' rel='noopener'>Binair rekenen (docx)</a></li>
+    <li>Ga naar de uitlegpagina: <a href="https://www.hetklokhuis.nl/onderwerp/binair-tellen" target="_blank" rel="noopener">Klokhuis - Binair tellen</a>.</li>
+    <li>Lees de uitleg en bekijk hoe decimale getallen worden omgezet naar binair en andersom.</li>
 </ul>
+
+<h3>2. Oefenen met rekenen</h3>
+<p>Zet de volgende getallen om:</p>
+<ul>
+    <li>13 (decimaal) &rarr; binair</li>
+    <li>25 (decimaal) &rarr; binair</li>
+    <li>11101 (binair) &rarr; decimaal</li>
+    <li>10011 (binair) &rarr; decimaal</li>
+</ul>
+<p>Reken uit in binair:</p>
+<ul>
+    <li>1011 + 110 = ?</li>
+    <li>1110 + 101 = ?</li>
+    <li>1001 + 1111 = ?</li>
+</ul>
+
+<h3>3. Eigen uitleg maken</h3>
+<ul>
+    <li>Maak op je portfolio-website een eigen uitlegpagina.</li>
+    <li>Leg in je eigen woorden uit hoe binair tellen werkt.</li>
+    <li>Geef minstens 2 voorbeelden van rekenen met binaire getallen.</li>
+    <li>Voeg een zelfgemaakte tabel of afbeelding toe (bijvoorbeeld: decimaal en binair van 0 t/m 15).</li>
+</ul>
+
+<h2>Product</h2>
+<ul>
+    <li>Een uitlegpagina op je portfolio-website met tekst, voorbeelden en een visualisatie.</li>
+    <li>Je gemaakte rekenopgaven, verwerkt in de uitleg of apart toegevoegd.</li>
+</ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inhoud</strong></td>
+            <td style="padding: 12px;">Geen uitleg of alleen gekopieerde tekst.</td>
+            <td style="padding: 12px;">Eenvoudige uitleg, maar onvolledig of onduidelijk.</td>
+            <td style="padding: 12px;">Duidelijke uitleg met voorbeelden.</td>
+            <td style="padding: 12px;">Uitgebreide en heldere uitleg met meerdere voorbeelden en visualisatie.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Oefeningen</strong></td>
+            <td style="padding: 12px;">Geen opdrachten gemaakt.</td>
+            <td style="padding: 12px;">Enkele opdrachten geprobeerd, met fouten.</td>
+            <td style="padding: 12px;">Meeste opdrachten correct uitgewerkt.</td>
+            <td style="padding: 12px;">Alle opdrachten correct en netjes uitgewerkt.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving portfolio</strong></td>
+            <td style="padding: 12px;">Geen pagina aangemaakt.</td>
+            <td style="padding: 12px;">Pagina aangemaakt maar rommelig of kaal.</td>
+            <td style="padding: 12px;">Pagina netjes met structuur en alinea’s.</td>
+            <td style="padding: 12px;">Pagina aantrekkelijk vormgegeven met eigen afbeeldingen/tabel.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Bronvermelding</strong></td>
+            <td style="padding: 12px;">Geen bron gebruikt.</td>
+            <td style="padding: 12px;">Bron gebruikt maar niet genoemd.</td>
+            <td style="padding: 12px;">Bron vermeld.</td>
+            <td style="padding: 12px;">Bron vermeld en aangevuld met extra bron(nen).</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 12) × 9 + 1</p>
 </section>
 </main>
 </body>

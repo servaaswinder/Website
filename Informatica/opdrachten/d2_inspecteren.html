@@ -1,49 +1,102 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Inspecteren en aanpassen (D2)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Rekenspel verbeteren (D2)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Inspecteren en aanpassen (D2)</h1>
-<p><strong>Testen</strong></p>
-<p>Test je spelidee en beschrijf verbeterpunten.</p>
+<h1>Rekenspel verbeteren</h1>
+<p class="subtitle">Inspecteren (D2)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 3 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> D2</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<ul>
-<li><a href='../../Leerling opdrachten/D opdrachten/Rekenspel (D2).pdf' target='_blank' rel='noopener'>Rekenspel testrapport (pdf)</a></li>
-</ul>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je leert de structuur en werking van een bestaand programma uit te leggen en aan te passen. Je past dus niet alleen toe, maar verbetert of breidt het spel uit.</p>
+
+<h2>Uitgangspunt</h2>
+<p>Je krijgt een voorbeeldprogramma dat een simpel rekenspel maakt, maar nog niet goed werkt:</p>
+<pre><code class="language-python">import random
+
+score = 0
+
+for i in range(5):
+    a = random.randint(1, 10)
+    b = random.randint(1, 10)
+    print("Wat is", a, "+", b, "?")
+    antwoord = input()
+    if antwoord == a + b:
+        print("Goed!")
+        score = score + 1
+    else:
+        print("Fout!")
+    print("Je score is", score)</code></pre>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Inspecteer de code:</strong> leg in eigen woorden uit wat de code probeert te doen.</li>
+    <li><strong>Los de fouten op:</strong> zorg dat het programma correct werkt. (Tip: let op het type van de invoer!)</li>
+    <li><strong>Breid het spel uit</strong> met minimaal twee verbeteringen, bijvoorbeeld:
+        <ul>
+            <li>Voeg vermenigvuldig- of deelsommen toe.</li>
+            <li>Houd bij hoeveel rondes correct zijn beantwoord en toon een percentage.</li>
+            <li>Maak een levelsysteem met oplopende moeilijkheid.</li>
+            <li>Voeg feedback toe afhankelijk van het aantal punten.</li>
+        </ul>
+    </li>
+    <li><strong>Test het programma:</strong> werkt het betrouwbaar, ook bij verschillende antwoorden?</li>
+    <li><strong>Portfolio:</strong> Plaats het verbeterde programma en je uitleg in je portfolio.</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inspectie</strong></td>
+            <td style="padding: 12px;">Geen uitleg.</td>
+            <td style="padding: 12px;">Uitleg onvolledig of niet correct.</td>
+            <td style="padding: 12px;">Uitleg grotendeels correct.</td>
+            <td style="padding: 12px;">Uitleg volledig en duidelijk; laat zien dat de structuur begrepen is.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Foutoplossing</strong></td>
+            <td style="padding: 12px;">Fout blijft bestaan.</td>
+            <td style="padding: 12px;">Poging tot oplossen; werkt niet goed.</td>
+            <td style="padding: 12px;">Fout opgelost; programma werkt weer.</td>
+            <td style="padding: 12px;">Fout opgelost en code overzichtelijk verbeterd.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Uitbreiding</strong></td>
+            <td style="padding: 12px;">Geen uitbreiding.</td>
+            <td style="padding: 12px;">Kleine uitbreiding; niet goed uitgewerkt.</td>
+            <td style="padding: 12px;">Twee uitbreidingen maar niet volledig.</td>
+            <td style="padding: 12px;">Minstens twee goed werkende uitbreidingen.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 9) × 9 + 1</p>
 </section>
 </main>
 </body>

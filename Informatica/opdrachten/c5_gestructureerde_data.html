@@ -1,51 +1,178 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Gestructureerde data (C5)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Gestructureerde data (C5)</h1>
-<p><strong>Data organiseren</strong></p>
-<p>Analyseer sportdata en leer hoe je datasets voorbereidt voor visualisaties.</p>
+<h1>Data-analyse: Eredivisie 2023/2024</h1>
+<p class="subtitle">Gestructureerde data (C5)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 3 tot 4 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> C5</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Inleiding</h2>
+<p>In deze opdracht duik je in de wereld van sportdata-analyse. Je gaat aan de slag met echte wedstrijdgegevens van het Eredivisie-seizoen 2023/2024. Met behulp van de Python-bibliotheek <strong>pandas</strong> leer je hoe je data kunt inladen, opschonen, analyseren en visualiseren. Het doel is om patronen en inzichten te ontdekken die verborgen liggen in de ruwe data. Wie scoort het meest? Is er echt een thuisvoordeel? Aan het einde van deze opdracht kun jij deze vragen beantwoorden met data!</p>
+
+<h2>Voorkennis</h2>
+<p>Voor deze opdracht is basiskennis van Python handig. Je moet weten hoe je:</p>
 <ul>
-<li><a href='../../Leerling opdrachten/C opdrachten/Gestructureerde data (C5)/Data-analyse Opdracht_ Eredivisie 2023_2024.pdf' target='_blank' rel='noopener'>Data-analyse Eredivisie 2023/2024 (pdf)</a></li>
-<li><a href='../../Leerling opdrachten/C opdrachten/Gestructureerde data (C5)/Voetbaldata 2023_2024.csv' target='_blank' rel='noopener'>Voetbaldata 2023/2024 (csv)</a></li>
-<li><a href='../../Leerling opdrachten/C opdrachten/Gestructureerde data (C5)/notes.txt' target='_blank' rel='noopener'>Notes (txt)</a></li>
+    <li>Een Google Colab-notebook opent en gebruikt.</li>
+    <li>Code in een cel uitvoert.</li>
+    <li>Het bestand <code>Voetbaldata 2023_2024.csv</code> uploadt naar je Colab-omgeving.</li>
 </ul>
+<p><em>Tip: Het is handig om voordat je begint de <a href="https://www.w3schools.com/python/pandas/default.asp" target="_blank" rel="noopener">W3Schools: Pandas tutorial</a> te doorlopen.</em></p>
+
+<h2>De Data</h2>
+<p>Je gebruikt een .csv-bestand met data van alle wedstrijden uit het seizoen. Download het bestand hier:</p>
+<ul>
+    <li><a href="../../Leerling opdrachten/C opdrachten/Gestructureerde data (C5)/Voetbaldata 2023_2024.csv" download>Voetbaldata 2023_2024.csv</a></li>
+</ul>
+<p>Enkele belangrijke kolommen zijn:</p>
+<ul>
+    <li><strong>HomeTeam:</strong> Het thuisteam</li>
+    <li><strong>AwayTeam:</strong> Het uitteam</li>
+    <li><strong>FTHG:</strong> Full Time Home Goals (doelpunten thuisteam na 90 min)</li>
+    <li><strong>FTAG:</strong> Full Time Away Goals (doelpunten uitteam na 90 min)</li>
+    <li><strong>FTR:</strong> Full Time Result (H=Thuiswinst, D=Gelijk, A=Uitwinst)</li>
+    <li><strong>HTHG:</strong> Half Time Home Goals (doelpunten thuisteam bij rust)</li>
+    <li><strong>HTAG:</strong> Half Time Away Goals (doelpunten uitteam bij rust)</li>
+    <li><strong>HTR:</strong> Half Time Result (H=Thuiswinst, D=Gelijk, A=Uitwinst)</li>
+</ul>
+
+<h2>Stappenplan</h2>
+<p>Open een nieuw notebook in Google Colab en volg de onderstaande stappen.</p>
+
+<h3>Stap 1: Data Inladen en Eerste Inspectie</h3>
+<p><strong>Doel:</strong> Kennismaken met de dataset.</p>
+<ol>
+    <li>Importeer de bibliotheken:
+<pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt</code></pre>
+    </li>
+    <li>Laad de data in een DataFrame. Vul de code aan:
+<pre><code class="language-python"># Vul de juiste bestandsnaam in
+df = pd.read_csv('...')</code></pre>
+    </li>
+    <li>Bekijk de eerste rijen:
+<pre><code class="language-python"># Schrijf hier de code om de eerste 5 rijen te tonen
+...</code></pre>
+    </li>
+    <li>Krijg een overzicht van de DataFrame:
+<pre><code class="language-python"># Schrijf hier de code om de info van de DataFrame op te vragen
+...</code></pre>
+    </li>
+</ol>
+
+<h3>Stap 2: Data Opschonen en Voorbereiden</h3>
+<p><strong>Doel:</strong> De data klaarmaken voor analyse.</p>
+<p>Maak een nieuwe kolom <code>TotaalAantalDoelpunten</code> door de doelpunten van thuis- en uitteam op te tellen:</p>
+<pre><code class="language-python"># Maak een nieuwe kolom 'TotaalAantalDoelpunten'
+df['TotaalAantalDoelpunten'] = ...
+
+# Controleer je werk
+df.head()</code></pre>
+
+<h3>Stap 3: Verkennende Analyse - De Eredivisie in Cijfers</h3>
+<p><strong>Doel:</strong> De eerste algemene inzichten uit de data halen.</p>
+<ol>
+    <li>Totaal aantal doelpunten:
+<pre><code class="language-python">totaal_goals = df['...'].sum()
+print(f"Totaal aantal gescoorde doelpunten: {totaal_goals}")</code></pre>
+    </li>
+    <li>Gemiddeld aantal doelpunten per wedstrijd:
+<pre><code class="language-python">gemiddelde_goals = df['...'].mean()
+print(f"Gemiddeld aantal doelpunten per wedstrijd: {gemiddelde_goals:.2f}")</code></pre>
+    </li>
+    <li>Thuisvoordeel: Onderzoek hoe vaak het thuisteam wint (H), gelijkspel (D), of uitteam wint (A).
+<pre><code class="language-python">resultaat_verdeling = df['...'].value_counts()
+print("Verdeling van de wedstrijdresultaten:")
+print(resultaat_verdeling)</code></pre>
+    </li>
+</ol>
+
+<h3>Stap 4: Visualiseren van de Resultaten</h3>
+<p><strong>Doel:</strong> Inzichten omzetten in duidelijke grafieken.</p>
+<ol>
+    <li>Maak een cirkeldiagram van de resultaten:
+<pre><code class="language-python"># Maak een cirkeldiagram
+....plot(kind='pie', autopct='%1.1f%%', title='Wedstrijdresultaten')
+plt.ylabel('')
+plt.show()</code></pre>
+    </li>
+    <li>Maak een histogram van het aantal doelpunten:
+<pre><code class="language-python"># Maak een histogram
+....plot(kind='hist', bins=10, title='Doelpuntenverdeling')
+plt.xlabel("Totaal Aantal Doelpunten")
+plt.ylabel("Aantal Wedstrijden")
+plt.show()</code></pre>
+    </li>
+</ol>
+
+<h2>Eindopdracht: Analyseer Jouw Favoriete Club</h2>
+<p><strong>Doel:</strong> Pas de geleerde technieken toe in een mini-onderzoek naar een specifiek team. Dit wordt beoordeeld.</p>
+<p>Kies een team (bijv. 'PSV Eindhoven', 'Ajax', 'Feyenoord') en beantwoord de vragen in je notebook.</p>
+<ol>
+    <li><strong>Filter de data:</strong>
+<pre><code class="language-python">team_naam = "PSV Eindhoven" # Pas aan naar jouw team
+df_team = df[...] # Filter op HomeTeam of AwayTeam (let op: dit is lastiger dan het lijkt, begin met alleen thuiswedstrijden of probeer beide te combineren)
+df_team.head()</code></pre>
+    </li>
+    <li><strong>Analyseer de prestaties:</strong> Presteert jouw team beter in thuis- of uitwedstrijden?</li>
+    <li><strong>Analyseer de mentaliteit:</strong> Hoe vaak geeft jouw team een voorsprong weg? (Optioneel/Bonus)</li>
+    <li><strong>Visualiseer:</strong> Maak een staafdiagram van winst/gelijk/verlies.</li>
+    <li><strong>Conclusie:</strong> Schrijf een korte conclusie (ca. 100 woorden).</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 Punten</th>
+            <th style="padding: 12px; text-align: left;">1 Punt</th>
+            <th style="padding: 12px; text-align: left;">2 Punten</th>
+            <th style="padding: 12px; text-align: left;">3 Punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Code Structuur & Werking</strong></td>
+            <td style="padding: 12px;">Code afwezig/werkt niet.</td>
+            <td style="padding: 12px;">Poging tot structuur, incompleet/foutief.</td>
+            <td style="padding: 12px;">Code werkt, kleine onvolkomenheden.</td>
+            <td style="padding: 12px;">Code correct, efficiënt en overzichtelijk.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Dataverwerking & Analyse</strong></td>
+            <td style="padding: 12px;">Vragen onbeantwoord/data incorrect.</td>
+            <td style="padding: 12px;">Poging gedaan, filters/berekeningen fundamenteel onjuist.</td>
+            <td style="padding: 12px;">Analyses grotendeels correct, kleine fout.</td>
+            <td style="padding: 12px;">Data correct gefilterd, berekeningen juist.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Visualisatie & Conclusie</strong></td>
+            <td style="padding: 12px;">Ontbreekt.</td>
+            <td style="padding: 12px;">Onduidelijk/niet onderbouwd.</td>
+            <td style="padding: 12px;">Correct maar niet volledig opgemaakt/zwak onderbouwd.</td>
+            <td style="padding: 12px;">Helder, compleet en sterk onderbouwd.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (Totaal aantal punten / 9) * 9 + 1</p>
 </section>
 </main>
 </body>

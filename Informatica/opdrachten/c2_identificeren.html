@@ -1,50 +1,93 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Identificeren (C2)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Identificeren (C2)</h1>
-<p><strong>Analyseren</strong></p>
-<p>Herken patronen in datasets en identificeer relevante variabelen.</p>
+<h1>Identificeren van trends in voetbaldata</h1>
+<p class="subtitle">Identificeren (C2)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
+    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Domein:</strong> C2</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>In deze opdracht leer je belangrijke informatie en trends herkennen in een dataset. Je gaat aan de slag met echte Eredivisie-data uit het seizoen 2023/2024. In plaats van grafieken maken (zoals bij de vorige opdracht), ligt nu de nadruk op patronen ontdekken en beschrijven met behulp van Python en pandas.</p>
+
+<h2>Benodigdheden</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/C opdrachten/Identificeren (C2)/Identificeren (C2).docx' target='_blank' rel='noopener'>Identificeren (docx)</a></li>
-<li><a href='../../Leerling opdrachten/C opdrachten/Identificeren (C2)/Voetbaldata 2023_2024.csv' target='_blank' rel='noopener'>Voetbaldata 2023/2024 (csv)</a></li>
+    <li>Google Colab</li>
+    <li>Het bestand <a href="../../Leerling opdrachten/C opdrachten/Identificeren (C2)/Voetbaldata 2023_2024.csv" download>Voetbaldata 2023_2024.csv</a></li>
 </ul>
+
+<h2>Opdrachtstappen</h2>
+<ul>
+    <li>Open een nieuw Python-notebook in Google Colab.</li>
+    <li>Upload het bestand <code>Voetbaldata 2023_2024.csv</code> en laad het in met pandas.</li>
+    <li>Kies <strong>minstens twee onderzoeksvragen</strong> uit onderstaande lijst:
+        <ul>
+            <li>Zijn er meer doelpunten in de eerste of tweede helft van wedstrijden?</li>
+            <li>Welke clubs presteren duidelijk beter thuis dan uit?</li>
+            <li>Welk team scoort gemiddeld de meeste doelpunten per wedstrijd?</li>
+            <li>Welk team krijgt gemiddeld de minste doelpunten tegen?</li>
+            <li>Welke eindstand (bijv. 1-0, 2-1, 0-0) komt het vaakst voor?</li>
+            <li>Zijn er speelrondes waarin opvallend veel doelpunten vallen?</li>
+        </ul>
+    </li>
+    <li>Gebruik Python (met pandas) om deze vragen te beantwoorden. Denk aan functies zoals <code>.mean()</code>, <code>.value_counts()</code> of <code>.groupby()</code>.</li>
+    <li>Schrijf per vraag een korte analyse (± 75 woorden). Leg duidelijk uit <strong>wat je hebt ontdekt</strong> en <strong>waarom dat interessant is</strong>.</li>
+    <li>Plaats je analyses in je portfolio (met codefragmenten of tabellen ter ondersteuning).</li>
+</ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Data laden</strong></td>
+            <td style="padding: 12px;">Geen data ingeladen of fout bestand.</td>
+            <td style="padding: 12px;">Data is ingeladen maar nauwelijks gebruikt.</td>
+            <td style="padding: 12px;">Data correct ingeladen en deels gebruikt.</td>
+            <td style="padding: 12px;">Data correct ingeladen en goed toegepast in meerdere analyses.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Analyse</strong></td>
+            <td style="padding: 12px;">Geen vragen beantwoord.</td>
+            <td style="padding: 12px;">Vragen beantwoord maar met fouten of zonder cijfers.</td>
+            <td style="padding: 12px;">Vragen grotendeels correct beantwoord, beperkt onderbouwd.</td>
+            <td style="padding: 12px;">Vragen volledig correct beantwoord en goed onderbouwd met data.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Uitleg</strong></td>
+            <td style="padding: 12px;">Geen uitleg aanwezig.</td>
+            <td style="padding: 12px;">Uitleg summier of onjuist.</td>
+            <td style="padding: 12px;">Uitleg correct maar oppervlakkig.</td>
+            <td style="padding: 12px;">Uitleg volledig, duidelijk en met eigen inzicht.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = aantal punten / 9 × 9 + 1</p>
 </section>
 </main>
 </body>

@@ -1,49 +1,83 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Algoritme (B1)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Algoritme (B1)</h1>
-<p><strong>Stappenplannen</strong></p>
-<p>Schrijf een algoritme voor een slim huis en test de logica.</p>
+<h1>Arduino Smart Home</h1>
+<p class="subtitle">Algoritme (B1)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 4 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> B1</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Inleiding</h2>
+<p>Een Smart Home maken doe je niet met een Arduino, maar met een ESP32. We kunnen wel oefenen met een Arduino, want bij een goed georganiseerde Smart Home zijn er heel veel ‘als’ functies die samen een prettige leefomgeving maken. (Bijvoorbeeld bij meneer Winder thuis is weinig daglicht. Dus hij wil overdag zijn lampen fel aan en zo blauw als mogelijk. ‘s Avonds wil meneer Winder juist dat de lampen zachter gaan en meer geel worden.)</p>
+<p>In deze opdracht ga je de Arduino zo programmeren dat een lampje aangaat als er iemand de kamer binnen is gekomen of binnen is. De lamp moet weer uitgaan zodra er niemand meer in de kamer is. Je bent beperkt met het arduino materiaal. Ontwerp daarom je kamer klein.</p>
+
+<h2>Materiaal</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/B opdrachten/Arduino Smart Home B1.docx' target='_blank' rel='noopener'>Arduino Smart Home (docx)</a></li>
+    <li>Zelf uitzoeken en met een 'boodschappenlijstje' naar je docent gaan. Als er wat besteld moet worden, kan het een tijdje duren.</li>
 </ul>
+
+<h2>Stappenplan</h2>
+<ol>
+    <li><strong>Eisen:</strong> Maak een overzicht van de eisen.</li>
+    <li><strong>Ontwerp:</strong> Ontwerp een logisch plan voor de code.</li>
+    <li><strong>Materialen:</strong> Verzamel de materialen.</li>
+    <li><strong>Bouwen:</strong> Bouw de opstelling.</li>
+    <li><strong>Verslag:</strong> Schrijf een verslag en plaats dit op je website.</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Voorbereiding & Plan</strong></td>
+            <td style="padding: 12px;">Er is geen plan of eisenoverzicht gemaakt.</td>
+            <td style="padding: 12px;">Er is een kort of onvolledig plan, zonder duidelijke eisen.</td>
+            <td style="padding: 12px;">Er is een logisch plan met eisen en een eenvoudig ontwerp.</td>
+            <td style="padding: 12px;">Het plan is volledig, met duidelijke eisen en een goed doordacht ontwerp voor code en opstelling.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Schakeling & Materialen</strong></td>
+            <td style="padding: 12px;">Er is geen werkende opstelling gebouwd.</td>
+            <td style="padding: 12px;">Er is een poging gedaan, maar de schakeling werkt niet of is foutief aangesloten.</td>
+            <td style="padding: 12px;">De schakeling werkt grotendeels goed; er zijn kleine storingen of onvolkomenheden.</td>
+            <td style="padding: 12px;">De schakeling werkt volledig en stabiel; materialen zijn goed gekozen en toegepast.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Code & Werking</strong></td>
+            <td style="padding: 12px;">Er is geen code ingeleverd of de code werkt niet.</td>
+            <td style="padding: 12px;">Er is code, maar deze werkt niet correct of slechts deels.</td>
+            <td style="padding: 12px;">De lamp reageert correct op aanwezigheid, maar met kleine beperkingen (bv. vertraagd of onbetrouwbaar).</td>
+            <td style="padding: 12px;">De lamp reageert volledig correct en betrouwbaar op aanwezigheid; code is netjes gestructureerd.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijferberekening: Cijfer = aantal punten + 1</p>
 </section>
 </main>
 </body>

@@ -1,8 +1,11 @@
-﻿<!DOCTYPE html>
+---
+---
+
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Informatica - Opdrachtenboom</title>
-		<link rel="stylesheet" href="../style.css" />
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<script
 			type="text/javascript"
@@ -60,33 +63,7 @@
 		</style>
 	</head>
 	<body>
-		<header>
-			<div class="bar">
-				<div class="brand">
-					<h1><a href="../index.html" style="text-decoration: none; color: inherit;">Servaas Winder</a></h1>
-					<p>Docent Northgo-College</p>
-				</div>
-				<nav>
-					<button class="menu-toggle">&#9776;</button>
-					<ul>
-						<li><a href="../index.html">Home</a></li>
-						<li><a href="../Natuurkunde/klassen.html">Natuurkunde</a></li>
-						<li><a href="./informatica_home.html">Informatica</a></li>
-						<li><a href="./informatica_opdrachten.html">Opdrachten</a></li>
-					</ul>
-				</nav>
-
-				<script>
-					const menuToggle = document.querySelector(".menu-toggle");
-					const navigation = document.querySelector("nav ul");
-					if (menuToggle && navigation) {
-						menuToggle.addEventListener("click", function () {
-							navigation.classList.toggle("is-open");
-						});
-					}
-				</script>
-			</div>
-		</header>
+		{% include site-header.html %}
 		<main class="site-content">
 			<section class="assignments-hero">
 				<h1>Opdrachtenoverzicht Informatica</h1>
@@ -97,7 +74,29 @@
 				</p>
 			</section>
 
-			<section class="tree-container">
+			<section id="login-section" class="auth-card" style="max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #e6e8ee; border-radius: 14px; background: #fff; box-shadow: 0 10px 25px rgba(20, 30, 60, 0.08);">
+				<h2 style="margin-top: 0;">Inloggen</h2>
+				<p>Log in om je voortgang te bekijken.</p>
+				<form id="login-form">
+					<div class="form-field" style="margin-bottom: 15px;">
+						<label for="login-email" style="display: block; margin-bottom: 5px; font-weight: 500;">E-mail</label>
+						<input type="email" id="login-email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+					</div>
+					<div class="form-field" style="margin-bottom: 20px;">
+						<label for="login-password" style="display: block; margin-bottom: 5px; font-weight: 500;">Wachtwoord</label>
+						<input type="password" id="login-password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
+					</div>
+					<button type="submit" class="inf-button" style="width: 100%; cursor: pointer;">Inloggen</button>
+				</form>
+				<div id="login-error" style="color: #dc3545; margin-top: 10px; font-size: 0.9em;"></div>
+			</section>
+
+			<div id="logged-in-controls" style="display: none; max-width: 1200px; margin: 0 auto 20px; padding: 0 20px; text-align: right;">
+				<span id="user-display" style="margin-right: 15px; color: var(--muted);"></span>
+				<button id="logout-btn" class="inf-button secondary" style="font-size: 0.9em; padding: 6px 12px;">Uitloggen</button>
+			</div>
+
+			<section class="tree-container" style="display: none;">
 				<div id="mynetwork"></div>
 			</section>
 
@@ -122,7 +121,7 @@
 					{
 						id: "A2",
 						label: "<b>Communiceren (A2)</b>\nSamenwerken",
-						title: "Hier komt uitleg over communiceren...",
+						title: "Maak een infografic over internetveiligheid",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -131,7 +130,7 @@
 					{
 						id: "A5",
 						label: "<b>Onderzoeken (A5)</b>\nOnderzoeksmethoden",
-						title: "Hier komt uitleg over onderzoeken...",
+						title: "Doe onderzoek naar sociale media gebruik en analyseer de resultaten.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -160,7 +159,7 @@
 					{
 						id: "A1",
 						label: "<b>Informatievaardigheden (A1)</b>\nInfo zoeken",
-						title: "Hier komt uitleg over informatievaardigheden...",
+						title: "Zoek een recent datalek, analyseer de oorzaken en stel maatregelen voor in een kort verslag.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -169,7 +168,7 @@
 					{
 						id: "A7",
 						label: "<b>Waarderen en oordelen (A7)</b>\nKritische blik",
-						title: "Hier komt uitleg over waarderen en oordelen...",
+						title: "Bereid een debat voor over ethische dilemma's rondom AI en reflecteer op de uitkomst.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -216,7 +215,7 @@
 					{
 						id: "A6",
 						label: "<b>Modelleren (A6)</b>\nModellen opstellen",
-						title: "Hier komt uitleg over modelleren...",
+						title: "Simuleer de populatie van vossen en konijnen op Terschelling met een wiskundig model.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -224,8 +223,8 @@
 					},
 					{
 						id: "C5",
-						label: "<b>Gestructureerde data (C5)</b>\nData organiseren",
-						title: "Hier komt uitleg over gestructureerde data...",
+						label: "<b>Gestructureerde data (C5)</b>\nDatabases",
+						title: "Analyseer Eredivisie-data met Python en Pandas.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -233,8 +232,8 @@
 					},
 					{
 						id: "C1",
-						label: "<b>Warming stripes (C1)</b>\nVisualiseren",
-						title: "Hier komt uitleg over warming stripes...",
+						label: "<b>Warming Stripes (C1)</b>\nData visualisatie",
+						title: "Visualiseer klimaatverandering met Python en data van het KNMI.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -242,8 +241,8 @@
 					},
 					{
 						id: "C2",
-						label: "<b>Identificeren (C2)</b>\nAnalyseren",
-						title: "Hier komt uitleg over identificeren...",
+						label: "<b>Identificeren (C2)</b>\nPatronen herkennen",
+						title: "Analyseer voetbaldata met Python en pandas en identificeer trends.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -252,7 +251,7 @@
 					{
 						id: "B3",
 						label: "<b>Automaten (B3)</b>\nToestandsdiagrammen",
-						title: "Hier komt uitleg over automaten...",
+						title: "Bouw en programmeer een digitale thermometer met Arduino.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -261,7 +260,7 @@
 					{
 						id: "B1",
 						label: "<b>Algoritme (B1)</b>\nStappenplannen",
-						title: "Hier komt uitleg over algoritmes...",
+						title: "Ontwerp en programmeer een slim lichtsysteem met Arduino dat reageert op aanwezigheid.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -270,7 +269,7 @@
 					{
 						id: "B2",
 						label: "<b>Datastructuren (B2)</b>\nKies structuur",
-						title: "Hier komt uitleg over datastructuren...",
+						title: "Vergelijk de efficiëntie van lijsten en sets door de zoeksnelheid te meten in Python.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -287,8 +286,8 @@
 					},
 					{
 						id: "D1",
-						label: "<b>Ontwikkelen (D1)</b>\nVertaal naar ontwerp",
-						title: "Hier komt uitleg over ontwikkelen...",
+						label: "<b>Ontwikkelen (D1)</b>\nProgrammeren",
+						title: "Programmeer een rekenspel met Python (random getallen, input/output).",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -308,7 +307,7 @@
 					{
 						id: "B4",
 						label: "<b>Introductie HTML (B4)</b>\nNieuwe website",
-						title: "Hier komt uitleg over HTML...",
+						title: "Leer de basis van HTML en bouw je eerste eigen webpagina.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -327,8 +326,8 @@
 					// Thema 4: Standaard-representaties
 					{
 						id: "C4",
-						label: "<b>Standaard-representaties (C4)</b>\nBinair en decimaal",
-						title: "Hier komt uitleg over standaard-representaties...",
+						label: "<b>Standaard representaties (C4)</b>\nBinair rekenen",
+						title: "Leer binair rekenen en maak een uitlegpagina op je portfolio.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -338,8 +337,8 @@
 					// Thema 5: Decompositie
 					{
 						id: "E1",
-						label: "<b>Decompositie (E1)</b>\nHardware componenten",
-						title: "Hier komt uitleg over decompositie...",
+						label: "<b>Decompositie (E1)</b>\nHardware",
+						title: "Haal een computer uit elkaar, benoem de onderdelen en geef hardware-advies.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
@@ -503,12 +502,60 @@
 					nodes.update(updates);
 				}
 
+				// Auth UI elements
+				const loginSection = document.getElementById("login-section");
+				const treeContainer = document.querySelector(".tree-container");
+				const loggedInControls = document.getElementById("logged-in-controls");
+				const loginForm = document.getElementById("login-form");
+				const logoutBtn = document.getElementById("logout-btn");
+				const loginError = document.getElementById("login-error");
+				const userDisplay = document.getElementById("user-display");
+
+				// Login handler
+				if (loginForm) {
+					loginForm.addEventListener("submit", (e) => {
+						e.preventDefault();
+						const email = document.getElementById("login-email").value;
+						const password = document.getElementById("login-password").value;
+						loginError.textContent = "";
+
+						auth.signInWithEmailAndPassword(email, password).catch((error) => {
+							console.error("Login error:", error);
+							loginError.textContent = "Inloggen mislukt: " + error.message;
+						});
+					});
+				}
+
+				// Logout handler
+				if (logoutBtn) {
+					logoutBtn.addEventListener("click", () => {
+						auth.signOut();
+					});
+				}
+
 				// Luister naar auth status
 				auth.onAuthStateChanged((user) => {
 					if (user) {
 						console.log("Ingelogd: " + user.email);
+						// Show tree, hide login
+						loginSection.style.display = "none";
+						treeContainer.style.display = "block";
+						loggedInControls.style.display = "block";
+						userDisplay.textContent = user.email;
+						
+						if (typeof network !== 'undefined') {
+							network.fit();
+						}
+						
 						loadStudentProgress(user);
 					} else {
+						// Show login, hide tree
+						loginSection.style.display = "block";
+						treeContainer.style.display = "none";
+						loggedInControls.style.display = "none";
+						userDisplay.textContent = "";
+						
+						// Reset tree to default state
 						applyStatusStyles(); 
 					}
 				});

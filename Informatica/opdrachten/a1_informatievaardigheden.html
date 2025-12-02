@@ -1,49 +1,100 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Informatievaardigheden (A1)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Informatievaardigheden (A1)</h1>
-<p><strong>Info zoeken</strong></p>
-<p>Leer informatiebronnen te beoordelen en de belangrijkste inzichten samen te vatten.</p>
+<h1>Informatievaardigheden opdracht</h1>
+<p class="subtitle">Informatievaardigheden (A1)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 1 tot 3 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> A1</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Het doel van deze opdracht is dat je gericht leert zoeken naar actuele informatie en betrouwbare bronnen. Je verdiept je in een recente case van een datalek bij een bekende organisatie. Je onderzoekt hoe dit kon gebeuren en welke maatregelen het datalek hadden kunnen voorkomen.</p>
+
+<h2>Opdracht</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/A opdrachten/Informatievaardigheden (A1).docx' target='_blank' rel='noopener'>Informatievaardigheden (docx)</a></li>
+    <li><strong>Zoeken naar een case</strong><br>
+    Zoek een recent datalek bij een bekende organisatie. Gebruik betrouwbare bronnen zoals NOS, RTL, NRC, Tweakers of Security.nl. Let op dat de case actueel is.</li>
+    <li><strong>Beschrijving van de case</strong><br>
+    Schrijf in je eigen woorden:
+        <ul>
+            <li>Bij welke organisatie vond het datalek plaats?</li>
+            <li>Wat is er precies gebeurd?</li>
+            <li>Hoeveel mensen zijn getroffen?</li>
+        </ul>
+    </li>
+    <li><strong>Analyse van oorzaken</strong><br>
+    Onderzoek hoe het datalek is ontstaan. Was het een menselijke fout (bijvoorbeeld verkeerd gemaild), of een technische fout (bijvoorbeeld onvoldoende beveiliging)?</li>
+    <li><strong>Voorstel voor maatregelen</strong><br>
+    Denk na over welke maatregelen getroffen hadden kunnen worden:
+        <ul>
+            <li><strong>Technisch</strong> (encryptie, tweefactorauthenticatie, firewalls).</li>
+            <li><strong>Organisatorisch</strong> (training medewerkers, protocollen voor datagebruik).</li>
+        </ul>
+    </li>
+    <li><strong>Portfolio</strong><br>
+    Schrijf een kort verslag van ongeveer 300 woorden met een samenvatting van de case, je analyse en je maatregelen. Voeg minimaal één bron toe volgens APA-stijl en plaats het verslag op je portfolio-website. Zorg voor een duidelijke lay-out (titel, alinea’s, eventueel een ondersteunend plaatje).</li>
 </ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Punten</th>
+            <th style="padding: 12px; text-align: left;">0</th>
+            <th style="padding: 12px; text-align: left;">1</th>
+            <th style="padding: 12px; text-align: left;">2</th>
+            <th style="padding: 12px; text-align: left;">3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Zoekvaardigheid</strong></td>
+            <td style="padding: 12px;">Geen case gevonden of bron onbetrouwbaar.</td>
+            <td style="padding: 12px;">Case gevonden, maar bron twijfelachtig.</td>
+            <td style="padding: 12px;">Case gevonden met betrouwbare bron(nen).</td>
+            <td style="padding: 12px;">Meerdere betrouwbare bronnen gebruikt, actueel en passend.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inhoud</strong></td>
+            <td style="padding: 12px;">Beschrijving ontbreekt of is onjuist.</td>
+            <td style="padding: 12px;">Beschrijving vaag of onvolledig.</td>
+            <td style="padding: 12px;">Case duidelijk beschreven inclusief oorzaken.</td>
+            <td style="padding: 12px;">Case volledig en gedetailleerd beschreven, inclusief aantallen en gevolgen.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Analyse &amp; maatregelen</strong></td>
+            <td style="padding: 12px;">Geen maatregelen genoemd.</td>
+            <td style="padding: 12px;">Maatregelen genoemd, maar niet passend.</td>
+            <td style="padding: 12px;">Passende maatregelen uitgewerkt.</td>
+            <td style="padding: 12px;">Uitgebreide maatregelen: technisch én organisatorisch.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving &amp; presentatie</strong></td>
+            <td style="padding: 12px;">Verslag ontbreekt of onleesbaar.</td>
+            <td style="padding: 12px;">Verslag kort/slordig, zonder bron.</td>
+            <td style="padding: 12px;">Net verslag, met bronvermelding.</td>
+            <td style="padding: 12px;">Goed gestructureerd, foutloos, meerdere bronnen, duidelijke lay-out.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijferberekening: Cijfer = (totaal aantal punten / 12) × 9 + 1</p>
 </section>
 </main>
 </body>

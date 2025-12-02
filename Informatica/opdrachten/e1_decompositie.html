@@ -1,49 +1,91 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Decompositie (E1)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Decompositie en adviezen (E1)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Decompositie (E1)</h1>
-<p><strong>Hardware componenten</strong></p>
-<p>Analyseer een apparaat en geef advies over de opbouw.</p>
+<h1>Decompositie en adviezen</h1>
+<p class="subtitle">Architectuur (E1)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 4 tot 6 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> E1</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Elk stukje techniek dat we gebruiken bestaat uit verschillende onderdelen. Denk aan je telefoon, een laptop, een printer, etc. In deze opdracht ga je analyseren uit welke onderdelen een computer bestaat en wat de functies van de verschillende onderdelen zijn.</p>
+
+<h2>Benodigdheden</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/E opdrachten/Decompositie en adviezen (E1).docx' target='_blank' rel='noopener'>Decompositie en adviezen (docx)</a></li>
+    <li>Oude computer</li>
+    <li>Gereedschap</li>
+    <li>Laptop om verslag te maken en dingen op te zoeken</li>
 </ul>
+
+<h2>Stappenplan</h2>
+<ul>
+    <li>Haal de computer zo ver mogelijk uit elkaar en benoem alle onderdelen. Wat is het? Wat doet het? Maak hier foto’s van en zet het in je verslag.</li>
+    <li>Zet de computer weer in elkaar en test of hij nog werkt.</li>
+    <li>Zoek ook de verschillen in kwaliteit en prijs van alle onderdelen. Waarom is het ene beter dan het andere?</li>
+    <li>Schrijf twee adviezen voor een bepaalde casus. Welke (kwaliteit van) onderdelen zou je aanbevelen voor welk scenario? Beargumenteer je advies. Kies twee van de volgende casussen:
+        <ul>
+            <li>Een klasgenoot maakt in zijn vrije tijd graag filmpjes en foto’s van hoge kwaliteit. Hij wil video’s kunnen monteren, werken met Photoshop en 4K kunnen renderen. Budget 1500 euro.</li>
+            <li>Een van je ouders heeft een nieuwe computer nodig voor het thuiswerken. Er wordt veel in Teams overlegd en gewerkt in documenten in de cloud. Budget 500 euro.</li>
+            <li>Een vriend wil een nieuwe PC om te gamen. Hij speelt zware games, die veel van een computer eisen. Budget 1600 euro.</li>
+            <li>Een leerling zoekt een laptop voor schoolwerk: tekstverwerking, online lessen, en wat basisfoto’s bewerken. Wat zijn de minimale eisen? Wat maakt het verschil tussen een “budget”- en een “premium”-keuze? Budget 300 of 900 euro.</li>
+        </ul>
+    </li>
+    <li>Verwerk alles in een mooi verslag en zet dit op je website.</li>
+</ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Beschrijving onderdelen</strong></td>
+            <td style="padding: 12px;">De informatie is onjuist en/of onvolledig.</td>
+            <td style="padding: 12px;">De informatie is juist, maar niet alle onderdelen komen aan bod.</td>
+            <td style="padding: 12px;">De informatie is juist, alle onderdelen komen aan bod.</td>
+            <td style="padding: 12px;">De informatie is juist, alle onderdelen komen aan bod. De bronnen zijn volgens de APA regels weergegeven.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Advies</strong></td>
+            <td style="padding: 12px;">Er wordt geen advies gegeven.</td>
+            <td style="padding: 12px;">Er is maar 1 advies of de 2 adviezen zijn mager uitgewerkt.</td>
+            <td style="padding: 12px;">Beide adviezen zijn uitvoerig uitgewerkt en bevatten meerdere argumenten.</td>
+            <td style="padding: 12px;">Beide adviezen zijn uitvoerig uitgewerkt, bevatten meerdere argumenten, verwijzen naar voorbeelden met linkjes en geven meerdere opties.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Vormgeving verslag</strong></td>
+            <td style="padding: 12px;">Er zijn geen foto’s/filmpjes geplaatst.</td>
+            <td style="padding: 12px;">Er zijn foto’s/filmpjes geplaatst, maar die staan niet op mooie/handige plekken.</td>
+            <td style="padding: 12px;">Er is een duidelijke structuur. Foto’s/filmpjes worden ondersteunend toegepast.</td>
+            <td style="padding: 12px;">Duidelijke structuur. Foto’s/filmpjes ondersteunend. Titels, kaders en kleuren zorgen voor een visueel rustig en mooi geheel.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = totaal aantal punten + 1</p>
 </section>
 </main>
 </body>

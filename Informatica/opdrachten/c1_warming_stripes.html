@@ -1,50 +1,150 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Warming stripes (C1)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Warming Stripes (C1)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Warming stripes (C1)</h1>
-<p><strong>Visualiseren</strong></p>
-<p>Gebruik klimaatdata om duidelijke visualisaties te maken en conclusies te trekken.</p>
+<h1>Warming Stripes</h1>
+<p class="subtitle">Warming Stripes (C1)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 3 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> C1</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je gaat klimaatdata van het KNMI visualiseren. De gemiddelde jaartemperatuur van De Bilt sinds 1901 is beschikbaar als tekstbestand. Jij gaat deze tekstdata omzetten naar een visuele warming-stripes afbeelding: elk jaar een verticale streep, van blauw (kouder) naar rood (warmer).</p>
+
+<h2>Leerdoelen</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/C opdrachten/Doelstellingen (C1)/WarmingStripes (C1).pdf' target='_blank' rel='noopener'>Warming Stripes (pdf)</a></li>
-<li><a href='../../Leerling opdrachten/C opdrachten/Doelstellingen (C1)/12.12 Doelstellingen data vinden en visualiseren over klimaat verandering (C1)' target='_blank' rel='noopener'>Doelstellingen en uitleg (docx)</a></li>
+    <li>Je kunt een tekstbestand downloaden en openen in Python met pandas.</li>
+    <li>Je kunt kolommen selecteren en waarden omzetten naar °C.</li>
+    <li>Je kunt lijsten vullen via een loop.</li>
+    <li>Je kunt data visualiseren met matplotlib.</li>
 </ul>
+
+<h2>Benodigdheden</h2>
+<ul>
+    <li>Jupyter Notebook of Google Colab.</li>
+    <li>Toegang tot de website van het KNMI: <a href="https://knmi.nl/home" target="_blank" rel="noopener">knmi.nl/home</a>.</li>
+</ul>
+
+<h2>Stappenplan</h2>
+
+<h3>1. Bestand zoeken, downloaden en verkennen</h3>
+<p>Ga naar knmi.nl/home en navigeer naar de maand- en jaarwaarden voor De Bilt (gemiddelde temperatuur). Download het getoonde TXT-bestand en sla het op in dezelfde map als je notebook, bijvoorbeeld als <code>mndgeg_260_tg.txt</code>. Open het bestand in een teksteditor om te bekijken hoe het is opgebouwd (maar laad het nog niet in Python).</p>
+
+<h3>2. Aantal kopregels bepalen</h3>
+<p>Tel hoeveel regels met uitleg bovenaan het bestand staan (koptekst). Deze informatie gebruik je straks bij het inlezen.</p>
+
+<h3>3. Python-omgeving klaarzetten</h3>
+<p>Maak een nieuw notebook aan en importeer de benodigde modules:</p>
+<pre><code class="language-python">import pandas as pd
+import matplotlib.pyplot as plt</code></pre>
+<p><em>Tip: werk met meerdere cellen (bijvoorbeeld: inlezen, verwerken, visualiseren) om het overzicht te bewaren.</em></p>
+
+<h3>4. Data inlezen</h3>
+<p>Zoek op hoe je met pandas een CSV- of tekstbestand kunt inlezen. Gebruik bij het inlezen:</p>
+<ul>
+    <li><code>skiprows=...</code> om de kopregels over te slaan. (Zorg dat STN, YYYY etc. de koppen worden).</li>
+    <li>Gebruik het volgende om spaties uit kolomkoppen te verwijderen en te controleren:</li>
+</ul>
+<pre><code class="language-python"># verwijder begin- en eindspaties uit kolomnamen
+df.columns = df.columns.str.strip()
+# voeg hier een regel toe waarmee je de kolom YYYY als index gebruikt
+print(df.head())</code></pre>
+
+<h3>5. Opschonen en Conversie</h3>
+<ul>
+    <li>Gebruik <code>print(df['...'])</code> om te controleren of je de juiste data selecteert.</li>
+    <li>Stel in dat de kolom YYYY als index wordt gebruikt.</li>
+    <li>Zet de kolom met gegevens om naar numeriek formaat (gebruik <code>pd.to_numeric</code> met <code>errors='coerce'</code>).</li>
+    <li>Deel de nieuwe kolom door 10 om van tienden van graden naar graden Celsius te gaan.</li>
+</ul>
+
+<h3>6. Kleuren normaliseren en strepen tekenen</h3>
+<p>We gaan van getallen naar kleuren (color mapping).</p>
+<ol>
+    <li><strong>Normaliseren:</strong> Schaal de waarden naar 0-1 met <code>plt.Normalize(...)</code>.</li>
+    <li><strong>Kleurenkaart:</strong> Kies een cmap, bijv. "RdBu_r" (blauw naar rood).</li>
+    <li><strong>Tekenen:</strong> Teken voor elk jaar een verticale streep met <code>ax.axvline</code>.</li>
+</ol>
+
+<pre><code class="language-python"># Code (vul de lege stukjes aan)
+import matplotlib.pyplot as plt
+
+# 1) Normaliseren op basis van min en max van de gekozen kolom
+norm = plt.Normalize(vmin=df['...'].min(), vmax=df['...'].max())
+
+# 2) Kleurenkaart kiezen (blauw -> rood)
+cmap = plt.get_cmap("RdBu_r")
+
+# 3) Figuur maken
+fig, ax = plt.subplots(figsize=(12, 2))
+
+# 4) Voor elk jaar een verticale streep tekenen
+for i, val in enumerate(df['...']):
+    ax.axvline(i, color=cmap(norm(val)), linewidth=4)
+
+# 5) As verbergen
+ax.set_axis_off()
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+<h3>Reflectie</h3>
+<p>Beschrijf in 2–3 zinnen wat je opvalt in je grafiek. Welke periode is koeler, welke warmer?</p>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Data inlezen</strong></td>
+            <td style="padding: 12px;">Bestand niet correct ingelezen; DataFrame leeg of fout gescheiden.</td>
+            <td style="padding: 12px;">Bestand ingelezen maar met onvolkomenheden (verkeerde sep, kolomnamen niet gestript, index niet ingesteld).</td>
+            <td style="padding: 12px;">Correct ingelezen met passende sep en skiprows; kolomnamen gestript; YYYY als index.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Tabel maken (opschonen)</strong></td>
+            <td style="padding: 12px;">Kolommen onjuist/ontbreken; waarden niet omgerekend.</td>
+            <td style="padding: 12px;">Juiste kolommen maar deels onjuist geconverteerd; tienden niet consequent gedeeld door 10.</td>
+            <td style="padding: 12px;">Kolommen logisch gekozen; to_numeric toegepast; direct gedeeld door 10 naar °C; NaN behandeld.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Visualisatie</strong></td>
+            <td style="padding: 12px;">Grafiek ontbreekt of verkeerd (geen kleurenmapping).</td>
+            <td style="padding: 12px;">Basis-stripes aanwezig maar onvolledig (verkeerde normalisatie, ongeschikte colormap, assen zichtbaar).</td>
+            <td style="padding: 12px;">Strakke stripes: Normalize op temperatuur; passende colormap; assen uit.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Reflectie</strong></td>
+            <td style="padding: 12px;">Ontbreekt of slechts 1 losse opmerking.</td>
+            <td style="padding: 12px;">Kort, beschrijvend zonder onderbouwing.</td>
+            <td style="padding: 12px;">Duidelijke reflectie met voorbeelden: benoemt koelere/warme perioden en koppelt aan data.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = aantal punten / 8 × 9 + 1</p>
 </section>
 </main>
 </body>

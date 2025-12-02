@@ -1,49 +1,119 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Onderzoeken (A5)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Onderzoeken (A5)</h1>
-<p><strong>Onderzoeksmethoden</strong></p>
-<p>Leer een onderzoeksvraag op te stellen en data te verzamelen rond schermtijd en mediagebruik.</p>
+<h1>Onderzoek: Sociale media en schoolprestaties</h1>
+<p class="subtitle">Onderzoeken (A5)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 3 tot 5 uur</span> |
+    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Domein:</strong> A5</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/A opdrachten/Schermtijdonderzoek (A5).pdf' target='_blank' rel='noopener'>Schermtijdonderzoek (pdf)</a></li>
+    <li><strong>Havo:</strong> Voer een eenvoudig onderzoek uit naar hoeveel tijd leerlingen gemiddeld per dag op sociale media doorbrengen.</li>
+    <li><strong>Vwo:</strong> Analyseer de verzamelde gegevens en formuleer hypotheses over het verband tussen schermtijd en schoolprestaties.</li>
 </ul>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Onderzoeksvraag formuleren</strong>
+        <ul>
+            <li>Havo: “Hoeveel tijd besteden leerlingen gemiddeld per dag aan sociale media?”</li>
+            <li>Vwo: Voeg toe: “Is er een verband tussen schermtijd en cijfers op school?”</li>
+        </ul>
+    </li>
+    <li><strong>Data verzamelen</strong>
+        <ul>
+            <li>Maak een korte vragenlijst met ten minste:
+                <ul>
+                    <li>Geschatte uren/dag op sociale media.</li>
+                    <li>Meest gebruikte platform(s).</li>
+                    <li>(Vwo) Gemiddeld cijfer van de afgelopen periode.</li>
+                </ul>
+            </li>
+            <li>Laat minimaal 10 medeleerlingen de vragenlijst invullen.</li>
+            <li><em>Tip: Gebruik Google Forms om de antwoorden te verzamelen.</em></li>
+        </ul>
+    </li>
+    <li><strong>Data verwerken</strong>
+        <ul>
+            <li>Zet de resultaten in een tabel (Google Sheets, Excel of Python).</li>
+            <li>Havo: Bereken gemiddelde en mediaan van het aantal uren per dag.</li>
+            <li>Vwo: Maak een spreidingsdiagram (x-as: schermtijd, y-as: gemiddeld cijfer).</li>
+        </ul>
+    </li>
+    <li><strong>Resultaten analyseren</strong>
+        <ul>
+            <li>Havo: Beschrijf in 3–5 zinnen wat opvalt (uitbijters, verschillen).</li>
+            <li>Vwo: Beschrijf of er een zichtbaar verband is en formuleer 1–2 hypotheses, bijv.: “Leerlingen met > 4 uur schermtijd scoren gemiddeld lager.”</li>
+        </ul>
+    </li>
+    <li><strong>Presentatie</strong>
+        <ul>
+            <li>Plaats tabel(len) en grafiek(en) op je portfolio-website met een samenvatting (50–100 woorden).</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Dataverzameling</strong></td>
+            <td style="padding: 12px;">Geen data verzameld of onbruikbaar</td>
+            <td style="padding: 12px;">Minder dan 10 responses of onvolledig</td>
+            <td style="padding: 12px;">Minimaal 10 bruikbare responses</td>
+            <td style="padding: 12px;">≥ 15 bruikbare responses en duidelijke vragenlijst</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Verwerking van data</strong></td>
+            <td style="padding: 12px;">Geen berekeningen/grafieken</td>
+            <td style="padding: 12px;">Alleen ruwe data zonder bewerking</td>
+            <td style="padding: 12px;">Correcte basisberekeningen en grafiek(en)</td>
+            <td style="padding: 12px;">Volledige, nette bewerking en duidelijke visualisaties</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Analyse</strong></td>
+            <td style="padding: 12px;">Geen analyse</td>
+            <td style="padding: 12px;">Onjuist of onvolledig</td>
+            <td style="padding: 12px;">Juist maar summier</td>
+            <td style="padding: 12px;">Juist, volledig en goed onderbouwd</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Presentatie in portfolio</strong></td>
+            <td style="padding: 12px;">Geen presentatie</td>
+            <td style="padding: 12px;">Alleen data/grafieken geplaatst</td>
+            <td style="padding: 12px;">Data/grafiek + korte uitleg</td>
+            <td style="padding: 12px;">Verzorgde vormgeving + duidelijke uitleg en structuur</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijferberekening: Cijfer = (totaal aantal punten / 12) × 9 + 1</p>
 </section>
 </main>
 </body>

@@ -1,51 +1,91 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Representeren (C3)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Representeren (C3)</h1>
-<p><strong>Structuren herkennen</strong></p>
-<p>Vertaal ruwe data naar bruikbare representaties en check je resultaten met visualisaties.</p>
+<h1>Representeren: Visuele weergave van voetbaldata</h1>
+<p class="subtitle">Representeren (C3)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> C3</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>In deze opdracht leer je hoe je een dataset omzet naar een duidelijke grafiek of diagram. Je gebruikt de Eredivisie 2023/2024 dataset en Python in Google Colab om zelf te kiezen welke informatie je visueel wilt maken.</p>
+
+<h2>Benodigdheden</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/C opdrachten/Representeren (C3)/Representeren (C3).docx' target='_blank' rel='noopener'>Representeren (docx)</a></li>
-<li><a href='../../Leerling opdrachten/C opdrachten/Representeren (C3)/Voetbaldata 2023_2024.csv' target='_blank' rel='noopener'>Voetbaldata 2023/2024 (csv)</a></li>
-<li><a href='../../Leerling opdrachten/C opdrachten/Representeren (C3)/Voetbaldata 2023_2024.xlsx' target='_blank' rel='noopener'>Voetbaldata 2023/2024 (xlsx)</a></li>
+    <li>Toegang tot Google Colab</li>
+    <li>Het bestand <a href="../../Leerling opdrachten/C opdrachten/Representeren (C3)/Voetbaldata 2023_2024.csv" download>Voetbaldata 2023_2024.csv</a></li>
+    <li>Uitleg over de afkortingen: <a href="https://www.football-data.co.uk/notes.txt" target="_blank" rel="noopener">football-data.co.uk/notes.txt</a></li>
 </ul>
+
+<h2>Opdracht</h2>
+<ul>
+    <li>Open een nieuw Python-notebook in Google Colab.</li>
+    <li>Upload het bestand <code>Voetbaldata 2023_2024.csv</code>.</li>
+    <li>Kies één onderwerp dat je wilt weergeven, bijvoorbeeld:
+        <ul>
+            <li>Totaal aantal doelpunten per team</li>
+            <li>Percentage thuisoverwinningen per team</li>
+            <li>Verdeling van uitslagen (winst/gelijk/verlies)</li>
+        </ul>
+    </li>
+    <li>Maak met behulp van <strong>matplotlib</strong> of <strong>pandas</strong> een grafiek (bijvoorbeeld staafdiagram, cirkeldiagram of histogram).</li>
+    <li>Zorg dat je grafiek een <strong>titel</strong>, <strong>as-labels</strong> en, indien nodig, een <strong>legenda</strong> heeft.</li>
+    <li>Plaats de grafiek in je portfolio met een korte uitleg (2-3 zinnen) wat je ziet.</li>
+</ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Data laden</strong></td>
+            <td style="padding: 12px;">Geen data ingeladen of fout bestand.</td>
+            <td style="padding: 12px;">Data is ingeladen maar niet gebruikt.</td>
+            <td style="padding: 12px;">Data correct ingeladen en gebruikt voor eenvoudige analyse.</td>
+            <td style="padding: 12px;">Data correct ingeladen en bewerkt zodat deze goed bruikbaar is.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Visualisatie</strong></td>
+            <td style="padding: 12px;">Geen grafiek gemaakt.</td>
+            <td style="padding: 12px;">Grafiek is onduidelijk of onvolledig.</td>
+            <td style="padding: 12px;">Grafiek is correct maar mist afwerking (labels/titel).</td>
+            <td style="padding: 12px;">Grafiek is volledig, duidelijk en professioneel opgemaakt.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Uitleg</strong></td>
+            <td style="padding: 12px;">Geen uitleg.</td>
+            <td style="padding: 12px;">Uitleg is onjuist of onvolledig.</td>
+            <td style="padding: 12px;">Uitleg is juist maar summier.</td>
+            <td style="padding: 12px;">Uitleg is juist, volledig en duidelijk.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = aantal punten + 1</p>
 </section>
 </main>
 </body>

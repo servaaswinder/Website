@@ -398,7 +398,10 @@
 
 			// Geef hier het administrator e-mailadres op. Alleen gebruikers met
 			// dit e-mailadres krijgen toegang tot het adminpaneel.
-			const ADMIN_EMAIL = "servaas.winder@northgo-college.nl";
+			const ADMIN_EMAILS = [
+				"servaas.winder@northgo-college.nl",
+				"jaimy.treffers@northgo-college.nl",
+			];
 
 			// HTML-elementen ophalen
 			const loginSection = document.getElementById("login-section");
@@ -1988,7 +1991,7 @@
 			auth.onAuthStateChanged(async (user) => {
 				if (user) {
 					loginSection.classList.add("hidden");
-					if (user.email === ADMIN_EMAIL) {
+					if (ADMIN_EMAILS.includes(user.email)) {
 						cachedStudentData = null;
 						adminSection.classList.remove("hidden");
 						studentSection.classList.add("hidden");

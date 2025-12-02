@@ -1,49 +1,92 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
-<title>Ontwikkelen (D1)</title>
-<link rel='stylesheet' href='../../style.css' />
+<title>Rekenspel (D1)</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Ontwikkelen (D1)</h1>
-<p><strong>Vertaal naar ontwerp</strong></p>
-<p>Maak een ontwerp voor een rekenspel en beschrijf de functionaliteiten.</p>
+<h1>Rekenspel</h1>
+<p class="subtitle">Ontwikkelen (D1)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 4 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> D1</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>Je leert een programma schrijven in Python waarin de computer rekensommen genereert en de gebruiker deze moet oplossen. Je oefent met variabelen, input/output en controle van antwoorden.</p>
+
+<h2>Benodigdheden</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/D opdrachten/Rekenspel (D1).docx' target='_blank' rel='noopener'>Rekenspel (docx)</a></li>
+    <li>Google Colab</li>
+    <li>Basiskennis Python (print, input, if, while, variabelen)</li>
 </ul>
+
+<h2>Opdrachtstappen</h2>
+<ul>
+    <li>Maak een nieuw Python-notebook in Google Colab.</li>
+    <li>Schrijf een programma waarin de computer een willekeurige rekensom maakt. Begin met optelsommen (bijvoorbeeld: 7 + 3).<br>
+    <em>Tip: gebruik de functie <code>random.randint()</code> om getallen te genereren.</em></li>
+    <li>Laat de gebruiker het antwoord invullen. Controleer of het antwoord goed is en geef feedback ("Goed gedaan!" of "Helaas, fout").</li>
+    <li>Breid je spel uit met minstens twee extra functies, bijvoorbeeld:
+        <ul>
+            <li>Trek- of vermenigvuldig-sommen</li>
+            <li>Een puntentelling bijhouden</li>
+            <li>Een bepaald aantal rondes spelen</li>
+            <li>Moeilijkheidsgraad (grotere getallen)</li>
+        </ul>
+    </li>
+    <li>Test je programma goed. Zorg dat het geen fouten geeft en meerdere keren achter elkaar gespeeld kan worden.</li>
+    <li>Lever je code in via je portfolio en leg kort uit (2-3 zinnen) wat je hebt gemaakt.</li>
+</ul>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Code werking</strong></td>
+            <td style="padding: 12px;">Geen programma of werkt niet.</td>
+            <td style="padding: 12px;">Programma start maar werkt niet correct.</td>
+            <td style="padding: 12px;">Programma werkt, maar bevat kleine fouten of is erg beperkt.</td>
+            <td style="padding: 12px;">Programma werkt volledig correct.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Functies</strong></td>
+            <td style="padding: 12px;">Geen extra functies toegevoegd.</td>
+            <td style="padding: 12px;">Eén kleine extra functie.</td>
+            <td style="padding: 12px;">Twee extra functies, maar niet goed uitgewerkt.</td>
+            <td style="padding: 12px;">Minstens twee goed werkende uitbreidingen.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Uitleg</strong></td>
+            <td style="padding: 12px;">Geen uitleg.</td>
+            <td style="padding: 12px;">Uitleg onvolledig of onduidelijk.</td>
+            <td style="padding: 12px;">Uitleg correct maar summier.</td>
+            <td style="padding: 12px;">Uitleg volledig, duidelijk en in eigen woorden.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = totaal aantal punten + 1</p>
 </section>
 </main>
 </body>

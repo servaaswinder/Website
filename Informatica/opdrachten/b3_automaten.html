@@ -1,49 +1,89 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Automaten (B3)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Automaten (B3)</h1>
-<p><strong>Toestandsdiagrammen</strong></p>
-<p>Ontwerp een automaat om een fysiek systeem te beschrijven en test het in Arduino.</p>
+<h1>Arduino Thermometer</h1>
+<p class="subtitle">Automaten (B3)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
+    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Domein:</strong> B3</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Inleiding</h2>
+<p>Met deze opdracht ga je van een Arduino een digitale thermometer maken. Daarvoor ga je Arduino-code schrijven. Dat doe je online via <a href="https://app.arduino.cc/" target="_blank" rel="noopener">https://app.arduino.cc/</a>.</p>
+
+<h2>Benodigdheden</h2>
 <ul>
-<li><a href='../../Leerling opdrachten/B opdrachten/Arduino Thermometer B3.docx' target='_blank' rel='noopener'>Arduino Thermometer (docx)</a></li>
+    <li>Arduino</li>
+    <li>Temperatuursensor</li>
+    <li>Draadjes</li>
+    <li>Krokodillenklemmen</li>
+    <li>Diverse weerstandjes</li>
+    <li>Display</li>
 </ul>
+
+<h2>Stappenplan</h2>
+<ol>
+    <li><strong>Tutorial:</strong> Zoek online een tutorial op (bijvoorbeeld via Google of YouTube).</li>
+    <li><strong>Bouwen:</strong> Bouw de schakeling.</li>
+    <li><strong>Coderen:</strong> Schrijf de code.</li>
+    <li><strong>Testen:</strong> Test je opstelling.</li>
+    <li><strong>Onderzoeken:</strong> Onderzoek hoe de code werkt.</li>
+    <li><strong>Uitleg:</strong> Schrijf je uitleg over de verschillende onderdelen van de code.</li>
+    <li><strong>Portfolio:</strong> Plaats je code, uitleg en foto’s van de opstelling op de website.</li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Voorbereiding & Schakeling</strong></td>
+            <td style="padding: 12px;">Er is geen schakeling gebouwd of deze is onherkenbaar.</td>
+            <td style="padding: 12px;">Er is een poging gedaan, maar de schakeling is foutief aangesloten en werkt niet.</td>
+            <td style="padding: 12px;">De schakeling is grotendeels correct opgebouwd; kleine fouten zorgen voor storingen.</td>
+            <td style="padding: 12px;">De schakeling is volledig correct opgebouwd en werkt stabiel.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Code & Werking</strong></td>
+            <td style="padding: 12px;">Er is geen code ingeleverd of de code werkt niet.</td>
+            <td style="padding: 12px;">Er staat code in het project, maar deze werkt slechts deels of foutief.</td>
+            <td style="padding: 12px;">De thermometer leest de temperatuur goed uit, maar niet continu of rommelig.</td>
+            <td style="padding: 12px;">De thermometer leest nauwkeurig en real-time uit; code is overzichtelijk en goed gestructureerd.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Uitleg & Reflectie</strong></td>
+            <td style="padding: 12px;">Er is geen uitleg gegeven.</td>
+            <td style="padding: 12px;">Er is een korte en onvolledige uitleg van de code.</td>
+            <td style="padding: 12px;">De belangrijkste onderdelen van de code zijn benoemd en uitgelegd.</td>
+            <td style="padding: 12px;">Alle onderdelen van de code zijn duidelijk uitgelegd, inclusief reflectie op werking en verbeteringen.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = aantal punten + 1</p>
 </section>
 </main>
 </body>

@@ -1,49 +1,109 @@
+---
+---
+
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
 <meta charset='utf-8' />
 <title>Waarderen en oordelen (A7)</title>
-<link rel='stylesheet' href='../../style.css' />
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
 <meta name='viewport' content='width=device-width, initial-scale=1.0' />
 </head>
 <body>
-<header>
-<div class='bar'>
-<div class='brand'>
-<h1>Servaas Winder</h1>
-<p>Docent Northgo-College</p>
-</div>
-<nav>
-<button class='menu-toggle'>&#9776;</button>
-<ul>
-<li><a href='../../index.html'>Home</a></li>
-<li><a href='../../Natuurkunde/klassen.html'>Natuurkunde</a></li>
-<li><a href='../../Informatica/informatica_home.html'>Informatica</a></li>
-<li><a href='../informatica_opdrachten.html'>Opdrachten</a></li>
-</ul>
-</nav>
-<script>
-const menuToggle = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('nav ul');
-if (menuToggle && navigation) {
-    menuToggle.addEventListener('click', function () {
-        navigation.classList.toggle('is-open');
-    });
-}
-</script>
-</div>
-</header>
+{% include site-header.html %}
 <main class='site-content'>
 <section class='assignment-hero'>
-<h1>Waarderen en oordelen (A7)</h1>
-<p><strong>Kritische blik</strong></p>
-<p>Oefen met het afwegen van ethische aspecten rond AI door een debat voor te bereiden.</p>
+<h1>Debat: Ethiek van Kunstmatige Intelligentie</h1>
+<p class="subtitle">Waarderen en oordelen (A7)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 2 tot 4 uur</span> |
+    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Domein:</strong> A7</span>
+</div>
 </section>
-<section class='instructions'>
-<h2>Materialen</h2>
-<ul>
-<li><a href='../../Leerling opdrachten/A opdrachten/Debat ethiek AI (A7).pdf' target='_blank' rel='noopener'>Debat ethiek AI (pdf)</a></li>
-</ul>
+<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<h2>Doel van de opdracht</h2>
+<p>In deze opdracht ga je aan de slag met ethische dilemma’s rondom kunstmatige intelligentie (AI). Denk aan zelfrijdende auto’s, gezichtsherkenning of deepfakes. Je bereidt een debat voor waarin je een standpunt verdedigt (voor of tegen) en reflecteert op de uitkomst.</p>
+
+<h2>Opdrachtstappen</h2>
+<ol>
+    <li><strong>Onderwerp kiezen</strong>
+        <ul>
+            <li>Kies in je groepje een stelling, bijvoorbeeld: “Zelfrijdende auto’s moeten altijd de passagier beschermen, zelfs als dat ten koste gaat van een voetganger.” of “Gezichtsherkenning door de overheid moet verboden worden.”</li>
+        </ul>
+    </li>
+    <li><strong>Onderzoek</strong>
+        <ul>
+            <li>Zoek argumenten voor en tegen de stelling. Gebruik betrouwbare bronnen.</li>
+            <li>Bekijk het vraagstuk vanuit verschillende perspectieven (privacy, veiligheid, eerlijkheid).</li>
+        </ul>
+    </li>
+    <li><strong>Voorbereiding</strong>
+        <ul>
+            <li>Schrijf minimaal 3 sterke argumenten voor jouw kant op.</li>
+            <li>Schrijf ook 3 argumenten op die de tegenpartij zou kunnen gebruiken en bedenk daar alvast een weerlegging op.</li>
+            <li>Bereid een openingsstatement voor (1 minuut).</li>
+        </ul>
+    </li>
+    <li><strong>Het Debat</strong>
+        <ul>
+            <li>Voer het debat in de klas of in je groepje.</li>
+            <li>Luister goed naar de ander en reageer op hun argumenten.</li>
+        </ul>
+    </li>
+    <li><strong>Reflectie</strong>
+        <ul>
+            <li>Schrijf na afloop een reflectie (200–300 woorden): Hoe ging het debat? Wat kan beter? Welke argumenten waren het sterkst?</li>
+            <li>Plaats de reflectie, je argumenten en de bronnenlijst in je portfolio.</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>Beoordelingsmodel</h2>
+<div style="overflow-x: auto;">
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
+            <th style="padding: 12px; text-align: left;">Categorie</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Voorbereiding</strong></td>
+            <td style="padding: 12px;">Geen voorbereiding</td>
+            <td style="padding: 12px;">Beperkte voorbereiding of weinig relevante argumenten</td>
+            <td style="padding: 12px;">Duidelijke voorbereiding met relevante argumenten</td>
+            <td style="padding: 12px;">Uitstekende voorbereiding, sterke argumenten én tegenargumenten</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Inbreng in debat</strong></td>
+            <td style="padding: 12px;">Geen bijdrage</td>
+            <td style="padding: 12px;">Beperkte of weinig overtuigende bijdrage</td>
+            <td style="padding: 12px;">Actieve bijdrage met duidelijke argumenten</td>
+            <td style="padding: 12px;">Zeer overtuigend, reageert adequaat op tegenargumenten en vragen</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Gebruik van bronnen</strong></td>
+            <td style="padding: 12px;">Geen bronnen</td>
+            <td style="padding: 12px;">Onbetrouwbare of onvolledige bronnen</td>
+            <td style="padding: 12px;">Betrouwbare bronnen correct gebruikt</td>
+            <td style="padding: 12px;">Bronnen correct in APA-stijl, inhoudelijk goed toegepast</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;">
+            <td style="padding: 12px;"><strong>Reflectie</strong></td>
+            <td style="padding: 12px;">Geen reflectie</td>
+            <td style="padding: 12px;">Zeer oppervlakkig</td>
+            <td style="padding: 12px;">Benoemt sterke/zwakke punten</td>
+            <td style="padding: 12px;">Diepgaande reflectie met concrete leerpunten en beide standpunten</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijferberekening: Cijfer = (totaal aantal punten / 12) × 9 + 1</p>
 </section>
 </main>
 </body>
