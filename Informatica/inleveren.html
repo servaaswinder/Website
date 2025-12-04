@@ -40,6 +40,7 @@
 			}
 
 			.form-group select,
+			.form-group input,
 			.form-group textarea {
 				width: 100%;
 				padding: 12px;
@@ -106,7 +107,7 @@
 
 		<main>
 			<div class="submission-form">
-				<h2>Opdracht Inleveren</h2>
+				<h2>Opdracht Inleveren (nog in test fase)</h2>
 				<p style="margin-bottom: 24px; color: #666;">
 					Vul het onderstaande formulier in om aan te geven dat je een opdracht hebt afgerond en nagekeken wilt hebben.
 				</p>
@@ -167,6 +168,11 @@
 					</div>
 
 					<div class="form-group">
+						<label for="assignment_url">Link naar opdracht</label>
+						<input type="url" id="assignment_url" placeholder="https://jouw-website.nl/informatica/opdracht.html" required>
+					</div>
+
+					<div class="form-group">
 						<label for="comments">Opmerkingen (optioneel)</label>
 						<textarea id="comments" placeholder="Heb je nog specifieke vragen of opmerkingen voor de docent?"></textarea>
 					</div>
@@ -176,6 +182,10 @@
 
 				<div id="success-message">
 					<strong>Gelukt!</strong> Je aanvraag is verstuurd.
+				</div>
+				
+				<div id="loading-overlay" class="loading-overlay">
+					Even geduld...
 				</div>
 			</div>
 		</main>
@@ -219,10 +229,14 @@
 				e.preventDefault();
 				
 				const user = auth.currentUser;
-				if (!user) return;
+				if (!user) {
+					alert("Je moet ingelogd zijn om in te leveren.");
+					return;
+				}
 
 				const period = document.getElementById("period").value;
 				const assignment = document.getElementById("assignment").value;
+				const assignmentUrl = document.getElementById("assignment_url").value;
 				const comments = document.getElementById("comments").value;
 
 				// Show loading
@@ -235,6 +249,7 @@
 						userEmail: user.email,
 						period: period,
 						assignmentId: assignment,
+						assignmentUrl: assignmentUrl,
 						comments: comments,
 						timestamp: firebase.firestore.FieldValue.serverTimestamp(),
 						status: "pending"
@@ -245,7 +260,7 @@
 					successMessage.style.display = "block";
 				} catch (error) {
 					console.error("Error submitting assignment:", error);
-					alert("Er ging iets mis bij het versturen. Probeer het later opnieuw.");
+					alert("Er ging iets mis bij het versturen: " + error.message);
 					submitBtn.disabled = false;
 				} finally {
 					loadingOverlay.style.display = "none";

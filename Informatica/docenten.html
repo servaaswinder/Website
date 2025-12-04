@@ -1,0 +1,263 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Docenten Dashboard - Informatica</title>
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+		<!-- Load Firebase SDKs from CDN -->
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+		<style>
+			.dashboard-container {
+				max-width: 1000px;
+				margin: 0 auto;
+				background: #fff;
+				padding: 40px;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+				border: 1px solid #e1e1e1;
+			}
+
+			.dashboard-container h2 {
+				margin-top: 0;
+				margin-bottom: 24px;
+				border-bottom: 2px solid #0044B3;
+				padding-bottom: 10px;
+			}
+
+			.submissions-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-top: 20px;
+			}
+
+			.submissions-table th,
+			.submissions-table td {
+				padding: 12px;
+				text-align: left;
+				border-bottom: 1px solid #eee;
+			}
+
+			.submissions-table th {
+				background-color: #f8f9fa;
+				font-weight: 600;
+				color: #333;
+			}
+
+			.submissions-table tr:hover {
+				background-color: #f5f5f5;
+			}
+
+			.status-badge {
+				display: inline-block;
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 12px;
+				font-weight: 600;
+				text-transform: uppercase;
+			}
+
+			.status-pending {
+				background-color: #fff3cd;
+				color: #856404;
+			}
+
+			.status-graded {
+				background-color: #d4edda;
+				color: #155724;
+			}
+
+			.action-btn {
+				padding: 6px 12px;
+				background-color: #0044B3;
+				color: white;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 14px;
+				transition: background-color 0.2s;
+			}
+
+			.action-btn:hover {
+				background-color: #003399;
+			}
+            
+            .action-btn.secondary {
+                background-color: #6c757d;
+            }
+            
+            .action-btn.secondary:hover {
+                background-color: #5a6268;
+            }
+
+			.loading-message {
+				text-align: center;
+				padding: 20px;
+				color: #666;
+				font-style: italic;
+			}
+            
+            .no-submissions {
+                text-align: center;
+                padding: 40px;
+                color: #666;
+            }
+		</style>
+	</head>
+	<body class="auth-page">
+		{% include site-header-informatica.html %}
+
+		<main>
+			<div class="dashboard-container">
+				<div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Docenten Dashboard</h2>
+                    <button id="logout-btn" class="action-btn secondary">Uitloggen</button>
+                </div>
+				<p>Overzicht van ingeleverde opdrachten die nog nagekeken moeten worden.</p>
+
+				<div id="loading-message" class="loading-message">
+					Laden van inzendingen...
+				</div>
+
+				<div id="submissions-container" style="display: none;">
+					<table class="submissions-table">
+						<thead>
+							<tr>
+								<th>Datum</th>
+								<th>Leerling</th>
+								<th>Opdracht</th>
+								<th>Link</th>
+								<th>Opmerkingen</th>
+								<th>Actie</th>
+							</tr>
+						</thead>
+						<tbody id="submissions-body">
+							<!-- Submissions will be inserted here -->
+						</tbody>
+					</table>
+                    <div id="no-submissions" class="no-submissions" style="display: none;">
+                        Geen openstaande inzendingen gevonden.
+                    </div>
+				</div>
+			</div>
+		</main>
+
+		<footer>
+			<p>&copy; 2025 Servaas Winder</p>
+		</footer>
+
+		<script>
+			// Firebase configuratie
+			const firebaseConfig = {
+				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+				authDomain: "leerling-accounts.firebaseapp.com",
+				projectId: "leerling-accounts",
+				storageBucket: "leerling-accounts.firebasestorage.app",
+				messagingSenderId: "884081904341",
+				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+				measurementId: "G-9YY3856FBP",
+			};
+
+			// Initialiseer Firebase
+			firebase.initializeApp(firebaseConfig);
+			const auth = firebase.auth();
+			const db = firebase.firestore();
+
+			const loadingMessage = document.getElementById("loading-message");
+			const submissionsContainer = document.getElementById("submissions-container");
+			const submissionsBody = document.getElementById("submissions-body");
+            const noSubmissionsMessage = document.getElementById("no-submissions");
+            const logoutBtn = document.getElementById("logout-btn");
+
+			// Check auth state
+			auth.onAuthStateChanged((user) => {
+				if (!user) {
+					// Redirect to login if not logged in
+					window.location.href = "login.html?redirect=docenten.html";
+				} else {
+					// Load submissions if logged in
+					loadSubmissions();
+				}
+			});
+            
+            // Logout handler
+            logoutBtn.addEventListener("click", () => {
+                auth.signOut().then(() => {
+                    window.location.href = "login.html";
+                });
+            });
+
+			async function loadSubmissions() {
+				try {
+					const snapshot = await db.collection("submissions")
+						.where("status", "==", "pending")
+						.orderBy("timestamp", "desc")
+						.get();
+
+					loadingMessage.style.display = "none";
+					submissionsContainer.style.display = "block";
+
+					if (snapshot.empty) {
+                        noSubmissionsMessage.style.display = "block";
+						return;
+					}
+
+					snapshot.forEach((doc) => {
+						const data = doc.data();
+						const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") + " " + data.timestamp.toDate().toLocaleTimeString("nl-NL", {hour: '2-digit', minute:'2-digit'}) : "Onbekend";
+						
+						const row = document.createElement("tr");
+						row.id = `row-${doc.id}`;
+						
+						row.innerHTML = `
+							<td>${date}</td>
+							<td>${data.userEmail}</td>
+							<td>${data.assignmentId} (P${data.period})</td>
+							<td><a href="${data.assignmentUrl}" target="_blank" style="color: #0044B3; text-decoration: underline;">Bekijk</a></td>
+							<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${data.comments || ''}">${data.comments || '-'}</td>
+							<td>
+								<button onclick="markAsGraded('${doc.id}')" class="action-btn">Afvinken</button>
+							</td>
+						`;
+						
+						submissionsBody.appendChild(row);
+					});
+				} catch (error) {
+					console.error("Error loading submissions:", error);
+					loadingMessage.textContent = "Er ging iets mis bij het laden van de inzendingen.";
+                    loadingMessage.style.color = "red";
+				}
+			}
+
+			window.markAsGraded = async function(docId) {
+				if (!confirm("Weet je zeker dat je deze opdracht als nagekeken wilt markeren?")) return;
+
+				try {
+					await db.collection("submissions").doc(docId).update({
+						status: "graded",
+                        gradedAt: firebase.firestore.FieldValue.serverTimestamp()
+					});
+
+					// Remove row from table
+					const row = document.getElementById(`row-${docId}`);
+					if (row) {
+						row.remove();
+					}
+                    
+                    // Check if table is empty
+                    if (submissionsBody.children.length === 0) {
+                        noSubmissionsMessage.style.display = "block";
+                    }
+				} catch (error) {
+					console.error("Error updating submission:", error);
+					alert("Er ging iets mis. Probeer het opnieuw.");
+				}
+			};
+		</script>
+	</body>
+</html>
