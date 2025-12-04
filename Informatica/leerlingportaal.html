@@ -31,44 +31,13 @@
 				</section>
 
 				<div class="auth-panels">
-					<!-- Login form -->
-					<section id="login-section" class="auth-card">
-						<h2>Inloggen</h2>
+					<!-- Guest banner -->
+					<section id="login-section" class="auth-card auth-card-full" style="max-width: 600px; margin: 20px auto; text-align: center;">
+						<h2>Welkom</h2>
 						<p>
-							Log in met je e-mailadres en wachtwoord. Heb je nog geen account,
-							vraag dan je docent om er één voor je aan te maken.
+							Dit is het leerlingenportaal. Log in om je resultaten te bekijken.
 						</p>
-						<form id="login-form">
-							<div class="form-field">
-								<label for="login-email">E-mail</label>
-								<input type="email" id="login-email" required />
-							</div>
-							<div class="form-field">
-								<label for="login-password">Wachtwoord</label>
-								<input type="password" id="login-password" required />
-							</div>
-							<button type="submit" class="auth-button">Inloggen</button>
-						</form>
-						<div class="reset-box">
-							<h3>Wachtwoord vergeten?</h3>
-							<div class="form-field">
-								<label for="reset-email">E-mail</label>
-								<input
-									type="email"
-									id="reset-email"
-									placeholder="jouw@voorbeeld.nl"
-								/>
-							</div>
-							<button
-								id="reset-btn"
-								type="button"
-								class="auth-button secondary"
-							>
-								Stuur reset-link
-							</button>
-							<p id="reset-message" class="status-message"></p>
-						</div>
-						<div id="login-error" class="status-message error-message"></div>
+						<a href="login.html?redirect=leerlingportaal.html" class="auth-button" style="display: inline-block; text-align: center; text-decoration: none;">Inloggen</a>
 					</section>
 
 					<!-- Admin panel -->
@@ -316,6 +285,9 @@
 							Welkom, <span id="student-email-display"></span>! Bekijk hieronder
 							je persoonlijke resultaten en notities.
 						</p>
+						<div style="margin-bottom: 20px;">
+							<a href="informatica_opdrachten.html" class="inf-button">Naar opdrachtenboom</a>
+						</div>
 						<div
 							class="period-toggle compact"
 							id="student-period-filter"
@@ -405,8 +377,7 @@
 
 			// HTML-elementen ophalen
 			const loginSection = document.getElementById("login-section");
-			const loginForm = document.getElementById("login-form");
-			const loginError = document.getElementById("login-error");
+			// Login form elements removed as they are now on login.html
 			const adminSection = document.getElementById("admin-section");
 			const adminForm = document.getElementById("admin-form");
 			const adminMessage = document.getElementById("admin-message");
@@ -1342,16 +1313,7 @@
 			}
 
 			// Inlogformulier afhandelen
-			loginForm.addEventListener("submit", (e) => {
-				e.preventDefault();
-				const email = document.getElementById("login-email").value;
-				const password = document.getElementById("login-password").value;
-				loginError.textContent = "";
-				auth.signInWithEmailAndPassword(email, password).catch((err) => {
-					console.error(err);
-					loginError.textContent = "Fout bij inloggen: " + err.message;
-				});
-			});
+			// Inlogformulier is verplaatst naar login.html
 
 			// Creëer een nieuwe studentaccount en sla resultaten op
 			const createStudentBtn = document.getElementById("create-student-btn");
@@ -2018,32 +1980,7 @@
 				}
 			});
 
-			function sendPasswordReset() {
-				const email = document.getElementById("reset-email").value;
-				const msg = document.getElementById("reset-message");
-				msg.textContent = "";
-				msg.classList.remove("error-message", "success-message");
-				if (!email) {
-					msg.classList.add("error-message");
-					msg.textContent = "Vul een e-mailadres in.";
-					return;
-				}
-				auth
-					.sendPasswordResetEmail(email)
-					.then(() => {
-						msg.classList.add("success-message");
-						msg.textContent = "Reset-link is verstuurd naar " + email + ".";
-					})
-					.catch((error) => {
-						console.error("Wachtwoord reset fout:", error);
-						msg.classList.add("error-message");
-						msg.textContent = "Fout: " + error.message;
-					});
-			}
-
-			document
-				.getElementById("reset-btn")
-				.addEventListener("click", sendPasswordReset);
+			// Wachtwoord reset is verplaatst naar login.html
 
 			logoutButtons.forEach((button) => {
 				button.addEventListener("click", () => {

@@ -1,0 +1,256 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Opdracht Inleveren - Informatica</title>
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+		<!-- Load Firebase SDKs from CDN -->
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+		<style>
+			.submission-form {
+				max-width: 600px;
+				margin: 0 auto;
+				background: #fff;
+				padding: 40px;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+				border: 1px solid #e1e1e1;
+			}
+
+			.submission-form h2 {
+				margin-top: 0;
+				margin-bottom: 24px;
+			}
+
+			.form-group {
+				margin-bottom: 20px;
+			}
+
+			.form-group label {
+				display: block;
+				font-weight: 600;
+				margin-bottom: 8px;
+				color: #333;
+			}
+
+			.form-group select,
+			.form-group textarea {
+				width: 100%;
+				padding: 12px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				font-size: 16px;
+				background: #fff;
+				box-sizing: border-box;
+			}
+
+			.form-group textarea {
+				min-height: 120px;
+				resize: vertical;
+			}
+
+			.submit-btn {
+				width: 100%;
+				padding: 14px;
+				background: #0044B3;
+				color: white;
+				border: none;
+				border-radius: 4px;
+				font-size: 16px;
+				font-weight: 700;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+
+			.submit-btn:hover {
+				background: #003399;
+			}
+
+			.submit-btn:disabled {
+				background: #ccc;
+				cursor: not-allowed;
+			}
+
+			#success-message {
+				display: none;
+				margin-top: 20px;
+				padding: 15px;
+				background-color: #d4edda;
+				color: #155724;
+				border: 1px solid #c3e6cb;
+				border-radius: 4px;
+				text-align: center;
+			}
+			
+			.loading-overlay {
+				display: none;
+				position: fixed;
+				top: 0; left: 0; right: 0; bottom: 0;
+				background: rgba(255,255,255,0.8);
+				z-index: 1000;
+				align-items: center;
+				justify-content: center;
+				font-weight: 600;
+				color: #0044B3;
+			}
+		</style>
+	</head>
+	<body class="auth-page">
+		{% include site-header-informatica.html %}
+
+		<main>
+			<div class="submission-form">
+				<h2>Opdracht Inleveren</h2>
+				<p style="margin-bottom: 24px; color: #666;">
+					Vul het onderstaande formulier in om aan te geven dat je een opdracht hebt afgerond en nagekeken wilt hebben.
+				</p>
+
+				<form id="submission-form">
+					<div class="form-group">
+						<label for="period">Periode</label>
+						<select id="period" required>
+							<option value="" disabled selected>Kies een periode...</option>
+							<option value="1">Periode 1</option>
+							<option value="2">Periode 2</option>
+							<option value="3">Periode 3</option>
+							<option value="4">Periode 4</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="assignment">Opdracht</label>
+						<select id="assignment" required>
+							<option value="" disabled selected>Kies een opdracht...</option>
+							<optgroup label="Thema A: Vaardigheden">
+								<option value="A1">A1 - Informatievaardigheden</option>
+								<option value="A2">A2 - Communiceren</option>
+								<option value="A3">A3 - Portfoliostartopdracht</option>
+								<option value="A4">A4 - Oriënteren op studie en beroep</option>
+								<option value="A5">A5 - Onderzoeken</option>
+								<option value="A6">A6 - Modelleren</option>
+								<option value="A7">A7 - Waarderen en oordelen</option>
+							</optgroup>
+							<optgroup label="Thema B: Fundamenten">
+								<option value="B1">B1 - Algoritmen</option>
+								<option value="B2">B2 - Datastructuren</option>
+								<option value="B3">B3 - Automaten</option>
+								<option value="B4">B4 - Grammatica's</option>
+							</optgroup>
+							<optgroup label="Thema C: Informatie">
+								<option value="C1">C1 - Databanken</option>
+								<option value="C2">C2 - SQL</option>
+								<option value="C3">C3 - Representeren</option>
+								<option value="C4">C4 - Standaardrepresentaties</option>
+								<option value="C5">C5 - Gestructureerde data</option>
+							</optgroup>
+							<optgroup label="Thema D: Programmeren">
+								<option value="D1">D1 - Ontwikkelen</option>
+								<option value="D2">D2 - Inspecteren en aanpassen</option>
+							</optgroup>
+							<optgroup label="Thema E: Architectuur">
+								<option value="E1">E1 - Decompositie</option>
+								<option value="E2">E2 - Security</option>
+							</optgroup>
+							<optgroup label="Thema F: Interactie">
+								<option value="F1">F1 - Usability</option>
+								<option value="F2">F2 - Maatschappelijke aspecten</option>
+								<option value="F3">F3 - Privacy</option>
+								<option value="F4">F4 - Security</option>
+							</optgroup>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="comments">Opmerkingen (optioneel)</label>
+						<textarea id="comments" placeholder="Heb je nog specifieke vragen of opmerkingen voor de docent?"></textarea>
+					</div>
+
+					<button type="submit" class="submit-btn">Inleveren</button>
+				</form>
+
+				<div id="success-message">
+					<strong>Gelukt!</strong> Je aanvraag is verstuurd.
+				</div>
+			</div>
+		</main>
+
+		<footer>
+			<p>&copy; 2025 Servaas Winder</p>
+		</footer>
+
+		<script>
+			// Firebase configuratie
+			const firebaseConfig = {
+				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+				authDomain: "leerling-accounts.firebaseapp.com",
+				projectId: "leerling-accounts",
+				storageBucket: "leerling-accounts.firebasestorage.app",
+				messagingSenderId: "884081904341",
+				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+				measurementId: "G-9YY3856FBP",
+			};
+
+			// Initialiseer Firebase
+			firebase.initializeApp(firebaseConfig);
+			const auth = firebase.auth();
+			const db = firebase.firestore();
+
+			// Check auth state
+			auth.onAuthStateChanged((user) => {
+				if (!user) {
+					// Redirect to login if not logged in
+					window.location.href = "login.html?redirect=inleveren.html";
+				}
+			});
+
+			// Form submission
+			const form = document.getElementById("submission-form");
+			const successMessage = document.getElementById("success-message");
+			const loadingOverlay = document.getElementById("loading-overlay");
+			const submitBtn = document.querySelector(".submit-btn");
+
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				
+				const user = auth.currentUser;
+				if (!user) return;
+
+				const period = document.getElementById("period").value;
+				const assignment = document.getElementById("assignment").value;
+				const comments = document.getElementById("comments").value;
+
+				// Show loading
+				loadingOverlay.style.display = "flex";
+				submitBtn.disabled = true;
+
+				try {
+					await db.collection("submissions").add({
+						userId: user.uid,
+						userEmail: user.email,
+						period: period,
+						assignmentId: assignment,
+						comments: comments,
+						timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+						status: "pending"
+					});
+
+					// Show success
+					form.style.display = "none";
+					successMessage.style.display = "block";
+				} catch (error) {
+					console.error("Error submitting assignment:", error);
+					alert("Er ging iets mis bij het versturen. Probeer het later opnieuw.");
+					submitBtn.disabled = false;
+				} finally {
+					loadingOverlay.style.display = "none";
+				}
+			});
+		</script>
+	</body>
+</html>

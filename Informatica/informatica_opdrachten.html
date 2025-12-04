@@ -60,6 +60,36 @@
 			body {
 				min-width: fit-content;
 			}
+
+			.zoom-controls {
+				position: absolute;
+				bottom: 20px;
+				right: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				z-index: 100;
+			}
+
+			.zoom-controls button {
+				width: 36px;
+				height: 36px;
+				border: 1px solid #ccc;
+				background: #fff;
+				border-radius: 4px;
+				font-size: 18px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+				transition: background-color 0.2s;
+				color: #333;
+			}
+
+			.zoom-controls button:hover {
+				background-color: #f0f0f0;
+			}
 		</style>
 	</head>
 	<body>
@@ -74,30 +104,23 @@
 				</p>
 			</section>
 
-			<section id="login-section" class="auth-card" style="max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #e6e8ee; border-radius: 14px; background: #fff; box-shadow: 0 10px 25px rgba(20, 30, 60, 0.08);">
-				<h2 style="margin-top: 0;">Inloggen</h2>
-				<p>Log in om je voortgang te bekijken.</p>
-				<form id="login-form">
-					<div class="form-field" style="margin-bottom: 15px;">
-						<label for="login-email" style="display: block; margin-bottom: 5px; font-weight: 500;">E-mail</label>
-						<input type="email" id="login-email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
-					</div>
-					<div class="form-field" style="margin-bottom: 20px;">
-						<label for="login-password" style="display: block; margin-bottom: 5px; font-weight: 500;">Wachtwoord</label>
-						<input type="password" id="login-password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" />
-					</div>
-					<button type="submit" class="inf-button" style="width: 100%; cursor: pointer;">Inloggen</button>
-				</form>
-				<div id="login-error" style="color: #dc3545; margin-top: 10px; font-size: 0.9em;"></div>
+			<section id="guest-banner" class="auth-card" style="display: none; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e6e8ee; border-radius: 14px; background: #fff; box-shadow: 0 10px 25px rgba(20, 30, 60, 0.08); text-align: center;">
+				<h2 style="margin-top: 0;">Welkom bij Informatica</h2>
+				<p>Log in om de opdrachtenboom te bekijken en je voortgang te zien.</p>
+				<a href="login.html?redirect=informatica_opdrachten.html" class="inf-button" style="display: inline-block; text-decoration: none;">Inloggen</a>
 			</section>
 
 			<div id="logged-in-controls" style="display: none; max-width: 1200px; margin: 0 auto 20px; padding: 0 20px; text-align: right;">
-				<span id="user-display" style="margin-right: 15px; color: var(--muted);"></span>
-				<button id="logout-btn" class="inf-button secondary" style="font-size: 0.9em; padding: 6px 12px;">Uitloggen</button>
+				<span id="user-display" style="margin-right: 15px; color: var(--muted); font-weight: 500;"></span>
 			</div>
 
-			<section class="tree-container" style="display: none;">
+			<section class="tree-container" style="display: none; position: relative;">
 				<div id="mynetwork"></div>
+				<div class="zoom-controls">
+					<button id="zoom-in" title="Inzoomen">+</button>
+					<button id="zoom-out" title="Uitzoomen">−</button>
+					<button id="zoom-reset" title="Reset zoom">⟲</button>
+				</div>
 			</section>
 
 
@@ -108,7 +131,7 @@
 					// Root
 					{
 						id: "A3",
-						label: "<b>Portfoliostartopdracht (A3)</b>\nMaak je eigen website</b>\nNiveau 1",
+						label: "<b>Portfoliostartopdracht (A3)</b>\nMaak je eigen website\nNiveau 1",
 						title:
 							"Bouw je eigen portfolio-site, voeg achtergrondinformatie toe en deel de link met je docenten.",
 						shape: "box",
@@ -139,7 +162,7 @@
 					{
 						id: "F2",
 						label:
-							"<b>Maatschappelijke aspecten (F2)\nImpact op samenleving</b>\nNiveau 2",
+							"<b>Maatschappelijke aspecten (F2)</b>\nImpact op samenleving\nNiveau 2",
 						title: "Onderzoek hoe sociale media persoonlijke relaties beïnvloeden en schrijf hierover een onderbouwd verslag.",
 						shape: "box",
 						color: { background: "#fff", border: "#ccc" },
@@ -503,60 +526,35 @@
 				}
 
 				// Auth UI elements
-				const loginSection = document.getElementById("login-section");
+				const guestBanner = document.getElementById("guest-banner");
 				const treeContainer = document.querySelector(".tree-container");
 				const loggedInControls = document.getElementById("logged-in-controls");
-				const loginForm = document.getElementById("login-form");
-				const logoutBtn = document.getElementById("logout-btn");
-				const loginError = document.getElementById("login-error");
 				const userDisplay = document.getElementById("user-display");
-
-				// Login handler
-				if (loginForm) {
-					loginForm.addEventListener("submit", (e) => {
-						e.preventDefault();
-						const email = document.getElementById("login-email").value;
-						const password = document.getElementById("login-password").value;
-						loginError.textContent = "";
-
-						auth.signInWithEmailAndPassword(email, password).catch((error) => {
-							console.error("Login error:", error);
-							loginError.textContent = "Inloggen mislukt: " + error.message;
-						});
-					});
-				}
-
-				// Logout handler
-				if (logoutBtn) {
-					logoutBtn.addEventListener("click", () => {
-						auth.signOut();
-					});
-				}
 
 				// Luister naar auth status
 				auth.onAuthStateChanged((user) => {
 					if (user) {
 						console.log("Ingelogd: " + user.email);
-						// Show tree, hide login
-						loginSection.style.display = "none";
-						treeContainer.style.display = "block";
+						// Show logged in state
+						guestBanner.style.display = "none";
 						loggedInControls.style.display = "block";
-						userDisplay.textContent = user.email;
-						
-						if (typeof network !== 'undefined') {
-							network.fit();
-						}
+						treeContainer.style.display = "block"; // Show tree
+						userDisplay.textContent = "Ingelogd als: " + user.email;
 						
 						loadStudentProgress(user);
 					} else {
-						// Show login, hide tree
-						loginSection.style.display = "block";
-						treeContainer.style.display = "none";
+						// Show guest state
+						guestBanner.style.display = "block";
 						loggedInControls.style.display = "none";
+						treeContainer.style.display = "none"; // Hide tree for guests
 						userDisplay.textContent = "";
 						
-						// Reset tree to default state
+						// Reset tree to default state (not visible anyway)
 						applyStatusStyles(); 
+					}
+					
+					if (typeof network !== 'undefined') {
+						network.fit();
 					}
 				});
 
@@ -679,6 +677,7 @@
 					interaction: {
 						dragNodes: false,
 						hover: true,
+						zoomView: false, // Disable scroll to zoom
 					},
 				};
 				var network = new vis.Network(container, data, options);
@@ -782,6 +781,29 @@
 							ctx.textBaseline = "middle";
 							ctx.fillText(text, badgeX + badgeWidth / 2, badgeY + badgeHeight / 2);
 						}
+					});
+				});
+
+				// Zoom controls functionality
+				document.getElementById("zoom-in").addEventListener("click", function() {
+					var scale = network.getScale();
+					network.moveTo({
+						scale: scale * 1.2,
+						animation: { duration: 300, easingFunction: "easeInOutQuad" }
+					});
+				});
+
+				document.getElementById("zoom-out").addEventListener("click", function() {
+					var scale = network.getScale();
+					network.moveTo({
+						scale: scale * 0.8,
+						animation: { duration: 300, easingFunction: "easeInOutQuad" }
+					});
+				});
+
+				document.getElementById("zoom-reset").addEventListener("click", function() {
+					network.fit({
+						animation: { duration: 500, easingFunction: "easeInOutQuad" }
 					});
 				});
 			</script>

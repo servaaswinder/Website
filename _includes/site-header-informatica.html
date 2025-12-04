@@ -16,8 +16,9 @@
 						>Informatica</a
 					>
 				</li>
+				<li id="nav-inleveren" style="display: none;"><a href="{{ site.baseurl }}/Informatica/inleveren.html">Inleveren</a></li>
 				<li>
-					<a href="{{ site.baseurl }}/Informatica/leerlingportaal.html" id="nav-login-link">Inloggen</a>
+					<a href="{{ site.baseurl }}/Informatica/login.html" id="nav-login-link">Inloggen</a>
 				</li>
 			</ul>
 		</nav>
@@ -34,9 +35,12 @@
 			// Handle Login/Logout text if Firebase is available
 			document.addEventListener("DOMContentLoaded", function() {
 				const loginLink = document.getElementById("nav-login-link");
+				const inleverenLink = document.getElementById("nav-inleveren");
+
 				if (typeof firebase !== 'undefined' && loginLink) {
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
+							// User is logged in
 							loginLink.textContent = "Uitloggen";
 							loginLink.href = "#";
 							loginLink.onclick = function(e) {
@@ -45,10 +49,17 @@
 									window.location.href = "{{ site.baseurl }}/Informatica/leerlingportaal.html";
 								});
 							};
+							
+							// Show Inleveren link
+							if (inleverenLink) inleverenLink.style.display = "block";
 						} else {
+							// User is logged out
 							loginLink.textContent = "Inloggen";
-							loginLink.href = "{{ site.baseurl }}/Informatica/leerlingportaal.html";
+							loginLink.href = "{{ site.baseurl }}/Informatica/login.html";
 							loginLink.onclick = null;
+							
+							// Hide Inleveren link
+							if (inleverenLink) inleverenLink.style.display = "none";
 						}
 					});
 				}

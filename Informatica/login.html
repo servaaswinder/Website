@@ -1,0 +1,260 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Inloggen - Informatica</title>
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+		<!-- Load Firebase SDKs from CDN -->
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+	</head>
+	<style>
+		.submission-form {
+			max-width: 600px;
+			margin: 0 auto;
+			background: #fff;
+			padding: 40px;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+			border: 1px solid #e1e1e1;
+		}
+
+		.submission-form h2 {
+			margin-top: 0;
+			margin-bottom: 24px;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			font-weight: 600;
+			margin-bottom: 8px;
+			color: #333;
+		}
+
+		.form-group select,
+		.form-group input,
+		.form-group textarea {
+			width: 100%;
+			padding: 12px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 16px;
+			background: #fff;
+			box-sizing: border-box;
+		}
+
+		.form-group textarea {
+			min-height: 120px;
+			resize: vertical;
+		}
+
+		.submit-btn {
+			width: 100%;
+			padding: 14px;
+			background: #0044B3;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			font-size: 16px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+
+		.submit-btn:hover {
+			background: #003399;
+		}
+
+		.submit-btn:disabled {
+			background: #ccc;
+			cursor: not-allowed;
+		}
+
+		#success-message {
+			display: none;
+			margin-top: 20px;
+			padding: 15px;
+			background-color: #d4edda;
+			color: #155724;
+			border: 1px solid #c3e6cb;
+			border-radius: 4px;
+			text-align: center;
+		}
+		
+		.loading-overlay {
+			display: none;
+			position: fixed;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background: rgba(255,255,255,0.8);
+			z-index: 1000;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			color: #0044B3;
+		}
+	</style>
+	<body class="auth-page">
+		{% include site-header-informatica.html %}
+
+		<main>
+			<div class="submission-form">
+				<section id="login-section">
+					<!-- Login View -->
+					<div id="view-login">
+						<h2>Inloggen</h2>
+						<p>Vul je gegevens in om verder te gaan.</p>
+						<form id="login-form">
+							<div class="form-group">
+								<label for="login-email">E-mailadres</label>
+								<input type="email" id="login-email" required placeholder="" />
+							</div>
+							<div class="form-group">
+								<label for="login-password">Wachtwoord</label>
+								<input type="password" id="login-password" required placeholder="" />
+							</div>
+							<button type="submit" class="submit-btn">Inloggen</button>
+						</form>
+						<div class="toggle-link">
+							<button type="button" class="submit-btn secondary" id="show-reset-view" style="background: transparent; color: #0044B3; width: auto; display: inline-block; padding: 0; font-weight: 400; text-decoration: underline;">Wachtwoord vergeten of aanmaken?</button>
+						</div>
+						<div id="login-error" class="status-message error-message"></div>
+					</div>
+
+					<!-- Reset View (Hidden by default) -->
+					<div id="view-reset" class="hidden">
+						<h2>Wachtwoord herstellen</h2>
+						<p>Vul je e-mailadres in om een link te ontvangen voor het instellen of herstellen van je wachtwoord. Let op: dit bericht kan in je spambox belanden.</p>
+						<form id="reset-form">
+							<div class="form-group">
+								<label for="reset-email">E-mailadres</label>
+								<input type="email" id="reset-email" placeholder="lln12345@northgo-college.nl" />
+							</div>
+							<button type="button" id="reset-btn" class="submit-btn">Stuur reset-link</button>
+						</form>
+						<div class="toggle-link">
+							<button type="button" class="submit-btn secondary" id="show-login-view" style="background: transparent; color: #0044B3; width: auto; display: inline-block; padding: 0; font-weight: 400; text-decoration: underline;">Terug naar inloggen</button>
+						</div>
+						<p id="reset-message" class="status-message"></p>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<footer>
+			<p>&copy; 2025 Servaas Winder</p>
+		</footer>
+
+		<script>
+			// Firebase configuratie
+			const firebaseConfig = {
+				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+				authDomain: "leerling-accounts.firebaseapp.com",
+				projectId: "leerling-accounts",
+				storageBucket: "leerling-accounts.firebasestorage.app",
+				messagingSenderId: "884081904341",
+				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+				measurementId: "G-9YY3856FBP",
+			};
+
+			// Initialiseer Firebase
+			firebase.initializeApp(firebaseConfig);
+			const auth = firebase.auth();
+
+			// Haal redirect URL op
+			const urlParams = new URLSearchParams(window.location.search);
+			const redirectUrl = urlParams.get('redirect') || 'leerlingportaal.html';
+
+			// HTML-elementen
+			const loginForm = document.getElementById("login-form");
+			const loginError = document.getElementById("login-error");
+			const resetBtn = document.getElementById("reset-btn");
+			const resetEmailInput = document.getElementById("reset-email");
+			const resetMessage = document.getElementById("reset-message");
+			
+			// View elements
+			const viewLogin = document.getElementById("view-login");
+			const viewReset = document.getElementById("view-reset");
+			const showResetBtn = document.getElementById("show-reset-view");
+			const showLoginBtn = document.getElementById("show-login-view");
+
+			// Toggle views
+			if (showResetBtn) {
+				showResetBtn.addEventListener("click", () => {
+					viewLogin.classList.add("hidden");
+					viewReset.classList.remove("hidden");
+					resetMessage.textContent = "";
+					resetMessage.className = "status-message";
+				});
+			}
+
+			if (showLoginBtn) {
+				showLoginBtn.addEventListener("click", () => {
+					viewReset.classList.add("hidden");
+					viewLogin.classList.remove("hidden");
+					loginError.textContent = "";
+					loginError.className = "status-message error-message";
+				});
+			}
+
+			// Login handler
+			if (loginForm) {
+				loginForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+					const email = document.getElementById("login-email").value;
+					const password = document.getElementById("login-password").value;
+					loginError.textContent = "";
+
+					auth.signInWithEmailAndPassword(email, password)
+						.then(() => {
+							// Redirect na succesvolle login
+							window.location.href = redirectUrl;
+						})
+						.catch((error) => {
+							console.error("Login error:", error);
+							loginError.textContent = "Inloggen mislukt: " + error.message;
+						});
+				});
+			}
+
+			// Password reset handler
+			if (resetBtn) {
+				resetBtn.addEventListener("click", () => {
+					const email = resetEmailInput.value;
+					
+					if (!email) {
+						resetMessage.textContent = "Vul je e-mailadres in.";
+						resetMessage.className = "status-message error-message";
+						return;
+					}
+					auth.sendPasswordResetEmail(email)
+						.then(() => {
+							resetMessage.textContent = "Reset-link verzonden! Check je mail.";
+							resetMessage.className = "status-message success-message";
+						})
+						.catch((error) => {
+							resetMessage.textContent = "Fout: " + error.message;
+							resetMessage.className = "status-message error-message";
+						});
+				});
+			}
+
+			// Check of al ingelogd
+			auth.onAuthStateChanged((user) => {
+				if (user) {
+					// Als gebruiker al is ingelogd, stuur direct door
+					window.location.href = redirectUrl;
+				}
+			});
+		</script>
+	</body>
+</html>
