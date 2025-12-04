@@ -1,0 +1,58 @@
+<header>
+	<div class="bar">
+		<div class="brand">
+			<h1><a href="{{ site.baseurl }}/index.html" style="text-decoration: none; color: inherit;">Servaas Winder</a></h1>
+			<p>Docent Northgo-College</p>
+		</div>
+		<nav>
+			<button class="menu-toggle">&#9776;</button>
+			<ul>
+				<li><a href="{{ site.baseurl }}/index.html">Home</a></li>
+				<li>
+					<a href="{{ site.baseurl }}/Natuurkunde/klassen.html">Natuurkunde</a>
+				</li>
+				<li>
+					<a href="{{ site.baseurl }}/Informatica/informatica_home.html"
+						>Informatica</a
+					>
+				</li>
+				<li>
+					<a href="{{ site.baseurl }}/Informatica/leerlingportaal.html" id="nav-login-link">Inloggen</a>
+				</li>
+			</ul>
+		</nav>
+
+		<script>
+			const menuToggle = document.querySelector(".menu-toggle");
+			const navigation = document.querySelector("nav ul");
+			if (menuToggle && navigation) {
+				menuToggle.addEventListener("click", function () {
+					navigation.classList.toggle("is-open");
+				});
+			}
+
+			// Handle Login/Logout text if Firebase is available
+			document.addEventListener("DOMContentLoaded", function() {
+				const loginLink = document.getElementById("nav-login-link");
+				if (typeof firebase !== 'undefined' && loginLink) {
+					firebase.auth().onAuthStateChanged(function(user) {
+						if (user) {
+							loginLink.textContent = "Uitloggen";
+							loginLink.href = "#";
+							loginLink.onclick = function(e) {
+								e.preventDefault();
+								firebase.auth().signOut().then(function() {
+									window.location.href = "{{ site.baseurl }}/Informatica/leerlingportaal.html";
+								});
+							};
+						} else {
+							loginLink.textContent = "Inloggen";
+							loginLink.href = "{{ site.baseurl }}/Informatica/leerlingportaal.html";
+							loginLink.onclick = null;
+						}
+					});
+				}
+			});
+		</script>
+	</div>
+</header>
