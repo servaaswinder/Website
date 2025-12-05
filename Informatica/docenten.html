@@ -229,7 +229,7 @@
 					});
 				} catch (error) {
 					console.error("Error loading submissions:", error);
-					loadingMessage.textContent = "Er ging iets mis bij het laden van de inzendingen.";
+					loadingMessage.textContent = "Er ging iets mis bij het laden van de inzendingen: " + error.message;
                     loadingMessage.style.color = "red";
 				}
 			}
