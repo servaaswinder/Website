@@ -1,6 +1,3 @@
----
----
-
 <!DOCTYPE html>
 <html lang='nl'>
 <head>
@@ -16,14 +13,14 @@
 <h1>Warming Stripes</h1>
 <p class="subtitle">Warming Stripes (C1)</p>
 <div class="meta" style="margin-top: 10px; color: #666;">
-    <span><strong>Tijdsindicatie:</strong> 2 tot 3 uur</span> |
+    <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
     <span><strong>Niveau:</strong> 1</span> |
-    <span><strong>Domein:</strong> C1</span>
+    <span><strong>Domein:</strong> C1 (Zoeken), C3 (Representeren)</span>
 </div>
 </section>
 <section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
 <h2>Doel van de opdracht</h2>
-<p>Je gaat klimaatdata van het KNMI visualiseren. De gemiddelde jaartemperatuur van De Bilt sinds 1901 is beschikbaar als tekstbestand. Jij gaat deze tekstdata omzetten naar een visuele warming-stripes afbeelding: elk jaar een verticale streep, van blauw (kouder) naar rood (warmer).</p>
+<p>Je gaat klimaatdata van het KNMI visualiseren. De gemiddelde jaartemperatuur van De Bilt is beschikbaar als tekstbestand. Jij gaat deze tekstdata omzetten naar een visuele warming-stripes afbeelding: elk jaar een verticale streep, van blauw (kouder) naar rood (warmer).</p>
 
 <h2>Leerdoelen</h2>
 <ul>
@@ -39,37 +36,39 @@
     <li>Toegang tot de website van het KNMI: <a href="https://knmi.nl/home" target="_blank" rel="noopener">knmi.nl/home</a>.</li>
 </ul>
 
+<hr>
+
 <h2>Stappenplan</h2>
 
 <h3>1. Bestand zoeken, downloaden en verkennen</h3>
-<p>Ga naar knmi.nl/home en navigeer naar de maand- en jaarwaarden voor De Bilt (gemiddelde temperatuur). Download het getoonde TXT-bestand en sla het op in dezelfde map als je notebook, bijvoorbeeld als <code>mndgeg_260_tg.txt</code>. Open het bestand in een teksteditor om te bekijken hoe het is opgebouwd (maar laad het nog niet in Python).</p>
+<p>Ga naar knmi.nl/home en zoek naar de maand- en jaarwaarden voor De Bilt (gemiddelde temperatuur). Download het TXT-bestand en sla het op in de map van je notebook (bijv. als <code>mndgeg_260_tg.txt</code>). Open het bestand eerst in een teksteditor (Kladblok/TextEdit) om te zien hoe het is opgebouwd.</p>
 
 <h3>2. Aantal kopregels bepalen</h3>
-<p>Tel hoeveel regels met uitleg bovenaan het bestand staan (koptekst). Deze informatie gebruik je straks bij het inlezen.</p>
+<p>Tel hoeveel regels met uitleg er bovenaan het bestand staan (de header). Dit getal heb je straks nodig.</p>
 
 <h3>3. Python-omgeving klaarzetten</h3>
-<p>Maak een nieuw notebook aan en importeer de benodigde modules:</p>
+<p>Maak een nieuw notebook en importeer de modules:</p>
 <pre><code class="language-python">import pandas as pd
 import matplotlib.pyplot as plt</code></pre>
-<p><em>Tip: werk met meerdere cellen (bijvoorbeeld: inlezen, verwerken, visualiseren) om het overzicht te bewaren.</em></p>
+<p><em>Tip: werk met meerdere cellen (inlezen, verwerken, visualiseren) om overzicht te bewaren.</em></p>
 
-<h3>4. Data inlezen</h3>
-<p>Zoek op hoe je met pandas een CSV- of tekstbestand kunt inlezen. Gebruik bij het inlezen:</p>
+<h3>4. Data inlezen (Zelf zoeken)</h3>
+<p>Zoek in de <strong>Hulpbronnen</strong> (onderaan deze pagina) op hoe je met pandas een tekstbestand inleest. Let op de volgende eisen:</p>
 <ul>
-    <li><code>skiprows=...</code> om de kopregels over te slaan. (Zorg dat STN, YYYY etc. de koppen worden).</li>
-    <li>Gebruik het volgende om spaties uit kolomkoppen te verwijderen en te controleren:</li>
+    <li>Gebruik de parameter <code>skiprows=...</code> om de header over te slaan, zodat <code>STN, YYYY</code> etc. de kolomnamen worden.</li>
+    <li>De kolomnamen in het bestand bevatten vaak spaties. <strong>Onderzoek zelf</strong> hoe je in pandas de spaties voor en na de kolomnamen verwijdert (strip).</li>
+    <li>Stel de kolom <code>YYYY</code> in als index.</li>
 </ul>
-<pre><code class="language-python"># verwijder begin- en eindspaties uit kolomnamen
-df.columns = df.columns.str.strip()
-# voeg hier een regel toe waarmee je de kolom YYYY als index gebruikt
-print(df.head())</code></pre>
+<p>Controleer je werk met:</p>
+<pre><code class="language-python">print(df.columns) # Zijn de spaties weg?
+print(df.head())  # Is YYYY de index?</code></pre>
 
 <h3>5. Opschonen en Conversie</h3>
+<p>De data wordt waarschijnlijk ingelezen als tekst (string). Dit moet numeriek worden.</p>
 <ul>
-    <li>Gebruik <code>print(df['...'])</code> om te controleren of je de juiste data selecteert.</li>
-    <li>Stel in dat de kolom YYYY als index wordt gebruikt.</li>
-    <li>Zet de kolom met gegevens om naar numeriek formaat (gebruik <code>pd.to_numeric</code> met <code>errors='coerce'</code>).</li>
-    <li>Deel de nieuwe kolom door 10 om van tienden van graden naar graden Celsius te gaan.</li>
+    <li>Gebruik <code>print(df['...'])</code> om te testen of je de temperatuurkolom kunt selecteren.</li>
+    <li><strong>Zoekopdracht:</strong> Zoek op hoe je een kolom converteert naar getallen (numeriek). Gebruik hierbij een optie die foutieve waarden (zoals lege plekken) omzet naar <code>NaN</code> (Not a Number).</li>
+    <li>De KNMI-data is in 0.1 graden Celsius. Deel de kolom door 10 om echte graden te krijgen.</li>
 </ul>
 
 <h3>6. Kleuren normaliseren en strepen tekenen</h3>
@@ -83,7 +82,8 @@ print(df.head())</code></pre>
 <pre><code class="language-python"># Code (vul de lege stukjes aan)
 import matplotlib.pyplot as plt
 
-# 1) Normaliseren op basis van min en max van de gekozen kolom
+# 1) Normaliseren op basis van min en max van de gekozen temperatuurkolom
+# Let op: vul bij [...] de naam van jouw kolom in
 norm = plt.Normalize(vmin=df['...'].min(), vmax=df['...'].max())
 
 # 2) Kleurenkaart kiezen (blauw -> rood)
@@ -93,17 +93,60 @@ cmap = plt.get_cmap("RdBu_r")
 fig, ax = plt.subplots(figsize=(12, 2))
 
 # 4) Voor elk jaar een verticale streep tekenen
+# enumerate geeft i (positie 0,1,2..) en val (de temperatuurwaarde)
 for i, val in enumerate(df['...']):
     ax.axvline(i, color=cmap(norm(val)), linewidth=4)
 
-# 5) As verbergen
+# 5) As verbergen (het gaat om de kleuren)
 ax.set_axis_off()
 
 plt.tight_layout()
 plt.show()</code></pre>
 
+<div style="background-color: #f0f4f8; padding: 15px; border-left: 5px solid #2c3e50; margin: 20px 0;">
+    <h3>Wat gebeurt hier precies?</h3>
+    <ul style="margin-bottom: 0;">
+        <li><strong>Normalize:</strong> Schuift en rekt jouw data zodat de kleinste waarde 0 wordt en de grootste 1.</li>
+        <li><strong>cmap(norm(val)):</strong> Vertaalt die waarde (bijv. 0.8) naar een kleur (donkerrood).</li>
+        <li><strong>ax.axvline:</strong> Tekent een verticale lijn op positie <code>i</code>.</li>
+        <li><strong>set_axis_off:</strong> Verbergt de assen voor de strakke 'barcode' look.</li>
+    </ul>
+</div>
+
+<h3>Mini-checks (Beantwoord in je notebook)</h3>
+<ol>
+    <li>Welke kolom heb je gebruikt voor de kleuren? Waarom is dat logisch?</li>
+    <li>Wat verandert er in de grafiek als je <code>"RdBu_r"</code> vervangt door <code>"coolwarm"</code>?</li>
+    <li>Wat gebeurt er als je de <code>linewidth</code> halveert?</li>
+</ol>
+
+<div style="background-color: #fff3cd; padding: 15px; border-left: 5px solid #ffc107; margin: 20px 0;">
+    <strong>Veelgemaakte fout:</strong> Normaliseer op de <em>temperatuurkolom</em>. Als je per ongeluk op het jaartal normaliseert, krijg je een regenboog van links naar rechts (tijd) in plaats van blauw/rode afwisseling (warmte).
+</div>
+
+<div style="border: 2px solid #d63384; padding: 20px; margin-top: 30px; border-radius: 8px;">
+    <h3 style="color: #d63384; margin-top: 0;">Verplicht voor VWO (Verdieping)</h3>
+    <p>Als VWO-leerling voeg je de volgende verbeteringen toe aan de visualisatie:</p>
+    <ul>
+        <li><strong>Consistente breedte:</strong> Standaard laat matplotlib witruimte links en rechts. Zorg dat de strepen de hele figuur vullen. Zoek op hoe <code>ax.set_xlim</code> werkt.</li>
+        <li><strong>Legenda (Colorbar):</strong> Een grafiek zonder legenda is lastig te lezen. Voeg een kleurbalk toe die laat zien welke kleur bij welke temperatuur hoort.
+        <br><em>Tip: Zoek naar "Matplotlib colorbar from scalarmappable".</em></li>
+    </ul>
+</div>
+
 <h3>Reflectie</h3>
 <p>Beschrijf in 2–3 zinnen wat je opvalt in je grafiek. Welke periode is koeler, welke warmer?</p>
+
+<hr>
+
+<h2>Hulpbronnen</h2>
+<p>Gebruik deze links om de code voor stap 4 en 5 zelf uit te zoeken:</p>
+<ul>
+    <li><a href="https://www.w3schools.com/python/pandas/pandas_csv.asp" target="_blank">W3Schools: Pandas read_csv</a> - Basisuitleg over inlezen.</li>
+    <li><a href="https://pandas.pydata.org/docs/reference/api/pandas.to_numeric.html" target="_blank">Pandas: to_numeric documentatie</a> - Uitleg over converteren en <code>errors='coerce'</code>.</li>
+    <li><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Normalize.html" target="_blank">Matplotlib: Normalize</a> - Hoe schalen naar [0,1] werkt.</li>
+    <li><a href="https://matplotlib.org/stable/tutorials/colors/colormaps.html" target="_blank">Matplotlib: Colormaps</a> - Overzicht van alle kleurenschema's.</li>
+</ul>
 
 <h2>Beoordelingsmodel</h2>
 <div style="overflow-x: auto;">
@@ -119,27 +162,28 @@ plt.show()</code></pre>
     <tbody>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Data inlezen</strong></td>
-            <td style="padding: 12px;">Bestand niet correct ingelezen; DataFrame leeg of fout gescheiden.</td>
-            <td style="padding: 12px;">Bestand ingelezen maar met onvolkomenheden (verkeerde sep, kolomnamen niet gestript, index niet ingesteld).</td>
-            <td style="padding: 12px;">Correct ingelezen met passende sep en skiprows; kolomnamen gestript; YYYY als index.</td>
+            <td style="padding: 12px;">Bestand niet correct ingelezen; DataFrame leeg of fout gescheiden; geen skiprows.</td>
+            <td style="padding: 12px;">Bestand ingelezen maar met onvolkomenheden: verkeerde sep, kolomnamen niet gestript, index (YYYY) niet ingesteld.</td>
+            <td style="padding: 12px;">Correct ingelezen met passende sep en juiste skiprows; kolomnamen gestript; YYYY als index.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Tabel maken (opschonen)</strong></td>
-            <td style="padding: 12px;">Kolommen onjuist/ontbreken; waarden niet omgerekend.</td>
-            <td style="padding: 12px;">Juiste kolommen maar deels onjuist geconverteerd; tienden niet consequent gedeeld door 10.</td>
-            <td style="padding: 12px;">Kolommen logisch gekozen; to_numeric toegepast; direct gedeeld door 10 naar °C; NaN behandeld.</td>
+            <td style="padding: 12px;">Kolommen onjuist/ontbreken; waarden niet omgerekend; type blijft tekst.</td>
+            <td style="padding: 12px;">Juiste kolommen gekozen maar deels onjuist geconverteerd; tienden niet consequent gedeeld door 10; ontbrekende waarden niet benoemd.</td>
+            <td style="padding: 12px;">Kolommen logisch gekozen; to_numeric toegepast; direct gedeeld door 10 naar °C; ontbrekende waarden zinvol behandeld.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
-            <td style="padding: 12px;"><strong>Visualisatie</strong></td>
-            <td style="padding: 12px;">Grafiek ontbreekt of verkeerd (geen kleurenmapping).</td>
-            <td style="padding: 12px;">Basis-stripes aanwezig maar onvolledig (verkeerde normalisatie, ongeschikte colormap, assen zichtbaar).</td>
-            <td style="padding: 12px;">Strakke stripes: Normalize op temperatuur; passende colormap; assen uit.</td>
+            <td style="padding: 12px;"><strong>Visualisatie (warming stripes)</strong></td>
+            <td style="padding: 12px;">Grafiek ontbreekt of verkeerd (geen kleurenmapping/normalisatie of kleuren op jaartal i.p.v. temperatuur).</td>
+            <td style="padding: 12px;">Basis-stripes aanwezig maar onvolledig: verkeerde/geen normalisatie, ongeschikte colormap, assen zichtbaar.</td>
+            <td style="padding: 12px;">Strakke stripes: Normalize op temperatuurskolom; passende colormap; assen uit. 
+            <br><strong>(VWO: inclusief correcte x-as limieten en kleurbalk/legenda)</strong></td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Reflectie</strong></td>
             <td style="padding: 12px;">Ontbreekt of slechts 1 losse opmerking.</td>
-            <td style="padding: 12px;">Kort, beschrijvend zonder onderbouwing.</td>
-            <td style="padding: 12px;">Duidelijke reflectie met voorbeelden: benoemt koelere/warme perioden en koppelt aan data.</td>
+            <td style="padding: 12px;">Kort, beschrijvend (1-2 zinnen) zonder duidelijke onderbouwing.</td>
+            <td style="padding: 12px;">Duidelijke reflectie (2-3 zinnen) met voorbeelden: benoemt koelere/warme perioden en koppelt aan de visualisatie/data.</td>
         </tr>
     </tbody>
 </table>
