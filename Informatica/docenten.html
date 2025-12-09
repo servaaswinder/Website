@@ -125,6 +125,7 @@
 				</div>
 
 				<div id="submissions-container" style="display: none;">
+					<h3 style="border-bottom: 2px solid #0044B3; padding-bottom: 10px; margin-bottom: 15px;">Openstaande Inzendingen</h3>
 					<table class="submissions-table">
 						<thead>
 							<tr>
@@ -144,6 +145,33 @@
                         Geen openstaande inzendingen gevonden.
                     </div>
 				</div>
+
+				<!-- HISTORY SECTION -->
+				<div id="history-container" style="display: none; margin-top: 50px;">
+					<h3 style="border-bottom: 2px solid #666; padding-bottom: 10px; margin-bottom: 15px; color: #666;">Verwerkte Inzendingen (Geschiedenis)</h3>
+					<button onclick="loadHistory()" id="load-history-btn" class="action-btn secondary" style="margin-bottom: 15px;">Laad Geschiedenis</button>
+					
+					<div id="history-content" style="display: none;">
+						<table class="submissions-table" style="opacity: 0.9;">
+							<thead>
+								<tr>
+									<th>Status</th>
+									<th>Datum</th>
+									<th>Leerling</th>
+									<th>Opdracht</th>
+									<th>Docent & Opmerking</th>
+									<th>Actie</th>
+								</tr>
+							</thead>
+							<tbody id="history-body">
+								<!-- History items inserted here -->
+							</tbody>
+						</table>
+						<div id="no-history" class="no-submissions" style="display: none;">
+							Geen verwerkte inzendingen gevonden.
+						</div>
+					</div>
+				</div>
 			</div>
 		</main>
 
@@ -152,19 +180,10 @@
 		</footer>
 
 		<script>
-			// Firebase configuratie
-			const firebaseConfig = {
-				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-				authDomain: "leerling-accounts.firebaseapp.com",
-				projectId: "leerling-accounts",
-				storageBucket: "leerling-accounts.firebasestorage.app",
-				messagingSenderId: "884081904341",
-				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-				measurementId: "G-9YY3856FBP",
-			};
+			// Firebase Initialisatie (Gecentraliseerd in header)
+			// const firebaseConfig = { ... }; // Verwijderd
+			// firebase.initializeApp(firebaseConfig); // Verwijderd
 
-			// Initialiseer Firebase
-			firebase.initializeApp(firebaseConfig);
 			const auth = firebase.auth();
 			const db = firebase.firestore();
 
@@ -194,39 +213,67 @@
 
 			async function loadSubmissions() {
 				try {
+					// Fetch simply by status to avoid complex index issues
 					const snapshot = await db.collection("submissions")
 						.where("status", "==", "pending")
-						.orderBy("timestamp", "desc")
 						.get();
-
+						
 					loadingMessage.style.display = "none";
 					submissionsContainer.style.display = "block";
+					document.getElementById("history-container").style.display = "block"; // MAKE VISIBLE!
 
 					if (snapshot.empty) {
                         noSubmissionsMessage.style.display = "block";
-						return;
-					}
+						// Note: We do NOT return here, because we still want to show the history container!
+						// So remove the 'return;' and just let it skip the foreach
+					} else {
+						// Client-side sort (reliable and fast for this volume)
+						const sortedDocs = snapshot.docs.sort((a, b) => {
+							const timeA = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+							const timeB = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+							return timeB - timeA; // Descending (Newest first)
+						});
 
-					snapshot.forEach((doc) => {
+						sortedDocs.forEach((doc) => {
 						const data = doc.data();
 						const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") + " " + data.timestamp.toDate().toLocaleTimeString("nl-NL", {hour: '2-digit', minute:'2-digit'}) : "Onbekend";
 						
 						const row = document.createElement("tr");
 						row.id = `row-${doc.id}`;
 						
+                        // Opmerkingen van leerling
+                        const studentComment = data.comments ? `<div style="font-style: italic; color: #555; margin-bottom: 4px;">"${data.comments}"</div>` : '';
+
 						row.innerHTML = `
 							<td>${date}</td>
-							<td>${data.userEmail}</td>
-							<td>${data.assignmentId} (P${data.period})</td>
-							<td><a href="${data.assignmentUrl}" target="_blank" style="color: #0044B3; text-decoration: underline;">Bekijk</a></td>
-							<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${data.comments || ''}">${data.comments || '-'}</td>
 							<td>
-								<button onclick="markAsGraded('${doc.id}')" class="action-btn">Afvinken</button>
+                                <div>${data.userEmail}</div>
+                                <div style="font-size: 0.85em; color: #666;">${data.userClass || ''}</div>
+                            </td>
+							<td>${data.assignmentId}</td>
+							<td><a href="${data.assignmentUrl}" target="_blank" style="color: #0044B3; text-decoration: underline;">Link</a></td>
+							<td>
+                                ${studentComment}
+                                <textarea id="teacher-comment-${doc.id}" 
+                                    placeholder="Opmerking voor leerling of collega..."
+                                    style="width: 100%; min-height: 60px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 13px;">${data.teacherComment || ''}</textarea>
+                                <div style="text-align: right; margin-top: 4px;">
+                                    <button onclick="saveComment('${doc.id}')" class="action-btn secondary" style="font-size: 11px; padding: 2px 6px;">Opslaan (Notitie)</button>
+                                </div>
+                            </td>
+							<td>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+								    <button onclick="markAsChecked('${doc.id}')" class="action-btn" style="background-color: #28a745;">Afvinken</button>
+                                    <button onclick="rejectSubmission('${doc.id}')" class="action-btn" style="background-color: #dc3545;">Afwijzen</button>
+                                </div>
 							</td>
 						`;
 						
+						
 						submissionsBody.appendChild(row);
 					});
+                } // End of else
+
 				} catch (error) {
 					console.error("Error loading submissions:", error);
 					loadingMessage.textContent = "Er ging iets mis bij het laden van de inzendingen: " + error.message;
@@ -234,30 +281,186 @@
 				}
 			}
 
-			window.markAsGraded = async function(docId) {
-				if (!confirm("Weet je zeker dat je deze opdracht als nagekeken wilt markeren?")) return;
+			// NEW: Load History Function
+			async function loadHistory() {
+				const historyContainer = document.getElementById("history-content");
+				const historyBody = document.getElementById("history-body");
+				const noHistory = document.getElementById("no-history");
+				const btn = document.getElementById("load-history-btn");
+
+				btn.textContent = "Laden...";
+				btn.disabled = true;
 
 				try {
-					await db.collection("submissions").doc(docId).update({
-						status: "graded",
-                        gradedAt: firebase.firestore.FieldValue.serverTimestamp()
+					// Client-side filtering strategy again for robustness
+					// Fetching ALL submissions might be heavy eventually, but for now it ensures it works without index headaches.
+					// Or better: fetch where status != pending? explicit 'in' query.
+					// Let's stick to strict queries if possible, but 'in' requires index sometimes.
+					// Let's do two simple queries and merge, or just client-side filter all if not huge.
+					// Given previous issues, let's try fetch where status == checked OR rejected.
+					// Firestore 'in' query: where('status', 'in', ['checked', 'rejected'])
+					
+					const snapshot = await db.collection("submissions")
+						.where("status", "in", ["checked", "rejected"]) 
+						.get();
+
+					// Sort by timestamp desc (newest first)
+					const sortedDocs = snapshot.docs.sort((a, b) => {
+						const timeA = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+						const timeB = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+						return timeB - timeA;
 					});
 
-					// Remove row from table
-					const row = document.getElementById(`row-${docId}`);
-					if (row) {
-						row.remove();
+					historyBody.innerHTML = "";
+
+					if (sortedDocs.length === 0) {
+						noHistory.style.display = "block";
+						// keep table hidden or show empty?
+					} else {
+						noHistory.style.display = "none";
+						
+						sortedDocs.forEach(doc => {
+							const data = doc.data();
+							const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") : "Onbekend";
+							const statusColor = data.status === 'checked' ? '#28a745' : '#dc3545';
+							const statusLabel = data.status === 'checked' ? 'Afgevinkt' : 'Afgewezen';
+							
+							const row = document.createElement("tr");
+							row.id = `history-row-${doc.id}`;
+							row.innerHTML = `
+								<td style="color: ${statusColor}; font-weight: bold;">${statusLabel}</td>
+								<td>${date}</td>
+								<td>${data.userEmail}<br><span style="font-size:0.8em; color:#888;">${data.userClass || ''}</span></td>
+								<td>${data.assignmentId}</td>
+								<td>
+									<div style="font-size: 0.9em;">Door: ${data.checkedBy || '?'}</div>
+									<div style="font-style: italic; color: #555;">"${data.teacherComment || '-'}"</div>
+								</td>
+								<td>
+									<button onclick="deleteSubmission('${doc.id}')" class="action-btn secondary" style="background-color: #fff; color: #dc3545; border: 1px solid #dc3545;">🗑️</button>
+								</td>
+							`;
+							historyBody.appendChild(row);
+						});
 					}
-                    
-                    // Check if table is empty
-                    if (submissionsBody.children.length === 0) {
-                        noSubmissionsMessage.style.display = "block";
-                    }
+
+					historyContainer.style.display = "block";
+					document.getElementById("history-container").style.display = "block"; // Ensure parent is visible
+					btn.style.display = "none"; // Hide button after loading
+
 				} catch (error) {
-					console.error("Error updating submission:", error);
-					alert("Er ging iets mis. Probeer het opnieuw.");
+					console.error("Error loading history:", error);
+					alert("Fout bij laden geschiedenis: " + error.message);
+					btn.textContent = "Probeer opnieuw";
+					btn.disabled = false;
+				}
+			}
+
+			window.deleteSubmission = async function(docId) {
+				if (!confirm("Weet je zeker dat je deze historie wilt verwijderen? Dit kan niet ongedaan worden gemaakt.")) return;
+				try {
+					await db.collection("submissions").doc(docId).delete();
+					const row = document.getElementById(`history-row-${docId}`);
+					if (row) row.remove();
+				} catch (error) {
+					handleError(error);
 				}
 			};
+
+            function handleError(error) {
+                console.error("Operation failed:", error);
+                if (error.code === 'permission-denied') {
+                    alert("Je hebt geen rechten om deze actie uit te voeren. Ben je ingelogd als docent?");
+                } else {
+                    alert("Er ging iets mis: " + error.message);
+                }
+            }
+
+            async function getTeacherComment(docId) {
+                const textarea = document.getElementById(`teacher-comment-${docId}`);
+                return textarea ? textarea.value.trim() : '';
+            }
+
+			window.markAsChecked = async function(docId) {
+                const comment = await getTeacherComment(docId);
+				// Confirmation removed as per request for speed
+				// if (!confirm("Weet je zeker dat je deze opdracht als 'Gezien' wilt afvinken?")) return;
+
+				try {
+                    const user = auth.currentUser;
+					await db.collection("submissions").doc(docId).update({
+						status: "checked",
+                        checkedBy: user.email,
+						checkedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        teacherComment: comment
+					});
+
+					removeRow(docId);
+				} catch (error) {
+					handleError(error);
+				}
+			};
+
+            window.rejectSubmission = async function(docId) {
+                let comment = await getTeacherComment(docId);
+                
+                if (!comment) {
+                    if (confirm("Wil je afwijzen zonder opmerking te geven?")) {
+                        comment = "Afgewezen zonder toelichting.";
+                    } else {
+                        return; // Cancelled
+                    }
+                } else {
+                    // Standard confirmation REMOVED as per request.
+                    // If comment exists, proceed directly.
+                }
+
+                try {
+                    const user = auth.currentUser;
+                    if (!user) throw new Error("Not logged in");
+
+                    await db.collection("submissions").doc(docId).update({
+                        status: "rejected",
+                        checkedBy: user.email,
+                        checkedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        teacherComment: comment
+                    });
+
+                    removeRow(docId);
+                } catch (error) {
+                    handleError(error);
+                }
+            };
+
+            window.saveComment = async function(docId) {
+                const comment = await getTeacherComment(docId);
+                try {
+                    await db.collection("submissions").doc(docId).update({
+                        teacherComment: comment
+                    });
+                    
+                    // Visual feedback simple checkmark
+                    const btn = document.querySelector(`#row-${docId} button[onclick^="saveComment"]`);
+                    if(btn) {
+                        const originalText = btn.textContent;
+                        btn.textContent = "Opgeslagen!";
+                        setTimeout(() => btn.textContent = originalText, 2000);
+                    }
+                } catch (error) {
+                    handleError(error);
+                }
+            };
+
+            function removeRow(docId) {
+                const row = document.getElementById(`row-${docId}`);
+                if (row) {
+                    row.remove();
+                }
+                
+                if (submissionsBody.children.length === 0) {
+                    noSubmissionsMessage.style.display = "block";
+                }
+            }
 		</script>
 	</body>
 </html>

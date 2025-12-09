@@ -12,3 +12,5 @@ _site/
 vendor/
 .bundle/
 
+# Security Rules
+firestore.rules

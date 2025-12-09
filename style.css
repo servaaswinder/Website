@@ -37,6 +37,7 @@ a { color: inherit; text-decoration: none; }
   color: #0d2f7a;
 }
 
+
 /* Header */
 header {
   position: sticky;
@@ -797,6 +798,17 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
   background: rgba(66, 104, 214, 0.08);
 }
 
+#success-message {
+  display: none;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  text-align: center;
+}
+
 .reset-box h3 {
   margin: 0 0 12px;
 }
@@ -1340,4 +1352,17 @@ footer { text-align: center; color: var(--muted); padding: 40px 20px; }
 		left: -12px;
 		width: 20px;
 	}
+}
+
+
+/* Global Text Links - Forced Override */
+main a:not([class]),
+.submission-form a {
+  color: #1a4bb3 !important;
+  text-decoration: underline !important;
+}
+
+main a:not([class]):hover,
+.submission-form a:hover {
+  color: #0d2f7a !important;
 }

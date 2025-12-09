@@ -7,101 +7,13 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Opdracht Inleveren - Informatica</title>
-		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}?v=2" />
 		<!-- Load Firebase SDKs from CDN -->
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-		<style>
-			.submission-form {
-				max-width: 600px;
-				margin: 0 auto;
-				background: #fff;
-				padding: 40px;
-				border-radius: 8px;
-				box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-				border: 1px solid #e1e1e1;
-			}
 
-			.submission-form h2 {
-				margin-top: 0;
-				margin-bottom: 24px;
-			}
 
-			.form-group {
-				margin-bottom: 20px;
-			}
-
-			.form-group label {
-				display: block;
-				font-weight: 600;
-				margin-bottom: 8px;
-				color: #333;
-			}
-
-			.form-group select,
-			.form-group input,
-			.form-group textarea {
-				width: 100%;
-				padding: 12px;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				font-size: 16px;
-				background: #fff;
-				box-sizing: border-box;
-			}
-
-			.form-group textarea {
-				min-height: 120px;
-				resize: vertical;
-			}
-
-			.submit-btn {
-				width: 100%;
-				padding: 14px;
-				background: #0044B3;
-				color: white;
-				border: none;
-				border-radius: 4px;
-				font-size: 16px;
-				font-weight: 700;
-				cursor: pointer;
-				transition: background-color 0.2s;
-			}
-
-			.submit-btn:hover {
-				background: #003399;
-			}
-
-			.submit-btn:disabled {
-				background: #ccc;
-				cursor: not-allowed;
-			}
-
-			#success-message {
-				display: none;
-				margin-top: 20px;
-				padding: 15px;
-				background-color: #d4edda;
-				color: #155724;
-				border: 1px solid #c3e6cb;
-				border-radius: 4px;
-				text-align: center;
-			}
-			
-			.loading-overlay {
-				display: none;
-				position: fixed;
-				top: 0; left: 0; right: 0; bottom: 0;
-				background: rgba(255,255,255,0.8);
-				z-index: 1000;
-				align-items: center;
-				justify-content: center;
-				font-weight: 600;
-				color: #0044B3;
-			}
-		</style>
-	</head>
 	<body class="auth-page">
 		{% include site-header-informatica.html %}
 
@@ -109,7 +21,7 @@
 			<div class="submission-form">
 				<h2>Opdracht Inleveren (nog in test fase)</h2>
 				<p style="margin-bottom: 24px; color: #666;">
-					Vul het onderstaande formulier in om aan te geven dat je een opdracht hebt afgerond en nagekeken wilt hebben.
+					Dit is nog in test fase. Begruik voorlopig nog het <a href="https://docs.google.com/forms/d/e/1FAIpQLSf6WTa2rHy5JvROcnFAKMiQ9XIujvclaBCGkkdhI2GVFNlYNg/viewform?usp=header">Google Form</a> om je opdrachten in te leveren.
 				</p>
 
 				<form id="submission-form">
@@ -195,19 +107,7 @@
 		</footer>
 
 		<script>
-			// Firebase configuratie
-			const firebaseConfig = {
-				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-				authDomain: "leerling-accounts.firebaseapp.com",
-				projectId: "leerling-accounts",
-				storageBucket: "leerling-accounts.firebasestorage.app",
-				messagingSenderId: "884081904341",
-				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-				measurementId: "G-9YY3856FBP",
-			};
-
-			// Initialiseer Firebase
-			firebase.initializeApp(firebaseConfig);
+			// Firebase Initialisatie (Gecentraliseerd in header)
 			const auth = firebase.auth();
 			const db = firebase.firestore();
 
@@ -243,21 +143,51 @@
 				loadingOverlay.style.display = "flex";
 				submitBtn.disabled = true;
 
+				// Check for existing pending/rejected submissions for this assignment
 				try {
-					await db.collection("submissions").add({
-						userId: user.uid,
-						userEmail: user.email,
-						period: period,
-						assignmentId: assignment,
-						assignmentUrl: assignmentUrl,
-						comments: comments,
-						timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-						status: "pending"
+					const snapshot = await db.collection("submissions")
+						.where("userId", "==", user.uid)
+						.where("assignmentId", "==", assignment)
+						.get();
+
+					const activeSubmission = snapshot.docs.find(doc => {
+						const data = doc.data();
+						return data.status === 'pending' || data.status === 'rejected' || data.status === 'checked';
 					});
 
-					// Show success
+					if (activeSubmission) {
+						const oldStatus = activeSubmission.data().status;
+						const docRef = db.collection("submissions").doc(activeSubmission.id);
+						
+						await docRef.update({
+							assignmentUrl: assignmentUrl,
+							comments: comments,
+							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+							status: "pending",
+							// We laten teacherComment staan voor context of wissen hem? 
+							// Meestal wissen studenten liever "clean", maar voor historie is wissen van teacherComment handig zodat het echt "nieuw" lijkt.
+							// Laten we teacherComment wissen om verwarring te voorkomen met oude feedback.
+							teacherComment: firebase.firestore.FieldValue.delete() 
+						});
+					
+					} else {
+						// Nieuwe maken
+						await db.collection("submissions").add({
+							userId: user.uid,
+							userEmail: user.email,
+							period: period,
+							assignmentId: assignment,
+							assignmentUrl: assignmentUrl,
+							comments: comments,
+							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+							status: "pending"
+						});
+					}
+
+					// Show success (common for both)
 					form.style.display = "none";
 					successMessage.style.display = "block";
+					
 				} catch (error) {
 					console.error("Error submitting assignment:", error);
 					alert("Er ging iets mis bij het versturen: " + error.message);

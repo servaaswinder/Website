@@ -288,6 +288,14 @@
 						<div style="margin-bottom: 20px;">
 							<a href="informatica_opdrachten.html" class="inf-button">Naar opdrachtenboom</a>
 						</div>
+                        
+                        <!-- Rejected Assignments Section -->
+                        <div id="rejected-assignments-container" style="display: none; margin-bottom: 30px; border: 1px solid #f5c6cb; background-color: #f8d7da; border-radius: 8px; padding: 20px;">
+                            <h3 style="color: #721c24; margin-top: 0;">⚠️ Aandacht vereist</h3>
+                            <p style="color: #721c24;">De volgende opdrachten zijn afgewezen/niet goedgekeurd. Lees de opmerking van de docent en lever opnieuw in.</p>
+                            <div id="rejected-assignments-list"></div>
+                        </div>
+
 						<div
 							class="period-toggle compact"
 							id="student-period-filter"
@@ -344,19 +352,7 @@
 		</footer>
 
 		<script>
-			// Firebase configuratie (pas aan voor je eigen project)
-			const firebaseConfig = {
-				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-				authDomain: "leerling-accounts.firebaseapp.com",
-				projectId: "leerling-accounts",
-				storageBucket: "leerling-accounts.firebasestorage.app",
-				messagingSenderId: "884081904341",
-				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-				measurementId: "G-9YY3856FBP",
-			};
-
-			// Initialiseer Firebase
-			firebase.initializeApp(firebaseConfig);
+			// Firebase Initialisatie (Gecentraliseerd in header)
 			const auth = firebase.auth();
 			const db = firebase.firestore();
 			const FieldValue = firebase.firestore.FieldValue;
@@ -453,6 +449,73 @@
 					renderStudentPanel(studentResultsDisplay, cachedStudentData);
 				}
 			);
+
+            async function loadRejectedAssignments(user) {
+                try {
+                    // Fetch all submissions for user (no complex index needed) and filter client-side
+                    const snapshot = await db.collection("submissions")
+                        .where("userId", "==", user.uid)
+                        .get();
+                    
+                    const rejectedDocs = snapshot.docs.filter(doc => {
+                         const s = doc.data().status;
+                         return s === 'rejected'; 
+                    });
+
+                    if (rejectedDocs.length === 0) {
+                        container.style.display = "none";
+                        return;
+                    }
+
+                    list.innerHTML = "";
+                    rejectedDocs.forEach(doc => {
+                        const data = doc.data();
+                        const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") : "";
+                        
+                        const item = document.createElement("div");
+                        item.style.backgroundColor = "white";
+                        item.style.padding = "15px";
+                        item.style.borderRadius = "4px";
+                        item.style.marginBottom = "10px";
+                        item.style.borderLeft = "4px solid #dc3545";
+                        
+                        item.innerHTML = `
+                            <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 5px;">${data.assignmentId}</div>
+                            <div style="font-style: italic; color: #555; margin-bottom: 10px;">"${data.teacherComment || 'Geen opmerking'}"</div>
+                            <div style="font-size: 0.85em; color: #666;">
+                                Afgewezen op: ${date} door ${data.checkedBy || 'docent'}
+                                <br>
+                                <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center;">
+                                    <a href="inleveren.html" class="inf-button" style="padding: 4px 10px; font-size: 0.9em; text-decoration: none;">Opnieuw inleveren</a>
+                                    <button onclick="deleteSubmission('${doc.id}')" style="background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; font-size: 0.9em;">Melding verwijderen</button>
+                                </div>
+                            </div>
+                        `;
+                        list.appendChild(item);
+                    });
+                     // Ensuring proper closure of logic
+                
+                     container.style.display = "block";
+                } catch (error) {
+                    console.error("Error loading rejected assignments:", error);
+                }
+            }
+
+            window.deleteSubmission = async function(docId) {
+                if (!confirm("Wil je deze melding verwijderen? Je kunt de opdracht daarna opnieuw inleveren.")) return;
+                
+                try {
+                    await db.collection("submissions").doc(docId).delete();
+                    // Reload to update UI
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        loadRejectedAssignments(user);
+                    }
+                } catch (error) {
+                    console.error("Error deleting submission:", error);
+                    alert("Kon melding niet verwijderen: " + error.message);
+                }
+            };
 
 			function setStatusMessage(element, message, type) {
 				if (!element) {
@@ -1288,9 +1351,13 @@
 					await loadAllStudents();
 				} catch (error) {
 					console.error(error);
+                    let msg = "Synchroniseren mislukt: " + error.message;
+                    if (error.code === 'permission-denied') {
+                        msg = "Toegang geweigerd: Alleen docenten mogen resultaten synchroniseren.";
+                    }
 					setStatusMessage(
 						csvUploadMessage,
-						"Synchroniseren mislukt: " + error.message,
+						msg,
 						"error"
 					);
 				} finally {
@@ -1963,6 +2030,7 @@
 						adminSection.classList.add("hidden");
 						studentSection.classList.remove("hidden");
 						await loadStudentResults(user);
+                        await loadRejectedAssignments(user);
 					}
 				} else {
 					loginSection.classList.remove("hidden");

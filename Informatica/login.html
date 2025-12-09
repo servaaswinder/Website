@@ -8,10 +8,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Inloggen - Informatica</title>
 		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-		<!-- Load Firebase SDKs from CDN -->
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
 
 	</head>
 	<style>
@@ -156,18 +153,7 @@
 
 		<script>
 			// Firebase configuratie
-			const firebaseConfig = {
-				apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-				authDomain: "leerling-accounts.firebaseapp.com",
-				projectId: "leerling-accounts",
-				storageBucket: "leerling-accounts.firebasestorage.app",
-				messagingSenderId: "884081904341",
-				appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-				measurementId: "G-9YY3856FBP",
-			};
-
-			// Initialiseer Firebase
-			firebase.initializeApp(firebaseConfig);
+			// Firebase Initialisatie (Gecentraliseerd in header)
 			const auth = firebase.auth();
 
 			// Haal redirect URL op

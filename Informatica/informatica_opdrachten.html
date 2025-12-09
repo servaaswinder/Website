@@ -11,10 +11,7 @@
 			type="text/javascript"
 			src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
 		></script>
-		<!-- Load Firebase SDKs from CDN -->
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
 		<style>
 			#mynetwork {
 				width: 100%;
@@ -405,59 +402,58 @@
 					}
 				});
 
-				// Firebase configuratie
-				const firebaseConfig = {
-					apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
-					authDomain: "leerling-accounts.firebaseapp.com",
-					projectId: "leerling-accounts",
-					storageBucket: "leerling-accounts.firebasestorage.app",
-					messagingSenderId: "884081904341",
-					appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
-					measurementId: "G-9YY3856FBP",
-				};
-
-				// Initialiseer Firebase
-				firebase.initializeApp(firebaseConfig);
+				// Firebase Initialisatie (Gecentraliseerd in header)
 				const auth = firebase.auth();
 				const db = firebase.firestore();
 
-				// Haal studentdata op en update de boom
+				// Haal studentdata op (Resultaten én Inzendingen) en update de boom
 				async function loadStudentProgress(user) {
 					try {
-						let doc = await db.collection("results").doc(user.uid).get();
-						if (!doc.exists) {
-							const querySnapshot = await db
-								.collection("results")
-								.where("email", "==", user.email)
-								.limit(1)
-								.get();
-							if (!querySnapshot.empty) {
-								doc = querySnapshot.docs[0];
-							}
-						}
+                        const resultsPromise = (async () => {
+                            let doc = await db.collection("results").doc(user.uid).get();
+                            if (!doc.exists) {
+                                const q = await db.collection("results").where("email", "==", user.email).limit(1).get();
+                                if (!q.empty) doc = q.docs[0];
+                            }
+                            return (doc && doc.exists) ? (doc.data().assignments || []) : [];
+                        })();
 
-						if (doc && doc.exists) {
-							const data = doc.data();
-							const assignments = Array.isArray(data.assignments)
-								? data.assignments
-								: []; 
-							updateTreeWithProgress(assignments);
-						}
+                        const submissionsPromise = db.collection("submissions")
+                            .where("userId", "==", user.uid)
+                            .get()
+                            .then(snapshot => snapshot.docs.map(doc => doc.data()));
+
+                        const [assignments, submissions] = await Promise.all([resultsPromise, submissionsPromise]);
+						updateTreeWithProgress(assignments, submissions);
+
 					} catch (error) {
 						console.error("Fout bij ophalen voortgang:", error);
 					}
 				}
 
-				function updateTreeWithProgress(assignments) {
-					const completedMap = new Map();
+				function updateTreeWithProgress(assignments, submissions) {
+					const completedMap = new Map(); // Real grades
+                    const submissionMap = new Map(); // Pending/Rejected states
+
 					assignments.forEach((a) => {
 						if (a.title) {
 							const cleanTitle = String(a.title).trim();
 							completedMap.set(cleanTitle, a);
 						}
 					});
+                    
+                    if (submissions) {
+                        submissions.forEach(s => {
+                           if (s.assignmentId) {
+                               // Keep latest status if multiple (though rules imply 1 active usually)
+                               // Logic: Rejected overwrites Pending. Graded overwrites everything (but handled by completedMap).
+                               // We just store the object.
+                               submissionMap.set(s.assignmentId, s);
+                           } 
+                        });
+                    }
 
-					// Force ModIntro to be completed for everyone, without grade
+					// Force ModIntro to be completed for everyone
 					completedMap.set("ModIntro", { title: "ModIntro", grade: null });
 
 					// Bouw een map van parent-relaties om dependencies te checken
@@ -476,6 +472,9 @@
 					nodes.get().forEach((node) => {
 						let status = "locked";
 						let grade = null;
+                        let badgeIcon = ""; // custom icon badge
+                        let borderColorOverride = null;
+                        let bgColorOverride = null;
 
 						if (completedMap.has(node.id)) {
 							status = "completed";
@@ -483,7 +482,26 @@
 							if (assignment && assignment.grade) {
 								grade = assignment.grade;
 							}
-						} else {
+						} else if (submissionMap.has(node.id)) {
+                            // No grade yet, but has submission
+                            const sub = submissionMap.get(node.id);
+                            if (sub.status === 'rejected') {
+                                status = 'rejected';
+                                borderColorOverride = "#dc3545"; // Red
+                                bgColorOverride = "#f8d7da";
+                                badgeIcon = "⚠️";
+                            } else if (sub.status === 'pending' || sub.status === 'checked') {
+                                status = 'pending';
+                                borderColorOverride = "#fd7e14"; // Orange
+                                bgColorOverride = "#fff3cd";
+                                badgeIcon = "🕒";
+                            } else {
+                                // Fallback logic (e.g. graded but not in CSV yet? unlikely with clean workflow)
+                                status = 'pending';
+                            }
+                        } 
+                        
+                        if (status === 'locked' || status === 'unlocked') {
 							// Check of alle parents voltooid zijn
 							const parents = parentsMap[node.id];
 							if (parents.length === 0) {
@@ -505,16 +523,17 @@
 							currentBaseLabel = node.label; 
 						}
 						
-						const badge = "\n" + config.label;
+						let badge = "\n" + config.label;
+                        if (status === 'rejected') badge = "\n❌ Afgekeurd";
+                        if (status === 'pending') badge = "\n🕒 Ingeleverd";
 						
 						updates.push({
 							id: node.id,
 							label: currentBaseLabel + badge,
-							shape: 'box', // Revert to box
-							image: undefined, // Clear image
+							shape: 'box',
 							color: {
-								background: config.background,
-								border: config.border,
+								background: bgColorOverride || config.background,
+								border: borderColorOverride || config.border,
 							},
 							status: status,
 							baseLabel: currentBaseLabel,
