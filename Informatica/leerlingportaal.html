@@ -41,7 +41,7 @@
 					</section>
 
 					<!-- Admin panel -->
-					<section id="admin-section" class="auth-card auth-card-full hidden">
+					<section id="admin-section" class="auth-card auth-card-full hidden" style="max-width: 1000px; margin: 0 auto;">
 						<div class="panel-heading">
 							<div>
 								<h2>Beheerderspaneel</h2>
@@ -270,7 +270,7 @@
 					</section>
 
 					<!-- Student panel -->
-					<section id="student-section" class="auth-card auth-card-full hidden">
+					<section id="student-section" class="auth-card auth-card-full hidden" style="max-width: 1000px; margin: 0 auto;">
 						<div class="panel-heading">
 							<h2>Mijn resultaten</h2>
 							<button
@@ -1722,41 +1722,81 @@
 
 			function createAssignmentSection(assignment) {
 				const section = document.createElement("article");
-				section.className = "assignment-card";
+				section.className = "assignment-card collapsible";
+				
+                // HEADER (Always visible)
 				const header = document.createElement("header");
 				header.className = "assignment-header";
+                header.style.cursor = "pointer"; // Indicate clickable
+                header.style.display = "flex";
+                header.style.justifyContent = "space-between";
+                header.style.alignItems = "center";
+                header.title = "Klik om details te tonen/verbergen";
+
+                const headerContent = document.createElement("div");
+                headerContent.style.display = "flex";
+                headerContent.style.alignItems = "baseline";
+                headerContent.style.gap = "15px";
+                headerContent.style.flexWrap = "wrap";
+
 				const title = document.createElement("h4");
 				title.textContent = assignment.title || "Opdracht";
-				header.appendChild(title);
-				const meta = document.createElement("div");
-				meta.className = "assignment-header-meta";
+                title.style.margin = "0";
+				headerContent.appendChild(title);
+				
 				const periodLabel = normalizePeriodValue(assignment.period);
 				if (periodLabel) {
 					const periodBadge = document.createElement("span");
 					periodBadge.className = "assignment-period";
 					periodBadge.textContent = periodLabel;
-					meta.appendChild(periodBadge);
+					headerContent.appendChild(periodBadge);
 				}
 				if (assignment.grade) {
 					const gradeBadge = document.createElement("span");
 					gradeBadge.className = "assignment-grade";
 					gradeBadge.textContent = `Cijfer: ${assignment.grade}`;
-					meta.appendChild(gradeBadge);
+					headerContent.appendChild(gradeBadge);
 				}
-				if (meta.childElementCount > 0) {
-					header.appendChild(meta);
-				}
+                
+                header.appendChild(headerContent);
+                
+                // Chevron icon
+                const chevron = document.createElement("span");
+                chevron.innerHTML = "▼"; 
+                chevron.style.fontSize = "0.8em";
+                chevron.style.transition = "transform 0.2s";
+                header.appendChild(chevron);
+
 				section.appendChild(header);
+
+                // DETAILS (Hidden by default)
+                const detailsDiv = document.createElement("div");
+                detailsDiv.className = "assignment-details";
+                detailsDiv.style.display = "none";
+                detailsDiv.style.paddingTop = "15px";
+                detailsDiv.style.marginTop = "10px";
+                // detailsDiv.style.borderTop = "1px solid #eee"; // Removed as per user request
+
 				if (assignment.comment) {
 					const comment = document.createElement("p");
 					comment.className = "assignment-comment";
 					comment.textContent = assignment.comment;
-					section.appendChild(comment);
+					detailsDiv.appendChild(comment);
 				}
 				const rubricList = createRubricList(assignment.rubric);
 				if (rubricList) {
-					section.appendChild(rubricList);
+					detailsDiv.appendChild(rubricList);
 				}
+                
+                section.appendChild(detailsDiv);
+
+                // Toggle Logic
+                header.addEventListener("click", () => {
+                    const isHidden = detailsDiv.style.display === "none";
+                    detailsDiv.style.display = isHidden ? "block" : "none";
+                    chevron.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+                });
+
 				return section;
 			}
 

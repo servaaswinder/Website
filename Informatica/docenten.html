@@ -14,9 +14,12 @@
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 		<!-- PapaParse for CSV -->
 		<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+        <!-- Custom Scripts -->
+        <script src="js/rubric-parser.js"></script>
+        <script src="js/grading-ui.js"></script>
 		<style>
 			.dashboard-container {
-				max-width: 1000px;
+				max-width: 1400px;
 				margin: 0 auto;
 				background: #fff;
 				padding: 40px;
@@ -193,6 +196,7 @@
                                         <th>Leerling</th>
                                         <th>Opdracht</th>
                                         <th>Link</th>
+                                        <th>Nagekeken door</th>
                                         <th>Opmerkingen</th>
                                         <th>Actie</th>
                                     </tr>
@@ -295,6 +299,28 @@
                 </div>
 
 			</div>
+            
+            <script>
+                // Init Grading UI after load
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (typeof GradingUI !== 'undefined') {
+                        GradingUI.init();
+                    }
+                });
+
+                function openGrading(data, id) {
+                    GradingUI.open(id, data);
+                }
+
+                function openGradingById(id) {
+                    const data = window.submissionMap[id];
+                    if (data) {
+                        GradingUI.open(id, data);
+                    } else {
+                        alert("Fout: Kan data niet vinden.");
+                    }
+                }
+            </script>
 		</main>
 
 		<footer>
@@ -376,7 +402,7 @@
 				try {
 					// Fetch simply by status to avoid complex index issues
 					const snapshot = await db.collection("submissions")
-						.where("status", "==", "pending")
+						.where("status", "in", ["pending", "grading"])
 						.get();
 						
 					loadingMessage.style.display = "none";
@@ -386,7 +412,11 @@
 					if (snapshot.empty) {
                         noSubmissionsMessage.style.display = "block";
 					} else {
-                        noSubmissionsMessage.style.display = "none"; // Hide explicit 'none'
+						noSubmissionsMessage.style.display = "none"; // Hide explicit 'none'
+						
+						// Clear existing content
+						submissionsContainer.querySelector('tbody').innerHTML = '';
+
 						// Client-side sort
 						const sortedDocs = snapshot.docs.sort((a, b) => {
 							const timeA = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
@@ -394,8 +424,12 @@
 							return timeB - timeA; // Descending (Newest first)
 						});
 
+						// Global map to store submission data
+                        window.submissionMap = {};
+
 						sortedDocs.forEach((doc) => {
 						const data = doc.data();
+                        window.submissionMap[doc.id] = data; // Store for access
 						const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") + " " + data.timestamp.toDate().toLocaleTimeString("nl-NL", {hour: '2-digit', minute:'2-digit'}) : "Onbekend";
 						
 						const row = document.createElement("tr");
@@ -412,6 +446,10 @@
                             </td>
 							<td>${data.assignmentId}</td>
 							<td><a href="${data.assignmentUrl}" target="_blank" style="color: #0044B3; text-decoration: underline;">Link</a></td>
+                            <td>
+                                <div style="font-size: 0.9em; color: #555;">${data.gradingBy ? data.gradingBy.split('@')[0] : '-'}</div>
+                                ${data.status === 'grading' ? '<span class="status-badge status-pending" style="font-size: 10px; padding: 2px 4px;">Bezig</span>' : ''}
+                            </td>
 							<td>
                                 ${studentComment}
                                 <textarea id="teacher-comment-${doc.id}" 
@@ -421,9 +459,17 @@
                                     <button onclick="saveComment('${doc.id}')" class="action-btn secondary" style="font-size: 11px; padding: 2px 6px;">Opslaan (Notitie)</button>
                                 </div>
                             </td>
-							<td>
+						    <td>
                                 <div style="display: flex; flex-direction: column; gap: 6px;">
-								    <button onclick="markAsChecked('${doc.id}')" class="action-btn" style="background-color: #28a745;">Afvinken</button>
+                                    ${data.status === 'grading' && data.gradingBy && data.gradingBy !== firebase.auth().currentUser.email ? 
+                                        `<button disabled class="action-btn secondary" style="background-color: #ffc107; color: #333; cursor: not-allowed;">
+                                            🔒 Bezig: ${data.gradingBy.split('@')[0]}
+                                        </button>` 
+                                    : 
+                                        `<button onclick="openGradingById('${doc.id}')" class="action-btn" style="background-color: ${data.status === 'grading' ? '#ffc107' : '#0044B3'}; color: ${data.status === 'grading' ? '#000' : '#fff'};">
+                                            ${data.status === 'grading' ? 'Hervat nakijken' : 'Nakijken'}
+                                        </button>`
+                                    }
                                     <button onclick="rejectSubmission('${doc.id}')" class="action-btn" style="background-color: #dc3545;">Afwijzen</button>
                                 </div>
 							</td>
@@ -472,6 +518,9 @@
 						
 						sortedDocs.forEach(doc => {
 							const data = doc.data();
+                            if (!window.submissionMap) window.submissionMap = {}; // Ensure initialization
+                            window.submissionMap[doc.id] = data; // Store for reopening
+                            
 							const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") : "Onbekend";
 							const statusColor = data.status === 'checked' ? '#28a745' : '#dc3545';
 							const statusLabel = data.status === 'checked' ? 'Afgevinkt' : 'Afgewezen';
@@ -491,7 +540,10 @@
 									<div style="font-style: italic; color: #555;">"${data.teacherComment || '-'}"</div>
 								</td>
 								<td>
-									<button onclick="deleteSubmission('${doc.id}')" class="action-btn secondary" style="background-color: #fff; color: #dc3545; border: 1px solid #dc3545;">🗑️</button>
+                                    <div style="display: flex; gap: 5px;">
+                                        <button onclick="openGradingById('${doc.id}')" class="action-btn" style="background-color: #0044B3; padding: 4px 8px; font-size: 0.85em;">Heropen</button>
+									    <button onclick="deleteSubmission('${doc.id}')" class="action-btn secondary" style="background-color: #fff; color: #dc3545; border: 1px solid #dc3545; padding: 4px 8px;">🗑️</button>
+                                    </div>
 								</td>
 							`;
 							historyBody.appendChild(row);

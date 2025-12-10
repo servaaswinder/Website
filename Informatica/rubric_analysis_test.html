@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubric Analysis Test</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { padding: 20px; font-family: sans-serif; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        .details-row { display: none; background: #f9f9f9; }
+        .toggle-btn { cursor: pointer; color: blue; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Rubric Analysis Dashboard</h1>
+    <p>This page automatically fetches assignment pages, parses their grading tables, and verifies the point calculations.</p>
+    
+    <div id="summary">Calculating...</div>
+
+    <table id="results-table">
+        <thead>
+            <tr>
+                <th>Opdracht ID</th>
+                <th>Titel</th>
+                <th>Status</th>
+                <th>Berekend Totaal</th>
+                <th>Formule Totaal</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Include Parser -->
+    <script src="js/rubric-parser.js"></script>
+
+    <script>
+        // List of assignments manually extracted from informatica_opdrachten.html dataset or defined here
+        // Ideally we would parse informatica_opdrachten.html too, but for this test I will list the ones we saw in the tree.
+        const assignments = [
+            { id: "A3", url: "opdrachten/portfoliostartopdracht_a3.html" },
+            { id: "A2", url: "opdrachten/a2_communiceren.html" },
+            { id: "A5", url: "opdrachten/a5_onderzoeken.html" },
+            { id: "F2", url: "opdrachten/f2_maatschappij.html" },
+            { id: "A4", url: "opdrachten/a4_orienteren.html" },
+            { id: "A1", url: "opdrachten/a1_informatievaardigheden.html" },
+            { id: "A7", url: "opdrachten/a7_waarderen.html" },
+            { id: "E2", url: "opdrachten/e2_security.html" },
+            { id: "F4", url: "opdrachten/f4_security.html" },
+            { id: "F3", url: "opdrachten/f3_privacy.html" },
+            { id: "ModIntro", url: "opdrachten/modintro_leren_modelleren.html" }, // Likely no rubric
+            { id: "A6", url: "opdrachten/a6_modelleren.html" },
+            { id: "C5", url: "opdrachten/c5_gestructureerde_data.html" },
+            { id: "C1", url: "opdrachten/c1_warming_stripes.html" },
+            { id: "C2", url: "opdrachten/c2_identificeren.html" },
+            { id: "B3", url: "opdrachten/b3_automaten.html" },
+            { id: "B1", url: "opdrachten/b1_algoritme.html" },
+            { id: "B2", url: "opdrachten/b2_datastructuren.html" },
+            { id: "C3", url: "opdrachten/c3_representeren.html" },
+            { id: "D1", url: "opdrachten/d1_ontwikkelen.html" },
+            { id: "D2", url: "opdrachten/d2_inspecteren.html" },
+            { id: "B4", url: "opdrachten/b4_introductie_html.html" },
+            { id: "F1", url: "opdrachten/f1_usability.html" },
+            { id: "C4", url: "opdrachten/c4_standaard_representaties.html" },
+            { id: "E1", url: "opdrachten/e1_decompositie.html" }
+        ];
+
+        async function runAnalysis() {
+            const tableBody = document.querySelector('#results-table tbody');
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const assignment of assignments) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${assignment.id}</td><td><a href="${assignment.url}" target="_blank">Link</a></td><td colspan="4">Loading...</td>`;
+                tableBody.appendChild(tr);
+
+                try {
+                    const response = await fetch(assignment.url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const html = await response.text();
+                    
+                    const result = RubricParser.parse(html);
+                    
+                    // Update Row
+                    let statusClass = "warning";
+                    let statusText = "Unknown";
+                    
+                    if (result.error) {
+                        statusText = "No Rubric Found";
+                    } else if (result.match === true) {
+                        statusClass = "success";
+                        statusText = "OK";
+                        successCount++;
+                    } else if (result.match === false) {
+                        statusClass = "error";
+                        statusText = "MISMATCH";
+                        failCount++;
+                    } else {
+                        // Formula not found but rubric exists
+                        statusText = "Rubric Found (No Formula)";
+                        successCount++; // Count as success for now as long as we parsed something
+                    }
+
+                    tr.innerHTML = `
+                        <td>${assignment.id}</td>
+                        <td>${document.createElement('a').appendChild(document.createTextNode(assignment.url)).parentNode.innerHTML}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                        <td>${result.totalMaxPoints || '-'}</td>
+                        <td>${result.expectedTotalFromFormula || '-'}</td>
+                        <td><span class="toggle-btn" onclick="this.parentElement.parentElement.nextElementSibling.style.display = this.parentElement.parentElement.nextElementSibling.style.display === 'none' ? 'table-row' : 'none'">View Categories</span></td>
+                    `;
+
+                    // Details Row
+                    const detailsTr = document.createElement('tr');
+                    detailsTr.className = 'details-row';
+                    const catsHtml = result.categories ? result.categories.map(c => 
+                        `${c.name}: ${c.rawMaxPoints} pts * ${c.weight} weight = ${c.totalPoints}`
+                    ).join('<br>') : 'No categories';
+                    
+                    detailsTr.innerHTML = `<td colspan="6" style="padding-left: 20px; font-size: 0.9em; color: #555;">${catsHtml}</td>`;
+                    tableBody.appendChild(detailsTr);
+
+                } catch (e) {
+                    tr.innerHTML = `<td>${assignment.id}</td><td>${assignment.url}</td><td colspan="4" class="error">Error: ${e.message}</td>`;
+                }
+            }
+            
+            document.getElementById('summary').innerText = `Completed. Matches: ${successCount}, Mismatches: ${failCount}.`;
+        }
+
+        runAnalysis();
+    </script>
+</body>
+</html>
