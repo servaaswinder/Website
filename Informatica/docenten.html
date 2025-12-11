@@ -17,6 +17,7 @@
         <!-- Custom Scripts -->
         <script src="js/rubric-parser.js"></script>
         <script src="js/grading-ui.js"></script>
+    <script src="js/backup-manager.js"></script>
 		<style>
 			.dashboard-container {
 				max-width: 1400px;
@@ -298,7 +299,36 @@
                     </div>
                 </div>
 
+                <!-- Student Detail Modal -->
+                <div id="student-detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+                    <div style="background: white; width: 90%; max-width: 800px; margin: 50px auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                        <div style="padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 id="modal-student-name" style="margin: 0;">Student Details</h3>
+                            <button onclick="closeStudentDetails()" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">&times;</button>
+                        </div>
+                        <div style="padding: 20px;" id="modal-student-content">
+                            <!-- Content -->
+                        </div>
+                    </div>
+                </div>
+
+        <div style="margin-top:20px; text-align:right;">
+             <span id="backup-status" style="margin-right:15px; font-style:italic; color:#666;"></span>
+             <button class="action-btn" onclick="BackupManager.exportData()" style="background:#28a745;">Backup Downloaden</button>
+             <button class="action-btn" onclick="BackupManager.triggerImport()" style="background:#dc3545;">Backup Terugzetten</button>
+             <input type="file" id="backup-file-input" style="display:none;" accept=".csv" onchange="BackupManager.importData(event)">
+        </div>
 			</div>
+            
+            <style>
+                .clickable-row {
+                    cursor: pointer;
+                    transition: background-color 0.1s;
+                }
+                .clickable-row:hover {
+                    background-color: #f0f4ff !important; /* Light blue hover */
+                }
+            </style>
             
             <script>
                 // Init Grading UI after load
@@ -561,6 +591,543 @@
 				}
 			}
 
+            // ------------------------
+
+            // ------------------------
+
+            // --- Block 3: All Results ---
+            // Global state for refresh
+            window.activeStudentId = null;
+
+            window.refreshDashboard = async function() {
+                console.log("Refreshing dashboard data...");
+                await loadAllStudents(); // Re-fetch all data
+                
+                // If detail modal is open, refresh it
+                const modal = document.getElementById('student-modal');
+                if (modal.style.display === 'block' && window.activeStudentId) {
+                    console.log("Refreshing open student modal for:", window.activeStudentId);
+                    window.openStudentDetails(window.activeStudentId);
+                }
+            };
+
+            window.loadAllStudents = async function() {
+                const container = document.getElementById('all-students-container');
+                container.innerHTML = 'Laden...';
+                container.style.display = 'block';
+
+                try {
+                    const snapshot = await db.collection("results").get();
+                    if (snapshot.empty) {
+                        container.innerHTML = "Geen resultaten gevonden.";
+                        return;
+                    }
+                    
+                    // Fetch and store students
+                    const students = [];
+                    snapshot.forEach(doc => {
+                        students.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Sort
+                    students.sort((a, b) => {
+                        const classValA = a.class || a.klas || a.groep || a.className || "";
+                        const classValB = b.class || b.klas || b.groep || b.className || "";
+                        
+                        const classA = getClassSortInfo(classValA);
+                        const classB = getClassSortInfo(classValB);
+                        
+                        if (classA.order !== classB.order) return classA.order - classB.order;
+                        const classStrComp = (classValA || "").localeCompare(classValB || "", "nl", { sensitivity: "base" });
+                        if (classStrComp !== 0) return classStrComp;
+                        
+                        const lastA = getSortableLastName(a);
+                        const lastB = getSortableLastName(b);
+                        const lastCompare = lastA.localeCompare(lastB, "nl", { sensitivity: "base" });
+                        if (lastCompare !== 0) return lastCompare;
+                        
+                        return (a.name || "").localeCompare(b.name || "");
+                    });
+                    
+                    // Store globally
+                    window.allStudentsList = students;
+                    window.allStudentsMap = {};
+                    students.forEach(s => window.allStudentsMap[s.id] = s);
+                    
+                    // Initial Render
+                    renderStudentsTable();
+
+                } catch (error) {
+                    console.error("Error loading students:", error);
+                    container.innerHTML = "Fout bij laden leerlingen.";
+                }
+            };
+            
+            // --- Missing Grade Rules ---
+            function getMinRequired(period, className) {
+                const cls = normalizeClassCode(className);
+                const isHavo5 = cls.includes("5havo") || cls.includes("havo5");
+                const isVwo5 = cls.includes("5vwo") || cls.includes("vwo5");
+                const isHavo4 = cls.includes("4havo") || cls.includes("havo4");
+                const isVwo4 = cls.includes("4vwo") || cls.includes("vwo4"); // Assume matches logic
+                
+                if (period === "P1") return 4;
+                if (period === "P2") return 6;
+                if (period === "P3") {
+                    if (isHavo4 || isVwo4) return 6;
+                    if (isHavo5 || isVwo5) return 1;
+                    return 6; // Default safe fallback
+                }
+                if (period === "P4") {
+                    if (isHavo5) return 0;
+                    return 1;
+                }
+                return 0;
+            }
+
+            window.renderStudentsTable = function() {
+                const container = document.getElementById('all-students-container');
+                const students = window.allStudentsList || [];
+                
+                // Get Toggle States
+                const enforceP1 = document.getElementById('rule-p1')?.checked || false;
+                const enforceP2 = document.getElementById('rule-p2')?.checked || false;
+                const enforceP3 = document.getElementById('rule-p3')?.checked || false;
+                const enforceP4 = document.getElementById('rule-p4')?.checked || false;
+                
+                // Control Bar HTML
+                let controlHtml = `
+                    <div style="margin-bottom: 15px; padding: 10px; background: #f0f4f8; border-radius: 4px; border: 1px solid #dae1e7; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-weight: 600; color: #444;">Vul 1.0 aan:</span>
+                        <label style="cursor: pointer;"><input type="checkbox" id="rule-p1" onchange="renderStudentsTable()" ${enforceP1?'checked':''}> P1 (min 4)</label>
+                        <label style="cursor: pointer;"><input type="checkbox" id="rule-p2" onchange="renderStudentsTable()" ${enforceP2?'checked':''}> P2 (min 6)</label>
+                        <label style="cursor: pointer;"><input type="checkbox" id="rule-p3" onchange="renderStudentsTable()" ${enforceP3?'checked':''}> P3 (Regels)</label>
+                        <label style="cursor: pointer;"><input type="checkbox" id="rule-p4" onchange="renderStudentsTable()" ${enforceP4?'checked':''}> P4 (Regels)</label>
+                    </div>
+                `;
+
+                if (students.length === 0) {
+                     container.innerHTML = "Geen leerlingen.";
+                     return;
+                }
+                
+                // Table Header
+                let tableHtml = `
+                    <table class="submissions-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Klas</th>
+                                <th>Leerling</th>
+                                <th style="width: 100px;">P1</th>
+                                <th style="width: 100px;">P2</th>
+                                <th style="width: 100px;">P3</th>
+                                <th style="width: 100px;">P4</th>
+                                <th style="width: 80px; text-align: center; border-left: 2px solid #ddd;">G</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-students-body">
+                `;
+                
+                students.forEach(student => {
+                    const studentClass = student.class || student.klas || student.groep || "";
+                    
+                    // Calculate Stats
+                    let overallSum = 0;
+                    let overallCount = 0;
+                    let periodCells = "";
+                    
+                    ["P1", "P2", "P3", "P4"].forEach(p => {
+                        // Gather actual grades
+                        let actualSum = 0;
+                        let actualCount = 0;
+                        if (student.assignments && Array.isArray(student.assignments)) {
+                            student.assignments.forEach(a => {
+                                if (normalizePeriodValue(a.period) === p) {
+                                    const g = parseFloat(String(a.grade || "").replace(',', '.'));
+                                    if (!isNaN(g)) {
+                                        actualSum += g;
+                                        actualCount++;
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // Check logic
+                        let effectiveSum = actualSum;
+                        let effectiveCount = actualCount;
+                        let isAdjusted = false;
+                        
+                        let enforce = false;
+                        if (p === "P1") enforce = enforceP1;
+                        if (p === "P2") enforce = enforceP2;
+                        if (p === "P3") enforce = enforceP3;
+                        if (p === "P4") enforce = enforceP4;
+                        
+                        if (enforce) {
+                            const min = getMinRequired(p, studentClass);
+                            if (actualCount < min) {
+                                const missing = min - actualCount;
+                                effectiveSum += (missing * 1.0);
+                                effectiveCount += missing;
+                                isAdjusted = true;
+                            }
+                        }
+                        
+                        // Display
+                        const avg = effectiveCount > 0 ? (effectiveSum / effectiveCount).toFixed(1) : "-";
+                        const countDisplay = effectiveCount > 0 ? ` <span style="color:#888; font-size:0.85em;">(${effectiveCount})</span>` : "";
+                        const cellStyle = effectiveCount > 0 ? "font-weight: 500;" : "color: #ccc;";
+                        const cellBg = isAdjusted ? "background-color: #fff4e6;" : ""; // Subtle orange tint if adjusted
+                        
+                        periodCells += `<td style="${cellStyle} ${cellBg}" title="${isAdjusted ? 'Aangevuld met 1.0' : ''}">${avg}${countDisplay}</td>`;
+                        
+                        overallSum += effectiveSum;
+                        overallCount += effectiveCount;
+                    });
+                    
+                    const finalAvg = overallCount > 0 ? (overallSum / overallCount).toFixed(1) : "-";
+                    
+                    tableHtml += `
+                        <tr class="clickable-row" onclick="openStudentDetails('${student.id}')">
+                            <td>${studentClass || '-'}</td>
+                            <td>
+                                <div style="font-weight: 500;">${student.name || 'Naamloos'}</div>
+                                <div style="font-size: 0.8em; color: #888;">${student.email || ''}</div>
+                            </td>
+                            ${periodCells}
+                            <td style="font-weight: bold; text-align: center; border-left: 2px solid #ddd; background-color: #f8f9fa;">${finalAvg}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += `</tbody></table>`;
+                
+                container.innerHTML = controlHtml + tableHtml;
+            };
+            
+            // --- Modal Logic ---
+            window.openStudentDetails = function(studentId) {
+                window.activeStudentId = studentId; // Track active student
+                const student = window.allStudentsMap[studentId];
+                if (!student) return;
+                
+                document.getElementById('modal-student-name').textContent = `${student.name || 'Naamloos'} (${student.class || student.klas || '?'})`;
+                const content = document.getElementById('modal-student-content');
+                
+                // Group by Period
+                const assignments = student.assignments || [];
+                // Sorting helper
+                const sortedAssignments = [...assignments].sort((a,b) => (a.period || "").localeCompare(b.period || "") || (a.assignmentId || "").localeCompare(b.assignmentId || ""));
+                
+                const groups = { "P1": [], "P2": [], "P3": [], "P4": [], "Overig": [] };
+                
+                // We need to pass the ORIGINAL index to findAndOpenSubmission, OR use the sorted object to find it?
+                // Actually findAndOpenSubmission relies on index. 
+                // Better strategy: Pass the ID and let findAndOpenSubmission find it in the student object? 
+                // Or map it.
+                // Re-reading findAndOpenSubmission: it uses `student.assignments[assignmentIdx]`. 
+                // So I MUST use the index from the student.assignments array.
+                // Let's create a map of "assignment object -> original index".
+                
+                const originalIndices = new Map();
+                assignments.forEach((a, i) => originalIndices.set(a, i));
+
+                sortedAssignments.forEach(a => {
+                    const p = normalizePeriodValue(a.period) || "Overig";
+                    if (groups[p]) groups[p].push(a);
+                    else groups["Overig"].push(a);
+                });
+
+                // Calculate Totals
+                let totalSum = 0;
+                let totalCount = 0;
+
+                // Build HTML
+                let html = `<p style="margin-bottom:15px; color:#555;">${student.email || ''} - Laatste update: ${student.lastSyncedAt ? new Date(student.lastSyncedAt.toDate()).toLocaleDateString() : '-'}</p>`;
+                html += `<div style="font-size: 0.9em; margin-bottom: 10px; font-style: italic; color: #666;">Klik op een opdracht om het cijfer aan te passen.</div>`;
+                html += `<table class="submissions-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Opdracht</th>
+                                <th>Periode</th>
+                                <th>Cijfer</th>
+                                <th>Opmerking</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                const periods = ["P1", "P2", "P3", "P4", "Overig"];
+                let hasData = false;
+
+                periods.forEach(p => {
+                    const group = groups[p];
+                    if (group.length > 0) {
+                        hasData = true;
+                        
+                        let periodSum = 0;
+                        let periodCount = 0;
+                        
+                        group.forEach(a => {
+                            const idDisplay = a.assignmentId || a.id || a.title || 'Onbekend';
+                            const gStr = String(a.grade || "").replace(',', '.');
+                            const g = parseFloat(gStr);
+                            let gradeDisplay = a.grade || '-';
+                            
+                            if (!isNaN(g)) {
+                                periodSum += g;
+                                periodCount++;
+                                totalSum += g;
+                                totalCount++;
+                            }
+
+                            const originalIndex = originalIndices.get(a);
+
+                            html += `
+                                <tr class="clickable-row" onclick="findAndOpenSubmission('${studentId}', ${originalIndex})" title="Klik om te bewerken">
+                                    <td>${idDisplay}</td>
+                                    <td>${p}</td>
+                                    <td style="font-weight:600;">${gradeDisplay}</td>
+                                    <td style="font-style:italic; color:#666;">${a.comment || '-'}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        // Period Average Row... (existing logic)
+                        if (periodCount > 0) {
+                             const avg = (periodSum / periodCount).toFixed(1);
+                            html += `
+                                <tr style="background-color: #e9ecef; font-weight: bold;">
+                                    <td colspan="2" style="text-align: right;">Gemiddelde ${p}:</td>
+                                    <td>${avg}</td>
+                                    <td></td>
+                                </tr>
+                            `;
+                        }
+                    }
+                });
+                
+                if (!hasData) {
+                     html += `<tr><td colspan="4" style="text-align:center; padding:20px;">Geen resultaten.</td></tr>`;
+                } else if (totalCount > 0) {
+                    // Overall Average
+                    const overallAvg = (totalSum / totalCount).toFixed(1);
+                    html += `
+                        <tr style="background-color: #333; color: #fff; font-weight: bold;">
+                            <td colspan="2" style="text-align: right;">Eindgemiddelde:</td>
+                            <td>${overallAvg}</td>
+                            <td></td>
+                        </tr>
+                    `;
+                }
+                
+                html += `</tbody></table>`;
+
+                // --- Manual Assessment UI ---
+                html += `
+                    <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                        <h4 style="margin-top:0; color:#0044B3;">Nieuwe Beoordeling Toevoegen</h4>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <select id="manual-assignment-select" style="padding:8px; border-radius:4px; border:1px solid #ccc; min-width: 200px;">
+                                <option value="">Kies opdracht...</option>
+                            </select>
+                            <button onclick="startNewAssessment('${studentId}')" class="action-btn" style="padding: 8px 15px; font-size: 0.9em;">Start</button>
+                        </div>
+                        <div style="font-size:0.85em; color:#666; margin-top:5px;">
+                            Let op: Controleert automatisch op dubbele inzendingen.
+                        </div>
+                    </div>
+                `;
+
+                content.innerHTML = html;
+
+                // Populate Dropdown from GradingUI.ASSIGNMENT_MAP
+                const select = document.getElementById('manual-assignment-select');
+                if (window.GradingUI && window.GradingUI.ASSIGNMENT_MAP) {
+                    const sortedKeys = Object.keys(window.GradingUI.ASSIGNMENT_MAP).sort((a,b) => {
+                        // Custom sort: Letter then Number
+                        const aMatch = a.match(/([A-Z]+)(\d+)/);
+                        const bMatch = b.match(/([A-Z]+)(\d+)/);
+                        if (aMatch && bMatch) {
+                            if (aMatch[1] !== bMatch[1]) return aMatch[1].localeCompare(bMatch[1]);
+                            return parseInt(aMatch[2]) - parseInt(bMatch[2]);
+                        }
+                        return a.localeCompare(b);
+                    });
+                    
+                    sortedKeys.forEach(key => {
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.textContent = `${key} - Opdracht`; // Ideally fetch title if available, but ID is commonly used.
+                        select.appendChild(opt);
+                    });
+                }
+                
+                document.getElementById('student-detail-modal').style.display = 'block';
+            };
+            
+            // --- Manual Assessment Logic ---
+            window.startNewAssessment = async function(studentId) {
+                const assignmentId = document.getElementById('manual-assignment-select').value;
+                if (!assignmentId) {
+                    alert("Selecteer eerst een opdracht.");
+                    return;
+                }
+
+                const student = window.allStudentsMap[studentId];
+                if (!student) return alert("Leerling niet gevonden.");
+
+                console.log(`Starting assessment for ${student.email} - ${assignmentId}`);
+
+                // 1. Check for Duplicate Submission
+                try {
+                    const submissionsRef = firebase.firestore().collection("submissions");
+                    // Check active submissions for this user & assignment
+                    // Need to check both 'userId' (cleanest) and maybe 'userEmail' if legacy data is messy?
+                    // Submissions should always have userId if created properly.
+                    // But legacy migration creates them with userId = studentId (which might be email or uid).
+                    // Wait, student.id from 'results' collection is confusing. 
+                    // 'results' ID is often auto-generated OR email.
+                    // Submissions use 'userId' = AUTH uid usually.
+                    
+                    // ISSUE: If the student never logged in, they don't have a UID. Use Email instead?
+                    // Our system seems to rely on Email for linking results.
+                    // Detailed check: findAndOpenSubmission uses student.email.
+                    
+                    // Let's query by userEmail to be safe, as that's consistent.
+                    const q_email = submissionsRef.where("userEmail", "==", student.email)
+                                                  .where("assignmentId", "==", assignmentId)
+                                                  .limit(1);
+                    
+                    const snapshot = await q_email.get();
+                    
+                    if (!snapshot.empty) {
+                        const existingDoc = snapshot.docs[0];
+                        const data = existingDoc.data();
+                        
+                        alert(`Er bestaat al een inzending voor ${assignmentId} (${data.status}). Deze wordt nu geopend.`);
+                        
+                        // Open existing
+                        GradingUI.open(existingDoc.id, data);
+                        return;
+                    }
+
+                    // 2. Create NEW Submission (Synthetic)
+                    // We create a strict minimal submission document
+                    const user = firebase.auth().currentUser;
+                    const teacherEmail = user ? user.email : 'docent@northgo.nl';
+                    
+                    // Period determination? Try to guess from class year/level? Hard. Leaves empty.
+                    
+                    const newSubmission = {
+                        assignmentId: assignmentId,
+                        assignmentUrl: GradingUI.ASSIGNMENT_MAP[assignmentId], // URL from Map
+                        status: "pending", // Start as pending
+                        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        userEmail: student.email,
+                        userName: student.name,
+                        userClass: student.class || student.klas || "",
+                        // userId: ??? If we don't have UID, we omit or try to find it? 
+                        // Migration logic used existing or created new.
+                        // We will omit userId if we don't know it, rely on email. 
+                        // BUT: security rules require userId == auth.uid OR isAdmin.
+                        // We are admin, so we can set anything. 
+                        // Set userId to email if unknown to keep it traceable? Or leave blank?
+                        userId: student.id, // Best guess
+                        isManualAssessment: true
+                    };
+
+                    const docRef = await submissionsRef.add(newSubmission);
+                    
+                    // Refetch to get clean timestamps
+                    const docSnap = await docRef.get();
+                    
+                    // Open Grading UI
+                    GradingUI.open(docRef.id, docSnap.data());
+
+                } catch (e) {
+                    console.error(e);
+                    alert("Fout bij aanmaken beoordeling: " + e.message);
+                }
+            };    
+            
+            window.findAndOpenSubmission = async function(studentId, assignmentIdx) {
+                 const student = window.allStudentsMap[studentId];
+                 if (!student || !student.assignments || !student.assignments[assignmentIdx]) {
+                     alert("Geen opdrachtdata gevonden.");
+                     return;
+                 }
+                 
+                 const assignment = student.assignments[assignmentIdx];
+                 const assignmentId = assignment.assignmentId || assignment.id || assignment.title; // Best effort ID
+                 
+                 // Show loading
+                 document.body.style.cursor = 'wait';
+                 
+                 try {
+                     // 1. Try to find existing submission
+                     // Check by email + assignmentId
+                     const subRef = firebase.firestore().collection("submissions");
+                     let query = subRef.where("userEmail", "==", student.email).where("assignmentId", "==", assignmentId).limit(1);
+                     
+                     // Try finding case-insensitive match (harder in Firestore without normalized field)
+                     // Assuming email is normalized to lower case in DB largely?
+                     // Let's try exact first.
+                     
+                     let snapshot = await query.get();
+                     
+                     if (snapshot.empty) {
+                         // Fallback: Try with capitalized/lowercase ID variations if needed?
+                         // Or create NEW LEGACY MIGRATION
+                         console.log("No existing submission found. Creating legacy migration for:", assignmentId);
+                         
+                         const newDoc = {
+                             assignmentId: assignmentId,
+                             userEmail: student.email,
+                             userName: student.name,
+                             userClass: student.class || student.klas || "Onbekend",
+                             status: "imported",
+                             period: assignment.period,
+                             teacherComment: assignment.comment || "",
+                             grade: assignment.grade || "", // Store original CSV grade for reference
+                             csvRubric: assignment.rubric || [], // Pass the CSV rubric data!
+                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                             migratedAt: firebase.firestore.FieldValue.serverTimestamp()
+                         };
+                         
+                         const docRef = await subRef.add(newDoc);
+                         
+                         // Open Grading UI with this new doc
+                         // Close detail modal first
+                         window.closeStudentDetails();
+                         GradingUI.open(docRef.id, { ...newDoc, assignmentUrl: "#" }); // URL mock
+                         
+                     } else {
+                         // Found existing
+                         const doc = snapshot.docs[0];
+                         window.closeStudentDetails();
+                         GradingUI.open(doc.id, doc.data());
+                     }
+                     
+                 } catch (e) {
+                     console.error(e);
+                     alert("Fout bij openen opdracht: " + e.message);
+                 } finally {
+                     document.body.style.cursor = 'default';
+                 }
+            };
+            
+            window.closeStudentDetails = function() {
+                document.getElementById('student-detail-modal').style.display = 'none';
+            };
+            
+            // Close on outside click
+            window.onclick = function(event) {
+                const modal = document.getElementById('student-detail-modal');
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            };
+
             // --- Actions ---
 			window.deleteSubmission = async function(docId) {
 				if (!confirm("Weet je zeker dat je deze historie wilt verwijderen? Dit kan niet ongedaan worden gemaakt.")) return;
@@ -587,6 +1154,70 @@
                 return textarea ? textarea.value.trim() : '';
             }
 
+            // --- Sorting Helpers ---
+            const CLASS_PRIORITY = [
+                // 4 Havo / Havo 4
+                { key: "4havo", order: 0 },
+                { key: "havo4", order: 0 },
+                
+                // 4 Vwo / Vwo 4
+                { key: "4vwo", order: 1 },
+                { key: "vwo4", order: 1 },
+                
+                // 5 Havo / Havo 5
+                { key: "5havo", order: 2 },
+                { key: "havo5", order: 2 },
+                
+                // 5 Vwo / Vwo 5
+                { key: "5vwo", order: 3 },
+                { key: "vwo5", order: 3 },
+            ];
+
+            function normalizeClassCode(value) {
+                return (value || "").toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
+            }
+
+            function getClassSortInfo(className) {
+                const normalized = normalizeClassCode(className);
+                // Default higher order for unknowns
+                if (!normalized) return { order: 999, normalized: "" };
+                
+                for (const entry of CLASS_PRIORITY) {
+                    if (normalized.includes(entry.key) || entry.key.includes(normalized)) {
+                        return { order: entry.order, normalized };
+                    }
+                }
+                // If not in priority list, give it a high order but allow string sort later
+                return { order: 100, normalized };
+            }
+
+            function getSortableLastName(student) {
+                const name = student.name || student.email || "";
+                if (!name) return "";
+                
+                // Check if name is in "Last, First" format
+                if (name.includes(",")) {
+                    return name.split(",")[0].trim().toLowerCase();
+                }
+                
+                // Assume "First Last" format
+                const parts = name.trim().split(/\s+/);
+                if (parts.length > 0) {
+                     // Check for common prefix issues? For now take last word.
+                     // But if there are tussenvoegsels, we might want to strip them if they are separate?
+                     // E.g. "van de Berg" -> "Berg". This is handled by taking the last part.
+                     return parts[parts.length - 1].toLowerCase();
+                }
+                return name.toLowerCase();
+            }
+
+            function normalizePeriodValue(value) {
+				if (!value) return "";
+				const upper = String(value).trim().toUpperCase();
+				return ["P1","P2","P3","P4"].includes(upper) ? upper : "";
+			}
+            // ------------------------
+
 			window.markAsChecked = async function(docId) {
                 const comment = await getTeacherComment(docId);
 				try {
@@ -598,7 +1229,28 @@
                         teacherComment: comment
 					});
 
-					removeRow(docId);
+					// Update local map
+					if (window.submissionMap && window.submissionMap[docId]) {
+						window.submissionMap[docId].status = "checked";
+						window.submissionMap[docId].checkedBy = user.email;
+                        window.submissionMap[docId].teacherComment = comment;
+					}
+
+					// Update UI row
+					// We refresh to be sure or just update row style
+					const row = document.getElementById(`row-${docId}`);
+					if (row) row.remove();
+					
+					// Also update history if visible? 
+					// Ideally we reload history 
+					// loadHistory(); 
+                    
+                    // Since we removed the row, check if empty
+                    const pendingRows = document.getElementById("submissions-body").children;
+                    if (pendingRows.length === 0) {
+                        document.getElementById("no-submissions").style.display = "block";
+                    }
+
 				} catch (error) {
 					handleError(error);
 				}

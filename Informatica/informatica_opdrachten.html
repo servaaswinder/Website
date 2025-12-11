@@ -433,7 +433,12 @@
 				async function loadStudentProgress(user) {
 					try {
                         const resultsPromise = (async () => {
-                            let doc = await db.collection("results").doc(user.uid).get();
+                            // Try direct ID, but catch permission errors
+                            let doc = await db.collection("results").doc(user.uid).get().catch(e => {
+                                console.warn("Tree: Direct ID lookup blocked/failed:", e.message);
+                                return { exists: false };
+                            });
+                            
                             if (!doc.exists) {
                                 const q = await db.collection("results").where("email", "==", user.email).limit(1).get();
                                 if (!q.empty) doc = q.docs[0];

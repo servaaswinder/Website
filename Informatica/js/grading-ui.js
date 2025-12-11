@@ -20,6 +20,7 @@ const GradingUI = {
         document.getElementById('close-grading-modal').addEventListener('click', () => this.closeModal());
         document.getElementById('save-draft-btn').addEventListener('click', () => this.saveDraft());
         document.getElementById('finalize-grade-btn').addEventListener('click', () => this.finalizeGrade());
+        document.getElementById('delete-grading-btn').addEventListener('click', () => this.deleteGrading()); // New Binding
         document.getElementById('grading-comment').addEventListener('input', (e) => {
             this.teacherComment = e.target.value;
             this.isDirty = true;
@@ -62,14 +63,16 @@ const GradingUI = {
                     </div>
 
                     <div style="padding: 15px 20px; border-top: 1px solid #eee; background: #f8f9fa; border-radius: 0 0 8px 8px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
-                        <span id="grading-status-msg" style="margin-right: auto; font-style: italic; color: #666;"></span>
+                        <button id="delete-grading-btn" style="background: none; border: 1px solid #dc3545; color: #dc3545; padding: 10px 15px; border-radius: 4px; font-size:0.9em; margin-right: auto; cursor:pointer;" title="Inzending resetten en cijfer wissen">Wis Resultaat</button>
+                        <span id="grading-status-msg" style="font-style: italic; color: #666;"></span>
                         
                         <!-- Period Selector -->
                         <div style="display: flex; align-items: center; gap: 5px; margin-right: 10px;">
                             <label for="grading-period" style="font-size: 0.9em; font-weight: 600; color: #555;">Periode:</label>
                             <select id="grading-period" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: white;">
+                                <option value="" disabled selected>Kies...</option>
                                 <option value="P1">P1</option>
-                                <option value="P2" selected>P2</option>
+                                <option value="P2">P2</option>
                                 <option value="P3">P3</option>
                                 <option value="P4">P4</option>
                             </select>
@@ -247,19 +250,29 @@ const GradingUI = {
             console.log(`[GradingUI] Trying to fetch: ${url}`);
             const response = await fetch(url);
             if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-            return response.text();
+            return await response.text();
         };
 
         try {
-            const assignmentId = submissionData.assignmentId;
-            const relativePath = this.ASSIGNMENT_MAP[assignmentId];
+            // 1. Try relative path
+            let html = "";
+            let finalUrl = "";
+            const variants = [
+                this.ASSIGNMENT_MAP[submissionData.assignmentId], // Preferred
+                `opdrachten/${submissionData.assignmentId}.html`, // Fallback 1
+                `${submissionData.assignmentId}.html`             // Fallback 2
+            ];
 
-            if (!relativePath) {
-                throw new Error(`Geen bestand gekoppeld aan opdracht ID: ${assignmentId}`);
+            for (const path of variants) {
+                if (!path) continue;
+                try {
+                    html = await tryFetch(path);
+                    finalUrl = path;
+                    break;
+                } catch (e) { console.warn("Fetch failed:", path); }
             }
 
-            // Fetch logic
-            let html = await tryFetch(relativePath);
+            if (!html) throw new Error("Kan opdrachtbestand niet laden locaal.");
 
             // Use RubricParser (must be available globally)
             if (typeof RubricParser === 'undefined') {
@@ -280,14 +293,28 @@ const GradingUI = {
                  if (periodSelect) periodSelect.value = submissionData.period;
             }
 
-            // Restore draft state if exists
-            if (submissionData.gradingDraft) {
-                this.selectedCells = submissionData.gradingDraft.selectedCells || {};
-                this.teacherComment = submissionData.gradingDraft.comment || this.teacherComment;
-                document.getElementById('grading-comment').value = this.teacherComment;
-                this.updateUISelection();
-                this.updateCalculation();
+            // Restore Selection and State
+            if (this.currentSubmissionData.gradingDraft && this.currentSubmissionData.gradingDraft.selectedCells) {
+                 this.selectedCells = this.currentSubmissionData.gradingDraft.selectedCells;
+                 this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
+                 this.updateUISelection();
+                 this.updateCalculation(); 
+            } else if (this.currentSubmissionData.finalRubric) {
+                 this.selectedCells = this.currentSubmissionData.finalRubric;
+                 if (this.currentSubmissionData.teacherComment) {
+                     this.teacherComment = this.currentSubmissionData.teacherComment;
+                 }
+                 this.updateUISelection();
+                 this.updateCalculation();
+            } else if (this.currentSubmissionData.csvRubric) {
+                 // Smart Restore from CSV (New Feature)
+                 this.applyCsvRubric(this.currentSubmissionData.csvRubric);
             }
+            
+            // Apply Comment to UI
+            document.getElementById('grading-comment').value = this.teacherComment;
+            this.updateUISelection();
+            this.updateCalculation();
 
             // Lock submission
             await this.lockSubmission(submissionId);
@@ -306,6 +333,42 @@ const GradingUI = {
             // Explicit alert for user to see
             alert(`DEBUG INFO:\nFout bij ophalen pagina.\nOorspronkelijke URL: ${submissionData.assignmentUrl}\nFoutmelding: ${error.message}`);
         }
+    },
+
+    applyCsvRubric: function(csvRubric) {
+        if (!this.currentRubricData || !csvRubric) return;
+        
+        console.log("Applying CSV Rubric:", csvRubric);
+
+        csvRubric.forEach(item => {
+            // Find category by name
+            const catIndex = this.currentRubricData.categories.findIndex(c => 
+                c.name.toLowerCase().trim() === item.theme.toLowerCase().trim()
+            );
+
+            if (catIndex !== -1) {
+                const category = this.currentRubricData.categories[catIndex];
+                let points = parseFloat(item.value.toString().replace(',','.'));
+                
+                if (isNaN(points)) return;
+
+                // Logic: matched points to rubric options.
+                // If value > maxPoints, it might be the weighted value.
+                if (points > category.rawMaxPoints) {
+                    if (category.weight > 0 && (points / category.weight) <= category.rawMaxPoints) {
+                         points = points / category.weight;
+                    }
+                }
+                
+                // Assume integer steps for buttons
+                points = Math.round(points);
+
+                if (points >= 0 && points <= category.rawMaxPoints) {
+                    this.selectedCells[catIndex] = points; // Set directly to avoid UI redraw loops
+                }
+            }
+        });
+        // UI update called after this returns by the caller
     },
 
     renderRubric: function(data) {
@@ -449,6 +512,11 @@ const GradingUI = {
             const calculatedGrade = document.getElementById('grading-calculated-grade').textContent;
             const selectedPeriod = document.getElementById('grading-period').value; // Get Period
             
+            if (!selectedPeriod) {
+                alert("Selecteer eerst een periode (P1-P4) voordat je het cijfer afrondt.");
+                return;
+            }
+            
             const user = firebase.auth().currentUser;
             const teacherEmail = user ? user.email : 'Unknown';
             const studentEmail = this.currentSubmissionData.userEmail ? this.currentSubmissionData.userEmail.toLowerCase() : null;
@@ -459,6 +527,7 @@ const GradingUI = {
                 grade: calculatedGrade,
                 teacherComment: this.teacherComment,
                 finalRubric: this.selectedCells,
+                period: selectedPeriod, // Save period to submission for reopening
                 checkedBy: teacherEmail,
                 checkedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 gradingDraft: firebase.firestore.FieldValue.delete() // Remove draft
@@ -493,7 +562,8 @@ const GradingUI = {
                             })),
                             period: selectedPeriod, // Add Period
                             gradedAt: new Date().toISOString(),
-                            gradedBy: teacherEmail
+                            gradedBy: teacherEmail,
+                            assignmentId: assignmentTitle
                         };
                         
                         // Remove existing entry for this assignment if it exists
@@ -523,7 +593,8 @@ const GradingUI = {
                             })),
                             period: selectedPeriod, // Add Period
                             gradedAt: new Date().toISOString(),
-                            gradedBy: teacherEmail
+                            gradedBy: teacherEmail,
+                            assignmentId: assignmentTitle
                         };
                         
                         await resultsRef.add({
@@ -544,7 +615,9 @@ const GradingUI = {
             this.closeModal();
             
             // Refresh parent
-            if (typeof loadSubmissions === 'function') {
+            if (typeof refreshDashboard === 'function') {
+                refreshDashboard();
+            } else if (typeof loadSubmissions === 'function') {
                 loadSubmissions();
             } else {
                 window.location.reload();
@@ -554,6 +627,67 @@ const GradingUI = {
             console.error(e);
             statusMsg.textContent = "Fout bij afronden!";
             alert("Fout bij afronden: " + e.message);
+        }
+    },
+
+    deleteGrading: async function() {
+        if (!confirm("LET OP: Weet je zeker dat je deze beoordeling wilt verwijderen?\n\n- Het cijfer wordt gewist.\n- De inzending wordt VOLLEDIG VERWIJDERD (ook geen backup meer).\n\nWil je doorgaan?")) return;
+        
+        const statusMsg = document.getElementById('grading-status-msg');
+        statusMsg.textContent = "Wissen...";
+        
+        try {
+            const studentEmail = this.currentSubmissionData.userEmail;
+            const assignmentTitle = this.currentSubmissionData.assignmentId || "Opdracht";
+            
+            // 1. Remove from 'results' collection
+            if (studentEmail) {
+                const resultsRef = firebase.firestore().collection("results");
+                // Try exact match first
+                let snapshot = await resultsRef.where("email", "==", studentEmail).limit(1).get();
+                 if (snapshot.empty && studentEmail) {
+                    snapshot = await resultsRef.where("email", "==", studentEmail.toLowerCase()).limit(1).get();
+                }
+
+                if (!snapshot.empty) {
+                    const studentDoc = snapshot.docs[0];
+                    const studentData = studentDoc.data();
+                    let assignments = studentData.assignments || [];
+                    
+                    // Filter out this assignment
+                    const originalLength = assignments.length;
+                    assignments = assignments.filter(a => a.title !== assignmentTitle && a.assignmentId !== assignmentTitle);
+                    
+                    if (assignments.length < originalLength) {
+                        await studentDoc.ref.update({
+                            assignments: assignments,
+                            lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        console.log("Removed result from student record.");
+                    }
+                }
+            }
+
+            // 2. Reset Submission Document
+            // User requested full deletion ("ook niet pending")
+            await firebase.firestore().collection("submissions").doc(this.currentSubmissionId).delete();
+
+            this.isDirty = false;
+            this.closeModal();
+            
+            // Refresh parent
+            if (typeof refreshDashboard === 'function') {
+                refreshDashboard();
+            } else if (typeof loadSubmissions === 'function') {
+                loadSubmissions();
+            } else {
+                window.location.reload();
+            }
+
+        } catch (e) {
+            console.error(e);
+            statusMsg.textContent = "Fout bij wissen!";
+            alert("Fout bij wissen: " + e.message);
         }
     },
 
@@ -574,3 +708,5 @@ const GradingUI = {
         // So keeping it 'grading' is correct.
     }
 };
+
+window.GradingUI = GradingUI;

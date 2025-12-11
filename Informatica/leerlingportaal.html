@@ -2027,33 +2027,60 @@
 
 			// Laad de resultaten voor een ingelogde student
 			async function loadStudentResults(user) {
-				let doc = await db.collection("results").doc(user.uid).get();
-				if (!doc.exists) {
-					const querySnapshot = await db
-						.collection("results")
-						.where("email", "==", user.email)
-						.limit(1)
-						.get();
-					if (!querySnapshot.empty) {
-						doc = querySnapshot.docs[0];
+				try {
+					console.log("Loading results for:", user.email, "UID:", user.uid);
+					let doc = await db.collection("results").doc(user.uid).get().catch(e => {
+						console.log("Direct DOC ID lookup failed/denied:", e.message);
+						return { exists: false };
+					});
+
+					if (!doc.exists) {
+						console.log("Querying by email...");
+						const querySnapshot = await db
+							.collection("results")
+							.where("email", "==", user.email)
+							.limit(1)
+							.get();
+						
+						if (!querySnapshot.empty) {
+							doc = querySnapshot.docs[0];
+							console.log("Found document via email query:", doc.id);
+						} else {
+							console.log("No document found via email query.");
+						}
 					}
+					
+					if (!doc || !doc.exists) {
+						studentEmailDisplay.textContent = user.email;
+						cachedStudentData = null;
+						document.getElementById('student-results-display').innerHTML = `
+							<div class="empty-state">
+								<p>Geen resultaten gevonden voor <strong>${user.email}</strong>.</p>
+								<p style="font-size:0.9em; color:#666;">Neem contact op met je docent als dit niet klopt.</p>
+							</div>
+						`;
+						return;
+					}
+
+					const student = normalizeStudentData(doc.id, doc.data() || {});
+					// ... (rest of logic)
+					if (student.name) studentEmailDisplay.textContent = student.name;
+					else if (student.email) studentEmailDisplay.textContent = student.email;
+					else studentEmailDisplay.textContent = user.email;
+
+					cachedStudentData = student;
+					renderStudentPanel(studentResultsDisplay, student);
+
+				} catch (error) {
+					console.error("Error loading results:", error);
+					alert("Fout bij laden resultaten:\n" + error.message);
+					document.getElementById('student-results-display').innerHTML = `
+						<div class="error-message">
+							<p>Kon gegevens niet laden.</p>
+							<p><small>${error.message}</small></p>
+						</div>
+					`;
 				}
-				if (!doc || !doc.exists) {
-					studentEmailDisplay.textContent = user.email;
-					cachedStudentData = null;
-					renderStudentPanel(studentResultsDisplay, null);
-					return;
-				}
-				const student = normalizeStudentData(doc.id, doc.data() || {});
-				if (student.name) {
-					studentEmailDisplay.textContent = student.name;
-				} else if (student.email) {
-					studentEmailDisplay.textContent = student.email;
-				} else {
-					studentEmailDisplay.textContent = user.email;
-				}
-				cachedStudentData = student;
-				renderStudentPanel(studentResultsDisplay, student);
 			}
 
 			// Toon/hide panelen afhankelijk van loginstatus
