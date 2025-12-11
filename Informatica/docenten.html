@@ -173,23 +173,25 @@
 
 		<main>
 			<div class="dashboard-container">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2>Docenten Dashboard</h2>
-                    <button id="refresh-btn" class="action-btn secondary">Verversen</button>
-                </div>
+
 				
                 <!-- Block 1: Ingeleverde Opdrachten -->
-                <div class="accordion-block" id="block-submissions">
+                <div class="accordion-block active" id="block-submissions">
                     <div class="accordion-header" onclick="toggleBlock('block-submissions')">
                         1. Ingeleverde Opdrachten & Geschiedenis
                     </div>
                     <div class="accordion-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                             <h3>Openstaande Inzendingen</h3>
+                             <button onclick="loadSubmissions()" class="action-btn secondary" style="font-size: 0.9em;">🔄 Verversen</button>
+                        </div>
                         <div id="loading-message" class="loading-message">
                             Laden van inzendingen...
                         </div>
 
                         <div id="submissions-container" style="display: none;">
-                            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Openstaande Inzendingen</h3>
+                            <!-- Header moved up -->
                             <table class="submissions-table">
                                 <thead>
                                     <tr>
@@ -290,7 +292,7 @@
                     </div>
                     <div class="accordion-content">
                         <div style="margin-bottom: 15px;">
-                            <button onclick="loadAllStudents()" class="action-btn secondary">Laad alle leerlingen</button>
+                            <button onclick="loadAllStudents()" class="action-btn secondary">🔄 Verversen</button>
                         </div>
                         <div id="all-students-container" style="display: none;">
                              <p>Hier komen alle resultaten (nog te implementeren visualisatie).</p>
@@ -345,7 +347,8 @@
                 function openGradingById(id) {
                     const data = window.submissionMap[id];
                     if (data) {
-                        GradingUI.open(id, data);
+                        // Pass true to force status update (e.g. from Heropen button)
+                        GradingUI.open(id, data, true);
                     } else {
                         alert("Fout: Kan data niet vinden.");
                     }
@@ -374,6 +377,16 @@
 			function toggleBlock(id) {
 				const block = document.getElementById(id);
 				block.classList.toggle('active');
+                
+                // Auto-load logic for Block 3
+                if (id === 'block-results' && block.classList.contains('active')) {
+                    // Only load if empty or if force requested? 
+                    // User said "automatisch de tabel wordt geladen", implying every time or on first open.
+                    // Let's call it every time to be safe/fresh, as user requested "Verversen" logic.
+                    // But maybe check if already loaded to avoid spam? 
+                    // No, user wants freshness.
+                     loadAllStudents();
+                }
 			}
 
 			// Check auth state
@@ -601,7 +614,10 @@
 
             window.refreshDashboard = async function() {
                 console.log("Refreshing dashboard data...");
-                await loadAllStudents(); // Re-fetch all data
+                await Promise.all([
+                    loadSubmissions(), // Refresh Inbox/History
+                    loadAllStudents()  // Refresh All Results
+                ]);
                 
                 // If detail modal is open, refresh it
                 const modal = document.getElementById('student-modal');
@@ -688,6 +704,15 @@
             window.renderStudentsTable = function() {
                 const container = document.getElementById('all-students-container');
                 const students = window.allStudentsList || [];
+                
+                // Initialize Stats
+                const periodStats = {
+                    P1: { sum: 0, count: 0 },
+                    P2: { sum: 0, count: 0 },
+                    P3: { sum: 0, count: 0 },
+                    P4: { sum: 0, count: 0 },
+                    Overall: { sum: 0, count: 0 }
+                };
                 
                 // Get Toggle States
                 const enforceP1 = document.getElementById('rule-p1')?.checked || false;
@@ -783,10 +808,24 @@
                         
                         overallSum += effectiveSum;
                         overallCount += effectiveCount;
+
+                        // Global Accumulators
+                        if(effectiveCount > 0) {
+                            periodStats[p].sum += parseFloat(avg);
+                            periodStats[p].count++;
+                        }
                     });
                     
                     const finalAvg = overallCount > 0 ? (overallSum / overallCount).toFixed(1) : "-";
                     
+                    if (overallCount > 0) {
+                         const fv = parseFloat(finalAvg);
+                         if (!isNaN(fv)) {
+                             periodStats.Overall.sum += fv;
+                             periodStats.Overall.count++;
+                         }
+                    }
+
                     tableHtml += `
                         <tr class="clickable-row" onclick="openStudentDetails('${student.id}')">
                             <td>${studentClass || '-'}</td>
@@ -799,8 +838,28 @@
                         </tr>
                     `;
                 });
-                
-                tableHtml += `</tbody></table>`;
+
+                // Footer with Averages
+                const p1Avg = periodStats.P1.count ? (periodStats.P1.sum / periodStats.P1.count).toFixed(1) : "-";
+                const p2Avg = periodStats.P2.count ? (periodStats.P2.sum / periodStats.P2.count).toFixed(1) : "-";
+                const p3Avg = periodStats.P3.count ? (periodStats.P3.sum / periodStats.P3.count).toFixed(1) : "-";
+                const p4Avg = periodStats.P4.count ? (periodStats.P4.sum / periodStats.P4.count).toFixed(1) : "-";
+                const totalAvg = periodStats.Overall.count ? (periodStats.Overall.sum / periodStats.Overall.count).toFixed(1) : "-";
+
+                tableHtml += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #343a40; color: #fff; font-weight: bold;">
+                            <td colspan="2" style="text-align: right; padding-right: 15px;">Gemiddelde:</td>
+                            <td>${p1Avg}</td>
+                            <td>${p2Avg}</td>
+                            <td>${p3Avg}</td>
+                            <td>${p4Avg}</td>
+                            <td style="text-align: center; border-left: 1px solid #555;">${totalAvg}</td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                `;
                 
                 container.innerHTML = controlHtml + tableHtml;
             };
@@ -1278,7 +1337,12 @@
                         teacherComment: comment
                     });
 
-                    removeRow(docId);
+                    // Refresh logic
+                    if (window.refreshDashboard) {
+                        await window.refreshDashboard();
+                    } else {
+                        removeRow(docId);
+                    }
                 } catch (error) {
                     handleError(error);
                 }

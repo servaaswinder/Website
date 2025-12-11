@@ -42,7 +42,8 @@ const GradingUI = {
                         <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start;">
                             <div style="flex: 1;">
                                 <strong style="font-size: 1.2em;">Opdracht: <span id="grading-assignment-title">...</span></strong><br>
-                                <a id="grading-assignment-link" href="#" target="_blank" style="font-size: 0.95em; color: #0044B3; text-decoration: underline;">Open orgineel opdrachtbestand in nieuw tabblad</a>
+                                <a id="grading-rubric-link" href="#" target="_blank" style="font-size: 0.95em; color: #0044B3; text-decoration: underline; margin-right: 15px;">📄 Open opdrachtbeschrijving</a>
+                                <a id="grading-student-link" href="#" target="_blank" style="display:none; font-size: 0.95em; color: #28a745; text-decoration: underline;">🔗 Open werk van leerling</a>
                             </div>
                             <div style="text-align: right; background: #f0f8ff; padding: 10px 15px; border-radius: 8px; border: 1px solid #cce5ff;">
                                 <div style="font-size: 0.9em; color: #555; margin-bottom: 2px;">Cijfer</div>
@@ -229,7 +230,7 @@ const GradingUI = {
         "E1": "opdrachten/e1_decompositie.html"
     },
 
-    open: async function(submissionId, submissionData) {
+    open: async function(submissionId, submissionData, forceGrading = false) {
         this.currentSubmissionId = submissionId;
         this.currentSubmissionData = submissionData; // Assign this!
         this.currentRubricData = null;
@@ -237,9 +238,37 @@ const GradingUI = {
         this.teacherComment = submissionData.teacherComment || "";
         this.isDirty = false;
 
-        document.getElementById('grading-student-name').textContent = submissionData.userEmail;
+        // Determine display name
+        const displayName = submissionData.userName || submissionData.name || submissionData.userEmail || "Onbekend";
+        document.getElementById('grading-student-name').textContent = displayName;
         document.getElementById('grading-assignment-title').textContent = submissionData.assignmentId;
-        document.getElementById('grading-assignment-link').href = submissionData.assignmentUrl; // This is the student's link
+        
+        // 1. Rubric Link (Trusted source)
+        let rubricLink = submissionData.assignmentUrl; // Fallback
+        if (this.ASSIGNMENT_MAP && this.ASSIGNMENT_MAP[submissionData.assignmentId]) {
+            rubricLink = this.ASSIGNMENT_MAP[submissionData.assignmentId];
+        }
+        document.getElementById('grading-rubric-link').href = rubricLink; 
+
+        // 2. Student Link (Portfolio)
+        const studentLink = document.getElementById('grading-student-link');
+        if (submissionData.assignmentUrl && submissionData.assignmentUrl !== rubricLink) {
+             studentLink.href = submissionData.assignmentUrl;
+             studentLink.textContent = "🔗 Open werk van leerling";
+             studentLink.style.display = 'inline-block';
+             studentLink.style.color = '#28a745';
+             studentLink.style.pointerEvents = 'auto';
+             studentLink.style.textDecoration = 'underline';
+        } else {
+             // Fallback for manual/old assignments
+             studentLink.removeAttribute('href');
+             studentLink.textContent = "⚠️ Geen link (Handmatig/Legacy)";
+             studentLink.style.display = 'inline-block';
+             studentLink.style.color = '#999';
+             studentLink.style.pointerEvents = 'none';
+             studentLink.style.textDecoration = 'none';
+        } 
+
         document.getElementById('grading-comment').value = this.teacherComment;
         document.getElementById('grading-rubric-container').innerHTML = '<div style="padding: 20px; text-align: center;">Beoordelingsmodel laden...</div>';
         document.getElementById('grading-modal').style.display = 'block';
@@ -317,7 +346,7 @@ const GradingUI = {
             this.updateCalculation();
 
             // Lock submission
-            await this.lockSubmission(submissionId);
+            await this.lockSubmission(submissionId, forceGrading);
 
         } catch (error) {
             console.error(error);
@@ -340,11 +369,21 @@ const GradingUI = {
         
         console.log("Applying CSV Rubric:", csvRubric);
 
+        // Helper to clean strings for comparison
+        const cleanStr = (s) => (s || "").toLowerCase().replace(/[:\.\s]+/g, ' ').trim();
+
         csvRubric.forEach(item => {
-            // Find category by name
-            const catIndex = this.currentRubricData.categories.findIndex(c => 
-                c.name.toLowerCase().trim() === item.theme.toLowerCase().trim()
-            );
+            // Find category by name with loose matching
+            const itemTheme = cleanStr(item.theme);
+            
+            const catIndex = this.currentRubricData.categories.findIndex(c => {
+                const catName = cleanStr(c.name);
+                // 1. Exact cleaned match
+                if (catName === itemTheme) return true;
+                // 2. Substring match (e.g. "Layout" in "Layout of site")
+                if (catName.includes(itemTheme) || itemTheme.includes(catName)) return true;
+                return false;
+            });
 
             if (catIndex !== -1) {
                 const category = this.currentRubricData.categories[catIndex];
@@ -464,7 +503,16 @@ const GradingUI = {
         document.getElementById('grading-calculated-grade').textContent = displayGrade.toFixed(1);
     },
 
-    lockSubmission: async function(docId) {
+    lockSubmission: async function(docId, forceGrading = false) {
+        // Only lock if status is pending (or already grading) OR if forced
+        // Do NOT change status if it is already 'checked' or 'rejected', UNLESS forced (Reopen)
+        const currentStatus = this.currentSubmissionData ? this.currentSubmissionData.status : null;
+        
+        if (!forceGrading && (currentStatus === 'checked' || currentStatus === 'rejected')) {
+            console.log("Skipping lock: Submission is already final (" + currentStatus + ") and not forced.");
+            return;
+        }
+
         const user = firebase.auth().currentUser;
         await firebase.firestore().collection("submissions").doc(docId).update({
             status: "grading",
@@ -477,12 +525,16 @@ const GradingUI = {
         const statusMsg = document.getElementById('grading-status-msg');
         statusMsg.textContent = "Opslaan...";
         try {
+            const user = firebase.auth().currentUser;
             await firebase.firestore().collection("submissions").doc(this.currentSubmissionId).update({
                 gradingDraft: {
                     selectedCells: this.selectedCells,
                     comment: this.teacherComment
                 },
-                teacherComment: this.teacherComment // Sync comment to main field too
+                teacherComment: this.teacherComment, // Sync comment to main field too
+                // Force status to 'grading' so it reappears in inbox
+                status: "grading",
+                gradingBy: user.email
             });
             
             this.isDirty = false;
