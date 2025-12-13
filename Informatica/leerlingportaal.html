@@ -2036,12 +2036,23 @@
 
 					if (!doc.exists) {
 						console.log("Querying by email...");
-						const querySnapshot = await db
+						// Probeer eerst met de exacte email
+						let querySnapshot = await db
 							.collection("results")
 							.where("email", "==", user.email)
 							.limit(1)
 							.get();
 						
+						// Als dat niet werkt, probeer lowercase (voor het geval data lowercase is opgeslagen)
+						if (querySnapshot.empty) {
+							console.log("Querying by lowercase email...");
+							querySnapshot = await db
+								.collection("results")
+								.where("email", "==", user.email.toLowerCase())
+								.limit(1)
+								.get();
+						}
+
 						if (!querySnapshot.empty) {
 							doc = querySnapshot.docs[0];
 							console.log("Found document via email query:", doc.id);
