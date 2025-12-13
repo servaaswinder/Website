@@ -341,6 +341,10 @@
 								</button>
 							</div>
 						</div>
+						<div id="debug-console" style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; font-family: monospace; font-size: 0.85rem; color: #333; display: none;">
+							<h4 style="margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Debug Log</h4>
+							<div id="debug-content" style="max-height: 150px; overflow-y: auto;"></div>
+						</div>
 						<div id="student-results-display" class="results"></div>
 					</section>
 				</div>
@@ -2026,53 +2030,96 @@
 			}
 
 			// Laad de resultaten voor een ingelogde student
+			function logToPage(msg) {
+				console.log(msg);
+				const debugConsole = document.getElementById("debug-console");
+				const debugContent = document.getElementById("debug-content");
+				if (debugConsole && debugContent) {
+					debugConsole.style.display = "block";
+					const entry = document.createElement("div");
+					entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+					entry.style.borderBottom = "1px solid #ddd";
+					entry.style.padding = "2px 0";
+					debugContent.appendChild(entry);
+				}
+			}
+
 			async function loadStudentResults(user) {
 				try {
-					console.log("Loading results for:", user.email, "UID:", user.uid);
+					logToPage(`Start laden voor: ${user.email} (UID: ${user.uid})`);
+					
+					// 1. Probeer direct op UID (werkt als doc aangemaakt is na account creation)
+					logToPage(`Poging 1: Direct Doc ID check op '${user.uid}'...`);
 					let doc = await db.collection("results").doc(user.uid).get().catch(e => {
-						console.log("Direct DOC ID lookup failed/denied:", e.message);
+						logToPage(`Fout bij UID lookup: ${e.message}`);
 						return { exists: false };
 					});
 
-					if (!doc.exists) {
-						console.log("Querying by email...");
-						// Probeer eerst met de exacte email
+					if (doc.exists) {
+						logToPage("Succes! Document gevonden via UID.");
+					} else {
+						logToPage("Niet gevonden via UID.");
+						
+						// 2. Probeer exacte email match
+						logToPage(`Poging 2: Query op exacte email '${user.email}'...`);
 						let querySnapshot = await db
 							.collection("results")
 							.where("email", "==", user.email)
 							.limit(1)
 							.get();
 						
-						// Als dat niet werkt, probeer lowercase (voor het geval data lowercase is opgeslagen)
-						if (querySnapshot.empty) {
-							console.log("Querying by lowercase email...");
+						if (!querySnapshot.empty) {
+							doc = querySnapshot.docs[0];
+							logToPage(`Succes! Document gevonden via email query (ID: ${doc.id})`);
+						} else {
+							logToPage("Niet gevonden via exacte email.");
+							
+							// 3. Probeer lowercase email match
+							logToPage(`Poging 3: Query op lowercase email '${user.email.toLowerCase()}'...`);
 							querySnapshot = await db
 								.collection("results")
 								.where("email", "==", user.email.toLowerCase())
 								.limit(1)
 								.get();
-						}
 
-						if (!querySnapshot.empty) {
-							doc = querySnapshot.docs[0];
-							console.log("Found document via email query:", doc.id);
-						} else {
-							console.log("No document found via email query.");
+							if (!querySnapshot.empty) {
+								doc = querySnapshot.docs[0];
+								logToPage(`Succes! Document gevonden via lowercase email query (ID: ${doc.id})`);
+							} else {
+								logToPage("Niet gevonden via lowercase email.");
+
+								// 4. Probeer predicted (sanitized) ID match
+								const predictedId = sanitizeDocId(user.email);
+								logToPage(`Poging 4: Direct Doc ID check op predicted ID '${predictedId}'...`);
+								const directDoc = await db.collection("results").doc(predictedId).get().catch(e => {
+									logToPage(`Fout bij predicted ID lookup: ${e.message}`);
+									return { exists: false };
+								});
+								
+								if (directDoc.exists) {
+									doc = directDoc;
+									logToPage(`Succes! Document gevonden via predicted ID.`);
+								} else {
+									logToPage("Niet gevonden via predicted ID. Geen opties meer.");
+								}
+							}
 						}
 					}
 					
 					if (!doc || !doc.exists) {
 						studentEmailDisplay.textContent = user.email;
 						cachedStudentData = null;
+						logToPage("CONCLUSIE: Geen resultaten kunnen laden.");
 						document.getElementById('student-results-display').innerHTML = `
 							<div class="empty-state">
 								<p>Geen resultaten gevonden voor <strong>${user.email}</strong>.</p>
-								<p style="font-size:0.9em; color:#666;">Neem contact op met je docent als dit niet klopt.</p>
+								<p style="font-size:0.9em; color:#666;">Neem contact op met je docent. <br>Debug log hierboven toont details.</p>
 							</div>
 						`;
 						return;
 					}
 
+					logToPage("Data normaliseren en weergeven...");
 					const student = normalizeStudentData(doc.id, doc.data() || {});
 					// ... (rest of logic)
 					if (student.name) studentEmailDisplay.textContent = student.name;
@@ -2081,10 +2128,11 @@
 
 					cachedStudentData = student;
 					renderStudentPanel(studentResultsDisplay, student);
+					logToPage("Klaar.");
 
 				} catch (error) {
 					console.error("Error loading results:", error);
-					alert("Fout bij laden resultaten:\n" + error.message);
+					logToPage(`FATALE FOUT: ${error.message}`);
 					document.getElementById('student-results-display').innerHTML = `
 						<div class="error-message">
 							<p>Kon gegevens niet laden.</p>
