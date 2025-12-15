@@ -45,12 +45,24 @@ const RubricParser = {
         const categories = [];
         let totalMaxPoints = 0;
 
-        // Parse Header to find point values for columns if possible
-        // Standard format: [Categorie | 0 Punten | 1 Punt | ... | Max Punten]
-        // Actually, usually headers are "0 punten", "1 punt", etc.
-        // We need to determine the max points per row.
-        // Usually, the last column represents the max points for that row *if* it's just linear.
-        // But weight multipliers mean we should look at the row content/header.
+        // Parse Headers to map columns to point values
+        const headerCells = rubricTable.querySelectorAll('thead th');
+        const colPointMap = []; // Index -> Point Value
+        let headerHasNumbers = false;
+
+        if (headerCells.length > 0) {
+            headerCells.forEach((th, index) => {
+                if (index === 0) return; // Skip Category
+                const match = th.textContent.match(/(\d+)/);
+                if (match) {
+                    colPointMap[index] = parseInt(match[1], 10);
+                    headerHasNumbers = true;
+                } else {
+                    // Fallback: assume standard 0-indexed progression if no numbers found
+                    colPointMap[index] = index - 1; 
+                }
+            });
+        }
 
         const rows = rubricTable.querySelectorAll('tbody tr');
         
@@ -62,32 +74,49 @@ const RubricParser = {
             const categoryText = categoryCell.textContent.trim();
             
             // Extract Weight
-            // Format example: "Inhoud (weging 2)" or just "Analyse"
             let weight = 1;
             const weightMatch = categoryText.match(/\(weging\s+(\d+)\)/i);
             if (weightMatch) {
                 weight = parseInt(weightMatch[1], 10);
+            } else if (categoryText.toLowerCase().includes('(max 2pt)')) {
+                 // Explicit max point override in text? 
+                 // Actually relying on "N.v.t." detection is better, but this is a safety.
+                 // Let's stick to column detection mostly.
             }
 
-            // Determine max points for this specific category
-            // The table columns usually represent 0, 1, 2, 3... points indices.
-            // But we shouldn't assume the index matches points perfectly without checking headers.
-            // HOWEVER, based on user description: "meest rechter kolom" is max score.
-            // Let's count how many score columns there are.
-            // Standard: Categorie + N columns.
-            // Points usually range from 0 to N-1.
-            const scoreColumnsCount = cells.length - 1;
-            const rawMaxPoints = scoreColumnsCount - 1; // 0-indexed, so 4 score cols = 0,1,2,3 -> max 3.
-            
-            // Wait, let's verify with f1_usability.
-            // Header: Categorie, 0 Punten, 1 Punt, 2 Punten, 3 Punten.
-            // Columns: 5. Score cols: 4. Max points: 3. Correct.
+            // Determine max points for this row
+            // Find the last "active" column (not N.v.t.)
+            let maxPointsIndex = cells.length - 1;
+            for (let i = cells.length - 1; i >= 1; i--) {
+                const cellText = cells[i].textContent.trim().toLowerCase();
+                if (!cellText.includes('n.v.t.') && cellText !== '-') {
+                    maxPointsIndex = i;
+                    break;
+                }
+            }
+
+            let rawMaxPoints = 0;
+            if (headerHasNumbers && colPointMap[maxPointsIndex] !== undefined) {
+                rawMaxPoints = colPointMap[maxPointsIndex];
+            } else {
+                // Fallback logic
+                // If headers didn't have numbers, or we couldn't map, assume 0-indexed count
+                // But account for excluded N.v.t columns
+                // Effective score columns = maxPointsIndex (since index 1 is column 0)
+                rawMaxPoints = maxPointsIndex - 1; 
+            }
             
             // Extract descriptions for each point level
+            // Extract descriptions for each point level, mapped by Point Value
             const descriptions = [];
-            // Skip the first cell (Category Name) and iterate through score cells
             for (let i = 1; i < cells.length; i++) {
-                descriptions.push(cells[i].innerHTML.trim()); // Use innerHTML to preserve formatting like <br> or <b>
+                const pointVal = colPointMap[i];
+                if (pointVal !== undefined) {
+                     descriptions[pointVal] = cells[i].innerHTML.trim();
+                } else {
+                     // Fallback: assume standard 0-based index if map fails
+                     descriptions[i-1] = cells[i].innerHTML.trim();
+                }
             }
 
             const rowTotal = rawMaxPoints * weight;
@@ -112,19 +141,24 @@ const RubricParser = {
         // Case B: Points + 1 (Implicitly Max=9, or points map directly to grade)
         // We look for patterns.
         
-        let formulaMatch = bodyText.match(/Cijfer\s*=\s*.*?(\d+)\s*\)\s*[\*×x]/i) || bodyText.match(/Cijfer\s*=\s*.*?(\d+)\s*[\*×x]/i);
+        let expectedTotal = 0;
         
-        // Check for simplified "Count + 1" pattern which implies Max=9 (usually) or just additive
-        // Example: "Cijfer = aantal punten + 1" or "Cijfer = totaal aantal punten + 1"
-        if (!formulaMatch) {
-            if (bodyText.match(/Cijfer\s*=\s*.*?aantal punten\s*\+\s*1/i)) {
-                 // If formula is just "points + 1", and we assume linear 0-9 scale, then max points = 9.
-                 // However, we can't extract "9" from "points + 1".
-                 // But we can infer expectedTotal = 9 if this formula is used.
-                 expectedTotal = 9;
-            }
+        // Check for Strict Formula: ((Totaal - Deduction) / Scale) * 9 + 1
+        // Example: ((Totaal - 2) / 10)
+        let strictMatch = bodyText.match(/Cijfer\s*=\s*\(\(.*?-\s*(\d+)\)\s*\/\s*(\d+)\)/i);
+        if (strictMatch) {
+            expectedTotal = parseInt(strictMatch[2], 10) + parseInt(strictMatch[1], 10);
         } else {
-             expectedTotal = parseInt(formulaMatch[1], 10);
+            // Standard Formula: (Totaal / Max) * 9 + 1
+            let formulaMatch = bodyText.match(/Cijfer\s*=\s*.*?(\d+)\s*\)\s*[\*×x]/i) || bodyText.match(/Cijfer\s*=\s*.*?(\d+)\s*[\*×x]/i);
+            
+            if (!formulaMatch) {
+                if (bodyText.match(/Cijfer\s*=\s*.*?aantal punten\s*\+\s*1/i)) {
+                     expectedTotal = 9;
+                }
+            } else {
+                 expectedTotal = parseInt(formulaMatch[1], 10);
+            }
         }
 
         return {

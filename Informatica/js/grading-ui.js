@@ -227,7 +227,8 @@ const GradingUI = {
         "B4": "opdrachten/b4_introductie_html.html",
         "F1": "opdrachten/f1_usability.html",
         "C4": "opdrachten/c4_standaard_representaties.html",
-        "E1": "opdrachten/e1_decompositie.html"
+        "E1": "opdrachten/e1_decompositie.html",
+        "Eind1": "opdrachten/eindopdracht_gamedev.html"
     },
 
     open: async function(submissionId, submissionData, forceGrading = false) {
@@ -417,12 +418,36 @@ const GradingUI = {
         let maxCols = 0;
         data.categories.forEach(c => maxCols = Math.max(maxCols, c.rawMaxPoints + 1));
         
+        // Determine Min Column (skip 0 if unused)
+        let minCol = maxCols; // Start high
+        if (data.categories.length === 0) minCol = 0;
+        
+        data.categories.forEach(cat => {
+            if (cat.descriptions) {
+                 // Check indices 0 to rawMax
+                 // Since descriptions is a sparse array, custom iteration or check
+                 if (cat.descriptions[0]) minCol = 0;
+                 else {
+                     // Check finding first non-empty
+                     for (let i = 0; i < cat.descriptions.length; i++) {
+                         if (cat.descriptions[i]) {
+                             minCol = Math.min(minCol, i);
+                             break;
+                         }
+                     }
+                 }
+            } else {
+                minCol = 0; // Fallback
+            }
+        });
+        if (minCol === maxCols) minCol = 0; // If nothing found, default 0
+
         let html = '<table class="rubric-grid">';
         
         // Main Header Row (Points)
         html += '<thead><tr>';
         html += '<th style="width: 200px;">Categorie</th>'; // Fixed width for category
-        for (let i = 0; i < maxCols; i++) {
+        for (let i = minCol; i < maxCols; i++) {
             html += `<th>${i} Punt${i!==1?'en':''}</th>`;
         }
         html += '</tr></thead><tbody>';
@@ -437,7 +462,7 @@ const GradingUI = {
             html += `</td>`;
             
             // Score Columns
-            for (let i = 0; i < maxCols; i++) {
+            for (let i = minCol; i < maxCols; i++) {
                 if (i <= cat.rawMaxPoints) {
                     const isSelected = GradingUI.selectedCells[index] === i;
                     const desc = cat.descriptions && cat.descriptions[i] ? cat.descriptions[i] : '<span style="color:#999; font-style:italic;">Geen beschrijving</span>';
@@ -459,8 +484,13 @@ const GradingUI = {
     },
 
     selectCell: function(catIndex, points) {
-        const catName = this.currentRubricData.categories[catIndex].name;
-        this.selectedCells[catIndex] = points;
+        // Toggle logic: If already selected, deselect it
+        if (this.selectedCells[catIndex] === points) {
+            delete this.selectedCells[catIndex];
+        } else {
+            this.selectedCells[catIndex] = points;
+        }
+        
         this.updateUISelection();
         this.updateCalculation();
         this.isDirty = true;
