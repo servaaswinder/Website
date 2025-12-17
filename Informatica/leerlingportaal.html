@@ -16,6 +16,33 @@
 	</head>
 	<body class="auth-page">
 		{% include site-header-informatica.html %}
+		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
+		<script src="js/student-utils.js"></script>
+		<style>
+			.student-results-container {
+				margin-top: 20px;
+			}
+			.student-results-container .empty-state {
+				padding: 20px;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				background-color: #f9f9f9;
+				text-align: center;
+				color: #555;
+			}
+			.student-results-container .error-message {
+				padding: 20px;
+				border: 1px solid #f5c6cb;
+				border-radius: 8px;
+				background-color: #f8d7da;
+				color: #721c24;
+			}
+			.student-results-container .error-message small {
+				display: block;
+				margin-top: 10px;
+				color: #721c24;
+			}
+		</style>
 
 		<main>
 			<div class="auth-layout">
@@ -203,8 +230,8 @@
 						</div>
 						<h3>Alle leerlingenrecords</h3>
 						<p class="status-message muted">
-							Alleen zichtbaar voor demonstratiedoeleinden. In een
-							productieomgeving zou je de lijst verbergen of beperken.
+								Alleen zichtbaar voor demonstratiedoeleinden. In een
+								productieomgeving zou je de lijst verbergen of beperken.
 						</p>
 						<div
 							class="period-toggle compact"
@@ -345,7 +372,7 @@
 							<h4 style="margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Debug Log</h4>
 							<div id="debug-content" style="max-height: 150px; overflow-y: auto;"></div>
 						</div>
-						<div id="student-results-display" class="results"></div>
+						<div id="student-results-display" class="results student-results-container"></div>
 					</section>
 				</div>
 			</div>
@@ -455,6 +482,10 @@
 			);
 
             async function loadRejectedAssignments(user) {
+                const container = document.getElementById("rejected-assignments-container");
+                const list = document.getElementById("rejected-assignments-list");
+                if (!container || !list) return;
+
                 try {
                     // Fetch all submissions for user (no complex index needed) and filter client-side
                     const snapshot = await db.collection("submissions")
@@ -2045,95 +2076,42 @@
 			}
 
 			async function loadStudentResults(user) {
+				// Haal resultaten op met robuuste shared logic
+				logToPage(`Start laden voor: ${user.email} (UID: ${user.uid})`);
+				const welcomeMessage = document.getElementById("student-name-display");
+				const noResultsMessage = document.createElement("div");
+				noResultsMessage.className = "empty-state";
+				noResultsMessage.style.display = "none";
+				studentResultsDisplay.innerHTML = "";
+				studentResultsDisplay.appendChild(noResultsMessage);
+
 				try {
-					logToPage(`Start laden voor: ${user.email} (UID: ${user.uid})`);
+					const doc = await resolveStudentDocument(db, user, logToPage);
 					
-					// 1. Probeer direct op UID (werkt als doc aangemaakt is na account creation)
-					logToPage(`Poging 1: Direct Doc ID check op '${user.uid}'...`);
-					let doc = await db.collection("results").doc(user.uid).get().catch(e => {
-						logToPage(`Fout bij UID lookup: ${e.message}`);
-						return { exists: false };
-					});
-
-					if (doc.exists) {
-						logToPage("Succes! Document gevonden via UID.");
+					if (doc && doc.exists) {
+						logToPage(`Succes! Document gevonden (ID: ${doc.id})`);
+						logToPage("Data normaliseren en weergeven...");
+						
+						const data = doc.data();
+						const studentName = data.name || user.displayName || user.email;
+						welcomeMessage.textContent = `${studentName}`;
+						
+						const student = normalizeStudentData(doc.id, data || {});
+						cachedStudentData = student;
+						renderStudentPanel(studentResultsDisplay, student);
+						logToPage("Klaar.");
 					} else {
-						logToPage("Niet gevonden via UID.");
-						
-						// 2. Probeer exacte email match
-						logToPage(`Poging 2: Query op exacte email '${user.email}'...`);
-						let querySnapshot = await db
-							.collection("results")
-							.where("email", "==", user.email)
-							.limit(1)
-							.get();
-						
-						if (!querySnapshot.empty) {
-							doc = querySnapshot.docs[0];
-							logToPage(`Succes! Document gevonden via email query (ID: ${doc.id})`);
-						} else {
-							logToPage("Niet gevonden via exacte email.");
-							
-							// 3. Probeer lowercase email match
-							logToPage(`Poging 3: Query op lowercase email '${user.email.toLowerCase()}'...`);
-							querySnapshot = await db
-								.collection("results")
-								.where("email", "==", user.email.toLowerCase())
-								.limit(1)
-								.get();
-
-							if (!querySnapshot.empty) {
-								doc = querySnapshot.docs[0];
-								logToPage(`Succes! Document gevonden via lowercase email query (ID: ${doc.id})`);
-							} else {
-								logToPage("Niet gevonden via lowercase email.");
-
-								// 4. Probeer predicted (sanitized) ID match
-								const predictedId = sanitizeDocId(user.email);
-								logToPage(`Poging 4: Direct Doc ID check op predicted ID '${predictedId}'...`);
-								const directDoc = await db.collection("results").doc(predictedId).get().catch(e => {
-									logToPage(`Fout bij predicted ID lookup: ${e.message}`);
-									return { exists: false };
-								});
-								
-								if (directDoc.exists) {
-									doc = directDoc;
-									logToPage(`Succes! Document gevonden via predicted ID.`);
-								} else {
-									logToPage("Niet gevonden via predicted ID. Geen opties meer.");
-								}
-							}
-						}
-					}
-					
-					if (!doc || !doc.exists) {
-						studentEmailDisplay.textContent = user.email;
-						cachedStudentData = null;
 						logToPage("CONCLUSIE: Geen resultaten kunnen laden.");
-						document.getElementById('student-results-display').innerHTML = `
-							<div class="empty-state">
-								<p>Geen resultaten gevonden voor <strong>${user.email}</strong>.</p>
-								<p style="font-size:0.9em; color:#666;">Neem contact op met je docent. <br>Debug log hierboven toont details.</p>
-							</div>
-						`;
-						return;
+						noResultsMessage.style.display = "block";
+						noResultsMessage.innerHTML = `
+                            <p>Geen resultaten gevonden voor jouw account.</p>
+                            <p><small>Debug Info: Zie log hieronder.</small></p>
+                        `;
 					}
-
-					logToPage("Data normaliseren en weergeven...");
-					const student = normalizeStudentData(doc.id, doc.data() || {});
-					// ... (rest of logic)
-					if (student.name) studentEmailDisplay.textContent = student.name;
-					else if (student.email) studentEmailDisplay.textContent = student.email;
-					else studentEmailDisplay.textContent = user.email;
-
-					cachedStudentData = student;
-					renderStudentPanel(studentResultsDisplay, student);
-					logToPage("Klaar.");
-
 				} catch (error) {
 					console.error("Error loading results:", error);
 					logToPage(`FATALE FOUT: ${error.message}`);
-					document.getElementById('student-results-display').innerHTML = `
+					studentResultsDisplay.innerHTML = `
 						<div class="error-message">
 							<p>Kon gegevens niet laden.</p>
 							<p><small>${error.message}</small></p>

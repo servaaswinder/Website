@@ -12,6 +12,7 @@
 			src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
 		></script>
 		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
+		<script src="js/student-utils.js"></script>
 		<style>
 			#mynetwork {
 				width: 100%;
@@ -445,16 +446,7 @@
 				async function loadStudentProgress(user) {
 					try {
                         const resultsPromise = (async () => {
-                            // Try direct ID, but catch permission errors
-                            let doc = await db.collection("results").doc(user.uid).get().catch(e => {
-                                console.warn("Tree: Direct ID lookup blocked/failed:", e.message);
-                                return { exists: false };
-                            });
-                            
-                            if (!doc.exists) {
-                                const q = await db.collection("results").where("email", "==", user.email).limit(1).get();
-                                if (!q.empty) doc = q.docs[0];
-                            }
+                            const doc = await resolveStudentDocument(db, user, /* logFn= */ console.log);
                             return (doc && doc.exists) ? (doc.data().assignments || []) : [];
                         })();
 
