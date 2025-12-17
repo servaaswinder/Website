@@ -368,10 +368,6 @@
 								</button>
 							</div>
 						</div>
-						<div id="debug-console" style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; font-family: monospace; font-size: 0.85rem; color: #333; display: none;">
-							<h4 style="margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Debug Log</h4>
-							<div id="debug-content" style="max-height: 150px; overflow-y: auto;"></div>
-						</div>
 						<div id="student-results-display" class="results student-results-container"></div>
 					</section>
 				</div>
@@ -2060,38 +2056,15 @@
 				}
 			}
 
-			// Laad de resultaten voor een ingelogde student
-			function logToPage(msg) {
-				console.log(msg);
-				const debugConsole = document.getElementById("debug-console");
-				const debugContent = document.getElementById("debug-content");
-				if (debugConsole && debugContent) {
-					debugConsole.style.display = "block";
-					const entry = document.createElement("div");
-					entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-					entry.style.borderBottom = "1px solid #ddd";
-					entry.style.padding = "2px 0";
-					debugContent.appendChild(entry);
-				}
-			}
-
 			async function loadStudentResults(user) {
-				// Haal resultaten op met robuuste shared logic
-				logToPage(`Start laden voor: ${user.email} (UID: ${user.uid})`);
 				const welcomeMessage = document.getElementById("student-name-display");
-				const noResultsMessage = document.createElement("div");
-				noResultsMessage.className = "empty-state";
-				noResultsMessage.style.display = "none";
 				studentResultsDisplay.innerHTML = "";
-				studentResultsDisplay.appendChild(noResultsMessage);
 
 				try {
-					const doc = await resolveStudentDocument(db, user, logToPage);
+					// Haal resultaten op met robuuste shared logic (student-utils.js)
+					const doc = await resolveStudentDocument(db, user, /* logFn= */ () => {});
 					
 					if (doc && doc.exists) {
-						logToPage(`Succes! Document gevonden (ID: ${doc.id})`);
-						logToPage("Data normaliseren en weergeven...");
-						
 						const data = doc.data();
 						const studentName = data.name || user.displayName || user.email;
 						welcomeMessage.textContent = `${studentName}`;
@@ -2099,18 +2072,17 @@
 						const student = normalizeStudentData(doc.id, data || {});
 						cachedStudentData = student;
 						renderStudentPanel(studentResultsDisplay, student);
-						logToPage("Klaar.");
 					} else {
-						logToPage("CONCLUSIE: Geen resultaten kunnen laden.");
-						noResultsMessage.style.display = "block";
-						noResultsMessage.innerHTML = `
-                            <p>Geen resultaten gevonden voor jouw account.</p>
-                            <p><small>Debug Info: Zie log hieronder.</small></p>
+						// Geen resultaten gevonden -> Toon vriendelijke melding
+						studentResultsDisplay.innerHTML = `
+                            <div class="empty-state">
+                                <p>Geen resultaten gevonden voor account <strong>${user.email}</strong>.</p>
+                                <p><small>Neem contact op met je docent als je denkt dat dit een fout is.</small></p>
+                            </div>
                         `;
 					}
 				} catch (error) {
 					console.error("Error loading results:", error);
-					logToPage(`FATALE FOUT: ${error.message}`);
 					studentResultsDisplay.innerHTML = `
 						<div class="error-message">
 							<p>Kon gegevens niet laden.</p>
