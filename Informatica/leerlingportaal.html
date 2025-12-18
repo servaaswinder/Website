@@ -42,6 +42,33 @@
 				margin-top: 10px;
 				color: #721c24;
 			}
+            
+            /* Table Styles */
+            .submissions-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                background: #fff;
+            }
+            .submissions-table th,
+            .submissions-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+            .submissions-table th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+                color: #333;
+            }
+            .clickable-row {
+                cursor: pointer;
+                transition: background-color 0.1s;
+            }
+            .clickable-row:hover {
+                background-color: #e3f2fd;
+            }
+            /* Modal Styles handled inline or generic */
 		</style>
 
 		<main>
@@ -377,6 +404,19 @@
 		<footer>
 			<p>&copy; 2025 Servaas Winder</p>
 		</footer>
+
+        <!-- Student Detail Modal (Read Only) -->
+        <div id="student-detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+            <div style="background: white; width: 90%; max-width: 600px; margin: 50px auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+                <div style="padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="modal-student-name" style="margin: 0;">Opdracht Details</h3>
+                    <button onclick="closeStudentDetails()" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">&times;</button>
+                </div>
+                <div style="padding: 20px;" id="modal-student-content">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </div>
 
 		<script>
 			// Firebase Initialisatie (Gecentraliseerd in header)
@@ -748,63 +788,135 @@
 				return null;
 			}
 
-			const CLASS_PRIORITY = [
+            // --- Constants & Helpers ---
+            const CLASS_PRIORITY = [
 				{ key: "4havo", order: 0 },
 				{ key: "4vwo", order: 1 },
 				{ key: "5havo", order: 2 },
 				{ key: "5vwo", order: 3 },
 			];
+            
+            const CLASS_WEIGHTS = {
+                "4havo": { P1: 10, P2: 20, P3: 20, P4: 50 },
+                "4vwo":  { P1: 10, P2: 20, P3: 20, P4: 50 },
+                "5havo": { P1: 25, P2: 25, P3: 50, P4: 0 },
+                "5vwo":  { P1: 10, P2: 20, P3: 35, P4: 35 }
+            };
 
-			function normalizeClassCode(value) {
+            function normalizeClassCode(value) {
 				return (value || "")
 					.toLowerCase()
 					.replace(/\s+/g, "")
 					.replace(/[^a-z0-9]/g, "");
 			}
 
-			function getClassSortInfo(className) {
-				const normalized = normalizeClassCode(className);
-				if (!normalized) {
-					return { order: CLASS_PRIORITY.length + 1, normalized: "" };
-				}
-				for (const entry of CLASS_PRIORITY) {
-					if (
-						normalized.includes(entry.key) ||
-						entry.key.includes(normalized)
-					) {
-						return { order: entry.order, normalized };
-					}
-				}
-				return { order: CLASS_PRIORITY.length, normalized };
-			}
+            function getStudentWeights(className) {
+                const cls = normalizeClassCode(className);
+                if (cls.includes("4havo") || cls.includes("havo4")) return CLASS_WEIGHTS["4havo"];
+                if (cls.includes("4vwo") || cls.includes("vwo4")) return CLASS_WEIGHTS["4vwo"];
+                if (cls.includes("5havo") || cls.includes("havo5")) return CLASS_WEIGHTS["5havo"];
+                if (cls.includes("5vwo") || cls.includes("vwo5")) return CLASS_WEIGHTS["5vwo"];
+                return null;
+            }
 
-			function getSortableLastName(student) {
-				if (student && student.name) {
-					const parts = student.name.trim().split(/\s+/);
-					if (parts.length) {
-						return parts[parts.length - 1].toLowerCase();
-					}
-				}
-				if (student && student.email) {
-					const localPart = student.email.split("@")[0];
-					if (localPart) {
-						return localPart.toLowerCase();
-					}
-				}
-				return student && student.id ? student.id.toLowerCase() : "";
-			}
+            // ... (existing helper functions: getClassSortInfo, getSortableLastName etc.)
 
-			const COMMENT_HEADER_KEYWORDS = [
-				"opmerking",
-				"opmerkingen",
-				"comment",
-				"commentaar",
-				"comments",
-				"notitie",
-				"notities",
-				"feedback",
-			];
-			const GRADE_HEADER_KEYWORDS = [
+            // --- Assignment Detail Modal Logic ---
+            function openAssignmentDetail(assignment) {
+                const modal = document.getElementById('student-detail-modal');
+                const content = document.getElementById('modal-student-content');
+                const titleEl = document.getElementById('modal-student-name');
+                
+                if (!modal || !content) return;
+                
+                titleEl.textContent = assignment.title || 'Opdracht Details';
+                
+                let html = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                            <span class="assignment-period" style="font-size:1em;">${normalizePeriodValue(assignment.period) || 'Geen periode'}</span>
+                            ${assignment.grade ? `<span class="assignment-grade" style="font-size:1.2em;">Cijfer: <strong>${assignment.grade}</strong></span>` : ''}
+                        </div>
+                `;
+                
+                if (assignment.comment) {
+                    html += `
+                        <div style="background:#f8f9fa; padding:15px; border-radius:6px; margin-bottom:20px; border-left:4px solid #0044B3;">
+                            <strong style="display:block; margin-bottom:5px; color:#555;">Feedback docent:</strong>
+                            <div style="font-style:italic;">${assignment.comment}</div>
+                        </div>
+                    `;
+                }
+                
+                html += `<h4 style="border-bottom:1px solid #eee; padding-bottom:10px; margin-top:0;">Beoordeling (Rubric)</h4>`;
+                
+                // Use temp container to generate rubric HTML using existing helper
+                const rubricList = createRubricList(assignment.rubric);
+                if (rubricList) {
+                    html += `<div id="rubric-container"></div>`;
+                } else {
+                    html += `<p style="color:#888; font-style:italic;">Geen rubric details beschikbaar.</p>`;
+                }
+                html += `</div>`;
+                
+                content.innerHTML = html;
+                
+                if(rubricList) {
+                    content.querySelector('#rubric-container').appendChild(rubricList);
+                }
+                
+                modal.style.display = 'block';
+            }
+            
+            // Close Modal Logic
+             window.onclick = function(event) {
+                const modal = document.getElementById('student-detail-modal');
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            };
+            function closeStudentDetails() {
+                 document.getElementById('student-detail-modal').style.display = 'none';
+            }
+
+            function getClassSortInfo(className) {
+                const normalized = normalizeClassCode(className);
+                if (!normalized) {
+                    return { order: CLASS_PRIORITY.length + 1, normalized: "" };
+                }
+                for (const entry of CLASS_PRIORITY) {
+                    if (
+                        normalized.includes(entry.key) ||
+                        entry.key.includes(normalized)
+                    ) {
+                        return { order: entry.order, normalized };
+                    }
+                }
+                return { order: CLASS_PRIORITY.length, normalized };
+            }
+
+            function getSortableLastName(student) {
+                if (student && student.name) {
+                    const parts = student.name.trim().split(/\s+/);
+                    if (parts.length) {
+                        return parts[parts.length - 1].toLowerCase();
+                    }
+                }
+                if (student && student.email) {
+                    const localPart = student.email.split("@")[0];
+                    if (localPart) {
+                        return localPart.toLowerCase();
+                    }
+                }
+                return student && student.id ? student.id.toLowerCase() : "";
+            }
+
+            const COMMENT_HEADER_KEYWORDS = [
+                "opmerking",
+                "opmerkingen",
+                "comment",
+            ];
+            const GRADE_HEADER_KEYWORDS = [
 				"cijfer",
 				"score",
 				"beoordeling",
@@ -1906,11 +2018,15 @@
 					container.appendChild(empty);
 					return;
 				}
+
+                const studentClass = student.className || student.class || "";
+                const weights = getStudentWeights(studentClass);
+
 				const summary = document.createElement("div");
 				summary.className = "student-summary";
-				if (student.className) {
+				if (studentClass) {
 					const classInfo = document.createElement("p");
-					classInfo.textContent = `Klas: ${student.className}`;
+					classInfo.textContent = `Klas: ${studentClass}`;
 					summary.appendChild(classInfo);
 				}
 				const syncInfo = formatDate(student.lastSyncedAt);
@@ -1919,12 +2035,23 @@
 					syncText.textContent = `Laatste update: ${syncInfo}`;
 					summary.appendChild(syncText);
 				}
+                
+                // Add weighting info if applicable
+                if (weights) {
+                    const weightText = document.createElement("p");
+                    weightText.innerHTML = `<small><em>Weging: ${Object.entries(weights).map(([p,w]) => `${p}(${w}%)`).join(', ')}</em></small>`;
+                    weightText.style.color = "#666";
+                    summary.appendChild(weightText);
+                }
+                
 				container.appendChild(summary);
-				const assignmentsToRender = filterAssignmentsByPeriod(
+
+				const assignments = filterAssignmentsByPeriod(
 					student.assignments,
 					studentPeriodFilter
 				);
-				if (!assignmentsToRender.length) {
+                
+				if (!assignments.length) {
 					const empty = document.createElement("p");
 					empty.className = "empty-state";
 					empty.textContent =
@@ -1934,9 +2061,138 @@
 					container.appendChild(empty);
 					return;
 				}
-				assignmentsToRender.forEach((assignment) => {
-					container.appendChild(createAssignmentSection(assignment));
-				});
+                
+                // --- Table Layout Implementation ---
+                
+                // Sort assignments: P1, P2... then by ID/Title
+                // Actually, let's group closely to how the modal does it, but respecting the filter?
+                // The modal groups by period. Here we might have a specific filter.
+                // If filter is ALL, grouping by Period is nice.
+                // If specific, just list them? 
+                // Let's stick to the modal look: Table with headers.
+                
+                const table = document.createElement('table');
+                table.className = "submissions-table";
+                table.style.width = "100%";
+                
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr>
+                        <th>Opdracht</th>
+                        <th>Periode</th>
+                        <th>Cijfer</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+                
+                const tbody = document.createElement('tbody');
+                
+                // Sort logic similar to modal
+                // Try to sort by period then name
+                assignments.sort((a,b) => {
+                    const pA = normalizePeriodValue(a.period) || "Z";
+                    const pB = normalizePeriodValue(b.period) || "Z";
+                    if (pA !== pB) return pA.localeCompare(pB);
+                    return (a.title||"").localeCompare(b.title||"", undefined, {numeric: true});
+                });
+                
+                // Calc stats
+                const periodStats = { P1:[], P2:[], P3:[], P4:[], Overig:[] };
+                
+                let lastPeriod = null;
+                
+                assignments.forEach((assignment, index) => {
+                    const p = normalizePeriodValue(assignment.period) || "Overig";
+                    const pLabel = normalizePeriodValue(assignment.period) || "-";
+                    
+                    // Period separation headers? 
+                    // Not strictly necessary if sorted, but nice.
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "clickable-row";
+                    tr.title = "Klik voor details";
+                    tr.onclick = function() { openAssignmentDetail(assignment); };
+                    
+                    tr.innerHTML = `
+                        <td style="font-weight:500;">${assignment.title || 'Naamloos'}</td>
+                        <td>${pLabel}</td>
+                        <td style="font-weight:600;">${assignment.grade || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                    
+                    // Collect stats
+                    const g = parseFloat(String(assignment.grade || "").replace(',', '.'));
+                    if (!isNaN(g)) {
+                        if (periodStats[p]) periodStats[p].push(g);
+                        else periodStats["Overig"].push(g);
+                    }
+                });
+                
+                table.appendChild(tbody);
+                container.appendChild(table);
+                
+                // --- Averages Section ---
+                // Only show if we showing ALL periods (to make sense of weights) OR show period average?
+                
+                const statsDiv = document.createElement('div');
+                statsDiv.style.marginTop = "20px";
+                statsDiv.style.padding = "15px";
+                statsDiv.style.backgroundColor = "#f8f9fa";
+                statsDiv.style.borderRadius = "8px";
+                statsDiv.style.border = "1px solid #e9ecef";
+                
+                let statsHtml = `<h4 style="margin-top:0;">Gemiddelden</h4><div style="display:flex; gap:20px; flex-wrap:wrap;">`;
+                
+                // Calculate Period Averages
+                const periodAverages = {};
+                ["P1", "P2", "P3", "P4"].forEach(p => {
+                    const grades = periodStats[p];
+                    if (grades && grades.length > 0) {
+                        const sum = grades.reduce((a,b) => a+b, 0);
+                        const rawAvg = sum / grades.length;
+                        const roundedAvg = Math.round(rawAvg * 10) / 10;
+                        periodAverages[p] = roundedAvg; // Store rounded for weighting
+                        
+                        statsHtml += `
+                            <div style="text-align:center;">
+                                <div style="font-size:0.85em; color:#666;">${p} ${weights && weights[p] ? `(${weights[p]}%)` : ''}</div>
+                                <div style="font-size:1.2em; font-weight:bold;">${roundedAvg.toFixed(1)}</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                statsHtml += `</div>`;
+                
+                // Final Grade
+                if (weights && Object.keys(periodAverages).length > 0) {
+                     let weightedSum = 0;
+                     let totalWeight = 0;
+                     
+                     ["P1", "P2", "P3", "P4"].forEach(p => {
+                         if (periodAverages[p] !== undefined && weights[p]) {
+                             weightedSum += periodAverages[p] * weights[p];
+                             totalWeight += weights[p];
+                         }
+                     });
+                     
+                     if (totalWeight > 0) {
+                         const finalAvg = (weightedSum / totalWeight).toFixed(1);
+                         statsHtml += `
+                            <div style="margin-top:15px; border-top:1px solid #ccc; padding-top:10px;">
+                                <div style="font-size:0.9em; color:#444;">Voorlopig Eindcijfer (Gewogen)</div>
+                                <div style="font-size:1.5em; font-weight:bold; color:#0044B3;">${finalAvg}</div>
+                            </div>
+                         `;
+                     }
+                } else if (!weights && Object.keys(periodAverages).length > 0) {
+                     // Simple average of all grades if no weights?
+                     // Or just leave it as period averages.
+                     statsHtml += `<p style="font-size:0.8em; color:#666; margin-top:10px;">Geen weging bekend voor klas '${studentClass}'.</p>`;
+                }
+                
+                statsDiv.innerHTML = statsHtml;
+                container.appendChild(statsDiv);
 			}
 
 			// Laden van alle studenten (zichtbaar in adminpaneel)

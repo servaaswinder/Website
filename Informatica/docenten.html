@@ -701,6 +701,24 @@
                 return 0;
             }
 
+            // Weighting Rules
+            const CLASS_WEIGHTS = {
+                "4havo": { P1: 10, P2: 20, P3: 20, P4: 50 },
+                "4vwo":  { P1: 10, P2: 20, P3: 20, P4: 50 },
+                "5havo": { P1: 25, P2: 25, P3: 50, P4: 0 },
+                "5vwo":  { P1: 10, P2: 20, P3: 35, P4: 35 }
+            };
+
+            function getStudentWeights(className) {
+                const cls = normalizeClassCode(className);
+                if (cls.includes("4havo") || cls.includes("havo4")) return CLASS_WEIGHTS["4havo"];
+                if (cls.includes("4vwo") || cls.includes("vwo4")) return CLASS_WEIGHTS["4vwo"];
+                if (cls.includes("5havo") || cls.includes("havo5")) return CLASS_WEIGHTS["5havo"];
+                if (cls.includes("5vwo") || cls.includes("vwo5")) return CLASS_WEIGHTS["5vwo"];
+                // Fallback: Equal weights or 100% P1? Let's default to null (simple average)
+                return null;
+            }
+
             window.renderStudentsTable = function() {
                 const container = document.getElementById('all-students-container');
                 const students = window.allStudentsList || [];
@@ -747,7 +765,7 @@
                                 <th style="width: 100px;">P2</th>
                                 <th style="width: 100px;">P3</th>
                                 <th style="width: 100px;">P4</th>
-                                <th style="width: 80px; text-align: center; border-left: 2px solid #ddd;">G</th>
+                                <th style="width: 80px; text-align: center; border-left: 2px solid #ddd;" title="Gewogen Eindcijfer">Eind</th>
                             </tr>
                         </thead>
                         <tbody id="all-students-body">
@@ -755,11 +773,17 @@
                 
                 students.forEach(student => {
                     const studentClass = student.class || student.klas || student.groep || "";
+                    const weights = getStudentWeights(studentClass);
                     
-                    // Calculate Stats
-                    let overallSum = 0;
-                    let overallCount = 0;
                     let periodCells = "";
+                    let weightedSum = 0;
+                    let totalWeightUsed = 0;
+                    
+                    // Stats for simple avg fallback
+                    let simpleSum = 0;
+                    let simpleCount = 0;
+
+                    const periodGrades = {}; // Store for weighting
                     
                     ["P1", "P2", "P3", "P4"].forEach(p => {
                         // Gather actual grades
@@ -799,31 +823,61 @@
                         }
                         
                         // Display
-                        const avg = effectiveCount > 0 ? (effectiveSum / effectiveCount).toFixed(1) : "-";
+                        let avg = null;
+                        if (effectiveCount > 0) {
+                            // Calculate exact average first
+                            let rawAvg = effectiveSum / effectiveCount;
+                            // Round to 1 decimal for official Period Grade logic
+                            avg = Math.round(rawAvg * 10) / 10;
+                            
+                            periodGrades[p] = avg; // Store rounded average for weighting
+                            simpleSum += avg;
+                            simpleCount++;
+                        }
+
+                        const avgDisplay = avg !== null ? avg.toFixed(1) : "-";
                         const countDisplay = effectiveCount > 0 ? ` <span style="color:#888; font-size:0.85em;">(${effectiveCount})</span>` : "";
                         const cellStyle = effectiveCount > 0 ? "font-weight: 500;" : "color: #ccc;";
                         const cellBg = isAdjusted ? "background-color: #fff4e6;" : ""; // Subtle orange tint if adjusted
                         
-                        periodCells += `<td style="${cellStyle} ${cellBg}" title="${isAdjusted ? 'Aangevuld met 1.0' : ''}">${avg}${countDisplay}</td>`;
+                        periodCells += `<td style="${cellStyle} ${cellBg}" title="${isAdjusted ? 'Aangevuld met 1.0' : ''}">${avgDisplay}${countDisplay}</td>`;
                         
-                        overallSum += effectiveSum;
-                        overallCount += effectiveCount;
-
-                        // Global Accumulators
-                        if(effectiveCount > 0) {
-                            periodStats[p].sum += parseFloat(avg);
+                        // Global Accumulators (Stats)
+                        if(avg !== null) {
+                            periodStats[p].sum += avg;
                             periodStats[p].count++;
                         }
                     });
                     
-                    const finalAvg = overallCount > 0 ? (overallSum / overallCount).toFixed(1) : "-";
+                    // Calculate Final Grade
+                    let finalAvgStr = "-";
+                    let finalVal = null;
+
+                    if (weights) {
+                        // Weighted Calculation
+                        ["P1", "P2", "P3", "P4"].forEach(p => {
+                            if (periodGrades[p] !== undefined) {
+                                weightedSum += periodGrades[p] * weights[p];
+                                totalWeightUsed += weights[p];
+                            }
+                        });
+                        
+                        if (totalWeightUsed > 0) {
+                            finalVal = weightedSum / totalWeightUsed;
+                            finalAvgStr = finalVal.toFixed(1);
+                        }
+                    } else {
+                        // Simple Average Fallback (if class unknown)
+                        if (simpleCount > 0) {
+                            finalVal = simpleSum / simpleCount;
+                            finalAvgStr = finalVal.toFixed(1);
+                        }
+                    }
                     
-                    if (overallCount > 0) {
-                         const fv = parseFloat(finalAvg);
-                         if (!isNaN(fv)) {
-                             periodStats.Overall.sum += fv;
-                             periodStats.Overall.count++;
-                         }
+                    // Add to Overall Stats
+                    if (finalVal !== null) {
+                        periodStats.Overall.sum += finalVal;
+                        periodStats.Overall.count++;
                     }
 
                     tableHtml += `
@@ -834,7 +888,7 @@
                                 <div style="font-size: 0.8em; color: #888;">${student.email || ''}</div>
                             </td>
                             ${periodCells}
-                            <td style="font-weight: bold; text-align: center; border-left: 2px solid #ddd; background-color: #f8f9fa;">${finalAvg}</td>
+                            <td style="font-weight: bold; text-align: center; border-left: 2px solid #ddd; background-color: #f8f9fa;">${finalAvgStr}</td>
                         </tr>
                     `;
                 });
@@ -865,28 +919,25 @@
             };
             
             // --- Modal Logic ---
+            // --- Modal Logic ---
             window.openStudentDetails = function(studentId) {
                 window.activeStudentId = studentId; // Track active student
                 const student = window.allStudentsMap[studentId];
                 if (!student) return;
                 
-                document.getElementById('modal-student-name').textContent = `${student.name || 'Naamloos'} (${student.class || student.klas || '?'})`;
+                const studentClass = student.class || student.klas || student.groep || "";
+                const weights = getStudentWeights(studentClass);
+                
+                document.getElementById('modal-student-name').textContent = `${student.name || 'Naamloos'} (${studentClass})`;
                 const content = document.getElementById('modal-student-content');
                 
                 // Group by Period
                 const assignments = student.assignments || [];
-                // Sorting helper
-                const sortedAssignments = [...assignments].sort((a,b) => (a.period || "").localeCompare(b.period || "") || (a.assignmentId || "").localeCompare(b.assignmentId || ""));
+                // Sorting: Assignment ID (A1, A2...)
+                // Sort by ID naturally
+                const sortedAssignments = [...assignments].sort((a,b) => (a.assignmentId||"").localeCompare(b.assignmentId||"", undefined, {numeric: true}));
                 
                 const groups = { "P1": [], "P2": [], "P3": [], "P4": [], "Overig": [] };
-                
-                // We need to pass the ORIGINAL index to findAndOpenSubmission, OR use the sorted object to find it?
-                // Actually findAndOpenSubmission relies on index. 
-                // Better strategy: Pass the ID and let findAndOpenSubmission find it in the student object? 
-                // Or map it.
-                // Re-reading findAndOpenSubmission: it uses `student.assignments[assignmentIdx]`. 
-                // So I MUST use the index from the student.assignments array.
-                // Let's create a map of "assignment object -> original index".
                 
                 const originalIndices = new Map();
                 assignments.forEach((a, i) => originalIndices.set(a, i));
@@ -898,9 +949,8 @@
                 });
 
                 // Calculate Totals
-                let totalSum = 0;
-                let totalCount = 0;
-
+                let periodGrades = {};
+                
                 // Build HTML
                 let html = `<p style="margin-bottom:15px; color:#555;">${student.email || ''} - Laatste update: ${student.lastSyncedAt ? new Date(student.lastSyncedAt.toDate()).toLocaleDateString() : '-'}</p>`;
                 html += `<div style="font-size: 0.9em; margin-bottom: 10px; font-style: italic; color: #666;">Klik op een opdracht om het cijfer aan te passen.</div>`;
@@ -917,6 +967,7 @@
 
                 const periods = ["P1", "P2", "P3", "P4", "Overig"];
                 let hasData = false;
+                let anyGrades = false;
 
                 periods.forEach(p => {
                     const group = groups[p];
@@ -935,8 +986,7 @@
                             if (!isNaN(g)) {
                                 periodSum += g;
                                 periodCount++;
-                                totalSum += g;
-                                totalCount++;
+                                anyGrades = true;
                             }
 
                             const originalIndex = originalIndices.get(a);
@@ -951,14 +1001,19 @@
                             `;
                         });
                         
-                        // Period Average Row... (existing logic)
+                        // Period Average Row
                         if (periodCount > 0) {
-                             const avg = (periodSum / periodCount).toFixed(1);
+                            // Rounded to 1 decimal for consistency
+                             const rawAvg = periodSum / periodCount;
+                             const roundedAvg = Math.round(rawAvg * 10) / 10;
+                             
+                             periodGrades[p] = roundedAvg;
+
                             html += `
                                 <tr style="background-color: #e9ecef; font-weight: bold;">
                                     <td colspan="2" style="text-align: right;">Gemiddelde ${p}:</td>
-                                    <td>${avg}</td>
-                                    <td></td>
+                                    <td>${roundedAvg.toFixed(1)}</td>
+                                    <td>${weights && weights[p] ? '<span style="font-weight:normal; font-size:0.8em; color:#666;">(' + weights[p] + '%)</span>' : ''}</td>
                                 </tr>
                             `;
                         }
@@ -967,13 +1022,46 @@
                 
                 if (!hasData) {
                      html += `<tr><td colspan="4" style="text-align:center; padding:20px;">Geen resultaten.</td></tr>`;
-                } else if (totalCount > 0) {
-                    // Overall Average
-                    const overallAvg = (totalSum / totalCount).toFixed(1);
+                } else if (anyGrades) {
+                    // Overall Average Calculation
+                    let finalAvgStr = "-";
+                    
+                    if (weights) {
+                        // Weighted
+                        let weightedSum = 0;
+                        let totalWeight = 0;
+                        ["P1", "P2", "P3", "P4"].forEach(p => {
+                            if (periodGrades[p] !== undefined) {
+                                weightedSum += periodGrades[p] * weights[p];
+                                totalWeight += weights[p];
+                            }
+                        });
+                        
+                        if (totalWeight > 0) {
+                            finalAvgStr = (weightedSum / totalWeight).toFixed(1);
+                        }
+                    } else {
+                        // Simple fallback (if no class match)
+                        // Note: To perfectly match 'renderStudentsTable', we would need to check simple average logic again.
+                        // But here we can just sum up period averages? No, simple average is Sum(All)/Count(All).
+                        // Let's re-calculate simple avg if no weights found.
+                        let totalSum = 0;
+                        let totalCount = 0;
+                        // Iterate groups again... simplified:
+                        // Just use the pre-calculated sums? Need to track them.
+                        // For simplicity, let's just accept that if no weights are found, we show "-" or simple average logic.
+                        // Re-iterating to be safe:
+                        assignments.forEach(a => {
+                            const g = parseFloat(String(a.grade||"").replace(',','.'));
+                            if(!isNaN(g)) { totalSum+=g; totalCount++; }
+                        });
+                        if (totalCount > 0) finalAvgStr = (totalSum / totalCount).toFixed(1);
+                    }
+
                     html += `
                         <tr style="background-color: #333; color: #fff; font-weight: bold;">
                             <td colspan="2" style="text-align: right;">Eindgemiddelde:</td>
-                            <td>${overallAvg}</td>
+                            <td>${finalAvgStr}</td>
                             <td></td>
                         </tr>
                     `;

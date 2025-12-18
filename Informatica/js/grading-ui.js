@@ -228,7 +228,8 @@ const GradingUI = {
         "F1": "opdrachten/f1_usability.html",
         "C4": "opdrachten/c4_standaard_representaties.html",
         "E1": "opdrachten/e1_decompositie.html",
-        "Eind1": "opdrachten/eindopdracht_gamedev.html"
+        "Eind1": "opdrachten/eindopdracht_gamedev.html",
+        "Eind2": "opdrachten/eindopdracht_webshop.html"
     },
 
     open: async function(submissionId, submissionData, forceGrading = false) {
