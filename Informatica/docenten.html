@@ -15,9 +15,10 @@
 		<!-- PapaParse for CSV -->
 		<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
         <!-- Custom Scripts -->
+        <script src="js/student-utils.js"></script>
         <script src="js/rubric-parser.js"></script>
         <script src="js/grading-ui.js"></script>
-    <script src="js/backup-manager.js"></script>
+        <script src="js/backup-manager.js"></script>
 		<style>
 			.dashboard-container {
 				max-width: 1400px;
@@ -87,14 +88,27 @@
 				width: 100%;
 				border-collapse: collapse;
 				margin-top: 20px;
+                table-layout: fixed; /* Fix column widths */
 			}
 
 			.submissions-table th,
 			.submissions-table td {
-				padding: 12px;
+				padding: 8px 12px; /* Reduce vertical padding */
 				text-align: left;
 				border-bottom: 1px solid #eee;
+                vertical-align: top; /* Align top for better multiline handling */
+                word-wrap: break-word; /* Prevent overflow */
 			}
+
+            /* Define Column Widths */
+            /* Define Column Widths - Adjusted for better balance */
+            .submissions-table th:nth-child(1) { width: 10%; } /* Datum */
+            .submissions-table th:nth-child(2) { width: 15%; } /* Leerling */
+            .submissions-table th:nth-child(3) { width: 10%; } /* Opdracht (Was 8, now 10) */
+            .submissions-table th:nth-child(4) { width: 8%; }  /* Link (Was 6, now 8 - fixes wrapping) */
+            .submissions-table th:nth-child(5) { width: 12%; } /* Docent */
+            .submissions-table th:nth-child(6) { width: 25%; } /* Opmerkingen (Was 28) */
+            .submissions-table th:nth-child(7) { width: 20%; } /* Actie (Was 16 - gives buttons space) */
 
 			.submissions-table th {
 				background-color: #f8f9fa;
@@ -105,6 +119,14 @@
 			.submissions-table tr:hover {
 				background-color: #f5f5f5;
 			}
+
+            /* Responsive Adjustments */
+            @media (max-width: 1200px) {
+                .submissions-table th, .submissions-table td {
+                    font-size: 0.9em;
+                    padding: 6px 8px;
+                }
+            }
 
 			.status-badge {
 				display: inline-block;
@@ -282,6 +304,18 @@
                             <p id="csv-upload-message" style="margin-top: 10px; font-weight: 500;"></p>
                             <div id="csv-preview" style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 4px; display: none;"></div>
                         </div>
+                        
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <h4 style="margin-top: 0;">Database Onderhoud</h4>
+                            <p style="color: #666; font-size: 0.9em;">
+                                Gebruik deze functie als er dubbele leerling-accounts zijn ontstaan (bijv. eentje met hoofdletters en eentje zonder).
+                                Dit voegt de accounts samen en behoudt het account met hoofdletters (indien aanwezig).
+                            </p>
+                            <button onclick="mergeDuplicateAccounts()" class="action-btn" style="background-color: #6f42c1;">
+                                🛠️ Fix Dubbele Accounts
+                            </button>
+                            <span id="merge-status" style="margin-left: 10px; font-weight: 500;"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -441,7 +475,118 @@
                 return `<div>${email}</div>`;
             }
 
-			async function loadSubmissions() {
+            // --- Merge Duplicates Function ---
+            async function mergeDuplicateAccounts() {
+                const btn = document.querySelector('button[onclick="mergeDuplicateAccounts()"]');
+                const statusSpan = document.getElementById('merge-status');
+                
+                if (!confirm("Weet je zeker dat je dubbele accounts wilt samenvoegen? Dit proces:\n1. Zoekt accounts met hetzelfde emailadres (ongeacht hoofdletters).\n2. Voegt resultaten samen in het account met hoofdletters (indien aanwezig).\n3. Verwijdert de dubbele accounts.\n\nMaak voor de zekerheid eerst een backup!")) return;
+                
+                btn.disabled = true;
+                statusSpan.textContent = "Bezig met scannen...";
+                statusSpan.style.color = "blue";
+                
+                try {
+                    const snapshot = await db.collection("results").get();
+                    if (snapshot.empty) {
+                        statusSpan.textContent = "Geen resultaten gevonden.";
+                         btn.disabled = false;
+                        return;
+                    }
+                    
+                    // 1. Group by Normalized Email
+                    const groups = new Map(); // email_lower -> [doc1, doc2, ...]
+                    
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (!data.email) return;
+                        
+                        const normalizedEmail = data.email.toLowerCase();
+                        if (!groups.has(normalizedEmail)) {
+                            groups.set(normalizedEmail, []);
+                        }
+                        groups.get(normalizedEmail).push({ id: doc.id, data: data, ref: doc.ref });
+                    });
+                    
+                    let mergedCount = 0;
+                    let errorCount = 0;
+                    
+                    for (const [email, docs] of groups) {
+                        if (docs.length > 1) {
+                            console.log(`Duplicate found for ${email}: ${docs.length} copies.`);
+                            
+                            // 2. Identify Target (Prefer Uppercase in email string)
+                            // We prefer short IDs usually, but here ID format varies (uid vs email-slug).
+                            // User specifically wants to keep "Blokletters" account. Assumed this means formatting in 'email' field or 'name'.
+                            // Let's inspect the 'email' field of the docs.
+                            
+                            // Strategy: Find doc with uppercase letters in 'email' field.
+                            let target = docs.find(d => /[A-Z]/.test(d.data.email));
+                            
+                            // If no uppercase email found, pick the one that looks like an ID or just the first one.
+                            if (!target) {
+                                // Fallback: Pick the one that is NOT the email-slug if possible (UID based), or just first.
+                                target = docs[0];
+                            }
+                            
+                            const sources = docs.filter(d => d.id !== target.id);
+                            
+                            // 3. Merge Assignments
+                            let targetAssignments = target.data.assignments || [];
+                            let dirty = false;
+                            
+                            for (const source of sources) {
+                                const sourceAssignments = source.data.assignments || [];
+                                sourceAssignments.forEach(sAssignment => {
+                                    // Check if already exists in target (by ID or Title)
+                                    const exists = targetAssignments.some(t => 
+                                        (t.assignmentId && t.assignmentId === sAssignment.assignmentId) || 
+                                        (t.title && t.title === sAssignment.title)
+                                    );
+                                    
+                                    if (!exists) {
+                                        targetAssignments.push(sAssignment);
+                                        dirty = true;
+                                    }
+                                });
+                                
+                                // 4. Delete Source
+                                console.log(`Deleting duplicate source: ${source.id} (merging into ${target.id})`);
+                                await source.ref.delete();
+                            }
+                            
+                            // 5. Update Target
+                            if (dirty) {
+                                console.log(`Updating target ${target.id} with merged assignments.`);
+                                await target.ref.update({
+                                    assignments: targetAssignments,
+                                    lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                            }
+                            
+                            mergedCount++;
+                        }
+                    }
+                    
+                    statusSpan.textContent = `Klaar! ${mergedCount} accounts samengevoegd.`;
+                    statusSpan.style.color = "green";
+                    
+                    if (mergedCount > 0) {
+                        alert(`Succesvol ${mergedCount} dubbele accounts samengevoegd. De pagina wordt herladen.`);
+                        window.location.reload();
+                    }
+                    
+                } catch (e) {
+                    console.error("Merge failed:", e);
+                    statusSpan.textContent = "Fout: " + e.message;
+                    statusSpan.style.color = "red";
+                } finally {
+                    btn.disabled = false;
+                }
+            }
+
+            // Load Submissions Function
+            async function loadSubmissions() {
 				try {
 					// Fetch simply by status to avoid complex index issues
 					const snapshot = await db.collection("submissions")
@@ -504,15 +649,24 @@
                             </td>
 						    <td>
                                 <div style="display: flex; flex-direction: column; gap: 6px;">
-                                    ${data.status === 'grading' && data.gradingBy && data.gradingBy !== firebase.auth().currentUser.email ? 
-                                        `<button disabled class="action-btn secondary" style="background-color: #ffc107; color: #333; cursor: not-allowed;">
-                                            🔒 Bezig: ${data.gradingBy.split('@')[0]}
-                                        </button>` 
-                                    : 
-                                        `<button onclick="openGradingById('${doc.id}')" class="action-btn" style="background-color: ${data.status === 'grading' ? '#ffc107' : '#0044B3'}; color: ${data.status === 'grading' ? '#000' : '#fff'};">
-                                            ${data.status === 'grading' ? 'Hervat nakijken' : 'Nakijken'}
-                                        </button>`
-                                    }
+                                    ${(function() {
+                                        // Helper logic for button state
+                                        const currentUserEmail = firebase.auth().currentUser.email.toLowerCase();
+                                        const graderEmail = data.gradingBy ? data.gradingBy.toLowerCase() : '';
+                                        const isGrading = data.status === 'grading';
+                                        
+                                        // If grading AND handled by someone else
+                                        if (isGrading && graderEmail && graderEmail !== currentUserEmail) {
+                                            return `<button disabled class="action-btn secondary" style="background-color: #ffc107; color: #333; cursor: not-allowed; opacity: 0.8;">
+                                                🔒 ${data.gradingBy.split('@')[0]}
+                                            </button>`;
+                                        } 
+                                        
+                                        // Else: Show "Nakijken" or "Hervat"
+                                        return `<button onclick="openGradingById('${doc.id}')" class="action-btn" style="background-color: ${isGrading ? '#ffc107' : '#0044B3'}; color: ${isGrading ? '#000' : '#fff'};">
+                                            ${isGrading ? 'Hervat nakijken' : 'Nakijken'}
+                                        </button>`;
+                                    })()}
                                     <button onclick="rejectSubmission('${doc.id}')" class="action-btn" style="background-color: #dc3545;">Afwijzen</button>
                                 </div>
 							</td>
@@ -620,8 +774,8 @@
                 ]);
                 
                 // If detail modal is open, refresh it
-                const modal = document.getElementById('student-modal');
-                if (modal.style.display === 'block' && window.activeStudentId) {
+                const modal = document.getElementById('student-detail-modal');
+                if (modal && modal.style.display === 'block' && window.activeStudentId) {
                     console.log("Refreshing open student modal for:", window.activeStudentId);
                     window.openStudentDetails(window.activeStudentId);
                 }
@@ -1958,8 +2112,10 @@
                     row.remove();
                 }
                 
-                if (submissionsBody.children.length === 0) {
-                    noSubmissionsMessage.style.display = "block";
+                if (submissionsBody && submissionsBody.children.length === 0) {
+                    if (noSubmissionsMessage) {
+                        noSubmissionsMessage.style.display = "block";
+                    }
                 }
             }
 		</script>

@@ -20,6 +20,7 @@ const GradingUI = {
         document.getElementById('close-grading-modal').addEventListener('click', () => this.closeModal());
         document.getElementById('save-draft-btn').addEventListener('click', () => this.saveDraft());
         document.getElementById('finalize-grade-btn').addEventListener('click', () => this.finalizeGrade());
+        document.getElementById('release-grading-btn').addEventListener('click', () => this.releaseGrading()); // New Binding
         document.getElementById('delete-grading-btn').addEventListener('click', () => this.deleteGrading()); // New Binding
         document.getElementById('grading-comment').addEventListener('input', (e) => {
             this.teacherComment = e.target.value;
@@ -64,6 +65,7 @@ const GradingUI = {
                     </div>
 
                     <div style="padding: 15px 20px; border-top: 1px solid #eee; background: #f8f9fa; border-radius: 0 0 8px 8px; text-align: right; display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
+                        <button id="release-grading-btn" style="background: none; border: 1px solid #ffc107; color: #856404; background-color:#fff3cd; padding: 10px 15px; border-radius: 4px; font-size:0.9em; cursor:pointer; margin-right: 10px;" title="Stoppen met nakijken en vrijgeven voor collega's">🔓 Vrijgeven</button>
                         <button id="delete-grading-btn" style="background: none; border: 1px solid #dc3545; color: #dc3545; padding: 10px 15px; border-radius: 4px; font-size:0.9em; margin-right: auto; cursor:pointer;" title="Inzending resetten en cijfer wissen">Wis Resultaat</button>
                         <span id="grading-status-msg" style="font-style: italic; color: #666;"></span>
                         
@@ -237,7 +239,15 @@ const GradingUI = {
         this.currentSubmissionData = submissionData; // Assign this!
         this.currentRubricData = null;
         this.selectedCells = {};
-        this.teacherComment = submissionData.teacherComment || "";
+        
+        // If pending (e.g. resubmission), ignore the old comment from the doc.
+        // If duplicate fix loaded it, it will overwrite this later.
+        if (submissionData.status === 'pending') {
+            this.teacherComment = "";
+        } else {
+            this.teacherComment = submissionData.teacherComment || "";
+        }
+
         this.isDirty = false;
 
         // Determine display name
@@ -321,15 +331,22 @@ const GradingUI = {
             // Set Period if available
             if (submissionData.period) {
                  const periodSelect = document.getElementById('grading-period');
-                 if (periodSelect) periodSelect.value = submissionData.period;
+                 if (periodSelect) {
+                     // Normalize "1" to "P1" just in case
+                     let p = String(submissionData.period);
+                     if (!p.startsWith('P') && ['1','2','3','4'].includes(p)) p = 'P' + p;
+                     periodSelect.value = p;
+                 }
             }
 
             // Restore Selection and State
+            // 1. DRAFT (Highest priority)
             if (this.currentSubmissionData.gradingDraft && this.currentSubmissionData.gradingDraft.selectedCells) {
                  this.selectedCells = this.currentSubmissionData.gradingDraft.selectedCells;
                  this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
                  this.updateUISelection();
                  this.updateCalculation(); 
+            // 2. FINAL (If already graded)
             } else if (this.currentSubmissionData.finalRubric) {
                  this.selectedCells = this.currentSubmissionData.finalRubric;
                  if (this.currentSubmissionData.teacherComment) {
@@ -337,9 +354,43 @@ const GradingUI = {
                  }
                  this.updateUISelection();
                  this.updateCalculation();
+            // 3. CSV IMPORT RESTORE
             } else if (this.currentSubmissionData.csvRubric) {
-                 // Smart Restore from CSV (New Feature)
                  this.applyCsvRubric(this.currentSubmissionData.csvRubric);
+            // 4. PREVIOUS GRADED ASSIGNMENT (Resubmission inheritance)
+            } else {
+                 // Check if there is an existing result in 'results' collection
+                 // We can reuse resolveStudentDocument here if imported, or manual fetch.
+                 // We use the helper function from earlier changes in finalizeGrade.
+                 this.checkForPreviousGrade(submissionData).then(prevData => {
+                     if (prevData) {
+                         console.log("Restoring previous grade data:", prevData);
+                         
+                         // Fill Rubric
+                         if (prevData.rubric && Array.isArray(prevData.rubric)) {
+                             // Map array [{theme:..., value:...}] back to selectedCells {index: points}
+                             prevData.rubric.forEach(item => {
+                                 // Reuse applyCsvRubric logic or similar mapping
+                                 // Let's create a minimal shim as we have rubrics by Theme Name
+                                 this.applyCsvRubric([item]); // Works per item!
+                             });
+                         }
+                         
+                         // Fill Comment
+                         if (prevData.comment && !this.teacherComment) {
+                             this.teacherComment = "--- HERBEOORDELING (Vorig cijfer: " + prevData.grade + ") ---\n" + prevData.comment;
+                         } else {
+                             this.teacherComment = "--- HERBEOORDELING (Vorig cijfer: " + prevData.grade + ") ---\n" + this.teacherComment;
+                         }
+                         
+                         document.getElementById('grading-comment').value = this.teacherComment;
+                         
+                         // Show Notification
+                         const statusMsg = document.getElementById('grading-status-msg');
+                         statusMsg.textContent = "⚠️ Vorige beoordeling ingeladen!";
+                         statusMsg.style.color = "#ff9800";
+                     }
+                 });
             }
             
             // Apply Comment to UI
@@ -620,16 +671,32 @@ const GradingUI = {
             if (studentEmail) {
                 try {
                     const resultsRef = firebase.firestore().collection("results");
-                    // Try exact match first (original case)
-                    let snapshot = await resultsRef.where("email", "==", this.currentSubmissionData.userEmail).limit(1).get();
                     
-                    // If not found, try lowercase
-                    if (snapshot.empty && this.currentSubmissionData.userEmail !== studentEmail) {
-                        snapshot = await resultsRef.where("email", "==", studentEmail).limit(1).get();
+                    // Use robust resolveStudentDocument from student-utils.js
+                    // Note: GradingUI needs access to db. We can get it from firebase.firestore()
+                    const db = firebase.firestore();
+                    const userObj = { 
+                        email: this.currentSubmissionData.userEmail || studentEmail,
+                        uid: this.currentSubmissionData.userId // might be undefined, which is fine
+                    };
+
+                    let studentDoc = null;
+                    if (typeof resolveStudentDocument === 'function') {
+                        const docSnapshot = await resolveStudentDocument(db, userObj, console.log);
+                        if (docSnapshot && docSnapshot.exists) {
+                            studentDoc = docSnapshot;
+                        }
+                    } else {
+                        // Fallback if student-utils not loaded (should not happen in updated docenten.html)
+                        console.warn("GradingUI: resolveStudentDocument not found, using legacy lookup.");
+                        let snapshot = await resultsRef.where("email", "==", this.currentSubmissionData.userEmail).limit(1).get();
+                        if (snapshot.empty) {
+                            snapshot = await resultsRef.where("email", "==", studentEmail).limit(1).get();
+                        }
+                        if (!snapshot.empty) studentDoc = snapshot.docs[0];
                     }
                     
-                    if (!snapshot.empty) {
-                        const studentDoc = snapshot.docs[0];
+                    if (studentDoc) {
                         const studentData = studentDoc.data();
                         let assignments = studentData.assignments || [];
                         
@@ -660,9 +727,17 @@ const GradingUI = {
                         console.log("Synced result to student record:", studentDoc.id);
                     } else {
                         // Create new result document
-                        console.log("Creating new student record in 'results' for:", studentEmail);
+                        // IMPORTANT: Only create if really not found. 
+                        // If we are here, it means resolveStudentDocument failed.
+                        // We should prefer creating with the EXACT email from the submission IF it seems reliable,
+                        // OR stick to lowercase to prevent duplicates if that's the policy.
+                        // But user wants "Blokletters behouden".
                         
-                        const studentName = this.currentSubmissionData.userName || this.currentSubmissionData.name || studentEmail.split('@')[0];
+                        // If the submission email HAS capitals, we use that for the NEW document email field.
+                        const newEmail = this.currentSubmissionData.userEmail || studentEmail;
+                        console.log("Creating new student record in 'results' for:", newEmail);
+                        
+                        const studentName = this.currentSubmissionData.userName || this.currentSubmissionData.name || newEmail.split('@')[0];
                         const studentClass = this.currentSubmissionData.userClass || this.currentSubmissionData.class || 'Onbekend';
                         
                         const assignmentTitle = this.currentSubmissionData.assignmentId || "Opdracht";
@@ -680,8 +755,13 @@ const GradingUI = {
                             assignmentId: assignmentTitle
                         };
                         
-                        await resultsRef.add({
-                            email: studentEmail,
+                        // Use sanitized ID to prevent weird chars in Doc ID
+                        const newDocId = (typeof sanitizeDocId === 'function') 
+                                        ? sanitizeDocId(newEmail) 
+                                        : newEmail.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+                        await resultsRef.doc(newDocId).set({
+                            email: newEmail, // Keep original casing in field
                             name: studentName,
                             class: studentClass,
                             assignments: [assignmentObj],
@@ -774,6 +854,42 @@ const GradingUI = {
         }
     },
 
+    releaseGrading: async function() {
+        // Reset status to pending so others can pick it up
+        const statusMsg = document.getElementById('grading-status-msg');
+        statusMsg.textContent = "Vrijgeven...";
+        
+        try {
+            await firebase.firestore().collection("submissions").doc(this.currentSubmissionId).update({
+                status: "pending",
+                gradingBy: firebase.firestore.FieldValue.delete(),
+                gradingStartedAt: firebase.firestore.FieldValue.delete(),
+                gradingDraft: firebase.firestore.FieldValue.delete() // Also clear draft if any? Maybe better to keep draft? 
+                // User asked: "I want to reset so my colleague can grade it". Implicitly "I didn't do anything useful yet". 
+                // If we keep draft, the colleague sees my draft. That might be confusing or helpful. 
+                // Let's Keep the draft! Just unlock it.
+            });
+            
+            // Note: If we really want to remove the "lock", we should probably remove the field `gradingBy`.
+            // Done above.
+
+            this.isDirty = false; // No need to save
+            this.closeModal();
+            
+            // Refresh parent
+            if (typeof loadSubmissions === 'function') {
+                loadSubmissions();
+            } else {
+                window.location.reload();
+            }
+
+        } catch (e) {
+            console.error(e);
+            statusMsg.textContent = "Fout bij vrijgeven!";
+            alert("Fout bij vrijgeven: " + e.message);
+        }
+    },
+
     closeModal: async function() {
         if (this.isDirty) {
             if (!confirm("Je hebt wijzigingen die nog niet zijn opgeslagen als concept. Wil je toch sluiten?")) return;
@@ -781,14 +897,39 @@ const GradingUI = {
         
         document.getElementById('grading-modal').style.display = 'none';
         document.body.style.overflow = '';
-        
-        // Only unlock if we are closing without finishing?
-        // Actually, if we close, we probably keep the lock until explicitly unlocked or finished?
-        // But user might just want to stop grading for now.
-        // Let's leave it in 'grading' status so Jaimy sees it.
-        // Or should we revert to 'pending' if no draft saved?
-        // "Op het moment dat ik een inzending open, wil ik dat dit zichtbaar wordt... zodat Jaimy kan zien dat ik bezig ben".
-        // So keeping it 'grading' is correct.
+    },
+
+    checkForPreviousGrade: async function(submissionData) {
+        try {
+            const db = firebase.firestore();
+            const studentEmail = submissionData.userEmail;
+            const assignmentId = submissionData.assignmentId;
+            
+            if (!studentEmail || !assignmentId) return null;
+
+            // Use resolveStudentDocument if available (it is in docenten.html now)
+            let studentDoc = null;
+            if (typeof resolveStudentDocument === 'function') {
+                 const docSnapshot = await resolveStudentDocument(db, { email: studentEmail }, () => {});
+                 if (docSnapshot && docSnapshot.exists) studentDoc = docSnapshot;
+            }
+            
+            if (!studentDoc) return null;
+            
+            const data = studentDoc.data();
+            if (data.assignments && Array.isArray(data.assignments)) {
+                // Find matching assignment
+                // Assuming assignmentId matches 'title' or 'assignmentId' in result object
+                const found = data.assignments.find(a => 
+                    a.title === assignmentId || a.assignmentId === assignmentId
+                );
+                return found || null;
+            }
+        } catch (e) {
+            console.warn("Error checking previous grade:", e);
+            return null;
+        }
+        return null;
     }
 };
 

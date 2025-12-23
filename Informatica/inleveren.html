@@ -12,6 +12,7 @@
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+        <script src="js/student-utils.js"></script>
 
 
 	<body class="auth-page">
@@ -30,10 +31,10 @@
 						<label for="period">Periode</label>
 						<select id="period" required>
 							<option value="" disabled selected>Kies een periode...</option>
-							<option value="1">Periode 1</option>
-							<option value="2">Periode 2</option>
-							<option value="3">Periode 3</option>
-							<option value="4">Periode 4</option>
+							<option value="P1">Periode 1</option>
+							<option value="P2">Periode 2</option>
+							<option value="P3">Periode 3</option>
+							<option value="P4">Periode 4</option>
 						</select>
 					</div>
 
@@ -130,7 +131,7 @@
 			const loadingOverlay = document.getElementById("loading-overlay");
 			const submitBtn = document.querySelector(".submit-btn");
 
-			form.addEventListener("submit", async (e) => {
+            form.addEventListener("submit", async (e) => {
 				e.preventDefault();
 				
 				const user = auth.currentUser;
@@ -148,8 +149,41 @@
 				loadingOverlay.style.display = "flex";
 				submitBtn.disabled = true;
 
-				// Check for existing pending/rejected submissions for this assignment
-				try {
+                try {
+                    // --- STEP 1: Check for existing grade in 'results' collection ---
+                    // Using student-utils.js resolveStudentDocument for robust lookup
+                    let existingGrade = null;
+                    try {
+                        const studentDoc = await resolveStudentDocument(db, user, console.log);
+                        if (studentDoc && studentDoc.exists) {
+                            const data = studentDoc.data();
+                            if (data.assignments && Array.isArray(data.assignments)) {
+                                const found = data.assignments.find(a => 
+                                    a.title === assignment || a.assignmentId === assignment
+                                );
+                                if (found && found.grade) {
+                                    existingGrade = found;
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("Could not check existing grade:", err);
+                    }
+
+                    if (existingGrade) {
+                        const confirmed = confirm(
+                            `⚠️ WAARSCHUWING: Je hebt deze opdracht al eerder ingeleverd en een cijfer gekregen (${existingGrade.grade}).\n\n` +
+                            `Als je opnieuw inlevert, wordt dit een HERBEOORDELING.\n\n` +
+                            `Weet je zeker dat je opnieuw wilt inleveren? De docent ziet je vorige beoordeling als uitgangspunt.`
+                        );
+                        if (!confirmed) {
+                            loadingOverlay.style.display = "none";
+                            submitBtn.disabled = false;
+                            return; // Stop submission
+                        }
+                    }
+
+                    // --- STEP 2: Check for active submissions (Pending/Checked) ---
 					const snapshot = await db.collection("submissions")
 						.where("userId", "==", user.uid)
 						.where("assignmentId", "==", assignment)
@@ -164,16 +198,24 @@
 						const oldStatus = activeSubmission.data().status;
 						const docRef = db.collection("submissions").doc(activeSubmission.id);
 						
-						await docRef.update({
+						// Prepare update data
+                        const updateData = {
 							assignmentUrl: assignmentUrl,
 							comments: comments,
 							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-							status: "pending",
-							// We laten teacherComment staan voor context of wissen hem? 
-							// Meestal wissen studenten liever "clean", maar voor historie is wissen van teacherComment handig zodat het echt "nieuw" lijkt.
-							// Laten we teacherComment wissen om verwarring te voorkomen met oude feedback.
-							teacherComment: firebase.firestore.FieldValue.delete() 
-						});
+							status: "pending"
+							// teacherComment deletion REMOVED to avoid permission error. 
+                            // grading-ui.js will handle ignoring old comments.
+						};
+
+                        // If inheriting from a grade, maybe mark it? 
+                        // Actually, grading-ui will look it up dynamically.
+                        // But we could add a flag: 'isResubmission: true'
+                        if (existingGrade) {
+                            updateData.isResubmission = true;
+                        }
+
+						await docRef.update(updateData);
 					
 					} else {
 						// Nieuwe maken
@@ -185,7 +227,8 @@
 							assignmentUrl: assignmentUrl,
 							comments: comments,
 							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-							status: "pending"
+							status: "pending",
+                            isResubmission: !!existingGrade
 						});
 					}
 
