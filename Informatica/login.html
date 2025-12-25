@@ -8,8 +8,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Inloggen - Informatica</title>
 		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
-
+        <!-- QR Code Library for Enrollment -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 	</head>
 	<style>
 		.submission-form {
@@ -25,6 +25,7 @@
 		.submission-form h2 {
 			margin-top: 0;
 			margin-bottom: 24px;
+            color: #0044B3;
 		}
 
 		.form-group {
@@ -38,9 +39,8 @@
 			color: #333;
 		}
 
-		.form-group select,
 		.form-group input,
-		.form-group textarea {
+        .form-group select {
 			width: 100%;
 			padding: 12px;
 			border: 1px solid #ccc;
@@ -48,11 +48,6 @@
 			font-size: 16px;
 			background: #fff;
 			box-sizing: border-box;
-		}
-
-		.form-group textarea {
-			min-height: 120px;
-			resize: vertical;
 		}
 
 		.submit-btn {
@@ -66,84 +61,146 @@
 			font-weight: 700;
 			cursor: pointer;
 			transition: background-color 0.2s;
+            margin-top: 10px;
 		}
 
 		.submit-btn:hover {
 			background: #003399;
 		}
 
-		.submit-btn:disabled {
-			background: #ccc;
-			cursor: not-allowed;
-		}
+        .submit-btn.secondary {
+            background: #6c757d;
+        }
+        .submit-btn.secondary:hover {
+            background: #5a6268;
+        }
 
-		#success-message {
-			display: none;
-			margin-top: 20px;
-			padding: 15px;
-			background-color: #d4edda;
-			color: #155724;
-			border: 1px solid #c3e6cb;
-			border-radius: 4px;
-			text-align: center;
-		}
-		
-		.loading-overlay {
-			display: none;
-			position: fixed;
-			top: 0; left: 0; right: 0; bottom: 0;
-			background: rgba(255,255,255,0.8);
-			z-index: 1000;
-			align-items: center;
-			justify-content: center;
-			font-weight: 600;
-			color: #0044B3;
-		}
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            text-align: center;
+        }
+        .status-message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* 2FA Specific Styles */
+        .hidden { display: none !important; }
+        
+        #qr-canvas {
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #eee;
+        }
+        .secret-code-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .instruction-text {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
 	</style>
+    
 	<body class="auth-page">
 		{% include site-header-informatica.html %}
 
 		<main>
 			<div class="submission-form">
-				<section id="login-section">
-					<!-- Login View -->
-					<div id="view-login">
-						<h2>Inloggen</h2>
-						<p>Vul je gegevens in om verder te gaan.</p>
-						<form id="login-form">
-							<div class="form-group">
-								<label for="login-email">E-mailadres</label>
-								<input type="email" id="login-email" required placeholder="" />
-							</div>
-							<div class="form-group">
-								<label for="login-password">Wachtwoord</label>
-								<input type="password" id="login-password" required placeholder="" />
-							</div>
-							<button type="submit" class="submit-btn">Inloggen</button>
-						</form>
-						<div class="toggle-link">
-							<button type="button" class="submit-btn secondary" id="show-reset-view" style="background: transparent; color: #0044B3; width: auto; display: inline-block; padding: 0; font-weight: 400; text-decoration: underline;">Wachtwoord vergeten of aanmaken?</button>
-						</div>
-						<div id="login-error" class="status-message error-message"></div>
-					</div>
+                <!-- 1. INITIAL LOADING (Spinner) -->
+                <div id="view-loading" style="text-align: center; padding: 40px;">
+                    <p>Bezig met laden...</p>
+                </div>
 
-					<!-- Reset View (Hidden by default) -->
-					<div id="view-reset" class="hidden">
-						<h2>Wachtwoord herstellen</h2>
-						<p>Vul je e-mailadres in om een link te ontvangen voor het instellen of herstellen van je wachtwoord. Let op: dit bericht kan in je spambox belanden.</p>
-						<form id="reset-form">
-							<div class="form-group">
-								<label for="reset-email">E-mailadres</label>
-								<input type="email" id="reset-email" placeholder="lln12345@northgo-college.nl" />
-							</div>
-							<button type="button" id="reset-btn" class="submit-btn">Stuur reset-link</button>
-						</form>
-						<div class="toggle-link">
-							<button type="button" class="submit-btn secondary" id="show-login-view" style="background: transparent; color: #0044B3; width: auto; display: inline-block; padding: 0; font-weight: 400; text-decoration: underline;">Terug naar inloggen</button>
+				<!-- 2. LOGIN FORM -->
+				<section id="view-login" class="hidden">
+					<h2>Inloggen</h2>
+					<p class="instruction-text">Log in met je schoolaccount.</p>
+					<form id="login-form">
+						<div class="form-group">
+							<label for="login-email">E-mailadres</label>
+							<input type="email" id="login-email" required placeholder="" />
 						</div>
-						<p id="reset-message" class="status-message"></p>
-					</div>
+						<div class="form-group">
+							<label for="login-password">Wachtwoord</label>
+							<input type="password" id="login-password" required placeholder="" />
+						</div>
+						<button type="submit" class="submit-btn" id="btn-login-submit">Inloggen</button>
+                        <div id="login-error" class="status-message"></div>
+					</form>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                         <button id="btn-goto-reset" style="background:none; border:none; color:#0044B3; text-decoration:underline; cursor:pointer;">Wachtwoord vergeten?</button>
+                    </div>
 				</section>
+
+                <!-- 3. MFA VERIFICATION (Existing Users) -->
+                <section id="view-mfa-verify" class="hidden">
+                    <h2>2FA Verificatie</h2>
+                    <p class="instruction-text">Je account is beveiligd met Two-Factor Authentication. Open je wachtwoordmanager of app en vul de code in.</p>
+                    <div class="form-group">
+                        <label for="mfa-verify-code">6-cijferige Code</label>
+                        <input type="text" id="mfa-verify-code" placeholder="123456" autocomplete="one-time-code" />
+                    </div>
+                    <button id="btn-mfa-verify-submit" class="submit-btn">Verifiëren</button>
+                    <div id="mfa-verify-error" class="status-message"></div>
+                    <button id="btn-back-to-login" class="submit-btn secondary" style="margin-top:10px;">Terug</button>
+                </section>
+
+                <!-- 4. ENROLLMENT (New Users - ENFORCED) -->
+                <section id="view-enroll" class="hidden">
+                    <h2>2FA Instellen (Verplicht)</h2>
+                    <p class="instruction-text">
+                        Om je account te beveiligen is het instellen van 2FA verplicht.<br>
+                        Scan de onderstaande QR-code met je favoriete <strong>wachtwoordmanager</strong> (zoals Bitwarden, 1Password) of Google Authenticator.
+                    </p>
+                    
+                    <canvas id="qr-canvas"></canvas>
+                    
+                    <p style="text-align: center; font-size: 0.9em; color: #666;">Lukt scannen niet? Typ deze code over:</p>
+                    <div class="secret-code-box" id="secret-code-display">...</div>
+
+                    <div class="form-group">
+                        <label for="enroll-code">Vul de code uit je app in om te bevestigen:</label>
+                        <input type="text" id="enroll-code" placeholder="123456" autocomplete="one-time-code" />
+                    </div>
+                    
+                    <button id="btn-enroll-submit" class="submit-btn">Activeren & Doorgaan</button>
+                    <div id="enroll-error" class="status-message"></div>
+                </section>
+
+				<!-- 5. PASSWORD RESET -->
+				<div id="view-reset" class="hidden">
+					<h2>Wachtwoord herstellen</h2>
+					<p class="instruction-text">Vul je e-mailadres in om een reset-link te ontvangen.</p>
+					<form id="reset-form">
+						<div class="form-group">
+							<label for="reset-email">E-mailadres</label>
+							<input type="email" id="reset-email" placeholder="" />
+						</div>
+						<button type="submit" id="btn-reset-submit" class="submit-btn">Stuur reset-link</button>
+                        <div id="reset-message" class="status-message"></div>
+					</form>
+					<button id="btn-back-from-reset" class="submit-btn secondary" style="margin-top:10px;">Terug naar inloggen</button>
+				</div>
 			</div>
 		</main>
 
@@ -151,96 +208,229 @@
 			<p>&copy; 2025 Servaas Winder</p>
 		</footer>
 
-		<script>
-			// Firebase configuratie
-			// Firebase Initialisatie (Gecentraliseerd in header)
-			const auth = firebase.auth();
+		<!-- MODULAR SDK SCRIPT -->
+		<script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+            import { 
+                getAuth, 
+                signInWithEmailAndPassword, 
+                signOut, 
+                onAuthStateChanged, 
+                multiFactor, 
+                TotpMultiFactorGenerator, 
+                TotpSecret, 
+                getMultiFactorResolver,
+                sendPasswordResetEmail,
+                setPersistence,
+                browserSessionPersistence
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-			// Haal redirect URL op
-			const urlParams = new URLSearchParams(window.location.search);
-			const redirectUrl = urlParams.get('redirect') || 'leerlingportaal.html';
+            const firebaseConfig = {
+                apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+                authDomain: "leerling-accounts.firebaseapp.com",
+                projectId: "leerling-accounts",
+                storageBucket: "leerling-accounts.firebasestorage.app",
+                messagingSenderId: "884081904341",
+                appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+                measurementId: "G-9YY3856FBP",
+            };
 
-			// HTML-elementen
-			const loginForm = document.getElementById("login-form");
-			const loginError = document.getElementById("login-error");
-			const resetBtn = document.getElementById("reset-btn");
-			const resetEmailInput = document.getElementById("reset-email");
-			const resetMessage = document.getElementById("reset-message");
-			
-			// View elements
-			const viewLogin = document.getElementById("view-login");
-			const viewReset = document.getElementById("view-reset");
-			const showResetBtn = document.getElementById("show-reset-view");
-			const showLoginBtn = document.getElementById("show-login-view");
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            
+            // SECURITY: Set Persistence to SESSION (clears on browser close)
+            // This prevents the user from staying logged in after closing the tab/window.
+            setPersistence(auth, browserSessionPersistence)
+                .then(() => console.log("Session persistence set to SESSION_ONLY"))
+                .catch((error) => console.error("Persistence Error:", error));
+            
+            // State Variables
+            let mfaResolver = null;      // For Login MFA
+            let enrollmentSecret = null; // For Enrollment
+            
+            // DOM Elements
+            const views = {
+                loading: document.getElementById('view-loading'),
+                login: document.getElementById('view-login'),
+                mfaVerify: document.getElementById('view-mfa-verify'),
+                enroll: document.getElementById('view-enroll'),
+                reset: document.getElementById('view-reset')
+            };
 
-			// Toggle views
-			if (showResetBtn) {
-				showResetBtn.addEventListener("click", () => {
-					viewLogin.classList.add("hidden");
-					viewReset.classList.remove("hidden");
-					resetMessage.textContent = "";
-					resetMessage.className = "status-message";
-				});
-			}
+            function showView(viewName) {
+                Object.values(views).forEach(el => el.classList.add('hidden'));
+                if (views[viewName]) views[viewName].classList.remove('hidden');
+            }
 
-			if (showLoginBtn) {
-				showLoginBtn.addEventListener("click", () => {
-					viewReset.classList.add("hidden");
-					viewLogin.classList.remove("hidden");
-					loginError.textContent = "";
-					loginError.className = "status-message error-message";
-				});
-			}
+            // --- AUTH STATE OBSERVER (The "Traffic Cop") ---
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    console.log("User logged in:", user.email);
+                    
+                    // Check if enrolled in MFA
+                    const enrolledFactors = multiFactor(user).enrolledFactors;
+                    if (enrolledFactors && enrolledFactors.length > 0) {
+                        // User HAS 2FA -> Allow Access
+                        console.log("2FA Active. Redirecting...");
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect') || 'leerlingportaal.html';
+                        window.location.href = redirectUrl;
+                    } else {
+                        // User NO 2FA -> Enforce Enrollment
+                        console.log("No 2FA. Enforcing enrollment...");
+                        startEnrollment(user);
+                    }
+                } else {
+                    // Not logged in -> Show Login Form
+                    console.log("User not logged in.");
+                    showView('login');
+                }
+            });
 
-			// Login handler
-			if (loginForm) {
-				loginForm.addEventListener("submit", (e) => {
-					e.preventDefault();
-					const email = document.getElementById("login-email").value;
-					const password = document.getElementById("login-password").value;
-					loginError.textContent = "";
+            // --- 1. LOGIN LOGIC ---
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorDiv = document.getElementById('login-error');
+                
+                errorDiv.className = 'status-message'; // hide
+                errorDiv.textContent = '';
+                
+                const btn = document.getElementById('btn-login-submit');
+                btn.disabled = true;
+                btn.textContent = "Even geduld...";
 
-					auth.signInWithEmailAndPassword(email, password)
-						.then(() => {
-							// Redirect na succesvolle login
-							window.location.href = redirectUrl;
-						})
-						.catch((error) => {
-							console.error("Login error:", error);
-							loginError.textContent = "Inloggen mislukt: " + error.message;
-						});
-				});
-			}
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // onAuthStateChanged will handle the rest
+                } catch (error) {
+                    console.error("Login Error:", error);
+                    btn.disabled = false;
+                    btn.textContent = "Inloggen";
+                    
+                    if (error.code === 'auth/multi-factor-auth-required') {
+                        // Handle MFA Challenge (Login 2nd step)
+                        mfaResolver = getMultiFactorResolver(auth, error);
+                        showView('mfaVerify');
+                    } else {
+                        errorDiv.textContent = "Inloggen mislukt: " + error.message;
+                        errorDiv.classList.add('error');
+                    }
+                }
+            });
 
-			// Password reset handler
-			if (resetBtn) {
-				resetBtn.addEventListener("click", () => {
-					const email = resetEmailInput.value;
-					
-					if (!email) {
-						resetMessage.textContent = "Vul je e-mailadres in.";
-						resetMessage.className = "status-message error-message";
-						return;
-					}
-					auth.sendPasswordResetEmail(email)
-						.then(() => {
-							resetMessage.textContent = "Reset-link verzonden! Check je mail.";
-							resetMessage.className = "status-message success-message";
-						})
-						.catch((error) => {
-							resetMessage.textContent = "Fout: " + error.message;
-							resetMessage.className = "status-message error-message";
-						});
-				});
-			}
+            // --- 2. MFA VERIFY LOGIC (For already enrolled users) ---
+            document.getElementById('btn-mfa-verify-submit').addEventListener('click', async () => {
+                if (!mfaResolver) return;
+                
+                const code = document.getElementById('mfa-verify-code').value;
+                const errorDiv = document.getElementById('mfa-verify-error');
+                errorDiv.className = 'status-message';
+                
+                // Find TOTP hint
+                const hints = mfaResolver.hints;
+                const totpHint = hints.find(h => h.factorId === TotpMultiFactorGenerator.FACTOR_ID);
+                
+                if (!totpHint) {
+                    errorDiv.textContent = "Geen geldige 2FA methode gevonden.";
+                    errorDiv.classList.add('error');
+                    return;
+                }
 
-			// Check of al ingelogd
-			auth.onAuthStateChanged((user) => {
-				if (user) {
-					// Als gebruiker al is ingelogd, stuur direct door
-					window.location.href = redirectUrl;
-				}
-			});
+                try {
+                    const multiFactorAssertion = TotpMultiFactorGenerator.assertionForSignIn(
+                        totpHint.uid, 
+                        code
+                    );
+                    const userCredential = await mfaResolver.resolveSignIn(multiFactorAssertion);
+                    // Success! onAuthStateChanged will redirect.
+                } catch (error) {
+                    console.error("Verify Error:", error);
+                    errorDiv.textContent = "Foute code: " + error.message;
+                    errorDiv.classList.add('error');
+                }
+            });
+
+            document.getElementById('btn-back-to-login').addEventListener('click', () => {
+                 window.location.reload(); // Reset everything
+            });
+
+            // --- 3. ENROLLMENT LOGIC (For new users) ---
+            async function startEnrollment(user) {
+                try {
+                    const multiFactorSession = await multiFactor(user).getSession();
+                    const secret = await TotpMultiFactorGenerator.generateSecret(multiFactorSession);
+                    enrollmentSecret = secret;
+
+                    // Generate QR
+                    const qrUrl = secret.generateQrCodeUrl(user.email, "Northgo Informatica");
+                    new QRious({
+                        element: document.getElementById('qr-canvas'),
+                        value: qrUrl,
+                        size: 200
+                    });
+                    
+                    document.getElementById('secret-code-display').textContent = secret.secretKey;
+                    showView('enroll');
+                    
+                } catch (error) {
+                    console.error("Enroll Start Error:", error);
+                    alert("Fout bij starten 2FA setup: " + error.message);
+                }
+            }
+
+            document.getElementById('btn-enroll-submit').addEventListener('click', async () => {
+                const code = document.getElementById('enroll-code').value;
+                const errorDiv = document.getElementById('enroll-error');
+                errorDiv.className = 'status-message';
+
+                if (!auth.currentUser || !enrollmentSecret) return;
+
+                const btn = document.getElementById('btn-enroll-submit');
+                btn.disabled = true;
+
+                try {
+                    const multiFactorAssertion = TotpMultiFactorGenerator.assertionForEnrollment(enrollmentSecret, code);
+                    await multiFactor(auth.currentUser).enroll(multiFactorAssertion, "Mijn App");
+                    
+                    // Success!
+                    errorDiv.textContent = "2FA Ingesteld! Je wordt doorgestuurd...";
+                    errorDiv.classList.add('success');
+                    
+                    // Force a reload or check
+                    setTimeout(() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect') || 'leerlingportaal.html';
+                        window.location.href = redirectUrl;
+                    }, 1500);
+
+                } catch (error) {
+                    console.error("Enroll Finish Error:", error);
+                    errorDiv.textContent = "Fout bij verifiëren: " + error.message;
+                    errorDiv.classList.add('error');
+                    btn.disabled = false;
+                }
+            });
+
+            // --- 4. PASSWORD RESET LOGIC ---
+            document.getElementById('btn-goto-reset').addEventListener('click', () => showView('reset'));
+            document.getElementById('btn-back-from-reset').addEventListener('click', () => showView('login'));
+            
+            document.getElementById('reset-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('reset-email').value;
+                const msg = document.getElementById('reset-message');
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    msg.textContent = "Reset-link verzonden! Check je spam-folder.";
+                    msg.className = "status-message success";
+                } catch (error) {
+                    msg.textContent = error.message;
+                    msg.className = "status-message error";
+                }
+            });
+
 		</script>
 	</body>
 </html>

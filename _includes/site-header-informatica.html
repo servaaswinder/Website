@@ -78,6 +78,20 @@
 
 					firebase.auth().onAuthStateChanged(function(user) {
 						if (user) {
+                            // --- SECURITY GATE: Enforce 2FA Enrollment ---
+                            // Check if user has 2FA enrolled. If not, force them to login.html to enroll.
+                            if (user.multiFactor) { // Check if multiFactor object exists
+                                const enrolledFactors = user.multiFactor.enrolledFactors;
+                                const isLoginPage = window.location.pathname.includes('login.html');
+                                const isTestPage = window.location.pathname.includes('test_2fa.html'); // Allow test page debugging
+                                
+                                if ((!enrolledFactors || enrolledFactors.length === 0) && !isLoginPage && !isTestPage) {
+                                    console.warn("User has no 2FA enrolled. Redirecting to setup...");
+                                    window.location.href = "{{ site.baseurl }}/Informatica/login.html";
+                                    return; // Stop processing to prevent flashing content
+                                }
+                            }
+                            
 							// User is logged in
 							loginLink.textContent = "Uitloggen";
 							loginLink.href = "#";
