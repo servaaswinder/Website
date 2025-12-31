@@ -1,0 +1,67 @@
+---
+---
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacyverklaring</title>
+    <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+    <style>
+        .privacy-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #0044B3; }
+        h2 { color: #333; margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        p, li { line-height: 1.6; color: #555; }
+        ul { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    {% include site-header-informatica.html %}
+
+    <main>
+        <div class="privacy-container">
+            <h1>Privacyverklaring</h1>
+            <p><em>Laatste update: 31 december 2025</em></p>
+
+            <p>Deze website wordt gebruikt ter ondersteuning van het vak Informatica op het Northgo College. Wij hechten veel waarde aan de bescherming van uw persoonsgegevens en houden ons aan de Algemene Verordening Gegevensbescherming (AVG).</p>
+
+            <h2>1. Welke gegevens worden verwerkt?</h2>
+            <p>Om gebruik te kunnen maken van het leerlingportaal verwerken wij de volgende gegevens:</p>
+            <ul>
+                <li><strong>Naam en E-mailadres:</strong> Om u te kunnen identificeren en toegang te geven tot uw resultaten.</li>
+                <li><strong>Cijfers en Voortgang:</strong> Resultaten van gemaakte toetsen en opdrachten.</li>
+                <li><strong>Technische Loggegevens:</strong> IP-adres en login-tijdstippen (automatisch verwerkt door Google voor beveiligingsdoeleinden).</li>
+                <li><strong>2FA Gegevens:</strong> Indien Two-Factor Authentication is ingeschakeld, wordt een koppeling gemaakt met uw authenticator-app. De daadwerkelijke codes worden nooit opgeslagen, enkel de verificatiesleutel.</li>
+            </ul>
+
+            <h2>2. Doel van de verwerking</h2>
+            <p>De gegevens worden uitsluitend gebruikt voor:</p>
+            <ul>
+                <li>Het bieden van toegang tot lesmateriaal en persoonlijke voortgang.</li>
+                <li>Het beveiligen van uw account tegen ongeautoriseerde toegang (o.a. via 2FA).</li>
+            </ul>
+
+            <h2>3. Gebruik van Cookies</h2>
+            <p>Deze website gebruikt <strong>geen tracking cookies</strong> of advertentiecookies.</p>
+            <p>Er wordt uitsluitend gebruik gemaakt van functionele cookies en lokale opslag door <strong>Google Firebase Authentication</strong>. Deze zijn strikt noodzakelijk om te onthouden dat u bent ingelogd ("sessiebeheer"). Voor deze cookies is volgens de AVG geen toestemmingsbanner vereist.</p>
+
+            <h2>4. Gegevensopslag en Beveiliging</h2>
+            <p>Voor de authenticatie en databaseopslag maken wij gebruik van <strong>Google Firebase</strong> (een dienst van Google Cloud). Er is een verwerkersovereenkomst van toepassing (via Google Workspace for Education of Google Cloud Terms) die de bescherming van uw gegevens waarborgt.</p>
+            <p>Uw toegang is beveiligd met een wachtwoord en (verplicht) Two-Factor Authentication (2FA).</p>
+
+            <h2>5. Uw Rechten</h2>
+            <p>U heeft het recht om uw gegevens in te zien, te corrigeren of te laten verwijderen. Omdat deze gegevens onderdeel zijn van uw schooldossier, gelden hierbij de regels van het Northgo College.</p>
+            <p>Voor vragen kunt u contact opnemen met uw docent Informatica (Servaas Winder).</p>
+        </div>
+    </main>
+
+    {% include site-footer-informatica.html %}
+</body>
+</html>

@@ -4,7 +4,7 @@
 		{
 			"label": "Start Server",
 			"type": "shell",
-			"command": "bundle config set --local path 'vendor/bundle' && bundle install && bundle exec jekyll serve --livereload --trace --port 4001",
+			"command": "bundle config set --local path 'vendor/bundle' && bundle install && lsof -ti:4000 | xargs kill -9 2>/dev/null; bundle exec jekyll serve --livereload --trace --port 4000",
 			"presentation": {
 				"reveal": "always",
 				"panel": "shared"

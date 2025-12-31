@@ -466,14 +466,22 @@
                             .then(snapshot => snapshot.docs.map(doc => doc.data()));
 
                         const [assignments, submissions] = await Promise.all([resultsPromise, submissionsPromise]);
-						updateTreeWithProgress(assignments, submissions);
+                        
+                        // Get user class from the doc we already resolved
+                        let userClass = "";
+                        const doc = await resolveStudentDocument(db, user, () => {});
+                        if (doc && doc.exists) {
+                            userClass = doc.data().userClass || doc.data().klas || "";
+                        }
+                        
+						updateTreeWithProgress(assignments, submissions, userClass);
 
 					} catch (error) {
 						console.error("Fout bij ophalen voortgang:", error);
 					}
 				}
 
-				function updateTreeWithProgress(assignments, submissions) {
+				function updateTreeWithProgress(assignments, submissions, userClass) {
 					const completedMap = new Map(); // Real grades
                     const submissionMap = new Map(); // Pending/Rejected states
 
@@ -541,6 +549,27 @@
                                 // Fallback logic (e.g. graded but not in CSV yet? unlikely with clean workflow)
                                 status = 'pending';
                             }
+                        } 
+                        
+                        // --- FINAL PROJECT LOGIC (YEAR FILTER) ---
+                        // Rule: 4th graders = Locked. 5th graders = Unlocked.
+                        // We check if node is a final project (Eind1, Eind2)
+                        // If it is ALREADY COMPLETED or HAS SUBMISSION, we respect that status (don't lock it back).
+                        // Otherwise, we apply the year filter.
+                        if ((node.id === "Eind1" || node.id === "Eind2") && status !== 'completed' && status !== 'pending' && status !== 'rejected') {
+                             if (userClass) {
+                                 // Check for '4' at start (e.g. 4H, 4V, 4 Havo)
+                                 const normalizedClass = userClass.trim().toUpperCase();
+                                 if (normalizedClass.startsWith("4")) {
+                                     status = "locked"; // Force lock for 4th year
+                                 } else if (normalizedClass.startsWith("5")) {
+                                     status = "unlocked"; // Force unlock for 5th year
+                                 }
+                                 // If class is unknown or empty, we stick to default (which is unlocked for these orphans), or maybe lock?
+                                 // Let's stick to default behavior if class is unclear, or maybe lock safe?
+                                 // User said "alle 5e klassers VRIJ, alle 4e klassers LOCK".
+                                 // Safe default: Lock if not explicitly 5? No, let's just implement the request strict.
+                             }
                         } 
                         
                         if (status === 'locked' || status === 'unlocked') {
@@ -878,5 +907,6 @@
 				});
 			</script>
 		</main>
+		{% include site-footer-informatica.html %}
 	</body>
 </html>
