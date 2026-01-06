@@ -14,3 +14,4 @@ vendor/
 
 # Security Rules
 firestore.rules
+serviceAccountKey.json

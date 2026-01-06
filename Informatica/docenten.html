@@ -345,6 +345,11 @@
                         <div style="padding: 20px;" id="modal-student-content">
                             <!-- Content -->
                         </div>
+                        <div style="padding: 15px 20px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: flex-end;">
+                            <button id="btn-reset-2fa" class="action-btn secondary" style="background-color: #dc3545; color: white;" onclick="resetStudent2FA()">
+                                🛡️ Reset 2FA
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -776,6 +781,49 @@
                 if (modal && modal.style.display === 'block' && window.activeStudentId) {
                     console.log("Refreshing open student modal for:", window.activeStudentId);
                     window.openStudentDetails(window.activeStudentId);
+                }
+            };
+            
+            // --- 2FA RESET LOGIC ---
+            window.resetStudent2FA = async function() {
+                if (!window.activeStudentId) return;
+                
+                const confirmed = confirm("Weet je zeker dat je de 2FA voor deze leerling wilt resetten?\n\nDit verwijdert hun ingestelde authenticator. Ze moeten deze bij de volgende login opnieuw instellen.");
+                if (!confirmed) return;
+                
+                const btn = document.getElementById('btn-reset-2fa');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = "Bezig...";
+                
+                const student = window.allStudentsMap ? window.allStudentsMap[window.activeStudentId] : null;
+                const email = student ? student.email : null;
+                
+                try {
+                    const response = await fetch('http://localhost:5000/api/reset-2fa', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            uid: window.activeStudentId,
+                            email: email 
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert("✅ Succes! 2FA is gereset.");
+                    } else {
+                        alert("❌ Fout: " + (result.error || "Onbekende fout"));
+                    }
+                } catch (e) {
+                    console.error("API Error:", e);
+                    alert("❌ Kon geen verbinding maken met de server backend. Draait server.py?");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 }
             };
 
