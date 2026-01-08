@@ -206,7 +206,7 @@
                     <div class="accordion-content">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                              <h3>Openstaande Inzendingen</h3>
-                             <button onclick="loadSubmissions()" class="action-btn secondary" style="font-size: 0.9em;">🔄 Verversen</button>
+                             <button id="refresh-btn" onclick="loadSubmissions()" class="action-btn secondary" style="font-size: 0.9em;">🔄 Verversen</button>
                         </div>
                         <div id="loading-message" class="loading-message">
                             Laden van inzendingen...
@@ -380,14 +380,21 @@
                 });
 
                 function openGrading(data, id) {
-                    GradingUI.open(id, data);
+                    GradingUI.open(id, data, false, false); // force=false, readOnly=false
+                }
+                
+                function viewSubmission(id) {
+                    const data = window.submissionMap[id];
+                    if (data) {
+                         GradingUI.open(id, data, false, true); // force=false, readOnly=true
+                    }
                 }
 
                 function openGradingById(id) {
                     const data = window.submissionMap[id];
                     if (data) {
                         // Pass true to force status update (e.g. from Heropen button)
-                        GradingUI.open(id, data, true);
+                        GradingUI.open(id, data, true, false);
                     } else {
                         alert("Fout: Kan data niet vinden.");
                     }
@@ -623,11 +630,29 @@
                         window.submissionMap[doc.id] = data; // Store for access
 						const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") + " " + data.timestamp.toDate().toLocaleTimeString("nl-NL", {hour: '2-digit', minute:'2-digit'}) : "Onbekend";
 						
-						const row = document.createElement("tr");
+                        const row = document.createElement("tr");
 						row.id = `row-${doc.id}`;
+                        // Make row clickable for view mode, EXCEPT for buttons (handled by event propagation stop if needed, or just specific cols)
+                        // Actually, easiest is to make cells clickable or the whole row.
+                        row.className = "clickable-row";
+                        row.onclick = (e) => {
+                            // Don't trigger if clicked on a button or link or textarea
+                            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'TEXTAREA') return;
+                            viewSubmission(doc.id);
+                        };
 						
                         // Opmerkingen van leerling
                         const studentComment = data.comments ? `<div style="font-style: italic; color: #555; margin-bottom: 4px;">"${data.comments}"</div>` : '';
+
+                        // Assignment Title Display
+                        const assignTitle = GradingUI.ASSIGNMENT_TITLES ? (GradingUI.ASSIGNMENT_TITLES[data.assignmentId] || '') : '';
+                        const assignDisplay = assignTitle ? `${data.assignmentId}<br><small style="color:#666; font-size:0.85em;">${assignTitle}</small>` : data.assignmentId;
+                        
+                        // Link Logic
+                        let linkDisplay = '<span style="color:#ccc; font-size:0.9em;">-</span>';
+                        if (data.assignmentUrl && data.assignmentUrl.length > 5) {
+                             linkDisplay = `<a href="${data.assignmentUrl}" target="_blank" style="color: #0044B3; text-decoration: underline;">Link</a>`;
+                        }
 
 						row.innerHTML = `
 							<td>${date}</td>
@@ -635,8 +660,8 @@
                                 ${getStudentName(data.userEmail)}
                                 <div style="font-size: 0.85em; color: #666;">${data.userClass || ''}</div>
                             </td>
-							<td>${data.assignmentId}</td>
-							<td><a href="${data.assignmentUrl}" target="_blank" style="color: #0044B3; text-decoration: underline;">Link</a></td>
+							<td>${assignDisplay}</td>
+							<td>${linkDisplay}</td>
                             <td>
                                 <div style="font-size: 0.9em; color: #555;">${data.gradingBy ? data.gradingBy.split('@')[0] : '-'}</div>
                                 ${data.status === 'grading' ? '<span class="status-badge status-pending" style="font-size: 10px; padding: 2px 4px;">Bezig</span>' : ''}
@@ -734,7 +759,10 @@
                                     ${getStudentName(data.userEmail)}
                                     <span style="font-size:0.8em; color:#888;">${data.userClass || ''}</span>
                                 </td>
-								<td>${data.assignmentId}</td>
+								<td>
+                                    ${data.assignmentId}
+                                    <br><small style="color:#666; font-size:0.85em;">${GradingUI.ASSIGNMENT_TITLES ? (GradingUI.ASSIGNMENT_TITLES[data.assignmentId] || '') : ''}</small>
+                                </td>
 								<td>
 									<div style="font-size: 0.9em;">Door: ${data.checkedBy || '?'}</div>
 									<div style="font-style: italic; color: #555;">"${data.teacherComment || '-'}"</div>
@@ -1191,9 +1219,18 @@
 
                             const originalIndex = originalIndices.get(a);
 
+                            const title = a.title || a.assignmentId || "?";
+                            // Try to find human readable title if the stored title is just a code
+                            const humanTitle = (a.title === a.assignmentId && GradingUI.ASSIGNMENT_TITLES[a.title]) 
+                                                ? GradingUI.ASSIGNMENT_TITLES[a.title] 
+                                                : ((GradingUI.ASSIGNMENT_TITLES[a.assignmentId]) ? GradingUI.ASSIGNMENT_TITLES[a.assignmentId] : title);
+                            
+                            const grade = a.grade || "-";
+                            const period = a.period || "";
+                            
                             html += `
                                 <tr class="clickable-row" onclick="findAndOpenSubmission('${studentId}', ${originalIndex})" title="Klik om te bewerken">
-                                    <td>${idDisplay}</td>
+                                    <td><span style="font-weight:600;">${a.assignmentId || "?"}</span><br><small style="color:#666;">${humanTitle}</small></td>
                                     <td>${p}</td>
                                     <td style="font-weight:600;">${gradeDisplay}</td>
                                     <td style="font-style:italic; color:#666;">${a.comment || '-'}</td>
@@ -1304,7 +1341,8 @@
                     sortedKeys.forEach(key => {
                         const opt = document.createElement('option');
                         opt.value = key;
-                        opt.textContent = `${key} - Opdracht`; // Ideally fetch title if available, but ID is commonly used.
+                        const humanTitle = window.GradingUI.ASSIGNMENT_TITLES[key] || "Opdracht";
+                        opt.textContent = `${key} - ${humanTitle}`;
                         select.appendChild(opt);
                     });
                 }
@@ -1446,13 +1484,15 @@
                          // Open Grading UI with this new doc
                          // Close detail modal first
                          window.closeStudentDetails();
-                         GradingUI.open(docRef.id, { ...newDoc, assignmentUrl: "#" }); // URL mock
+                         // Force READ ONLY (false for forceGrading, true for readOnly)
+                         GradingUI.open(docRef.id, { ...newDoc, assignmentUrl: "#" }, false, true);
                          
                      } else {
                          // Found existing
                          const doc = snapshot.docs[0];
                          window.closeStudentDetails();
-                         GradingUI.open(doc.id, doc.data());
+                         // Force READ ONLY
+                         GradingUI.open(doc.id, doc.data(), false, true);
                      }
                      
                  } catch (e) {

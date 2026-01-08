@@ -236,7 +236,7 @@
                 verifyPasswordResetCode,
                 confirmPasswordReset,
                 setPersistence,
-                browserSessionPersistence
+                browserLocalPersistence
             } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
             const firebaseConfig = {
@@ -252,10 +252,9 @@
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             
-            // SECURITY: Set Persistence to SESSION (clears on browser close)
-            // This prevents the user from staying logged in after closing the tab/window.
-            setPersistence(auth, browserSessionPersistence)
-                .then(() => console.log("Session persistence set to SESSION_ONLY"))
+            // SECURITY: Set Persistence to LOCAL (Remembers user across tabs/restarts)
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => console.log("Session persistence set to LOCAL"))
                 .catch((error) => console.error("Persistence Error:", error));
             
             // State Variables
@@ -346,6 +345,11 @@
             });
 
             // --- 2. MFA VERIFY LOGIC (For already enrolled users) ---
+            // Allow Enter key
+            document.getElementById('mfa-verify-code').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('btn-mfa-verify-submit').click();
+            });
+
             document.getElementById('btn-mfa-verify-submit').addEventListener('click', async () => {
                 if (!mfaResolver) return;
                 
@@ -404,6 +408,11 @@
                     alert("Fout bij starten 2FA setup: " + error.message);
                 }
             }
+
+            // Allow Enter key
+            document.getElementById('enroll-code').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('btn-enroll-submit').click();
+            });
 
             document.getElementById('btn-enroll-submit').addEventListener('click', async () => {
                 const code = document.getElementById('enroll-code').value;

@@ -234,27 +234,67 @@ const GradingUI = {
         "Eind2": "opdrachten/eindopdracht_webshop.html"
     },
 
-    open: async function(submissionId, submissionData, forceGrading = false) {
+    // Human Readable Titles
+    ASSIGNMENT_TITLES: {
+        "A3": "Portfoliostartopdracht",
+        "A2": "Communiceren",
+        "A5": "Onderzoeken",
+        "F2": "Maatschappelijke aspecten",
+        "A4": "Orienteren op studie/beroep",
+        "A1": "Informatievaardigheden",
+        "A7": "Waarderen en oordelen",
+        "E2": "Security (Algemeen)",
+        "F4": "Security (Wachtwoorden)",
+        "F3": "Privacy",
+        "ModIntro": "Leren Modelleren (Intro)",
+        "A6": "Modelleren",
+        "C5": "Gestructureerde data",
+        "C1": "Warming Stripes",
+        "C2": "Identificeren",
+        "B3": "Automaten",
+        "B1": "Algoritme",
+        "B2": "Datastructuren",
+        "C3": "Representeren",
+        "D1": "Ontwikkelen",
+        "D2": "Inspecteren en aanpassen",
+        "B4": "Introductie HTML",
+        "F1": "Usability",
+        "C4": "Standaard representaties",
+        "E1": "Decompositie",
+        "Eind1": "Game Development",
+        "Eind2": "Webshop"
+    },
+
+    open: async function(submissionId, submissionData, forceGrading = false, readOnly = false) {
         this.currentSubmissionId = submissionId;
         this.currentSubmissionData = submissionData; // Assign this!
         this.currentRubricData = null;
         this.selectedCells = {};
+        this.isReadOnly = !!readOnly; // Ensure boolean
         
-        // If pending (e.g. resubmission), ignore the old comment from the doc.
-        // If duplicate fix loaded it, it will overwrite this later.
+        console.log(`[GradingUI] Opening submission ${submissionId}. ReadOnly: ${this.isReadOnly}`);
+
+        
+        // Setup Modal Title
+        const displayName = submissionData.userName || submissionData.name || submissionData.userEmail || "Onbekend";
+        document.getElementById('grading-student-name').textContent = displayName + (readOnly ? " (Inzien)" : "");
+
+        const title = this.ASSIGNMENT_TITLES[submissionData.assignmentId] || submissionData.assignmentId;
+        document.getElementById('grading-assignment-title').innerHTML = `${submissionData.assignmentId} <small style="font-weight:normal; color:#666;"> - ${title}</small>`;
+
+        // Comment Handling
         if (submissionData.status === 'pending') {
             this.teacherComment = "";
         } else {
             this.teacherComment = submissionData.teacherComment || "";
         }
+        const commentBox = document.getElementById('grading-comment');
+        commentBox.value = this.teacherComment;
+        commentBox.readOnly = readOnly;
+        commentBox.style.backgroundColor = readOnly ? "#f9f9f9" : "white";
 
         this.isDirty = false;
 
-        // Determine display name
-        const displayName = submissionData.userName || submissionData.name || submissionData.userEmail || "Onbekend";
-        document.getElementById('grading-student-name').textContent = displayName;
-        document.getElementById('grading-assignment-title').textContent = submissionData.assignmentId;
-        
         // 1. Rubric Link (Trusted source)
         let rubricLink = submissionData.assignmentUrl; // Fallback
         if (this.ASSIGNMENT_MAP && this.ASSIGNMENT_MAP[submissionData.assignmentId]) {
@@ -264,7 +304,8 @@ const GradingUI = {
 
         // 2. Student Link (Portfolio)
         const studentLink = document.getElementById('grading-student-link');
-        if (submissionData.assignmentUrl && submissionData.assignmentUrl !== rubricLink) {
+        // Logic: if URL provided AND it's not just the rubric itself (legacy fallback)
+        if (submissionData.assignmentUrl && submissionData.assignmentUrl.length > 5 && submissionData.assignmentUrl !== rubricLink) {
              studentLink.href = submissionData.assignmentUrl;
              studentLink.textContent = "🔗 Open werk van leerling";
              studentLink.style.display = 'inline-block';
@@ -272,25 +313,73 @@ const GradingUI = {
              studentLink.style.pointerEvents = 'auto';
              studentLink.style.textDecoration = 'underline';
         } else {
-             // Fallback for manual/old assignments
+             // If manual entry with no link or same as rubric
              studentLink.removeAttribute('href');
-             studentLink.textContent = "⚠️ Geen link (Handmatig/Legacy)";
+             studentLink.textContent = "⚠️ Geen link beschikbaar";
              studentLink.style.display = 'inline-block';
              studentLink.style.color = '#999';
              studentLink.style.pointerEvents = 'none';
              studentLink.style.textDecoration = 'none';
         } 
 
-        document.getElementById('grading-comment').value = this.teacherComment;
         document.getElementById('grading-rubric-container').innerHTML = '<div style="padding: 20px; text-align: center;">Beoordelingsmodel laden...</div>';
         document.getElementById('grading-modal').style.display = 'block';
         document.body.style.overflow = 'hidden';
+
+        // --- Handle Buttons for Read-Only ---
+        const footerBtns = document.querySelector('#grading-modal .action-btn').parentElement; // The container
+        // We can just query by ID
+        const btnRelease = document.getElementById('release-grading-btn');
+        const btnDelete = document.getElementById('delete-grading-btn');
+        const btnSave = document.getElementById('save-draft-btn');
+        const btnFinalize = document.getElementById('finalize-grade-btn');
+        const periodSelect = document.getElementById('grading-period');
+
+        if (readOnly) {
+            if(btnRelease) btnRelease.style.display = 'none';
+            if(btnDelete) btnDelete.style.display = 'none';
+            if(btnSave) btnSave.style.display = 'none';
+            if(btnFinalize) btnFinalize.style.display = 'none';
+            if(periodSelect) periodSelect.disabled = true;
+            
+            // Add "Edit" button if not exists
+            if (!document.getElementById('edit-grading-btn')) {
+                 const editBtn = document.createElement('button');
+                 editBtn.id = 'edit-grading-btn';
+                 editBtn.className = 'action-btn';
+                 editBtn.style.backgroundColor = '#ffc107'; 
+                 editBtn.style.color = '#333';
+                 editBtn.innerHTML = '✏️ Bewerken starten';
+                 editBtn.style.marginRight = '10px';
+                 editBtn.onclick = () => {
+                     // Close and Reopen in Edit Mode
+                     GradingUI.open(submissionId, submissionData, true, false);
+                 };
+                 // Insert before Close/Finalize
+                 footerBtns.appendChild(editBtn);
+            } else {
+                document.getElementById('edit-grading-btn').style.display = 'inline-block';
+            }
+        } else {
+            if(btnRelease) btnRelease.style.display = 'inline-block';
+            if(btnDelete) btnDelete.style.display = 'inline-block';
+            if(btnSave) btnSave.style.display = 'inline-block';
+            if(btnFinalize) btnFinalize.style.display = 'inline-block';
+            if(periodSelect) periodSelect.disabled = false;
+            if(document.getElementById('edit-grading-btn')) {
+                document.getElementById('edit-grading-btn').style.display = 'none';
+            }
+        }
 
         // Load Rubric
         const tryFetch = async (url) => {
             console.log(`[GradingUI] Trying to fetch: ${url}`);
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+            if (!response.ok) {
+                 // Try relative to current location if absolute failed?
+                 // But fetch handles relative fine.
+                 throw new Error(`${response.status} ${response.statusText}`);
+            }
             return await response.text();
         };
 
@@ -345,7 +434,16 @@ const GradingUI = {
                  this.selectedCells = this.currentSubmissionData.gradingDraft.selectedCells;
                  this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
                  this.updateUISelection();
-                 this.updateCalculation(); 
+                 this.updateUISelection();
+                 this.updateCalculation();
+                 
+                 // CRITICAL: If restoring DRAFT, and we are NOT read-only, ensure status is synced?
+                 // No, usually status is already 'grading' if draft exists. 
+                 // But if we clicked "Bewerken", we might need to lock it now if it wasn't locked.
+                 if (!this.isReadOnly && this.currentSubmissionData.status === 'pending') {
+                     await this.lockSubmission(submissionId, forceGrading);
+                 }
+                 
             // 2. FINAL (If already graded)
             } else if (this.currentSubmissionData.finalRubric) {
                  this.selectedCells = this.currentSubmissionData.finalRubric;
@@ -359,9 +457,11 @@ const GradingUI = {
                  this.applyCsvRubric(this.currentSubmissionData.csvRubric);
             // 4. PREVIOUS GRADED ASSIGNMENT (Resubmission inheritance)
             } else {
-                 // Check if there is an existing result in 'results' collection
-                 // We can reuse resolveStudentDocument here if imported, or manual fetch.
+                 // Only check for previous grade if in edit mode, OR if we want to show it in read-only too?
+                 // Showing it in read-only is good.
+                 
                  // We use the helper function from earlier changes in finalizeGrade.
+                 // NOTE: checkForPreviousGrade might trigger logic? No, just reads.
                  this.checkForPreviousGrade(submissionData).then(prevData => {
                      if (prevData) {
                          console.log("Restoring previous grade data:", prevData);
@@ -398,8 +498,10 @@ const GradingUI = {
             this.updateUISelection();
             this.updateCalculation();
 
-            // Lock submission
-            await this.lockSubmission(submissionId, forceGrading);
+            // Lock submission ONLY if NOT readOnly
+            if (!this.isReadOnly) {
+                await this.lockSubmission(submissionId, forceGrading);
+            }
 
         } catch (error) {
             console.error(error);
@@ -536,12 +638,11 @@ const GradingUI = {
     },
 
     selectCell: function(catIndex, points) {
-        // Toggle logic: If already selected, deselect it
-        if (this.selectedCells[catIndex] === points) {
-            delete this.selectedCells[catIndex];
-        } else {
-            this.selectedCells[catIndex] = points;
+        if (this.isReadOnly) {
+            console.log("Ignored click in read-only mode");
+            return; 
         }
+        this.selectedCells[catIndex] = points;
         
         this.updateUISelection();
         this.updateCalculation();
