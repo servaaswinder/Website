@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/bin/zsh
+
+# Ensure we are using Homebrew Ruby
+export PATH="/opt/homebrew/opt/ruby@3.3/bin:$PATH"
+
+echo "Using Ruby: $(ruby -v)"
+echo "Using Bundler: $(bundle -v)"
 
 # Function to kill processes
 cleanup() {
