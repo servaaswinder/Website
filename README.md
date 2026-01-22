@@ -10,5 +10,7 @@ De site is gemaakt met jekyll en github pages. Alle autenticatie en opslag van g
 - [ ] Tijdstempel bij overzicht gemaakte opdrachten, zowel docentend ashboard als leerling dashboard.
 - [ ] Bij nakijken van een opdracht op het docentendashboard, moet de titel van de odpracht zichtbaar zijn, niet alleen maar de code van de odpracht. 
 - [ ] Bij het nakijken van en een opdracht moet duidelijk worden of het de eerste keer is dat deze odpracht is ingeleverd/nagekeken. Als deze opdracht als een eerder is nagekeken moet in de rubric de vakjes aangekruist zijn die als deze waren bij de vorige keer. Mogelijk is een deel hiervan al gemaakt, maar dat is niet niet heel duidelijk. 
+- [ ] De optie toevoegen om een opdracht te met maximaal een 6. Als een vinkje bij het nakijken. Met de tekst te laat ingeleverd. 
+- [ ] Bij het nakijkscherm ook de tijdstemper erbij zetten van het inleveren en van eventuele eerder ingeleverde opdrachten. 
 
 **Overig:**
