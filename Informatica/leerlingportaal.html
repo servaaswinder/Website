@@ -1762,6 +1762,7 @@
 					comment,
 					rubric: rubricItems,
 					period,
+                    gradedAt: rawAssignment.gradedAt || rawAssignment.timestamp || null
 				};
 			}
 
@@ -2274,9 +2275,14 @@
                                         ? `${assignment.title} <br><small style="color:#666; font-weight:normal;">${ASSIGNMENT_TITLES[assignment.title]}</small>` 
                                         : (assignment.title || 'Naamloos');
 
+                    const dateStr = assignment.gradedAt ? formatDate(assignment.gradedAt) : (assignment.lastUpdated ? formatDate(assignment.lastUpdated) : '-');
+
                     tr.innerHTML = `
                         <td style="font-weight:500;">${displayTitle}</td>
-                        <td>${pLabel}</td>
+                        <td>
+                            ${pLabel}
+                            <div style="font-size:0.75em; color:#888;">${dateStr}</div>
+                        </td>
                         <td style="font-weight:600;">${assignment.grade || '-'}</td>
                     `;
                     tbody.appendChild(tr);

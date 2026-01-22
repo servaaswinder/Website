@@ -746,7 +746,7 @@
                             if (!window.submissionMap) window.submissionMap = {}; // Ensure initialization
                             window.submissionMap[doc.id] = data; // Store for reopening
                             
-							const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") : "Onbekend";
+							const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString("nl-NL") + " " + data.timestamp.toDate().toLocaleTimeString("nl-NL", {hour: '2-digit', minute:'2-digit'}) : "Onbekend";
 							const statusColor = data.status === 'checked' ? '#28a745' : '#dc3545';
 							const statusLabel = data.status === 'checked' ? 'Afgevinkt' : 'Afgewezen';
 							
@@ -1182,11 +1182,19 @@
                 // Build HTML
                 let html = `<p style="margin-bottom:15px; color:#555;">${student.email || ''} - Laatste update: ${student.lastSyncedAt ? new Date(student.lastSyncedAt.toDate()).toLocaleDateString() : '-'}</p>`;
                 html += `<div style="font-size: 0.9em; margin-bottom: 10px; font-style: italic; color: #666;">Klik op een opdracht om het cijfer aan te passen.</div>`;
-                html += `<table class="submissions-table" style="width:100%;">
+                html += `<table class="submissions-table" style="width:100%; table-layout: fixed;">
+                        <colgroup>
+                            <col style="width: 18%;">
+                            <col style="width: 8%;">
+                            <col style="width: 14%;">
+                            <col style="width: 8%;">
+                            <col style="width: 52%;">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Opdracht</th>
                                 <th>Periode</th>
+                                <th>Datum</th>
                                 <th>Cijfer</th>
                                 <th>Opmerking</th>
                             </tr>
@@ -1226,12 +1234,55 @@
                                                 : ((GradingUI.ASSIGNMENT_TITLES[a.assignmentId]) ? GradingUI.ASSIGNMENT_TITLES[a.assignmentId] : title);
                             
                             const grade = a.grade || "-";
-                            const period = a.period || "";
                             
+                            // -- Feature 5: Split Timestamps & Mini Logbook --
+                            let submittedDate = a.timestamp ? new Date(a.timestamp.toDate()) : null;
+                            let checkedDate = a.gradedAt ? new Date(a.gradedAt) : null;
+                            let history = a.history || [];
+
+                            // Deriving from history if available (more accurate)
+                            if (history && history.length > 0) {
+                                const lastSubmit = history.filter(h => h.action === 'submitted' || h.action === 'resubmitted').pop();
+                                if (lastSubmit && lastSubmit.timestamp) submittedDate = new Date(lastSubmit.timestamp.seconds ? lastSubmit.timestamp.toDate() : lastSubmit.timestamp);
+                                
+                                const lastCheck = history.filter(h => h.action === 'checked').pop();
+                                if (lastCheck && lastCheck.timestamp) checkedDate = new Date(lastCheck.timestamp.seconds ? lastCheck.timestamp.toDate() : lastCheck.timestamp);
+                            }
+
+                            const submittedStr = submittedDate ? submittedDate.toLocaleDateString("nl-NL") + " " + submittedDate.toLocaleTimeString("nl-NL", {hour:'2-digit', minute:'2-digit'}) : "-";
+                            const checkedStr = checkedDate ? checkedDate.toLocaleDateString("nl-NL") + " " + checkedDate.toLocaleTimeString("nl-NL", {hour:'2-digit', minute:'2-digit'}) : "-";
+
+                            // Unique ID for date cell to update it later
+                            const dateCellId = `date-cell-${originalIndex}`;
+                            
+                            // Build Logbook Tooltip content
+                            let historyTooltip = "";
+                            if (history.length > 0) {
+                                historyTooltip = history.map(h => {
+                                    const d = new Date(h.timestamp.seconds ? h.timestamp.toDate() : h.timestamp);
+                                    const dateFmt = d.toLocaleDateString("nl-NL") + " " + d.toLocaleTimeString("nl-NL", {hour:'2-digit', minute:'2-digit'});
+                                    let actionLabel = h.action;
+                                    if(actionLabel === 'submitted') actionLabel = '📬 Ingeleverd';
+                                    if(actionLabel === 'resubmitted') actionLabel = '🔄 Opnieuw ingeleverd';
+                                    if(actionLabel === 'checked') actionLabel = '✅ Nagekeken (' + (h.grade || '?') + ')';
+                                    return `<div><small>${dateFmt}</small> <strong>${actionLabel}</strong><br><span style='color:#ccc;font-size:0.8em'>${h.email || h.by || ''}</span></div>`;
+                                }).join("<hr style='margin:4px 0; border-color:#555;'>");
+                            }
+
                             html += `
                                 <tr class="clickable-row" onclick="findAndOpenSubmission('${studentId}', ${originalIndex})" title="Klik om te bewerken">
                                     <td><span style="font-weight:600;">${a.assignmentId || "?"}</span><br><small style="color:#666;">${humanTitle}</small></td>
                                     <td>${p}</td>
+                                    <td id="${dateCellId}" style="font-size: 0.8em; line-height: 1.4; color: #444;">
+                                        <div style="margin-bottom:2px;">📬 <span id="${dateCellId}-sub" style="color:#666;">${submittedStr}</span></div>
+                                        <div>✅ <span id="${dateCellId}-check" style="color:#666;">${checkedStr}</span></div>
+                                        ${history.length > 0 ? `
+                                            <div class="history-trigger" style="margin-top:4px; font-size:0.9em; cursor:help; color:#0044B3; text-decoration:underline dashed;">
+                                                📜 Logboek
+                                                <div class="history-tooltip">${historyTooltip}</div>
+                                            </div>
+                                        ` : ''}
+                                    </td>
                                     <td style="font-weight:600;">${gradeDisplay}</td>
                                     <td style="font-style:italic; color:#666;">${a.comment || '-'}</td>
                                 </tr>
@@ -1248,7 +1299,7 @@
 
                             html += `
                                 <tr style="background-color: #e9ecef; font-weight: bold;">
-                                    <td colspan="2" style="text-align: right;">Gemiddelde ${p}:</td>
+                                    <td colspan="3" style="text-align: right;">Gemiddelde ${p}:</td>
                                     <td>${roundedAvg.toFixed(1)}</td>
                                     <td>${weights && weights[p] ? '<span style="font-weight:normal; font-size:0.8em; color:#666;">(' + weights[p] + '%)</span>' : ''}</td>
                                 </tr>
@@ -1258,7 +1309,7 @@
                 });
                 
                 if (!hasData) {
-                     html += `<tr><td colspan="4" style="text-align:center; padding:20px;">Geen resultaten.</td></tr>`;
+                     html += `<tr><td colspan="5" style="text-align:center; padding:20px;">Geen resultaten.</td></tr>`;
                 } else if (anyGrades) {
                     // Overall Average Calculation
                     let finalAvgStr = "-";
@@ -1278,16 +1329,8 @@
                             finalAvgStr = (weightedSum / totalWeight).toFixed(1);
                         }
                     } else {
-                        // Simple fallback (if no class match)
-                        // Note: To perfectly match 'renderStudentsTable', we would need to check simple average logic again.
-                        // But here we can just sum up period averages? No, simple average is Sum(All)/Count(All).
-                        // Let's re-calculate simple avg if no weights found.
                         let totalSum = 0;
                         let totalCount = 0;
-                        // Iterate groups again... simplified:
-                        // Just use the pre-calculated sums? Need to track them.
-                        // For simplicity, let's just accept that if no weights are found, we show "-" or simple average logic.
-                        // Re-iterating to be safe:
                         assignments.forEach(a => {
                             const g = parseFloat(String(a.grade||"").replace(',','.'));
                             if(!isNaN(g)) { totalSum+=g; totalCount++; }
@@ -1297,7 +1340,7 @@
 
                     html += `
                         <tr style="background-color: #333; color: #fff; font-weight: bold;">
-                            <td colspan="2" style="text-align: right;">Eindgemiddelde:</td>
+                            <td colspan="3" style="text-align: right;">Eindgemiddelde:</td>
                             <td>${finalAvgStr}</td>
                             <td></td>
                         </tr>
@@ -1328,7 +1371,6 @@
                 const select = document.getElementById('manual-assignment-select');
                 if (window.GradingUI && window.GradingUI.ASSIGNMENT_MAP) {
                     const sortedKeys = Object.keys(window.GradingUI.ASSIGNMENT_MAP).sort((a,b) => {
-                        // Custom sort: Letter then Number
                         const aMatch = a.match(/([A-Z]+)(\d+)/);
                         const bMatch = b.match(/([A-Z]+)(\d+)/);
                         if (aMatch && bMatch) {
@@ -1348,6 +1390,52 @@
                 }
                 
                 document.getElementById('student-detail-modal').style.display = 'block';
+                
+                // --- Retroactive Timestamp Fetch ---
+                const studentEmail = student.email;
+                if (studentEmail) {
+                    const fetchSubmissions = async (email) => {
+                        try {
+                            const snapshot = await db.collection('submissions').where('userEmail', '==', email).get();
+                            if (snapshot.empty) return false;
+                            
+                            snapshot.forEach(doc => {
+                                const sub = doc.data();
+                                const subId = sub.assignmentId;
+                                student.assignments.forEach((a, idx) => {
+                                    if (a.assignmentId === subId || a.title === subId) {
+                                        const subSpan = document.getElementById(`date-cell-${idx}-sub`);
+                                        const checkSpan = document.getElementById(`date-cell-${idx}-check`);
+                                        
+                                        if (subSpan && (subSpan.textContent === '-' || subSpan.textContent === '')) {
+                                            if (sub.timestamp) {
+                                                const d = sub.timestamp.toDate ? sub.timestamp.toDate() : new Date(sub.timestamp);
+                                                subSpan.textContent = d.toLocaleDateString("nl-NL") + " " + d.toLocaleTimeString("nl-NL", {hour:'2-digit', minute:'2-digit'});
+                                            }
+                                        }
+                                        if (checkSpan && (checkSpan.textContent === '-' || checkSpan.textContent === '')) {
+                                            if (sub.checkedAt) {
+                                                const d = sub.checkedAt.toDate ? sub.checkedAt.toDate() : new Date(sub.checkedAt);
+                                                checkSpan.textContent = d.toLocaleDateString("nl-NL") + " " + d.toLocaleTimeString("nl-NL", {hour:'2-digit', minute:'2-digit'});
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                            return true;
+                        } catch (err) {
+                            console.error("Fetch error for " + email, err);
+                            return false;
+                        }
+                    };
+
+                    // Try original email, and if that fails or finds nothing, try lowercase
+                    fetchSubmissions(studentEmail).then(found => {
+                        if (!found || studentEmail !== studentEmail.toLowerCase()) {
+                            fetchSubmissions(studentEmail.toLowerCase());
+                        }
+                    });
+                }
             };
             
             // --- Manual Assessment Logic ---

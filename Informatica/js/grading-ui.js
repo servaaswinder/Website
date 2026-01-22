@@ -60,6 +60,11 @@ const GradingUI = {
                                 <div style="font-size: 0.9em; color: #555; margin-bottom: 2px;">Cijfer</div>
                                 <div style="font-size: 2em; font-weight: bold; color: #0044B3; line-height: 1;"><span id="grading-calculated-grade">-</span></div>
                                 <div style="font-size: 0.85em; color: #666; margin-top: 4px;">(<span id="grading-total-points">0</span> / <span id="grading-max-points">0</span> pt)</div>
+                                <div style="margin-top: 5px; padding-top: 5px; border-top: 1px solid #cce5ff;">
+                                    <label style="font-size: 0.8em; cursor: pointer; color: #d63384; font-weight: 600;">
+                                        <input type="checkbox" id="grading-late-check" onchange="GradingUI.updateCalculation()"> Te laat (Max 6.0)
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -298,6 +303,13 @@ const GradingUI = {
         } else {
             this.teacherComment = submissionData.teacherComment || "";
         }
+        
+        // Late Check Restore
+        const lateCheck = document.getElementById('grading-late-check');
+        if (lateCheck) {
+            lateCheck.checked = !!submissionData.isLate; // Restore if saved
+        }
+        
         const commentBox = document.getElementById('grading-comment');
         commentBox.value = this.teacherComment;
         commentBox.readOnly = readOnly;
@@ -472,18 +484,49 @@ const GradingUI = {
                  
                  // We use the helper function from earlier changes in finalizeGrade.
                  // NOTE: checkForPreviousGrade might trigger logic? No, just reads.
-                 this.checkForPreviousGrade(submissionData).then(prevData => {
+                     this.checkForPreviousGrade(submissionData).then(prevData => {
                      if (prevData) {
                          console.log("Restoring previous grade data:", prevData);
                          
-                         // Fill Rubric
-                         if (prevData.rubric && Array.isArray(prevData.rubric)) {
-                             // Map array [{theme:..., value:...}] back to selectedCells {index: points}
-                             prevData.rubric.forEach(item => {
-                                 // Reuse applyCsvRubric logic or similar mapping
-                                 // Let's create a minimal shim as we have rubrics by Theme Name
-                                 this.applyCsvRubric([item]); // Works per item!
+                         // Fill Rubric if Rubric Empty?
+                        //  if (prevData.rubric && Array.isArray(prevData.rubric)) {
+                        //      // Only if we want to AUTO-FILL. User asked: "Als deze opdracht al een eerder is nagekeken moet in de rubric de vakjes aangekruist zijn".
+                        //      // YES, pre-fill!
+                        //      prevData.rubric.forEach(item => {
+                        //          this.applyCsvRubric([item]);
+                        //      });
+                        //  }
+                         // Let's defer rubric fill to explicit user action or just do it?
+                         // "Als deze opdracht... moet de rubric... aangekruist zijn".
+                         // So yes, do it. But maybe add a visual indicator.
+
+
+                         // UPDATE UI with Timestamp Info
+                         const titleEl = document.getElementById('grading-assignment-title');
+                         if (titleEl) {
+                             const prevDate = prevData.gradedAt ? new Date(prevData.gradedAt).toLocaleString() : "Eerder";
+                             const curDate = submissionData.timestamp ? new Date(submissionData.timestamp.toDate()).toLocaleString() : "Nu";
+                             
+                             titleEl.innerHTML += `<div style="font-size: 0.6em; margin-top: 4px; color: #d63384; background: #fff0f6; padding: 2px 6px; border-radius: 4px; display: inline-block;">
+                                 ⚠️ <strong>Herkansing</strong> (Vorige: ${prevData.grade} op ${prevDate})<br>
+                                 Ingeleverd: ${curDate}
+                             </div>`;
+                         }
+                         
+                         // FILL RUBRIC (If empty?)
+                         if (Object.keys(this.selectedCells).length === 0 && prevData.rubric && Array.isArray(prevData.rubric)) {
+                              prevData.rubric.forEach(item => {
+                                 this.applyCsvRubric([item]);
                              });
+                             console.log("Pre-filled rubric from previous grading.");
+                             this.updateUISelection();
+                             this.updateCalculation();
+                         }
+                         
+                         // Fill Comment Context
+                         if (!this.teacherComment.includes("--- HERKANSING ---")) {
+                             // Don't overwrite if already there
+                             // Just append context
                          }
                          
                          // Fill Comment
@@ -687,10 +730,15 @@ const GradingUI = {
         document.getElementById('grading-total-points').textContent = totalPoints;
         
         // Calculate Grade: (Points / Max) * 9 + 1
-        // Or if max is 9, Points + 1 (But uniform formula handles both)
         const max = this.currentRubricData.totalMaxPoints;
-        const grade = ((totalPoints / max) * 9) + 1;
+        let grade = ((totalPoints / max) * 9) + 1;
         
+        // --- TOO LATE CHECK ---
+        const isLate = document.getElementById('grading-late-check')?.checked;
+        if (isLate && grade > 6.0) {
+            grade = 6.0;
+        }
+
         // Round to 1 decimal
         const displayGrade = Math.round(grade * 10) / 10;
         document.getElementById('grading-calculated-grade').textContent = displayGrade.toFixed(1);
@@ -775,7 +823,14 @@ const GradingUI = {
                 period: selectedPeriod, // Save period to submission for reopening
                 checkedBy: teacherEmail,
                 checkedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                gradingDraft: firebase.firestore.FieldValue.delete() // Remove draft
+                gradingDraft: firebase.firestore.FieldValue.delete(), // Remove draft
+                isLate: document.getElementById('grading-late-check')?.checked || false, // Feature 4
+                history: firebase.firestore.FieldValue.arrayUnion({
+                    action: 'checked',
+                    timestamp: new Date(),
+                    by: teacherEmail,
+                    grade: calculatedGrade
+                })
             });
 
             // 2. Sync to 'results' collection (Student Database)
@@ -824,7 +879,11 @@ const GradingUI = {
                             period: selectedPeriod, // Add Period
                             gradedAt: new Date().toISOString(),
                             gradedBy: teacherEmail,
-                            assignmentId: assignmentTitle
+                            assignmentId: assignmentTitle,
+                            // Preserve metadata from submission
+                            timestamp: this.currentSubmissionData.timestamp || null,
+                            history: this.currentSubmissionData.history || [],
+                            isLate: document.getElementById('grading-late-check')?.checked || false
                         };
                         
                         // Remove existing entry for this assignment if it exists
@@ -863,7 +922,11 @@ const GradingUI = {
                             period: selectedPeriod, // Add Period
                             gradedAt: new Date().toISOString(),
                             gradedBy: teacherEmail,
-                            assignmentId: assignmentTitle
+                            assignmentId: assignmentTitle,
+                            // Preserve metadata
+                            timestamp: this.currentSubmissionData.timestamp || null,
+                            history: this.currentSubmissionData.history || [],
+                            isLate: document.getElementById('grading-late-check')?.checked || false
                         };
                         
                         // Use sanitized ID to prevent weird chars in Doc ID

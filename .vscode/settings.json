@@ -1,0 +1,14 @@
+{
+  "rubyLsp.bundleGemfile": "Gemfile",
+  "rubyLsp.featuresConfiguration": {
+    "inlayHint": {
+      "enableAll": true
+    }
+  },
+  "rubyLsp.rubyVersionManager": "none",
+  "rubyLsp.customRubyCommand": "/opt/homebrew/opt/ruby@3.3/bin/bundle exec ruby-lsp",
+  "go.useLanguageServer": false,
+  "go.toolsManagement.checkForUpdates": "off",
+  "java.server.launchMode": "LightWeight",
+  "java.autobuild.enabled": false
+}

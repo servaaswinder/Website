@@ -197,13 +197,19 @@
 						const docRef = db.collection("submissions").doc(activeSubmission.id);
 						
 						// Prepare update data
-                        const updateData = {
+						const updateData = {
 							assignmentUrl: assignmentUrl,
 							comments: comments,
 							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-							status: "pending"
-							// teacherComment deletion REMOVED to avoid permission error. 
-                            // grading-ui.js will handle ignoring old comments.
+							status: "pending",
+                            history: firebase.firestore.FieldValue.arrayUnion({
+                                action: 'resubmitted',
+                                timestamp: new Date(), // using client date for arrayUnion, serverTimestamp only works in top-level fields for some SDK versions, but let's try to be safe with client date for history array items or use Timestamp.now() if available. 
+                                // Actually, Firestore arrayUnion with serverTimestamp() inside objects is tricky. 
+                                // Let's use new Date().toISOString() or just new Date() which Firestore SDK converts.
+                                timestamp: new Date(), 
+                                email: user.email
+                            })
 						};
 
                         // If inheriting from a grade, maybe mark it? 
@@ -226,7 +232,12 @@
 							comments: comments,
 							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
 							status: "pending",
-                            isResubmission: !!existingGrade
+                            isResubmission: !!existingGrade,
+                            history: [{
+                                action: 'submitted',
+                                timestamp: new Date(),
+                                email: user.email
+                            }]
 						});
 					}
 
