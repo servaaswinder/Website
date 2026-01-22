@@ -16,16 +16,26 @@ const GradingUI = {
         if (!document.getElementById('grading-modal')) {
             this.createModal();
         }
-        // Bind events
-        document.getElementById('close-grading-modal').addEventListener('click', () => this.closeModal());
-        document.getElementById('save-draft-btn').addEventListener('click', () => this.saveDraft());
-        document.getElementById('finalize-grade-btn').addEventListener('click', () => this.finalizeGrade());
-        document.getElementById('release-grading-btn').addEventListener('click', () => this.releaseGrading()); // New Binding
-        document.getElementById('delete-grading-btn').addEventListener('click', () => this.deleteGrading()); // New Binding
-        document.getElementById('grading-comment').addEventListener('input', (e) => {
-            this.teacherComment = e.target.value;
-            this.isDirty = true;
-        });
+        // Bind events with checks
+        const bind = (id, fn) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', fn);
+            else console.warn(`[GradingUI] Element not found: ${id}`);
+        };
+
+        bind('close-grading-modal', () => this.closeModal());
+        bind('save-draft-btn', () => this.saveDraft());
+        bind('finalize-grade-btn', () => this.finalizeGrade());
+        bind('release-grading-btn', () => this.releaseGrading());
+        bind('delete-grading-btn', () => this.deleteGrading());
+
+        const commentBox = document.getElementById('grading-comment');
+        if (commentBox) {
+            commentBox.addEventListener('input', (e) => {
+                this.teacherComment = e.target.value;
+                this.isDirty = true;
+            });
+        }
     },
 
     createModal: function() {
