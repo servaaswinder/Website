@@ -431,11 +431,21 @@
 				};
 
 				// Default logic for visitors (non-logged in)
+				var startNodeId = "A3";
+				var unlockedAfterStart = ["A2", "B4", "C4", "E1"]; // ModIntro removed as it is now completed
 				var nodeStatusMap = {};
 				
-				// Initialize default status: everything unlocked for public access
+				// Initialize default status
 				nodes.get().forEach(function (node) {
-					nodeStatusMap[node.id] = "unlocked";
+					nodeStatusMap[node.id] = "locked";
+				});
+				nodeStatusMap[startNodeId] = "completed";
+				nodeStatusMap["ModIntro"] = "completed"; // Always completed
+
+				unlockedAfterStart.forEach(function (id) {
+					if (nodeStatusMap[id] !== "completed") {
+						nodeStatusMap[id] = "unlocked";
+					}
 				});
 
 				// Firebase Initialisatie (Gecentraliseerd in header)
@@ -885,19 +895,14 @@
                             }, 100);
                         }
 					} else {
-						// Show guest state (Modified for public access)
-						guestBanner.style.display = "none"; 
+						// Show guest state
+						guestBanner.style.display = "block";
 						loggedInControls.style.display = "none";
-						treeContainer.style.display = "block"; // Always show tree
+						treeContainer.style.display = "none"; // Hide tree for guests
+						userDisplay.textContent = "";
 						
-						// Reset tree to default state (all unlocked)
+						// Reset tree to default state (not visible anyway)
 						applyStatusStyles(); 
-
-                        if (typeof initNetwork === 'function') {
-                            setTimeout(function() {
-                                initNetwork();
-                            }, 100);
-                        }
 					}
 				});
 			</script>
