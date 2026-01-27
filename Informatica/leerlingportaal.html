@@ -2484,26 +2484,68 @@
 				studentResultsDisplay.innerHTML = "";
 
 				try {
-					// Haal resultaten op met robuuste shared logic (student-utils.js)
+					// 1. Haal opgeslagen resultaten op (student-utils.js)
 					const doc = await resolveStudentDocument(db, user, /* logFn= */ () => {});
 					
+                    let student = { assignments: [] };
+                    let studentName = user.displayName || user.email;
+
 					if (doc && doc.exists) {
 						const data = doc.data();
-						const studentName = data.name || user.displayName || user.email;
-						welcomeMessage.textContent = `${studentName}`;
-						
-						const student = normalizeStudentData(doc.id, data || {});
-						cachedStudentData = student;
-						renderStudentPanel(studentResultsDisplay, student);
-					} else {
-						// Geen resultaten gevonden -> Toon vriendelijke melding
-						studentResultsDisplay.innerHTML = `
-                            <div class="empty-state">
-                                <p>Geen resultaten gevonden voor account <strong>${user.email}</strong>.</p>
-                                <p><small>Neem contact op met je docent als je denkt dat dit een fout is.</small></p>
-                            </div>
-                        `;
+						studentName = data.name || studentName;
+						student = normalizeStudentData(doc.id, data || {});
 					}
+                    
+                    welcomeMessage.textContent = `${studentName}`;
+                    cachedStudentData = student;
+
+                    // 2. Haal 'Pending' / 'Grading' submissions op (nog niet nagekeken)
+                    // Deze staan in de 'submissions' collectie, niet in 'results'
+                    try {
+                        const pendingSnapshot = await db.collection("submissions")
+                            .where("userId", "==", user.uid)
+                            .get();
+                        
+                        const pendingAssignments = [];
+                        
+                        pendingSnapshot.forEach(subDoc => {
+                            const subData = subDoc.data();
+                            // Filter op status: pending of grading
+                            if (subData.status === 'pending' || subData.status === 'grading') {
+                                
+                                // Check if already present in 'results'? 
+                                // Normaal gesproken staat het pas in results als het 'checked' is.
+                                // Maar voor de zekerheid:
+                                const alreadyExists = student.assignments.some(a => a.assignmentId === subData.assignmentId || a.title === subData.assignmentId);
+                                
+                                if (!alreadyExists) {
+                                    pendingAssignments.push({
+                                        title: subData.assignmentId, // Dit is vaak de ID, wordt gemapt door render logic
+                                        period: subData.period,
+                                        grade: "Ingeleverd", // Speciale status tekst
+                                        status: subData.status,
+                                        gradedAt: subData.timestamp ? subData.timestamp.toDate() : new Date(),
+                                        isPending: true // Flag voor styling indien nodig
+                                    });
+                                }
+                            }
+                        });
+
+
+                        // Merge pending assignments into student assignments
+                        if (pendingAssignments.length > 0) {
+                            console.log("Adding pending assignments:", pendingAssignments);
+                            student.assignments = student.assignments.concat(pendingAssignments);
+                        }
+                        
+                    } catch (err) {
+                        console.error("Error fetching pending submissions:", err);
+                        // Fout hier mag de rest niet blokkeren
+                    }
+
+                    // Render de hele lijst (inclusief pending)
+					renderStudentPanel(studentResultsDisplay, student);
+
 				} catch (error) {
 					console.error("Error loading results:", error);
 					studentResultsDisplay.innerHTML = `
