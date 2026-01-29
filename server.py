@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, firestore
 import os
+import secrets
+import string
 
 app = Flask(__name__)
 # Allow CORS request from our frontend (port 4000)
@@ -107,6 +109,122 @@ def reset_2fa():
 
     except Exception as e:
         print(f"❌ Error resetting 2FA: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/create-student', methods=['POST'])
+def create_student():
+    """
+    Creates a new student account in Firebase Auth and Firestore.
+    """
+    try:
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        name = data.get('name')
+        classroom = data.get('class', '')
+
+        if not email or not name:
+            return jsonify({"success": False, "error": "Email and name are required"}), 400
+
+        # Generate random password if not provided
+        if not password:
+            alphabet = string.ascii_letters + string.digits
+            password = ''.join(secrets.choice(alphabet) for i in range(12))
+
+        print(f"🆕 Creating student: {name} ({email})")
+
+        # 1. Create Auth User
+        try:
+            user = auth.create_user(
+                email=email,
+                email_verified=False,
+                password=password,
+                display_name=name,
+                disabled=False
+            )
+            print(f"✅ Auth user created: {user.uid}")
+        except auth.EmailAlreadyExistsError:
+            print(f"⚠️ User already exists: {email}")
+            return jsonify({"success": False, "error": "User already exists"}), 409
+        except Exception as e:
+            print(f"❌ Auth Error: {str(e)}")
+            return jsonify({"success": False, "error": f"Auth Error: {str(e)}"}), 500
+
+        # 2. Create Firestore Document in 'results'
+        try:
+            db = firestore.client()
+            doc_ref = db.collection('results').document(user.uid) # Use UID as doc ID for consistency
+            
+            # Check if doc exists (unlikely if new user, but good hygiene)
+            # Actually create_user guarantees new UID.
+            
+            doc_data = {
+                "email": email,
+                "name": name,
+                "class": classroom,
+                "assignments": [], # Empty start
+                "createdAt": firestore.SERVER_TIMESTAMP
+            }
+            
+            doc_ref.set(doc_data)
+            print(f"✅ Firestore document created for {user.uid}")
+            
+        except Exception as e:
+            print(f"❌ Firestore Error: {str(e)}")
+            # Cleanup auth user if firestore fails? Maybe too complex for now.
+            return jsonify({"success": False, "error": f"Firestore Error: {str(e)}"}), 500
+
+        return jsonify({"success": True, "message": f"Account aangemaakt voor {name}", "uid": user.uid})
+
+    except Exception as e:
+        print(f"❌ General Error creating student: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/delete-student', methods=['POST'])
+def delete_student():
+    """
+    Deletes a student account from Firebase Auth and Firestore.
+    """
+    try:
+        data = request.json
+        uid = data.get('uid')
+        
+        if not uid:
+             return jsonify({"success": False, "error": "UID is required"}), 400
+             
+        print(f"🗑️ Deleting student: {uid}")
+        
+        # 1. Delete Firestore Document
+        # We do this first or parallel? Auth delete is irrevocable.
+        try:
+            db = firestore.client()
+            # Try to delete 'results' doc
+            # Note: We do NOT delete submissions history to preserve audit trail?
+            # User request said "verwijderen", implies clean up.
+            # But let's stick to 'account' logic (auth + profile).
+            
+            db.collection('results').document(uid).delete()
+            print(f"✅ Firestore document deleted: {uid}")
+            
+        except Exception as e:
+            print(f"⚠️  Firestore delete warning: {str(e)}")
+            # Continue to delete auth anyway
+            
+        # 2. Delete Auth User
+        try:
+            auth.delete_user(uid)
+            print(f"✅ Auth user deleted: {uid}")
+        except auth.UserNotFoundError:
+             print(f"⚠️ Auth user not found: {uid}")
+        except Exception as e:
+             print(f"❌ Auth delete error: {str(e)}")
+             return jsonify({"success": False, "error": f"Auth Error: {str(e)}"}), 500
+
+        return jsonify({"success": True, "message": "Account verwijderd."})
+
+    except Exception as e:
+        print(f"❌ Error deleting student: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == '__main__':

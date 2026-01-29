@@ -5,6 +5,7 @@ De site is gemaakt met jekyll en github pages. Alle autenticatie en opslag van g
 
 **Bugs:**
 - [x] dode link bij voetbal data bestand dat gedownload moet worden. *opgelost voor 3 opdrachten. Ik kan even niet vinden of er een vierde is.*
+- [x] Bij C3 is het niveau onduidelijk. Is het niveau 1 of niveau 2?
 
 **Features:**
 - [x] Tijdstempel bij overzicht gemaakte opdrachten, zowel docentend ashboard als leerling dashboard.
@@ -16,3 +17,8 @@ De site is gemaakt met jekyll en github pages. Alle autenticatie en opslag van g
 - [x] Bij de het overzicht van de cijfers is de kolom voor de periode erg breed, terwijl daar maar P1 of P2 enzovoort staat. De kolom voor de opmerkingen kan dus wat breeder. 
 
 **Overig:**
+
+
+**Roadmap:**
+- [ ] Themaoverhaul
+- [ ] Deployen via Railway zodat de site beter beveiligd is. Data opslaan als PostgrdeSQL

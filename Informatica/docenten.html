@@ -335,6 +335,44 @@
                     </div>
                 </div>
 
+                <!-- Block 4: Accountbeheer -->
+                <div class="accordion-block" id="block-account">
+                    <div class="accordion-header" onclick="toggleBlock('block-account')">
+                        4. Accountbeheer (Nieuw)
+                    </div>
+                    <div class="accordion-content">
+                        <h3>Nieuwe Leerling Aanmaken</h3>
+                        <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">
+                            Maak hier handmatig een account aan voor een leerling die zich niet zelf kan registreren via de website.
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 600px; margin-bottom: 15px;">
+                            <div>
+                                <label style="display: block; font-weight: 500; margin-bottom: 5px;">Naam</label>
+                                <input type="text" id="new-student-name" placeholder="Voornaam Achternaam" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 500; margin-bottom: 5px;">Klas</label>
+                                <select id="new-student-class" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: white;">
+                                    <option value="4havo">4havo</option>
+                                    <option value="4vwo">4vwo</option>
+                                    <option value="5havo">5havo</option>
+                                    <option value="5vwo">5vwo</option>
+                                </select>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="display: block; font-weight: 500; margin-bottom: 5px;">Email</label>
+                                <input type="email" id="new-student-email" placeholder="leerling@school.nl" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        </div>
+                        
+                        <button id="btn-create-student" onclick="createStudentAccount()" class="action-btn" style="background-color: #28a745;">
+                            Maak Account & Nodig Uit
+                        </button>
+                        <span id="create-student-status" style="margin-left: 10px; font-weight: 500;"></span>
+                    </div>
+                </div>
+
                 <!-- Student Detail Modal -->
                 <div id="student-detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
                     <div style="background: white; width: 90%; max-width: 800px; margin: 50px auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
@@ -345,7 +383,10 @@
                         <div style="padding: 20px;" id="modal-student-content">
                             <!-- Content -->
                         </div>
-                        <div style="padding: 15px 20px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: flex-end;">
+                        <div style="padding: 15px 20px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                            <button id="btn-delete-student" class="action-btn secondary" style="background-color: #fff; color: #dc3545; border: 1px solid #dc3545;" onclick="deleteStudentAccount()">
+                                🗑️ Verwijder Account
+                            </button>
                             <button id="btn-reset-2fa" class="action-btn secondary" style="background-color: #dc3545; color: white;" onclick="resetStudent2FA()">
                                 🛡️ Reset 2FA
                             </button>
@@ -2292,6 +2333,109 @@
                     }
                 }
             }
+
+            // --- ACCOUNT MANAGEMENT LOGIC ---
+            // Removed generatePassword as it is handled by server/email flow now
+
+            window.createStudentAccount = async function() {
+                const name = document.getElementById('new-student-name').value;
+                const email = document.getElementById('new-student-email').value;
+                const cls = document.getElementById('new-student-class').value;
+                
+                if (!name || !email) {
+                    alert("Vul naam en email in.");
+                    return;
+                }
+                
+                const btn = document.getElementById('btn-create-student');
+                const status = document.getElementById('create-student-status');
+                
+                btn.disabled = true;
+                status.textContent = "Bezig...";
+                status.style.color = "blue";
+                
+                try {
+                    // 1. Create Account via Backend (generates temp password)
+                    const response = await fetch('http://localhost:5000/api/create-student', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, class: cls })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        try {
+                            // 2. Trigger Password Reset Email
+                            await firebase.auth().sendPasswordResetEmail(email);
+                            
+                            status.textContent = "Succes! Uitnodiging verstuurd.";
+                            status.style.color = "green";
+                            alert(`Account aangemaakt voor ${name}.\n\n✅ Er is direct een email verstuurd naar ${email} om een wachtwoord in te stellen.`);
+                            
+                            // Clear form
+                            document.getElementById('new-student-name').value = "";
+                            document.getElementById('new-student-email').value = "";
+                            
+                        } catch (emailErr) {
+                            console.error("Email Error:", emailErr);
+                            status.textContent = "Account gemaakt, maar email faalde.";
+                            status.style.color = "orange";
+                            alert(`Account is aangemaakt, maar de verificatie-email kon niet worden verzonden: ${emailErr.message}\n\nDe leerling kan zelf op 'Wachtwoord vergeten' klikken op de loginpagina.`);
+                        }
+                        
+                    } else {
+                        status.textContent = "Fout: " + (result.error || "Onbekend");
+                        status.style.color = "red";
+                    }
+                } catch (e) {
+                    console.error(e);
+                    status.textContent = "Netwerkfout of server down.";
+                    status.style.color = "red";
+                } finally {
+                    btn.disabled = false;
+                }
+            };
+
+            window.deleteStudentAccount = async function() {
+                if (!window.activeStudentId) return;
+                
+                const student = window.allStudentsMap ? window.allStudentsMap[window.activeStudentId] : null;
+                const name = student ? (student.name || student.email) : "deze leerling";
+                
+                const confirmed = confirm(`Weet je zeker dat je het account van ${name} wilt verwijderen?\n\nDIT KAN NIET ONGEDAAN GEMAAKT WORDEN.\n\nHet account wordt verwijderd en de leerling kan niet meer inloggen. Inzendingen blijven bewaard in het archief.`);
+                if (!confirmed) return;
+                
+                const btn = document.getElementById('btn-delete-student');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = "Bezig...";
+                
+                try {
+                    const response = await fetch('http://localhost:5000/api/delete-student', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid: window.activeStudentId })
+                    });
+                     
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert("✅ Account succesvol verwijderd.");
+                        window.closeStudentDetails();
+                        // Refresh UI
+                        loadAllStudents();
+                    } else {
+                        alert("❌ Fout bij verwijderen: " + (result.error || "Onbekende fout"));
+                    }
+                } catch (e) {
+                    console.error("API Error:", e);
+                    alert("❌ Kon geen verbinding maken met de server backend.");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            };
 		</script>
 	</body>
 </html>
