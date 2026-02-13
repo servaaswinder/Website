@@ -353,7 +353,7 @@
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
 						url: "opdrachten/b4_introductie_html.html",
-						x: 750, y: -280
+						x: 500, y: -140
 					},
 					{
 						id: "F1",
@@ -375,7 +375,7 @@
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
 						url: "opdrachten/c4_standaard_representaties.html",
-						x: 250, y: -280
+						x: 500, y: -280
 					},
 
 					// Thema 5: Decompositie
@@ -387,7 +387,7 @@
 						color: { background: "#fff", border: "#ccc" },
 						font: { multi: "html" },
 						url: "opdrachten/e1_decompositie.html",
-						x: 500, y: -280
+						x: 500, y: -420
 					},
 
 					// Eindopdracht
@@ -662,11 +662,11 @@
 					// Root connections
 					{ from: "A3", to: "A2" },
 					{ from: "A3", to: "ModIntro" },
+					{ from: "A3", to: "B4" },
 					{ from: "A3", to: "C4" },
-					{ from: "A3", to: "E1", smooth: { type: 'curvedCW', roundness: 0.2 } },
-					{ from: "A3", to: "B4", smooth: { type: 'curvedCW', roundness: 0.2 } },
+					{ from: "A3", to: "E1" },
 
-					// Thema 1: Maatschappij & Interactie
+					// Thema 1: Communiceren
 					{ from: "A2", to: "A5" },
 					{ from: "A2", to: "A4" },
 					{ from: "A2", to: "A1" },
@@ -676,7 +676,7 @@
 					{ from: "E2", to: "F4" },
 					{ from: "F4", to: "F3" },
 
-					// Thema 2 & 3: Modelleren, Data & Software
+					// Thema 2: Modelleren
 					{ from: "ModIntro", to: "A6" },
 					{ from: "A6", to: "C5" },
 					{ from: "A6", to: "B3" },
@@ -688,7 +688,7 @@
 					{ from: "C3", to: "D1" },
 					{ from: "D1", to: "D2" },
 
-					// Thema 4: Web & Design
+					// Thema 3: HTML
 					{ from: "B4", to: "F1" },
 
 					// Cross-links
@@ -762,19 +762,14 @@
                             nodes: ["A2", "A5", "F2", "A4", "A1", "A7", "E2", "F4", "F3"]
                         },
                         {
-                            label: "Thema 2: Modelleren & Data",
+                            label: "Thema 2: Modelleren, Data & Programmeren",
                             color: "rgba(230, 244, 234, 0.6)", // Green
-                            nodes: ["ModIntro", "A6", "C5", "C1", "C2", "C3"]
+                            nodes: ["ModIntro", "A6", "C5", "C1", "C2", "C3", "B1", "B2", "B3", "D1", "D2"]
                         },
                         {
-                            label: "Thema 3: Software & Hardware", 
-                            color: "rgba(255, 236, 179, 0.6)", // Amber/Orange
-                            nodes: ["C4", "E1", "B3", "B1", "B2", "D1", "D2"]
-                        },
-                        {
-                            label: "Thema 4: Web & Design", 
-                            color: "rgba(243, 229, 245, 0.6)", // Purple
-                            nodes: ["B4", "F1"]
+                            label: "Thema 3, 4 & 5: Web & Systeem", 
+                            color: "rgba(254, 239, 195, 0.6)", // Yellow
+                            nodes: ["B4", "F1", "C4", "E1"]
                         },
                         {
                             label: "Eindopdrachten",

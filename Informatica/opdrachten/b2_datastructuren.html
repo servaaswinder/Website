@@ -22,7 +22,7 @@
 </div>
 </section>
 
-<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<section class='content' style="max-width: 1100px; margin: 0 auto; padding: 20px;">
 <h2>Inleiding</h2>
 <p>Als software developer werkt je code vaak prima met 10 items. Maar wat als je applicatie opeens door 1 miljoen gebruikers tegelijk wordt gebruikt? In deze opdracht duik je in de wereld van <em>tijdscomplexiteit</em>. Je gaat niet alleen code schrijven, je gaat meten, vergelijken en beargumenteren waarom bepaalde datastructuren sneller zijn dan andere.</p>
 
@@ -132,8 +132,10 @@ item = mijn_wachtrij.popleft() # Haal weg aan het begin (links)
         <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
             <th style="padding: 12px; text-align: left;">Categorie</th>
             <th style="padding: 12px; text-align: left;">0 punten</th>
-            <th style="padding: 12px; text-align: left;">1 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
             <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+            <th style="padding: 12px; text-align: left;">4 punten</th>
         </tr>
     </thead>
     <tbody>
@@ -141,24 +143,42 @@ item = mijn_wachtrij.popleft() # Haal weg aan het begin (links)
             <td style="padding: 12px;"><strong>Code Kwaliteit</strong></td>
             <td style="padding: 12px;">Code werkt niet of crasht. Geen metingen zichtbaar.</td>
             <td style="padding: 12px;">Code werkt, maar de meting bevat ruis (bv. prints binnen de tijdmeting).</td>
-            <td style="padding: 12px;">Code is schoon, efficiënt en meet uitsluitend het relevante algoritme. Variabelen hebben logische namen.</td>
+            <td style="padding: 12px;">Code werkt correct en meet uitsluitend het relevante algoritme.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Code werkt correct, meet zuiver en de leerling kan uitleggen hoe de code werkt.<br>
+                <strong>VWO:</strong> Daarnaast bevat de code geen onverklaarbaar complexe constructies en kan de leerling elke regel verantwoorden.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Experimenteren</strong></td>
             <td style="padding: 12px;">Alleen de voorbeelden zijn overgetypt zonder eigen implementatie.</td>
             <td style="padding: 12px;">Beide scenario's uitgevoerd, maar met te kleine datasets waardoor verschillen onzichtbaar zijn.</td>
             <td style="padding: 12px;">Scenario's correct uitgevoerd met grote datasets (1M+). Het snelheidsverschil is duidelijk aangetoond.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Scenario's correct met grote datasets + resultaten overzichtelijk gepresenteerd (tabel of grafiek).<br>
+                <strong>VWO:</strong> Daarnaast heeft de leerling geëxperimenteerd met verschillende datasetgroottes om het verband tussen grootte en snelheid te tonen.
+            </td>
+            <td style="padding: 12px;">De leerling heeft een eigen scenario bedacht en getest, of een grafiek gemaakt die de schaling visueel aantoont (bijv. O(n) vs O(1) curve).</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Analyse (Theorie)</strong></td>
             <td style="padding: 12px;">Vragen niet beantwoord of feitelijk onjuist.</td>
             <td style="padding: 12px;">Antwoorden correct maar oppervlakkig. Termen als O(n) worden genoemd zonder uitleg.</td>
             <td style="padding: 12px;">Diepgaand inzicht. Legt verband tussen interne werking (memory shifting / hashing) en gemeten tijd.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Alle vragen correct beantwoord met duidelijke koppeling tussen theorie en metingen.<br>
+                <strong>VWO:</strong> Daarnaast worden de concepten (O-notatie, hashing, memory layout) in eigen woorden uitgelegd met concrete voorbeelden uit de eigen metingen.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
     </tbody>
 </table>
 </div>
-<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 6) * 9 + 1</p>
+<div style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-top: 15px; font-size: 0.9em;">
+    <strong>Let op:</strong> Je moet in <em>elke</em> categorie minimaal 1 punt halen. Als je op een onderdeel 0 punten scoort, wordt de opdracht <strong>niet nagekeken</strong> en moet je deze eerst aanvullen.
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 10) * 9 + 1</p>
 </section>
 </main>
 {% include site-footer-informatica.html %}

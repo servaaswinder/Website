@@ -17,13 +17,14 @@
 <p class="subtitle">Warming Stripes (C1)</p>
 <div class="meta" style="margin-top: 10px; color: #666;">
     <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
-    <span><strong>Niveau:</strong> 1</span> |
+    <span><strong>Niveau:</strong> 2</span> |
     <span><strong>Domein:</strong> C1 (Zoeken), C3 (Representeren)</span>
 </div>
 </section>
-<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<section class='content' style="max-width: 1100px; margin: 0 auto; padding: 20px;">
 <h2>Doel van de opdracht</h2>
 <p>Je gaat klimaatdata van het KNMI visualiseren. De gemiddelde jaartemperatuur van De Bilt is beschikbaar als tekstbestand. Jij gaat deze tekstdata omzetten naar een visuele warming-stripes afbeelding: elk jaar een verticale streep, van blauw (kouder) naar rood (warmer).</p>
+<p style="background-color: #e8f4f8; padding: 10px; border-left: 5px solid #17a2b8; font-size: 0.9em;"><strong>Voorkennis:</strong> Je kunt al data laden, graficeren (C5, C3) en analyseren (C2) met pandas. Nu ga je een stap verder: het KNMI-bestand is niet netjes opgemaakt, dus je leert ook data opschonen. Daarnaast maak je een geavanceerde visualisatie met kleurenmapping.</p>
 
 <h2>Leerdoelen</h2>
 <ul>
@@ -138,7 +139,7 @@ plt.show()</code></pre>
 </div>
 
 <h3>Reflectie</h3>
-<p>Beschrijf in 2–3 zinnen wat je opvalt in je grafiek. Welke periode is koeler, welke warmer?</p>
+<p>Beschrijf wat je opvalt in je grafiek. Welke periode is koeler, welke warmer? Wat zou een mogelijke verklaring zijn? Hoe betrouwbaar is je visualisatie?</p>
 
 <hr>
 
@@ -160,38 +161,62 @@ plt.show()</code></pre>
             <th style="padding: 12px; text-align: left;">0 punten</th>
             <th style="padding: 12px; text-align: left;">1 punt</th>
             <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+            <th style="padding: 12px; text-align: left;">4 punten</th>
         </tr>
     </thead>
     <tbody>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Data inlezen</strong></td>
-            <td style="padding: 12px;">Bestand niet correct ingelezen; DataFrame leeg of fout gescheiden; geen skiprows.</td>
-            <td style="padding: 12px;">Bestand ingelezen maar met onvolkomenheden: verkeerde sep, kolomnamen niet gestript, index (YYYY) niet ingesteld.</td>
+            <td style="padding: 12px;">Bestand niet correct ingelezen; DataFrame leeg of fout gescheiden.</td>
+            <td style="padding: 12px;">Bestand ingelezen maar met onvolkomenheden: verkeerde sep, kolomnamen niet gestript, index niet ingesteld.</td>
             <td style="padding: 12px;">Correct ingelezen met passende sep en juiste skiprows; kolomnamen gestript; YYYY als index.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Correct ingelezen en de leerling kan uitleggen wat <code>skiprows</code>, <code>sep</code> en <code>set_index</code> doen.<br>
+                <strong>VWO:</strong> Daarnaast kan de leerling uitleggen <em>waarom</em> deze parameters nodig zijn voor dit specifieke bestandsformaat.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Tabel maken (opschonen)</strong></td>
             <td style="padding: 12px;">Kolommen onjuist/ontbreken; waarden niet omgerekend; type blijft tekst.</td>
-            <td style="padding: 12px;">Juiste kolommen gekozen maar deels onjuist geconverteerd; tienden niet consequent gedeeld door 10; ontbrekende waarden niet benoemd.</td>
-            <td style="padding: 12px;">Kolommen logisch gekozen; to_numeric toegepast; direct gedeeld door 10 naar °C; ontbrekende waarden zinvol behandeld.</td>
+            <td style="padding: 12px;">Juiste kolommen gekozen maar deels onjuist geconverteerd; tienden niet gedeeld door 10.</td>
+            <td style="padding: 12px;">Kolommen logisch gekozen; to_numeric toegepast; gedeeld door 10 naar °C; ontbrekende waarden behandeld.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Correct opgeschoond en de leerling kan uitleggen wat er met ontbrekende waarden gebeurt.<br>
+                <strong>VWO:</strong> Daarnaast kan de leerling uitleggen waarom <code>errors='coerce'</code> nodig is en wat het alternatief zou zijn.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Visualisatie (warming stripes)</strong></td>
-            <td style="padding: 12px;">Grafiek ontbreekt of verkeerd (geen kleurenmapping/normalisatie of kleuren op jaartal i.p.v. temperatuur).</td>
-            <td style="padding: 12px;">Basis-stripes aanwezig maar onvolledig: verkeerde/geen normalisatie, ongeschikte colormap, assen zichtbaar.</td>
-            <td style="padding: 12px;">Strakke stripes: Normalize op temperatuurskolom; passende colormap; assen uit. 
-            <br><strong>(VWO: inclusief correcte x-as limieten en kleurbalk/legenda)</strong></td>
+            <td style="padding: 12px;">Grafiek ontbreekt of verkeerd (geen kleurenmapping of kleuren op jaartal i.p.v. temperatuur).</td>
+            <td style="padding: 12px;">Basis-stripes aanwezig maar onvolledig: verkeerde normalisatie, ongeschikte colormap, assen zichtbaar.</td>
+            <td style="padding: 12px;">Strakke stripes met Normalize op temperatuurkolom, passende colormap, assen uit.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Strakke stripes en de leerling kan uitleggen hoe Normalize en de colormap samenwerken.<br>
+                <strong>VWO:</strong> Daarnaast zijn correcte x-as limieten ingesteld en een kleurbalk/legenda toegevoegd (verdiepingsopdracht).
+            </td>
+            <td style="padding: 12px;">De leerling heeft een onverwachte toevoeging gedaan, zoals jaartal-annotaties, een vergelijking met een ander weerstation, of een animatie.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Reflectie</strong></td>
             <td style="padding: 12px;">Ontbreekt of slechts 1 losse opmerking.</td>
-            <td style="padding: 12px;">Kort, beschrijvend (1-2 zinnen) zonder duidelijke onderbouwing.</td>
-            <td style="padding: 12px;">Duidelijke reflectie (2-3 zinnen) met voorbeelden: benoemt koelere/warme perioden en koppelt aan de visualisatie/data.</td>
+            <td style="padding: 12px;">Kort, beschrijvend zonder duidelijke onderbouwing.</td>
+            <td style="padding: 12px;">Benoemt koelere/warmere perioden en koppelt aan de visualisatie.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Duidelijke reflectie met voorbeelden uit de data en een mogelijke verklaring.<br>
+                <strong>VWO:</strong> Daarnaast reflecteert de leerling op de betrouwbaarheid van de visualisatie (bijv. invloed van kleurkeuze, schaal).
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
     </tbody>
 </table>
 </div>
-<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 8) * 9 + 1</p>
+<div style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-top: 15px; font-size: 0.9em;">
+    <strong>Let op:</strong> Je moet in <em>elke</em> categorie minimaal 1 punt halen. Als je op een onderdeel 0 punten scoort, wordt de opdracht <strong>niet nagekeken</strong> en moet je deze eerst aanvullen.
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 13) * 9 + 1</p>
 </section>
 </main>
 {% include site-footer-informatica.html %}

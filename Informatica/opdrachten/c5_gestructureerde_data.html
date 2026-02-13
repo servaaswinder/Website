@@ -17,11 +17,11 @@
 <p class="subtitle">Gestructureerde data (C5)</p>
 <div class="meta" style="margin-top: 10px; color: #666;">
     <span><strong>Tijdsindicatie:</strong> 3 tot 4 uur</span> |
-    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Niveau:</strong> 1</span> |
     <span><strong>Domein:</strong> C5</span>
 </div>
 </section>
-<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<section class='content' style="max-width: 1100px; margin: 0 auto; padding: 20px;">
 <h2>Inleiding</h2>
 <p>In deze opdracht duik je in de wereld van sportdata-analyse. Je gaat aan de slag met echte wedstrijdgegevens van het Eredivisie-seizoen 2023/2024. Met behulp van de Python-bibliotheek <strong>pandas</strong> leer je hoe je data kunt inladen, opschonen, analyseren en visualiseren. Het doel is om patronen en inzichten te ontdekken die verborgen liggen in de ruwe data. Wie scoort het meest? Is er echt een thuisvoordeel? Aan het einde van deze opdracht kun jij deze vragen beantwoorden met data!</p>
 
@@ -126,13 +126,17 @@ plt.show()</code></pre>
 <ol>
     <li><strong>Filter de data:</strong>
 <pre><code class="language-python">team_naam = "PSV Eindhoven" # Pas aan naar jouw team
-df_team = df[...] # Filter op HomeTeam of AwayTeam (let op: dit is lastiger dan het lijkt, begin met alleen thuiswedstrijden of probeer beide te combineren)
+
+# Filter op HomeTeam of AwayTeam
+# Let op: dit is lastiger dan het lijkt!
+# Begin met alleen thuiswedstrijden, of probeer beide te combineren
+df_team = df[...]
 df_team.head()</code></pre>
     </li>
     <li><strong>Analyseer de prestaties:</strong> Presteert jouw team beter in thuis- of uitwedstrijden?</li>
     <li><strong>Analyseer de mentaliteit:</strong> Hoe vaak geeft jouw team een voorsprong weg? (Optioneel/Bonus)</li>
     <li><strong>Visualiseer:</strong> Maak een staafdiagram van winst/gelijk/verlies.</li>
-    <li><strong>Conclusie:</strong> Schrijf een korte conclusie (ca. 100 woorden).</li>
+    <li><strong>Conclusie:</strong> Schrijf een uitgebreide conclusie waarin je je bevindingen samenvat, patronen benoemt en een mogelijke verklaring geeft.</li>
 </ol>
 
 <h2>Beoordelingsmodel</h2>
@@ -141,10 +145,11 @@ df_team.head()</code></pre>
     <thead>
         <tr style="background: #f7f8fb; border-bottom: 2px solid #e6e8ee;">
             <th style="padding: 12px; text-align: left;">Categorie</th>
-            <th style="padding: 12px; text-align: left;">0 Punten</th>
-            <th style="padding: 12px; text-align: left;">1 Punt</th>
-            <th style="padding: 12px; text-align: left;">2 Punten</th>
-            <th style="padding: 12px; text-align: left;">3 Punten</th>
+            <th style="padding: 12px; text-align: left;">0 punten</th>
+            <th style="padding: 12px; text-align: left;">1 punt</th>
+            <th style="padding: 12px; text-align: left;">2 punten</th>
+            <th style="padding: 12px; text-align: left;">3 punten</th>
+            <th style="padding: 12px; text-align: left;">4 punten</th>
         </tr>
     </thead>
     <tbody>
@@ -152,27 +157,42 @@ df_team.head()</code></pre>
             <td style="padding: 12px;"><strong>Code Structuur & Werking</strong></td>
             <td style="padding: 12px;">Code afwezig/werkt niet.</td>
             <td style="padding: 12px;">Poging tot structuur, incompleet/foutief.</td>
-            <td style="padding: 12px;">Code werkt, kleine onvolkomenheden.</td>
-            <td style="padding: 12px;">Code correct, efficiënt en overzichtelijk.</td>
+            <td style="padding: 12px;">Code werkt en de leerling kan in eigen woorden uitleggen wat de code doet. Er zijn geen onverklaarbare of verdacht complexe constructies.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Code werkt correct en de leerling kan stap voor stap uitleggen wat er in elke cel gebeurt.<br>
+                <strong>VWO:</strong> Daarnaast kan de leerling uitleggen <em>waarom</em> bepaalde pandas-functies (bijv. <code>groupby</code>, <code>value_counts</code>) geschikt zijn voor het probleem.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Dataverwerking & Analyse</strong></td>
             <td style="padding: 12px;">Vragen onbeantwoord/data incorrect.</td>
             <td style="padding: 12px;">Poging gedaan, filters/berekeningen fundamenteel onjuist.</td>
             <td style="padding: 12px;">Analyses grotendeels correct, kleine fout.</td>
-            <td style="padding: 12px;">Data correct gefilterd, berekeningen juist.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Data correct gefilterd, alle berekeningen juist en resultaten besproken.<br>
+                <strong>VWO:</strong> Daarnaast heeft de leerling extra analyses uitgevoerd (bijv. thuis vs. uit vergelijking, mentaliteitsanalyse) en deze onderbouwd.
+            </td>
+            <td style="padding: 12px;">De leerling heeft een onverwachte analyse toegevoegd, zoals vergelijking met een ander seizoen, een voorspellend model, of een statistische toets.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Visualisatie & Conclusie</strong></td>
             <td style="padding: 12px;">Ontbreekt.</td>
             <td style="padding: 12px;">Onduidelijk/niet onderbouwd.</td>
-            <td style="padding: 12px;">Correct maar niet volledig opgemaakt/zwak onderbouwd.</td>
-            <td style="padding: 12px;">Helder, compleet en sterk onderbouwd.</td>
+            <td style="padding: 12px;">Correct maar niet volledig opgemaakt of zwak onderbouwd.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Grafieken helder en volledig opgemaakt; conclusie onderbouwd met specifieke cijfers.<br>
+                <strong>VWO:</strong> Daarnaast reflecteert de leerling op beperkingen van de data en geeft suggesties voor vervolgonderzoek.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
     </tbody>
 </table>
 </div>
-<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 9) * 9 + 1</p>
+<div style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-top: 15px; font-size: 0.9em;">
+    <strong>Let op:</strong> Je moet in <em>elke</em> categorie minimaal 1 punt halen. Als je op een onderdeel 0 punten scoort, wordt de opdracht <strong>niet nagekeken</strong> en moet je deze eerst aanvullen.
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 10) * 9 + 1</p>
 </section>
 </main>
 {% include site-footer-informatica.html %}

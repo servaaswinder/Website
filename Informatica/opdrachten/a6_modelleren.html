@@ -21,7 +21,7 @@
     <span><strong>Domein:</strong> A6</span>
 </div>
 </section>
-<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<section class='content' style="max-width: 1100px; margin: 0 auto; padding: 20px;">
 <h2>Inleiding</h2>
 <p>Het doel van deze opdracht is het in beeld brengen van een populatie vossen en een populatie konijnen op Terschelling. Er worden in het jaar 2020 100 konijnen losgelaten op het eiland, maar er zijn ook al 20 vossen. Een wiskundige heeft een formule opgesteld waarmee te berekenen is hoeveel konijnen er ieder jaar bij komen of worden opgegeten. Datzelfde is ook opgesteld voor het aantal vossen.</p>
 <p>In deze opdracht leer je hoe je:</p>
@@ -75,7 +75,7 @@
 </ul>
 
 <h3>Stap 4: Inleveren en Vragen</h3>
-<p>Lever je werkende Google Colab-notebook in. Zorg dat de code overzichtelijk is en dat de grafiek als output zichtbaar is. Beantwoord de onderstaande vragen in een tekst-cel onder je code.</p>
+<p>Lever je werkende Google Colab-notebook in. Zorg dat de grafiek als output zichtbaar is. Beantwoord de onderstaande vragen in een tekst-cel onder je code.</p>
 <ul>
     <li>Beschrijf de relatie tussen de twee populaties die je in de grafiek ziet. Waarom loopt de piek van de vossenpopulatie achter op de piek van de konijnenpopulatie?</li>
     <li>Wat zou er op lange termijn gebeuren als de startpopulatie vossen veel hoger was, bijvoorbeeld 100? Pas dit aan in je model, voer het opnieuw uit en beschrijf het resultaat.</li>
@@ -91,6 +91,7 @@
             <th style="padding: 12px; text-align: left;">1 Punt</th>
             <th style="padding: 12px; text-align: left;">2 Punten</th>
             <th style="padding: 12px; text-align: left;">3 Punten</th>
+            <th style="padding: 12px; text-align: left;">4 Punten</th>
         </tr>
     </thead>
     <tbody>
@@ -99,26 +100,41 @@
             <td style="padding: 12px;">Code is afwezig, incompleet of bevat dusdanige fouten dat deze niet kan worden uitgevoerd.</td>
             <td style="padding: 12px;">Code heeft een poging tot de juiste structuur, maar is incompleet of werkt niet naar behoren. Essentiële onderdelen (zoals het vullen van lijsten) ontbreken.</td>
             <td style="padding: 12px;">De code werkt en heeft de juiste basisstructuur (initialisatie, while-loop, lijsten vullen). Alle onderdelen zijn aanwezig, maar mogelijk met kleine onvolkomenheden.</td>
-            <td style="padding: 12px;">De code is correct, compleet en overzichtelijk gestructureerd. Alle variabelen en lijsten zijn correct geïnitialiseerd en de while-loop functioneert zoals bedoeld.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> De code is correct, compleet en de leerling begrijpt wat de code doet. Alle variabelen en lijsten zijn correct geïnitialiseerd en de while-loop functioneert zoals bedoeld.<br>
+                <strong>VWO:</strong> Daarnaast kan de leerling uitleggen waarom bepaalde keuzes zijn gemaakt (bijv. keuze van dt, structuur van de loop) en bevat de code geen onverklaarbaar complexe constructies.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Model Implementatie</strong></td>
             <td style="padding: 12px;">De wiskundige formules zijn niet of volledig incorrect in de code verwerkt.</td>
             <td style="padding: 12px;">Er is een poging gedaan de formules te implementeren, maar de logica is fundamenteel onjuist (bv. de tijdstap dt wordt niet gebruikt of de populaties worden niet correct geüpdatet).</td>
             <td style="padding: 12px;">De formules zijn grotendeels correct geïmplementeerd, maar bevatten een kleine fout. Het resultaat lijkt op de verwachte grafiek, maar is niet volledig accuraat.</td>
-            <td style="padding: 12px;">Het wiskundige model is correct vertaald naar de code. De verandering per tijdstap (dK, dV) wordt correct berekend en gebruikt om de populaties binnen de loop te updaten.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Het wiskundige model is correct vertaald naar de code. De berekening per tijdstap werkt correct.<br>
+                <strong>VWO:</strong> Daarnaast toont de leerling begrip van het model door de invloed van parameters (zoals dt of startwaarden) te beschrijven.
+            </td>
+            <td style="padding: 12px;">De leerling heeft het model op een onverwachte manier uitgebreid, bijvoorbeeld door een derde soort toe te voegen, seizoensinvloed te modelleren, of een draagkracht in te bouwen.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Visualisatie en Analyse</strong></td>
             <td style="padding: 12px;">Er is geen grafiek en de analysevragen zijn niet beantwoord.</td>
             <td style="padding: 12px;">Er is een grafiek, maar deze is onvolledig of onduidelijk (mist labels/legenda). De antwoorden op de vragen zijn afwezig, of zeer oppervlakkig.</td>
             <td style="padding: 12px;">De grafiek is correct, maar niet volledig opgemaakt (mist bv. titel of legenda). De antwoorden op de vragen zijn correct, maar summier en zonder duidelijke onderbouwing.</td>
-            <td style="padding: 12px;">De grafiek is correct, volledig en helder opgemaakt (titel, as-labels, legenda). De analysevragen zijn correct en duidelijk beantwoord, waaruit begrip van het model blijkt.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> De grafiek is correct, volledig en helder opgemaakt (titel, as-labels, legenda). De analysevragen zijn correct beantwoord.<br>
+                <strong>VWO:</strong> Daarnaast toont de analyse diepgaand begrip: de leerling legt het verband tussen de populaties uit met eigen woorden en onderbouwt met specifieke waarden uit de grafiek.
+            </td>
+            <td style="padding: 12px;">De leerling heeft extra analyses uitgevoerd, zoals het vergelijken van meerdere scenario's of het beschrijven van langetermijntrends met wiskundige termen.</td>
         </tr>
     </tbody>
 </table>
 </div>
-<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 9) * 9 + 1</p>
+<div style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-top: 15px; font-size: 0.9em;">
+    <strong>Let op:</strong> Je moet in <em>elke</em> categorie minimaal 1 punt halen. Als je op een onderdeel 0 punten scoort, wordt de opdracht <strong>niet nagekeken</strong> en moet je deze eerst aanvullen.
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 11) * 9 + 1</p>
 </section>
 </main>
 {% include site-footer-informatica.html %}
