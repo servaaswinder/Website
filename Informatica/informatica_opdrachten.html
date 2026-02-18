@@ -399,7 +399,7 @@
 						color: { background: "#ffeaea", border: "#ff4444" },
 						font: { multi: "html" },
 						url: "opdrachten/eindopdracht_gamedev.html",
-						x: -250, y: 560
+						x: 500, y: 560
 					},
 					{
 						id: "Eind2",
@@ -409,7 +409,7 @@
 						color: { background: "#ffeaea", border: "#ff4444" },
 						font: { multi: "html" },
 						url: "opdrachten/eindopdracht_webshop.html",
-						x: 0, y: 560
+						x: 750, y: 560
 					},
 					{
 						id: "Eind3",
@@ -696,6 +696,7 @@
 					{ from: "B3", to: "B1" },
 					{ from: "B1", to: "B2" },
 					{ from: "C3", to: "D1" },
+					{ from: "B1", to: "D1" },
 					{ from: "D1", to: "D2" },
 
 					// Thema 4: Web & Design
@@ -706,6 +707,8 @@
 					
 					// Eindopdracht Links
 					{ from: "B1", to: "Eind3" }, // Algoritme -> Encryptie
+					{ from: "D2", to: "Eind1" }, // Inspecteren -> Gamedev
+					{ from: "F1", to: "Eind2" }, // Usability -> Webshop
 				]);
 
 				// Create a network
