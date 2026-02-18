@@ -186,7 +186,7 @@
     {% include site-header-informatica.html %}
     <main class='site-content'>
         <section class='assignment-hero'>
-            <h1>Netwerk Ninja: Bouw je eigen Internet</h1>
+            <h1>Eindopdracht: World Wide Web</h1>
             <p class="subtitle">Van kabel tot server</p>
             <div class="meta" style="margin-top: 10px; color: #666;">
                 <span><strong>Tijdsindicatie:</strong> 16 – 20 uur</span> |
@@ -335,9 +335,31 @@
                 bekijk het MAC-adres van de Raspberry Pi via <code>ifconfig</code> in de terminal.
             </div>
 
-            <h3>Stap 3: Ping!</h3>
-            <p>Nog even geduld — je kunt pas pingen als je in Fase 2 een IP-adres hebt ingesteld. Maar je kunt nu al
-                controleren of je kabel werkt door te kijken of er een link-light brandt op de switch.</p>
+            <h3>Stap 3: Link check</h3>
+            <p>Controleer nu of je kabel werkt door te kijken of er een link-light brandt op de switch. Als het lampje
+                knippert, is er ook dataverkeer. Voor de echte <em>ping</em> moet je nog even wachten tot Fase 2.</p>
+
+            <h3>Stap 4: Draadloze connecties (WiFi)</h3>
+            <p>Naast kabels gebruikt het World Wide Web ook <strong>radiogolven</strong> om data te versturen. WiFi
+                werkt op de 2.4 GHz of 5 GHz frequentieband. Een <strong>Access Point (AP)</strong> zendt een
+                <strong>SSID</strong> (Service Set Identifier) uit, oftewel de netwerknaam.
+            </p>
+            <ul>
+                <li><strong>Kanalen:</strong> WiFi-netwerken kunnen elkaar storen als ze op hetzelfde kanaal zitten. In
+                    de 2.4 GHz-band zijn kanalen 1, 6 en 11 de enige die elkaar niet overlappen.</li>
+                <li><strong>Encryptie:</strong> Om te voorkomen dat iedereen je data kan meelezen, wordt WiFi beveiligd
+                    met een wachtwoord via <strong>WPA2</strong> of <strong>WPA3</strong> encryptie.</li>
+            </ul>
+            <p><strong>Opdracht:</strong> Scan op je laptop of Raspberry Pi naar beschikbare WiFi-netwerken. Zoek de
+                sandbox-WiFi die de docent heeft klaargezet en verbind hiermee.</p>
+
+            <div
+                style="background: #e8f5e9; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                <strong style="color: #4caf50;">🔋 Chromebook-tip:</strong> Je kunt op de Raspberry Pi naar netwerken
+                scannen met het commando <code>nmcli dev wifi list</code>. Verbinden kan via de netwerk-icoon
+                rechtsboven
+                in de desktop-omgeving of via <code>nmcli</code> in de terminal.
+            </div>
 
             <h3>Functionaliteitseisen (Fase 1)</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
@@ -347,17 +369,18 @@
                         <li><strong>Zelf een UTP-kabel gemaakt</strong> met een crimptang en RJ45-connectors (T568B
                             standaard).</li>
                         <li>Werkende fysieke verbinding (link-light brandt) via je eigen kabel.</li>
+                        <li>Verbonden met het <strong>WiFi sandbox-netwerk</strong>.</li>
                         <li>Je eigen MAC-adres gevonden en genoteerd.</li>
-                        <li>Je kunt uitleggen wat een MAC-adres is en waarvoor het dient.</li>
+                        <li>Je kunt uitleggen wat een MAC-adres en een SSID is.</li>
                     </ul>
                 </div>
                 <div>
                     <strong>🟣 Expert (Challenge)</strong>
                     <ul>
-                        <li><strong>ARP-tabel bekijken:</strong> Gebruik <code>arp -a</code> om te zien welke
-                            MAC-adressen je apparaat al kent en leg uit hoe dit proces werkt.</li>
-                        <li><strong>Cross-over kabel:</strong> Leg uit wat het verschil is tussen een straight-through
-                            en een cross-over kabel en wanneer je welke nodig hebt.</li>
+                        <li><strong>Raspberry Pi Access Point:</strong> Configureer je Raspberry Pi als een eigen WiFi
+                            Access Point (Hotspot) zodat andere leerlingen met jouw Pi kunnen verbinden.</li>
+                        <li><strong>ARP-tabel &amp; Kanalen:</strong> Leg uit hoe ARP werkt én waarom kanaal 1, 6 en 11
+                            belangrijk zijn bij WiFi.</li>
                     </ul>
                 </div>
             </div>
@@ -831,16 +854,15 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Fase 1</strong><br><em>Kabels &amp; Connecties</em><br><span
+                            <td><strong>Fase 1</strong><br><em>Kabels &amp; WiFi</em><br><span
                                     style="font-size:0.8em;color:#555;">max 2 pt</span></td>
                             <td class="col-pts pt-0">&ndash;</td>
-                            <td>Kabel aangesloten maar geen link-light, of de kabel is niet zelf gemaakt (kant-en-klaar
-                                gebruikt).</td>
-                            <td><strong>Zelfgemaakte UTP-kabel</strong> werkt (link-light brandt). MAC-adres gevonden en
-                                genoteerd. Kan
-                                uitleggen wat een MAC-adres is.
-                                <br><br><em>Expert bonus:</em> ARP-tabel bekeken en proces van adres-resolutie
-                                uitgelegd.
+                            <td>Deels werkend: of de kabel werkt, of de WiFi-verbinding is gelukt, maar niet beide. Of
+                                de kabel is niet zelfgemaakt.</td>
+                            <td><strong>Alles compleet:</strong> Zelfgemaakte UTP-kabel werkt EN verbonden met WiFi. Kan
+                                MAC-adres en SSID uitleggen.
+                                <br><br><em>Expert bonus:</em> Raspberry Pi als Access Point geconfigureerd of
+                                diepgaande uitleg over WiFi-interferentie.
                             </td>
                             <td colspan="2" style="text-align:center; color:#888; font-style:italic;">n.v.t.</td>
                         </tr>
