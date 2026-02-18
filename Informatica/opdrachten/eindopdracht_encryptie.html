@@ -1,0 +1,596 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang='nl'>
+<head>
+<meta charset='utf-8' />
+<title>Eindopdracht: Geheime Communicatie</title>
+<link rel='stylesheet' href="{{ '/style.css' | relative_url }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .phase-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: stretch;
+            margin-bottom: 20px;
+        }
+        .phase-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        .phase-image-wrapper {
+            flex: 0 0 auto;
+            position: relative;
+            max-width: 400px;
+            min-width: 250px;
+            aspect-ratio: var(--ar, 16/9);
+        }
+        .phase-image-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+        }
+        .code-example {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            margin: 10px 0 20px 0;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .code-example .keyword { color: #cba6f7; }
+        .code-example .string { color: #a6e3a1; }
+        .code-example .function { color: #89b4fa; }
+        .code-example .comment { color: #6c7086; font-style: italic; }
+        .code-example .number { color: #fab387; }
+        .code-partial {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            margin: 10px 0 20px 0;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            border: 2px dashed #f38ba8;
+        }
+        .code-partial .placeholder {
+            color: #f38ba8;
+            font-weight: bold;
+        }
+        .serial-output {
+            background: #11111b;
+            color: #a6e3a1;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85em;
+            margin: 10px 0 20px 0;
+            line-height: 1.5;
+            border-left: 4px solid #a6e3a1;
+        }
+        .role-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .role-card {
+            background: #f7f8fb;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e6e8ee;
+        }
+        .role-card .emoji { font-size: 2em; display: block; margin-bottom: 8px; }
+        .role-card strong { display: block; margin-bottom: 5px; }
+        .role-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        .role-tag.ontvanger { background: #e8f5e9; color: #2e7d32; }
+        .role-tag.onderschepper { background: #fce4ec; color: #880e4f; }
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .rubric-table th {
+            padding: 12px;
+            text-align: left;
+            background: #f7f8fb;
+            border-bottom: 2px solid #e6e8ee;
+        }
+        .rubric-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e6e8ee;
+            vertical-align: top;
+        }
+        .rubric-table tr:hover td {
+            background: #fafbfc;
+        }
+        .pt-0 { color: #999; font-style: italic; }
+        .col-pts { width: 5%; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+{% include site-header-informatica.html %}
+<main class='site-content'>
+<section class='assignment-hero'>
+<h1>Eindopdracht: Geheime Communicatie</h1>
+<p class="subtitle">Netwerken & Security (Eind)</p>
+<div class="meta" style="margin-top: 10px; color: #666;">
+    <span><strong>Tijdsindicatie:</strong> 8 – 12 uur</span> |
+    <span><strong>Niveau:</strong> 3 (Eindbaas)</span> |
+    <span><strong>Groepsgrootte:</strong> 1, 2 of 3 leerlingen</span>
+</div>
+</section>
+
+<section class='content' style="max-width: 1100px; margin: 0 auto; padding: 20px;">
+
+<h2>De Missie</h2>
+<p>In deze eindopdracht bouw je een eigen <strong>beveiligd communicatiesysteem</strong> met de micro:bit. Jullie ontwerpen een protocol waarmee je draadloos berichten kunt versturen die door niemand anders gelezen kunnen worden. Je begint simpel (ASCII), bouwt daarna een klassieke versleuteling (Caesar), en eindigt met een eigen, uniek algoritme dat "onkraakbaar" is.</p>
+
+<p>Dit is een <strong>Eindbaas-opdracht</strong>. Dat betekent: minder handje-vasthouden, meer zelf ontwerpen. Je levert levert alles in via de site. De tijdsindicatie van 8–12 uur is inclusief het portfolio. Plan dit goed: de latere fases kosten meer tijd dan je denkt.</p>
+
+<div style="background-color: #e3f2fd; padding: 15px; border-left: 5px solid #2196f3; margin: 20px 0;">
+    <h3>De Rollen</h3>
+    <p>Je werkt in een groepje van <strong>1, 2 of 3 leerlingen</strong>. Er zijn drie rollen. Bij een groep van 2 worden de Onderschepper-taken verdeeld. <strong>Werk je alleen? Dan neem je alle drie de rollen op je.</strong></p>
+    <div class="role-cards">
+        <div class="role-card">
+            <span class="emoji">📡</span>
+            <strong>Verzender</strong>
+            Schrijft code om berichten te versleutelen en te versturen.
+        </div>
+        <div class="role-card">
+            <span class="emoji">📥</span>
+            <strong>Ontvanger</strong>
+            Schrijft code om berichten op te vangen en te ontsleutelen.
+        </div>
+        <div class="role-card">
+            <span class="emoji">🕵️</span>
+            <strong>Onderschepper</strong>
+            Probeert berichten van anderen te stelen en te kraken.
+        </div>
+    </div>
+    <p style="margin-top: 10px; font-size: 0.9em; color: #555;">Bij elke fase staat aangegeven welke rol aan zet is. Spreek vooraf af wie wat doet.</p>
+</div>
+
+<div style="background-color: #e3f2fd; padding: 15px; border-left: 5px solid #2196f3; margin: 20px 0;">
+    <h3>Differentiatie</h3>
+    <p>Iedereen kan deze opdracht halen, maar op zijn eigen niveau:</p>
+    <ul>
+        <li><strong>De Basis (Cijfer 5-7):</strong> Je bouwt alle fases werkend volgens de minimumeisen.</li>
+        <li><strong>De Expert (Cijfer 8-10):</strong> Je voegt expert features toe en je eigen encryptie is technisch indrukwekkend.</li>
+    </ul>
+    <p>In het beoordelingsmodel staat per categorie wat <strong>havo-niveau</strong> en wat <strong>vwo-niveau</strong> inhoudt bij 3 punten. Scoor jij hoger dan verwacht? Dan is 4 punten mogelijk — ongeacht welke richting je volgt.</p>
+</div>
+
+<h2>Werkomgeving & Spelregels</h2>
+<p>Je werkt in de online micro:bit editor: <a href="https://python.microbit.org/v/3" target="_blank"><strong>python.microbit.org</strong></a>.</p>
+
+<div style="background-color: #ffebee; padding: 15px; border-left: 5px solid #f44336; margin: 20px 0;">
+    <h3>⚠️ Spelregels & AI</h3>
+    <p>We weten dat AI (ChatGPT/Copilot) code kan schrijven. Daarom gelden deze regels:</p>
+    <ul>
+        <li><strong>AI is je tutor, niet je maker:</strong> Je mag AI vragen om <em>uitleg</em> ("Hoe werkt <code>ord()</code>?"), maar niet om de hele opdracht te maken.</li>
+        <li><strong>Mondelinge verdediging:</strong> Bij het aftekenen kan de docent vragen: "Waarom gebruik je hier een loop?" of "Wat doet deze variabele?". Als je het niet weet, telt de opdracht niet.</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ==================== FASE 1 ==================== -->
+<h2>Fase 1: Hello Radio (De Basis)</h2>
+
+<p>Eerst zorgen we voor een stabiele verbinding. We bouwen een Sender (zender) en Receiver (ontvanger). Het doel: de zender stuurt letters, de ontvanger plakt ze aan elkaar tot een woord.</p>
+
+<div style="background: #e3f2fd; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+    <span class="role-tag">📡 Verzender</span> schrijft de sender-code. &nbsp;
+    <span class="role-tag ontvanger">📥 Ontvanger</span> schrijft de receiver-code. &nbsp;
+    <span class="role-tag onderschepper">🕵️ Onderschepper</span> test of de verbinding stabiel is en of berichten onderschept kunnen worden.
+</div>
+
+<p>Voordat we geheime codes kunnen versturen, moeten we eerst een werkende radio-verbinding hebben. In deze fase bouwen we samen de basis: een verzender die letters stuurt, en een ontvanger die ze weer aan elkaar plakt. <strong>Volg de instructies hieronder om je eerste script te schrijven.</strong></p>
+
+<h3>Stap 1: De Verzender (Sender)</h3>
+<p>De verzender stuurt het bericht letter voor letter. Omdat de radio soms hapert als je te snel stuurt, wachten we kort (<code>sleep(300)</code>) tussen elke letter. Aan het eind sturen we een signaal ("END") zodat de ontvanger weet dat het bericht klaar is.</p>
+
+<p>Kopieer deze code naar micro:bit 1:</p>
+<div class="code-example">from microbit import *
+import radio
+
+radio.on()
+radio.config(group=7)  # Kies een groepnummer voor jouw team!
+
+display.scroll("A")
+
+while True:
+    if button_a.was_pressed():
+        bericht = "HALLO"
+        
+        # 1. Stuur elke letter los
+        for letter in bericht:
+            radio.send(letter)
+            display.show(letter)
+            sleep(300)  # Even wachten voor stabiliteit
+            
+        # 2. Stuur het eindsignaal
+        radio.send("END")
+        display.show(Image.YES)</div>
+
+<h3>Stap 2: De Ontvanger (Receiver)</h3>
+<p>De ontvanger luistert continu. Hij ontvangt losse letters en bewaart ze in een variabele <code>bericht</code>. Pas als hij het signaal "END" ontvangt, laat hij het hele woord zien op het scherm.</p>
+
+<p>Kopieer deze code naar micro:bit 2:</p>
+<div class="code-example">from microbit import *
+import radio
+
+radio.on()
+radio.config(group=7)  # Moet hetzelfde zijn als de sender!
+
+display.scroll("B")
+bericht = ""  # Hier bewaren we de inkomende letters
+
+while True:
+    msg = radio.receive()
+    if msg:
+        if msg == "END":
+            # Bericht is compleet! Laat zien.
+            display.scroll(bericht)
+            bericht = ""  # Maak leeg voor het volgende bericht
+        else:
+            # Plak de nieuwe letter achter het bericht
+            bericht = bericht + msg
+            display.show(".")  # Feedback dat we iets ontvangen</div>
+
+<h3>Probeer het uit!</h3>
+<ol>
+    <li>Flash de codes naar twee micro:bits.</li>
+    <li>Druk op <strong>A</strong> op de verzender.</li>
+    <li>Zie je de letters op de verzender? Zie je puntjes op de ontvanger?</li>
+    <li>Scrollt het woord "HALLO" voorbij op de ontvanger? Gefeliciteerd, je protocol werkt!</li>
+</ol>
+
+<hr>
+
+<!-- ==================== FASE 2 ==================== -->
+
+<h2>Fase 2: Van Letters naar Getallen</h2>
+<p>Nu gaan we de basis leggen voor versleutelen. Computers (en dus ook de micro:bit) werken stiekem niet met letters, maar met getallen (ASCII-code). Als je tekst eenmaal getallen zijn, kun je er sommen mee maken — en dat is de basis van encryptie.</p>
+
+<div style="background: #e3f2fd; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+    <span class="role-tag">📡 Verzender</span> past de sender-code aan zodat letters als getallen worden verstuurd. &nbsp;
+    <span class="role-tag ontvanger">📥 Ontvanger</span> past de receiver-code aan zodat getallen terug worden omgezet naar letters.
+</div>
+
+<h3>Wat verandert er?</h3>
+<p>In Fase 1 stuurden we de letter <code>"A"</code> direct. Nu sturen we het getal <code>65</code> (de ASCII-waarde van "A"). De ontvanger zet dat getal daarna weer terug naar de letter. Het resultaat op het scherm is hetzelfde — maar de data die over de radio gaat ziet er heel anders uit.</p>
+
+<h3>Gereedschapskist (Cheat Sheet)</h3>
+<details style="background: #f1f3f5; padding: 10px; border-radius: 5px; cursor: pointer; margin-bottom: 15px;">
+    <summary><strong>🛠 Klik hier voor Python Hulp (Strings & ASCII)</strong></summary>
+    <div class="code-example" style="white-space: pre-wrap;"># 1. Van Letter naar Getal (en terug)
+getal = ord("A")       # Wordt 65
+letter = chr(65)       # Wordt "A"
+
+# 2. Van String naar Int (voor berekeningen)
+tekst = "123"
+som = int(tekst) + 5   # Wordt 128
+terug_naar_tekst = str(128)
+
+# 3. Door een woord lopen (loop)
+woord = "HELLO"
+for letter in woord:
+    ascii_code = ord(letter)
+    # Doe iets met de code...
+
+# 4. Lijsten (Handig voor encryptie!)
+sleutel = [1, 2, 3]
+eerste_getal = sleutel[0]</div>
+</details>
+
+<h3>Functionaliteitseisen (Fase 2)</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+        <strong>🟢 Basis (Must-have)</strong>
+        <ul>
+            <li>Sender stuurt letters als ASCII-getallen (met <code>ord()</code>).</li>
+            <li>Receiver zet getallen terug naar letters (met <code>chr()</code>).</li>
+            <li>Bericht komt correct en leesbaar over op de ontvanger.</li>
+        </ul>
+    </div>
+    <div>
+        <strong>🟣 Expert (Challenge)</strong>
+        <ul>
+            <li><strong>Kommalijst:</strong> Verstuur een heel woord als lijst van getallen gescheiden door komma's. De receiver gebruikt <code>split(",")</code> om ze terug te zetten.</li>
+            <li><strong>Berichtbevestiging:</strong> De receiver stuurt een "OK" terug naar de sender na succesvolle ontvangst.</li>
+        </ul>
+    </div>
+</div>
+
+<h3>Aan de slag: vul de code in</h3>
+<p>Hieronder zie je een <em>gedeeltelijk ingevuld</em> startpunt voor de sender en receiver. De rode <code>???</code>-plekken moet je zelf invullen. Gebruik de cheat sheet hierboven als je niet meer weet welke functie je nodig hebt.</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+        <strong>📡 Sender (vul in):</strong>
+        <div class="code-partial">from microbit import *
+import radio
+
+radio.on()
+radio.config(group=7)
+
+while True:
+    if button_a.was_pressed():
+        bericht = "HALLO"
+        
+        for letter in bericht:
+            # Zet de letter om naar een getal
+            getal = <span class="placeholder">???</span>
+            
+            # Stuur het getal als tekst
+            radio.send(<span class="placeholder">???</span>)
+            display.show(<span class="placeholder">???</span>)
+            sleep(300)
+            
+        radio.send("END")
+        display.show(Image.YES)</div>
+    </div>
+    <div>
+        <strong>📥 Receiver (vul in):</strong>
+        <div class="code-partial">from microbit import *
+import radio
+
+radio.on()
+radio.config(group=7)
+
+bericht = ""
+
+while True:
+    msg = radio.receive()
+    if msg:
+        if msg == "END":
+            display.scroll(bericht)
+            bericht = ""
+        else:
+            # Ontvangen tekst omzetten naar getal
+            getal = <span class="placeholder">???</span>
+            
+            # Getal omzetten naar letter
+            letter = <span class="placeholder">???</span>
+            
+            bericht = bericht + letter
+            display.show(".")</div>
+    </div>
+</div>
+
+<p><strong>Test je code:</strong> Werkt het? Vergelijk de uitvoer met Fase 1. Het bericht op de ontvanger moet nog steeds "HALLO" laten zien — maar de radio stuurt nu getallen.</p>
+
+
+
+<hr>
+
+<!-- ==================== FASE 3 ==================== -->
+
+<h2>Fase 3: Caesar Cipher (De Versleuteling)</h2>
+<p>Je kunt nu letters versturen als getallen. De volgende stap is om die getallen te <strong>verschuiven</strong> zodat de vijand ze niet meer kan lezen. Dit heet de <em>Caesar Cipher</em>.</p>
+
+<div style="background: #e3f2fd; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+    <span class="role-tag">📡 Verzender</span> voegt encryptie toe: verschuift het getal voor het versturen. &nbsp;
+    <span class="role-tag ontvanger">📥 Ontvanger</span> voegt decryptie toe: verschuift het getal terug na ontvangst. &nbsp;
+    <span class="role-tag onderschepper">🕵️ Onderschepper</span> luistert mee op hetzelfde kanaal en probeert het bericht te lezen zonder de sleutel.
+</div>
+
+<p>Het idee: spreek met je partner een geheime sleutel af (bijv. <code>5</code>). Tel deze sleutel op bij elk ASCII-getal dat je verstuurt. De ontvanger trekt de sleutel er weer vanaf.</p>
+
+<h3>De Wiskunde</h3>
+<p><code>versleuteld_getal = origineel_getal + sleutel</code> (bij de sender)</p>
+<p><code>origineel_getal = ontvangen_getal - sleutel</code> (bij de ontvanger)</p>
+
+<h3>Functionaliteitseisen (Fase 3)</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+        <strong>🟢 Basis (Must-have)</strong>
+        <ul>
+            <li>Caesar Cipher werkt (verschuiving).</li>
+            <li><strong>Verstelbare Key:</strong> Je kunt de key aanpassen met knoppen A en B.</li>
+            <li>Toon de huidige key op het scherm bij het instellen.</li>
+        </ul>
+    </div>
+    <div>
+        <strong>🟣 Expert (Challenge)</strong>
+        <ul>
+            <li><strong>Key Wrapping:</strong> De key <em>wrapt</em> netjes rond (van 25 terug naar 0, nooit negatief).</li>
+            <li><strong>Spaties en leestekens</strong> worden niet meegecodeerd (ze komen ongewijzigd door).</li>
+            <li><strong>Rolling Code:</strong> de key verhoogt automatisch met 1 na elk bericht.</li>
+        </ul>
+    </div>
+</div>
+
+<div style="background: #fff8e1; padding: 15px; border-left: 5px solid #ff9800; margin: 20px 0;">
+    <strong>🏆 The Imitation Game</strong><br>
+    <p style="margin: 8px 0 0 0;">Laat een ander groepje een bericht versturen met een sleutel die jij niet weet. Gebruik jouw Onderschepper-script om hun bericht te onderscheppen. Lukt het jou om de key te achterhalen en het bericht te ontcijferen?</p>
+    <p style="margin: 8px 0 0 0; font-size: 0.9em; color: #666;">Hoe zou je dit systematisch aanpakken? Er zijn maar 26 mogelijkheden... Denk na over hoe je dat kunt automatiseren. Dit is iets om zelf uit te zoeken.</p>
+</div>
+
+<hr>
+
+<!-- ==================== FASE 4 ==================== -->
+
+<h2>Fase 4: De Eindbaas — Eigen Encryptie</h2>
+
+<p>De Caesar Cipher is makkelijk te kraken omdat er maar 26 opties zijn. Nu is het aan jou. <strong>Ontwerp en bouw een systeem dat aantoonbaar veiliger is.</strong> Dit is de kern van de opdracht — zonder deze fase is de opdracht onvolledig.</p>
+
+<div style="background: #e3f2fd; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+    <span class="role-tag">📡 Verzender</span> &amp; <span class="role-tag ontvanger">📥 Ontvanger</span> ontwerpen samen de encryptie. &nbsp;
+    <span class="role-tag onderschepper">🕵️ Onderschepper</span> probeert achteraf het bericht te kraken — en geeft feedback of het gelukt is.
+</div>
+
+<h3>Inspiratie & Ideeën</h3>
+<ul>
+    <li><strong>Vigenère Cipher:</strong> Gebruik een sleutelwoord (bijv. "PIZZA") in plaats van één getal. De eerste letter verschuif je met de ASCII-waarde van 'P', de tweede met 'I', enz. Veel moeilijker te kraken!</li>
+    <li><strong>XOR Encryptie:</strong> Gebruik de binaire <code>^</code> (XOR) operator in plaats van plus en min. Dit is de basis van moderne computerencryptie. XOR heeft een bijzondere eigenschap: <code>a ^ b ^ b == a</code>.</li>
+    <li><strong>One-Time Pad:</strong> Verzender en ontvanger spreken vooraf een willekeurige sleutelreeks af die maar één keer gebruikt wordt. Combineer dit met XOR voor maximale veiligheid.</li>
+</ul>
+
+<h3>Eisen Fase 4</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div>
+        <strong>🟢 Basis (Must-have)</strong>
+        <ul>
+            <li>Je eigen methode is aantoonbaar sterker dan Caesar (leg uit waarom).</li>
+            <li>Werkende Sender én Receiver.</li>
+            <li>Code maakt gebruik van functies (modulair).</li>
+            <li><strong>Demonstratie:</strong> je daagt de docent uit om jouw bericht te kraken.</li>
+        </ul>
+    </div>
+    <div>
+        <strong>🟣 Expert (Challenge)</strong>
+        <ul>
+            <li><strong>Wiskundig onderbouwd:</strong> Encryptie gebaseerd op XOR, OTP of vergelijkbaar.</li>
+            <li><strong>Handshake:</strong> Verzender en ontvanger wisselen eerst sleutelinformatie uit voordat het bericht wordt gestuurd.</li>
+            <li><strong>Brute-force bewijs:</strong> Je kunt aantonen waarom jouw methode niet met een brute-force aanval te kraken is.</li>
+        </ul>
+    </div>
+</div>
+
+<div style="background: #fce4ec; padding: 12px 15px; border-radius: 6px; font-size: 0.9em; margin-bottom: 10px;">
+    <strong>📐 Begin met een ontwerp op papier.</strong> Teken een flowchart: wat doet de sender stap voor stap, wat doet de receiver? Dit is een inleveronderdeel — maak er een foto van voor je portfolio.
+</div>
+
+<hr>
+
+<h2>Inleveren: Portfolio & Verdediging</h2>
+<p>In plaats van een saai Word-document, presenteer je jouw project op je eigen <strong>Portfolio Website</strong>. Zonder portfolio-pagina kan de opdracht <em>niet</em> worden afgetekend.</p>
+<p><strong>Maak een nieuwe pagina (of sectie) aan met:</strong></p>
+<ul>
+    <li><strong>Demo Video:</strong> Een kort filmpje (max 30 sec) waarin je laat zien dat je encryptie werkt (verzenden + ontvangen).</li>
+    <li><strong>Code:</strong> Screenshots van je belangrijkste functies — niet alles, maar het slimste stukje.</li>
+    <li><strong>Logboek / Proces:</strong>
+        <ul>
+            <li>Een foto van je <strong>papieren ontwerp</strong> (flowchart) van Fase 4.</li>
+            <li>Een korte uitleg van jouw eigen encryptie-algoritme: hoe werkt het, en waarom is het sterker dan Caesar?</li>
+            <li><strong>AI-Verantwoording:</strong> Wees eerlijk. Heb je AI gebruikt? Waarvoor? (Bijv. "Syntax opgezocht", "Idee voor XOR gevraagd").</li>
+        </ul>
+    </li>
+</ul>
+
+<hr>
+
+<h2>Beoordelingsmodel</h2>
+
+<div style="overflow-x: auto;">
+<table class="rubric-table">
+    <thead>
+        <tr>
+            <th style="width: 18%;">Onderdeel</th>
+            <th class="col-pts">0</th>
+            <th style="width: 17%;">1 punt</th>
+            <th style="width: 18%;">2 punten</th>
+            <th style="width: 22%;" class="pt-3">3 punten</th>
+            <th style="width: 20%;" class="pt-4">4 punten ✨</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Fase 2</strong><br><em>ASCII-conversie</em><br><span style="font-size:0.8em;color:#555;">max 4 pt</span></td>
+            <td class="col-pts pt-0">–</td>
+            <td>Conversie geprobeerd maar <code>ord()</code> of <code>chr()</code> ontbreekt of werkt niet correct. Bericht komt niet leesbaar over.</td>
+            <td>ASCII-conversie werkt foutloos. Bericht is leesbaar op de ontvanger. Code bevat geen storende bugs.</td>
+            <td class="pt-3">
+                <strong>Havo:</strong> Alle basiseisen werkend + minimaal 1 expert feature (bijv. kommalijst met <code>split()</code> of berichtbevestiging). Code is leesbaar met beschrijvende variabelenamen.<br><br>
+                <strong>VWO:</strong> Alle basiseisen + alle expert features werkend. Conversie zit in een herbruikbare functie. Code is efficiënt.
+            </td>
+            <td class="pt-4">Eigenstandige toevoeging die niet in de opdracht staat, bijv. automatische retry bij mislukte ontvangst, compressie van berichten, of een zelfbedachte foutcorrectie.</td>
+        </tr>
+
+        <tr>
+            <td><strong>Fase 3</strong><br><em>Caesar Cipher</em><br><span style="font-size:0.8em;color:#555;">max 4 pt</span></td>
+            <td class="col-pts pt-0">–</td>
+            <td>Encryptie is geprobeerd maar decryptie faalt, of de key is hardcoded en niet aanpasbaar.</td>
+            <td>Werkende Caesar cipher. Key is aanpasbaar via de knoppen en zichtbaar op het scherm.</td>
+            <td class="pt-3">
+                <strong>Havo:</strong> Alle basiseisen werkend + minimaal 1 expert feature (bijv. key-wrapping, spaties overslaan, of rolling code). Interface is intuïtief.<br><br>
+                <strong>VWO:</strong> Alle basiseisen + alle expert features werkend: key wrapt netjes, spaties/leestekens niet meegecodeerd, rolling code geïmplementeerd.
+            </td>
+            <td class="pt-4">Eigenstandige toevoeging die niet in de opdracht staat, bijv. een automatische brute-force kraker die alle 26 keys probeert, of frequentieanalyse om de key te raden.</td>
+        </tr>
+
+        <tr>
+            <td><strong>Fase 4 (weging 2)</strong><br><em>Eigen Encryptie</em><br><span style="font-size:0.8em;color:#555;">max 8 pt</span></td>
+            <td class="col-pts pt-0">–</td>
+            <td>Triviale aanpassing op Caesar (bijv. vaste extra verschuiving of andere key). Geen fundamenteel nieuwe methode.</td>
+            <td>Werkende eigen methode (bijv. Vigenère of XOR), maar de implementatie is simpel en de keuze is niet onderbouwd.</td>
+            <td class="pt-3">
+                <strong>Havo:</strong> Alle basiseisen werkend + minimaal 1 expert feature (bijv. wiskundige onderbouwing of handshake). Code gebruikt functies. Demonstratie aan docent.<br><br>
+                <strong>VWO:</strong> Alle basiseisen + alle expert features werkend: wiskundig onderbouwde encryptie, werkende handshake, en uitleg waarom brute-force moeilijker is.
+            </td>
+            <td class="pt-4">Leerling toont experimenteel of rekenkundig aan waarom de methode niet kwetsbaar is. Eigen onderzoek zichtbaar in portfolio. Of: compleet eigen protocol dat verder gaat dan de genoemde expert features.</td>
+        </tr>
+
+        <tr>
+            <td><strong>Verslaglegging</strong><br><em>Portfolio & Reflectie</em><br><span style="font-size:0.8em;color:#555;">max 4 pt</span></td>
+            <td class="col-pts pt-0">–</td>
+            <td>Portfolio is leeg of mist meerdere verplichte onderdelen (video, code-screenshot, logboek).</td>
+            <td>Portfolio bevat alle verplichte onderdelen: demo-video, screenshot van slimste code, flowchart van Fase 4, uitleg van het eigen algoritme, en een AI-verantwoording.</td>
+            <td class="pt-3">
+                <strong>Havo:</strong> Alle onderdelen aanwezig, én: de AI-verantwoording noemt concreet welk gereedschap waarvoor gebruikt is; de algoritme-uitleg bevat een vergelijking met Caesar; de flowchart klopt met de implementatie.<br><br>
+                <strong>VWO:</strong> Alles van havo, plus: de uitleg bespreekt ook de zwakheden of grenzen van de eigen methode — wanneer zou hij wél te kraken zijn?
+            </td>
+            <td class="pt-4">Verslag leest als een mini-paper: probleemstelling, aanpak, resultaat en reflectie zijn duidelijk van elkaar gescheiden. Of: de leerling geeft een korte presentatie waarmee andere leerlingen iets leren over encryptie.</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (punten ÷ 20) × 9 + 1</p>
+
+<div style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-top: 15px; font-size: 0.9em;">
+    <strong>Let op:</strong> Je moet in <em>elke</em> categorie minimaal 1 punt halen. Als je op een onderdeel 0 punten scoort, wordt de opdracht <strong>niet nagekeken</strong> en moet je deze eerst aanvullen.
+</div>
+
+<div style="margin-top: 30px;">
+    <h3>Cijfertabel</h3>
+    <table style="width: auto; border-collapse: collapse; font-size: 0.9em; min-width: 300px;">
+        <tr style="border-bottom: 2px solid #e6e8ee; background: #f7f8fb;">
+            <th style="padding: 8px 15px; text-align: left;">Punten</th>
+            <th style="padding: 8px 15px; text-align: left;">Cijfer</th>
+        </tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">4</td><td style="padding: 8px 15px; color: #d32f2f;"><strong>2,8</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">6</td><td style="padding: 8px 15px; color: #d32f2f;"><strong>3,7</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">8</td><td style="padding: 8px 15px; color: #d32f2f;"><strong>4,6</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">10</td><td style="padding: 8px 15px; color: #d32f2f;"><strong>5,5</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">12</td><td style="padding: 8px 15px; color: #388e3c;"><strong>6,4</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">14</td><td style="padding: 8px 15px; color: #388e3c;"><strong>7,3</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">16</td><td style="padding: 8px 15px; color: #388e3c;"><strong>8,2</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">18</td><td style="padding: 8px 15px; color: #388e3c;"><strong>9,1</strong></td></tr>
+        <tr style="border-bottom: 1px solid #e6e8ee;"><td style="padding: 8px 15px;">20</td><td style="padding: 8px 15px; color: #388e3c;"><strong>10,0</strong></td></tr>
+    </table>
+</div>
+
+</section>
+</main>
+{% include site-footer-informatica.html %}
+</body>
+</html>
