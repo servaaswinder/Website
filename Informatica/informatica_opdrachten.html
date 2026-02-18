@@ -411,6 +411,16 @@
 						url: "opdrachten/eindopdracht_webshop.html",
 						x: 0, y: 560
 					},
+					{
+						id: "Eind3",
+						label: "<b>Encryptie (Eind)</b>\nEindopdracht\nNiveau 3",
+						title: "Bouw een veilig communicatiesysteem met de micro:bit en ontwerp je eigen encryptie.",
+						shape: "box",
+						color: { background: "#ffeaea", border: "#ff4444" },
+						font: { multi: "html" },
+						url: "opdrachten/eindopdracht_encryptie.html",
+						x: 250, y: 560
+					},
 				]);
 
 				var STATUS_STYLES = {
@@ -557,7 +567,7 @@
                         // We check if node is a final project (Eind1, Eind2)
                         // If it is ALREADY COMPLETED or HAS SUBMISSION, we respect that status (don't lock it back).
                         // Otherwise, we apply the year filter.
-                        if ((node.id === "Eind1" || node.id === "Eind2") && status !== 'completed' && status !== 'pending' && status !== 'rejected') {
+                        if ((node.id === "Eind1" || node.id === "Eind2" || node.id === "Eind3") && status !== 'completed' && status !== 'pending' && status !== 'rejected') {
                              if (userClass) {
                                  // Check for '4' at start (e.g. 4H, 4V, 4 Havo)
                                  const normalizedClass = userClass.trim().toUpperCase();
@@ -693,6 +703,9 @@
 
 					// Cross-links
 					{ from: "F2", to: "F3" },
+					
+					// Eindopdracht Links
+					{ from: "B1", to: "Eind3" }, // Algoritme -> Encryptie
 				]);
 
 				// Create a network
@@ -779,7 +792,7 @@
                         {
                             label: "Eindopdrachten",
                             color: "rgba(252, 232, 230, 0.6)", // Red
-                            nodes: ["Eind1", "Eind2"]
+                            nodes: ["Eind1", "Eind2", "Eind3"]
                         }
                     ];
 

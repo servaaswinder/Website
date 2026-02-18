@@ -15,3 +15,6 @@ vendor/
 # Security Rules
 firestore.rules
 serviceAccountKey.json
+
+# Lokale testbestanden
+Informatica/opdrachten/microbit_test/
