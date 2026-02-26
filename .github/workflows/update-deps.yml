@@ -1,0 +1,24 @@
+name: Update Dependencies
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: false
+
+      - name: Update sass-embedded (fixes google-protobuf CVE)
+        run: |
+          bundle update sass-embedded
+          git config user.name "Wall-E Bot"
+          git config user.email "bot@servaaswinder.nl"
+          git add Gemfile.lock
+          git diff --staged --quiet || git commit -m "fix: update sass-embedded to fix google-protobuf vulnerability"
+          git push
