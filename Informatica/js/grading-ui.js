@@ -11,7 +11,7 @@ const GradingUI = {
     teacherComment: "",
     isDirty: false,
 
-    init: function() {
+    init: function () {
         // Create modal structure if not exists
         if (!document.getElementById('grading-modal')) {
             this.createModal();
@@ -38,7 +38,7 @@ const GradingUI = {
         }
     },
 
-    createModal: function() {
+    createModal: function () {
         const modalHtml = `
             <div id="grading-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
                 <div style="background: white; max-width: 85vw; margin: 20px auto; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; max-height: 95vh;">
@@ -170,7 +170,7 @@ const GradingUI = {
                 }
                 .rubric-cell.selected {
                     background-color: #f1f8ff;
-                    border: 2px solid #0366d6; /* Highlight border */
+                    border: 2px solid #0366d6;
                     box-shadow: inset 0 0 0 1px #0366d6;
                 }
                 .rubric-cell.selected::after {
@@ -181,6 +181,38 @@ const GradingUI = {
                     color: #0366d6;
                     font-weight: bold;
                     font-size: 1.2em;
+                }
+                /* AI-concept stijl: geel/oranje i.p.v. blauw */
+                .rubric-cell.ai-selected {
+                    background-color: #fffbea;
+                    border: 2px solid #f59e0b;
+                    box-shadow: inset 0 0 0 1px #f59e0b;
+                }
+                .rubric-cell.ai-selected::after {
+                    content: "✦";
+                    position: absolute;
+                    top: 5px;
+                    right: 5px;
+                    color: #d97706;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .rubric-cell.ai-selected .point-badge {
+                    background: #f59e0b;
+                    color: white;
+                }
+                /* AI banner bovenin modal */
+                #ai-grading-banner {
+                    background: #fffbea;
+                    border: 1px solid #f59e0b;
+                    border-radius: 6px;
+                    padding: 8px 14px;
+                    margin-bottom: 16px;
+                    font-size: 0.9em;
+                    color: #92400e;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 }
                 .point-badge {
                     display: inline-block;
@@ -194,15 +226,6 @@ const GradingUI = {
                     font-weight: bold;
                     margin-bottom: 8px;
                     font-size: 0.9em;
-                }
-                .rubric-cell.selected .point-badge {
-                    background: #0366d6;
-                    color: white;
-                }
-                .cell-desc {
-                    font-size: 0.95em;
-                    line-height: 1.5;
-                    color: #24292e;
                 }
                 .rubric-cell.selected .point-badge {
                     background: #0366d6;
@@ -280,16 +303,17 @@ const GradingUI = {
         "Eind2": "Webshop"
     },
 
-    open: async function(submissionId, submissionData, forceGrading = false, readOnly = false) {
+    open: async function (submissionId, submissionData, forceGrading = false, readOnly = false) {
         this.currentSubmissionId = submissionId;
         this.currentSubmissionData = submissionData; // Assign this!
         this.currentRubricData = null;
         this.selectedCells = {};
         this.isReadOnly = !!readOnly; // Ensure boolean
-        
-        console.log(`[GradingUI] Opening submission ${submissionId}. ReadOnly: ${this.isReadOnly}`);
+        this.isAIGraded = !!submissionData.gradedByAI; // Track AI concept
 
-        
+        console.log(`[GradingUI] Opening submission ${submissionId}. ReadOnly: ${this.isReadOnly}. AI-concept: ${this.isAIGraded}`);
+
+
         // Setup Modal Title
         const displayName = submissionData.userName || submissionData.name || submissionData.userEmail || "Onbekend";
         document.getElementById('grading-student-name').textContent = displayName + (readOnly ? " (Inzien)" : "");
@@ -303,13 +327,13 @@ const GradingUI = {
         } else {
             this.teacherComment = submissionData.teacherComment || "";
         }
-        
+
         // Late Check Restore
         const lateCheck = document.getElementById('grading-late-check');
         if (lateCheck) {
             lateCheck.checked = !!submissionData.isLate; // Restore if saved
         }
-        
+
         const commentBox = document.getElementById('grading-comment');
         commentBox.value = this.teacherComment;
         commentBox.readOnly = readOnly;
@@ -322,29 +346,44 @@ const GradingUI = {
         if (this.ASSIGNMENT_MAP && this.ASSIGNMENT_MAP[submissionData.assignmentId]) {
             rubricLink = this.ASSIGNMENT_MAP[submissionData.assignmentId];
         }
-        document.getElementById('grading-rubric-link').href = rubricLink; 
+        document.getElementById('grading-rubric-link').href = rubricLink;
 
         // 2. Student Link (Portfolio)
         const studentLink = document.getElementById('grading-student-link');
         // Logic: if URL provided AND it's not just the rubric itself (legacy fallback)
         if (submissionData.assignmentUrl && submissionData.assignmentUrl.length > 5 && submissionData.assignmentUrl !== rubricLink) {
-             studentLink.href = submissionData.assignmentUrl;
-             studentLink.textContent = "🔗 Open werk van leerling";
-             studentLink.style.display = 'inline-block';
-             studentLink.style.color = '#28a745';
-             studentLink.style.pointerEvents = 'auto';
-             studentLink.style.textDecoration = 'underline';
+            studentLink.href = submissionData.assignmentUrl;
+            studentLink.textContent = "🔗 Open werk van leerling";
+            studentLink.style.display = 'inline-block';
+            studentLink.style.color = '#28a745';
+            studentLink.style.pointerEvents = 'auto';
+            studentLink.style.textDecoration = 'underline';
         } else {
-             // If manual entry with no link or same as rubric
-             studentLink.removeAttribute('href');
-             studentLink.textContent = "⚠️ Geen link beschikbaar";
-             studentLink.style.display = 'inline-block';
-             studentLink.style.color = '#999';
-             studentLink.style.pointerEvents = 'none';
-             studentLink.style.textDecoration = 'none';
-        } 
+            // If manual entry with no link or same as rubric
+            studentLink.removeAttribute('href');
+            studentLink.textContent = "⚠️ Geen link beschikbaar";
+            studentLink.style.display = 'inline-block';
+            studentLink.style.color = '#999';
+            studentLink.style.pointerEvents = 'none';
+            studentLink.style.textDecoration = 'none';
+        }
 
         document.getElementById('grading-rubric-container').innerHTML = '<div style="padding: 20px; text-align: center;">Beoordelingsmodel laden...</div>';
+
+        // AI banner tonen/verbergen
+        let aiBanner = document.getElementById('ai-grading-banner');
+        if (this.isAIGraded) {
+            if (!aiBanner) {
+                aiBanner = document.createElement('div');
+                aiBanner.id = 'ai-grading-banner';
+                document.getElementById('grading-rubric-container').before(aiBanner);
+            }
+            aiBanner.innerHTML = '🤖 <strong>Concept door AI</strong> — Controleer de beoordeling en rond af. De gele vakjes zijn door AI geselecteerd.';
+            aiBanner.style.display = 'flex';
+        } else if (aiBanner) {
+            aiBanner.style.display = 'none';
+        }
+
         document.getElementById('grading-modal').style.display = 'block';
         document.body.style.overflow = 'hidden';
 
@@ -358,37 +397,37 @@ const GradingUI = {
         const periodSelect = document.getElementById('grading-period');
 
         if (readOnly) {
-            if(btnRelease) btnRelease.style.display = 'none';
-            if(btnDelete) btnDelete.style.display = 'none';
-            if(btnSave) btnSave.style.display = 'none';
-            if(btnFinalize) btnFinalize.style.display = 'none';
-            if(periodSelect) periodSelect.disabled = true;
-            
+            if (btnRelease) btnRelease.style.display = 'none';
+            if (btnDelete) btnDelete.style.display = 'none';
+            if (btnSave) btnSave.style.display = 'none';
+            if (btnFinalize) btnFinalize.style.display = 'none';
+            if (periodSelect) periodSelect.disabled = true;
+
             // Add "Edit" button if not exists
             if (!document.getElementById('edit-grading-btn')) {
-                 const editBtn = document.createElement('button');
-                 editBtn.id = 'edit-grading-btn';
-                 editBtn.className = 'action-btn';
-                 editBtn.style.backgroundColor = '#ffc107'; 
-                 editBtn.style.color = '#333';
-                 editBtn.innerHTML = '✏️ Bewerken starten';
-                 editBtn.style.marginRight = '10px';
-                 editBtn.onclick = () => {
-                     // Close and Reopen in Edit Mode
-                     GradingUI.open(submissionId, submissionData, true, false);
-                 };
-                 // Insert before Close/Finalize
-                 footerBtns.appendChild(editBtn);
+                const editBtn = document.createElement('button');
+                editBtn.id = 'edit-grading-btn';
+                editBtn.className = 'action-btn';
+                editBtn.style.backgroundColor = '#ffc107';
+                editBtn.style.color = '#333';
+                editBtn.innerHTML = '✏️ Bewerken starten';
+                editBtn.style.marginRight = '10px';
+                editBtn.onclick = () => {
+                    // Close and Reopen in Edit Mode
+                    GradingUI.open(submissionId, submissionData, true, false);
+                };
+                // Insert before Close/Finalize
+                footerBtns.appendChild(editBtn);
             } else {
                 document.getElementById('edit-grading-btn').style.display = 'inline-block';
             }
         } else {
-            if(btnRelease) btnRelease.style.display = 'inline-block';
-            if(btnDelete) btnDelete.style.display = 'inline-block';
-            if(btnSave) btnSave.style.display = 'inline-block';
-            if(btnFinalize) btnFinalize.style.display = 'inline-block';
-            if(periodSelect) periodSelect.disabled = false;
-            if(document.getElementById('edit-grading-btn')) {
+            if (btnRelease) btnRelease.style.display = 'inline-block';
+            if (btnDelete) btnDelete.style.display = 'inline-block';
+            if (btnSave) btnSave.style.display = 'inline-block';
+            if (btnFinalize) btnFinalize.style.display = 'inline-block';
+            if (periodSelect) periodSelect.disabled = false;
+            if (document.getElementById('edit-grading-btn')) {
                 document.getElementById('edit-grading-btn').style.display = 'none';
             }
         }
@@ -398,9 +437,9 @@ const GradingUI = {
             console.log(`[GradingUI] Trying to fetch: ${url}`);
             const response = await fetch(url);
             if (!response.ok) {
-                 // Try relative to current location if absolute failed?
-                 // But fetch handles relative fine.
-                 throw new Error(`${response.status} ${response.statusText}`);
+                // Try relative to current location if absolute failed?
+                // But fetch handles relative fine.
+                throw new Error(`${response.status} ${response.statusText}`);
             }
             return await response.text();
         };
@@ -438,57 +477,57 @@ const GradingUI = {
 
             this.currentRubricData = result;
             this.renderRubric(result);
-            
+
             // Set Period if available
             if (submissionData.period) {
-                 const periodSelect = document.getElementById('grading-period');
-                 if (periodSelect) {
-                     // Normalize "1" to "P1" just in case
-                     let p = String(submissionData.period);
-                     if (!p.startsWith('P') && ['1','2','3','4'].includes(p)) p = 'P' + p;
-                     periodSelect.value = p;
-                 }
+                const periodSelect = document.getElementById('grading-period');
+                if (periodSelect) {
+                    // Normalize "1" to "P1" just in case
+                    let p = String(submissionData.period);
+                    if (!p.startsWith('P') && ['1', '2', '3', '4'].includes(p)) p = 'P' + p;
+                    periodSelect.value = p;
+                }
             }
 
             // Restore Selection and State
             // 1. DRAFT (Highest priority)
             if (this.currentSubmissionData.gradingDraft && this.currentSubmissionData.gradingDraft.selectedCells) {
-                 this.selectedCells = this.currentSubmissionData.gradingDraft.selectedCells;
-                 this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
-                 this.updateUISelection();
-                 this.updateUISelection();
-                 this.updateCalculation();
-                 
-                 // CRITICAL: If restoring DRAFT, and we are NOT read-only, ensure status is synced?
-                 // No, usually status is already 'grading' if draft exists. 
-                 // But if we clicked "Bewerken", we might need to lock it now if it wasn't locked.
-                 if (!this.isReadOnly && this.currentSubmissionData.status === 'pending') {
-                     await this.lockSubmission(submissionId, forceGrading);
-                 }
-                 
-            // 2. FINAL (If already graded)
+                this.selectedCells = this.currentSubmissionData.gradingDraft.selectedCells;
+                this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
+                this.updateUISelection();
+                this.updateUISelection();
+                this.updateCalculation();
+
+                // CRITICAL: If restoring DRAFT, and we are NOT read-only, ensure status is synced?
+                // No, usually status is already 'grading' if draft exists. 
+                // But if we clicked "Bewerken", we might need to lock it now if it wasn't locked.
+                if (!this.isReadOnly && this.currentSubmissionData.status === 'pending') {
+                    await this.lockSubmission(submissionId, forceGrading);
+                }
+
+                // 2. FINAL (If already graded)
             } else if (this.currentSubmissionData.finalRubric) {
-                 this.selectedCells = this.currentSubmissionData.finalRubric;
-                 if (this.currentSubmissionData.teacherComment) {
-                     this.teacherComment = this.currentSubmissionData.teacherComment;
-                 }
-                 this.updateUISelection();
-                 this.updateCalculation();
-            // 3. CSV IMPORT RESTORE
+                this.selectedCells = this.currentSubmissionData.finalRubric;
+                if (this.currentSubmissionData.teacherComment) {
+                    this.teacherComment = this.currentSubmissionData.teacherComment;
+                }
+                this.updateUISelection();
+                this.updateCalculation();
+                // 3. CSV IMPORT RESTORE
             } else if (this.currentSubmissionData.csvRubric) {
-                 this.applyCsvRubric(this.currentSubmissionData.csvRubric);
-            // 4. PREVIOUS GRADED ASSIGNMENT (Resubmission inheritance)
+                this.applyCsvRubric(this.currentSubmissionData.csvRubric);
+                // 4. PREVIOUS GRADED ASSIGNMENT (Resubmission inheritance)
             } else {
-                 // Only check for previous grade if in edit mode, OR if we want to show it in read-only too?
-                 // Showing it in read-only is good.
-                 
-                 // We use the helper function from earlier changes in finalizeGrade.
-                 // NOTE: checkForPreviousGrade might trigger logic? No, just reads.
-                     this.checkForPreviousGrade(submissionData).then(prevData => {
-                     if (prevData) {
-                         console.log("Restoring previous grade data:", prevData);
-                         
-                         // Fill Rubric if Rubric Empty?
+                // Only check for previous grade if in edit mode, OR if we want to show it in read-only too?
+                // Showing it in read-only is good.
+
+                // We use the helper function from earlier changes in finalizeGrade.
+                // NOTE: checkForPreviousGrade might trigger logic? No, just reads.
+                this.checkForPreviousGrade(submissionData).then(prevData => {
+                    if (prevData) {
+                        console.log("Restoring previous grade data:", prevData);
+
+                        // Fill Rubric if Rubric Empty?
                         //  if (prevData.rubric && Array.isArray(prevData.rubric)) {
                         //      // Only if we want to AUTO-FILL. User asked: "Als deze opdracht al een eerder is nagekeken moet in de rubric de vakjes aangekruist zijn".
                         //      // YES, pre-fill!
@@ -496,56 +535,56 @@ const GradingUI = {
                         //          this.applyCsvRubric([item]);
                         //      });
                         //  }
-                         // Let's defer rubric fill to explicit user action or just do it?
-                         // "Als deze opdracht... moet de rubric... aangekruist zijn".
-                         // So yes, do it. But maybe add a visual indicator.
+                        // Let's defer rubric fill to explicit user action or just do it?
+                        // "Als deze opdracht... moet de rubric... aangekruist zijn".
+                        // So yes, do it. But maybe add a visual indicator.
 
 
-                         // UPDATE UI with Timestamp Info
-                         const titleEl = document.getElementById('grading-assignment-title');
-                         if (titleEl) {
-                             const prevDate = prevData.gradedAt ? new Date(prevData.gradedAt).toLocaleString() : "Eerder";
-                             const curDate = submissionData.timestamp ? new Date(submissionData.timestamp.toDate()).toLocaleString() : "Nu";
-                             
-                             titleEl.innerHTML += `<div style="font-size: 0.6em; margin-top: 4px; color: #d63384; background: #fff0f6; padding: 2px 6px; border-radius: 4px; display: inline-block;">
+                        // UPDATE UI with Timestamp Info
+                        const titleEl = document.getElementById('grading-assignment-title');
+                        if (titleEl) {
+                            const prevDate = prevData.gradedAt ? new Date(prevData.gradedAt).toLocaleString() : "Eerder";
+                            const curDate = submissionData.timestamp ? new Date(submissionData.timestamp.toDate()).toLocaleString() : "Nu";
+
+                            titleEl.innerHTML += `<div style="font-size: 0.6em; margin-top: 4px; color: #d63384; background: #fff0f6; padding: 2px 6px; border-radius: 4px; display: inline-block;">
                                  ⚠️ <strong>Herkansing</strong> (Vorige: ${prevData.grade} op ${prevDate})<br>
                                  Ingeleverd: ${curDate}
                              </div>`;
-                         }
-                         
-                         // FILL RUBRIC (If empty?)
-                         if (Object.keys(this.selectedCells).length === 0 && prevData.rubric && Array.isArray(prevData.rubric)) {
-                              prevData.rubric.forEach(item => {
-                                 this.applyCsvRubric([item]);
-                             });
-                             console.log("Pre-filled rubric from previous grading.");
-                             this.updateUISelection();
-                             this.updateCalculation();
-                         }
-                         
-                         // Fill Comment Context
-                         if (!this.teacherComment.includes("--- HERKANSING ---")) {
-                             // Don't overwrite if already there
-                             // Just append context
-                         }
-                         
-                         // Fill Comment
-                         if (prevData.comment && !this.teacherComment) {
-                             this.teacherComment = "--- HERBEOORDELING (Vorig cijfer: " + prevData.grade + ") ---\n" + prevData.comment;
-                         } else {
-                             this.teacherComment = "--- HERBEOORDELING (Vorig cijfer: " + prevData.grade + ") ---\n" + this.teacherComment;
-                         }
-                         
-                         document.getElementById('grading-comment').value = this.teacherComment;
-                         
-                         // Show Notification
-                         const statusMsg = document.getElementById('grading-status-msg');
-                         statusMsg.textContent = "⚠️ Vorige beoordeling ingeladen!";
-                         statusMsg.style.color = "#ff9800";
-                     }
-                 });
+                        }
+
+                        // FILL RUBRIC (If empty?)
+                        if (Object.keys(this.selectedCells).length === 0 && prevData.rubric && Array.isArray(prevData.rubric)) {
+                            prevData.rubric.forEach(item => {
+                                this.applyCsvRubric([item]);
+                            });
+                            console.log("Pre-filled rubric from previous grading.");
+                            this.updateUISelection();
+                            this.updateCalculation();
+                        }
+
+                        // Fill Comment Context
+                        if (!this.teacherComment.includes("--- HERKANSING ---")) {
+                            // Don't overwrite if already there
+                            // Just append context
+                        }
+
+                        // Fill Comment
+                        if (prevData.comment && !this.teacherComment) {
+                            this.teacherComment = "--- HERBEOORDELING (Vorig cijfer: " + prevData.grade + ") ---\n" + prevData.comment;
+                        } else {
+                            this.teacherComment = "--- HERBEOORDELING (Vorig cijfer: " + prevData.grade + ") ---\n" + this.teacherComment;
+                        }
+
+                        document.getElementById('grading-comment').value = this.teacherComment;
+
+                        // Show Notification
+                        const statusMsg = document.getElementById('grading-status-msg');
+                        statusMsg.textContent = "⚠️ Vorige beoordeling ingeladen!";
+                        statusMsg.style.color = "#ff9800";
+                    }
+                });
             }
-            
+
             // Apply Comment to UI
             document.getElementById('grading-comment').value = this.teacherComment;
             this.updateUISelection();
@@ -566,15 +605,15 @@ const GradingUI = {
             errorDiv.innerHTML = `<strong>Fout bij laden beoordelingsmodel:</strong><br>${error.message}<br><br><em>Tried fetching: ${submissionData.assignmentUrl}</em>`;
             document.getElementById('grading-rubric-container').innerHTML = '';
             document.getElementById('grading-rubric-container').appendChild(errorDiv);
-            
+
             // Explicit alert for user to see
             alert(`DEBUG INFO:\nFout bij ophalen pagina.\nOorspronkelijke URL: ${submissionData.assignmentUrl}\nFoutmelding: ${error.message}`);
         }
     },
 
-    applyCsvRubric: function(csvRubric) {
+    applyCsvRubric: function (csvRubric) {
         if (!this.currentRubricData || !csvRubric) return;
-        
+
         console.log("Applying CSV Rubric:", csvRubric);
 
         // Helper to clean strings for comparison
@@ -583,7 +622,7 @@ const GradingUI = {
         csvRubric.forEach(item => {
             // Find category by name with loose matching
             const itemTheme = cleanStr(item.theme);
-            
+
             const catIndex = this.currentRubricData.categories.findIndex(c => {
                 const catName = cleanStr(c.name);
                 // 1. Exact cleaned match
@@ -595,18 +634,18 @@ const GradingUI = {
 
             if (catIndex !== -1) {
                 const category = this.currentRubricData.categories[catIndex];
-                let points = parseFloat(item.value.toString().replace(',','.'));
-                
+                let points = parseFloat(item.value.toString().replace(',', '.'));
+
                 if (isNaN(points)) return;
 
                 // Logic: matched points to rubric options.
                 // If value > maxPoints, it might be the weighted value.
                 if (points > category.rawMaxPoints) {
                     if (category.weight > 0 && (points / category.weight) <= category.rawMaxPoints) {
-                         points = points / category.weight;
+                        points = points / category.weight;
                     }
                 }
-                
+
                 // Assume integer steps for buttons
                 points = Math.round(points);
 
@@ -618,31 +657,31 @@ const GradingUI = {
         // UI update called after this returns by the caller
     },
 
-    renderRubric: function(data) {
+    renderRubric: function (data) {
         const container = document.getElementById('grading-rubric-container');
-        
+
         // Determine max columns for header (0 to Max)
         let maxCols = 0;
         data.categories.forEach(c => maxCols = Math.max(maxCols, c.rawMaxPoints + 1));
-        
+
         // Determine Min Column (skip 0 if unused)
         let minCol = maxCols; // Start high
         if (data.categories.length === 0) minCol = 0;
-        
+
         data.categories.forEach(cat => {
             if (cat.descriptions) {
-                 // Check indices 0 to rawMax
-                 // Since descriptions is a sparse array, custom iteration or check
-                 if (cat.descriptions[0]) minCol = 0;
-                 else {
-                     // Check finding first non-empty
-                     for (let i = 0; i < cat.descriptions.length; i++) {
-                         if (cat.descriptions[i]) {
-                             minCol = Math.min(minCol, i);
-                             break;
-                         }
-                     }
-                 }
+                // Check indices 0 to rawMax
+                // Since descriptions is a sparse array, custom iteration or check
+                if (cat.descriptions[0]) minCol = 0;
+                else {
+                    // Check finding first non-empty
+                    for (let i = 0; i < cat.descriptions.length; i++) {
+                        if (cat.descriptions[i]) {
+                            minCol = Math.min(minCol, i);
+                            break;
+                        }
+                    }
+                }
             } else {
                 minCol = 0; // Fallback
             }
@@ -650,30 +689,30 @@ const GradingUI = {
         if (minCol === maxCols) minCol = 0; // If nothing found, default 0
 
         let html = '<table class="rubric-grid">';
-        
+
         // Main Header Row (Points)
         html += '<thead><tr>';
         html += '<th style="width: 200px;">Categorie</th>'; // Fixed width for category
         for (let i = minCol; i < maxCols; i++) {
-            html += `<th>${i} Punt${i!==1?'en':''}</th>`;
+            html += `<th>${i} Punt${i !== 1 ? 'en' : ''}</th>`;
         }
         html += '</tr></thead><tbody>';
 
         data.categories.forEach((cat, index) => {
             html += `<tr>`;
-            
+
             // Category Column
             html += `<td class="category-col">`;
             html += `<div class="category-title">${cat.name}</div>`;
             html += `<div class="category-weight">Weging: ${cat.weight}x</div>`;
             html += `</td>`;
-            
+
             // Score Columns
             for (let i = minCol; i < maxCols; i++) {
                 if (i <= cat.rawMaxPoints) {
                     const isSelected = GradingUI.selectedCells[index] === i;
                     const desc = cat.descriptions && cat.descriptions[i] ? cat.descriptions[i] : '<span style="color:#999; font-style:italic;">Geen beschrijving</span>';
-                    
+
                     html += `<td class="rubric-cell ${isSelected ? 'selected' : ''}" data-cat-index="${index}" data-points="${i}" onclick="GradingUI.selectCell(${index}, ${i})">`;
                     html += `<div class="point-badge">${i}</div>`;
                     html += `<div class="cell-desc">${desc}</div>`;
@@ -686,36 +725,40 @@ const GradingUI = {
         });
         html += '</tbody></table>';
         container.innerHTML = html;
-        
+
         document.getElementById('grading-max-points').textContent = data.totalMaxPoints;
     },
 
-    selectCell: function(catIndex, points) {
+    selectCell: function (catIndex, points) {
         if (this.isReadOnly) {
             console.log("Ignored click in read-only mode");
-            return; 
+            return;
         }
         this.selectedCells[catIndex] = points;
-        
+
         this.updateUISelection();
         this.updateCalculation();
         this.isDirty = true;
     },
 
-    updateUISelection: function() {
-        // Clear all selected classes
-        document.querySelectorAll('.rubric-cell.selected').forEach(el => el.classList.remove('selected'));
-        
-        // Apply selected classes
+    updateUISelection: function () {
+        // Clear all selection classes
+        document.querySelectorAll('.rubric-cell.selected, .rubric-cell.ai-selected').forEach(el => {
+            el.classList.remove('selected');
+            el.classList.remove('ai-selected');
+        });
+
+        // Apply selected classes — geel als AI-concept, blauw als door docent
+        const cellClass = this.isAIGraded ? 'ai-selected' : 'selected';
         for (const [catIndex, points] of Object.entries(this.selectedCells)) {
             const cell = document.querySelector(`.rubric-cell[data-cat-index="${catIndex}"][data-points="${points}"]`);
-            if (cell) cell.classList.add('selected');
+            if (cell) cell.classList.add(cellClass);
         }
     },
 
-    updateCalculation: function() {
+    updateCalculation: function () {
         if (!this.currentRubricData) return;
-        
+
         let totalPoints = 0;
         let allSelected = true;
 
@@ -728,11 +771,11 @@ const GradingUI = {
         });
 
         document.getElementById('grading-total-points').textContent = totalPoints;
-        
+
         // Calculate Grade: (Points / Max) * 9 + 1
         const max = this.currentRubricData.totalMaxPoints;
         let grade = ((totalPoints / max) * 9) + 1;
-        
+
         // --- TOO LATE CHECK ---
         const isLate = document.getElementById('grading-late-check')?.checked;
         if (isLate && grade > 6.0) {
@@ -744,11 +787,11 @@ const GradingUI = {
         document.getElementById('grading-calculated-grade').textContent = displayGrade.toFixed(1);
     },
 
-    lockSubmission: async function(docId, forceGrading = false) {
+    lockSubmission: async function (docId, forceGrading = false) {
         // Only lock if status is pending (or already grading) OR if forced
         // Do NOT change status if it is already 'checked' or 'rejected', UNLESS forced (Reopen)
         const currentStatus = this.currentSubmissionData ? this.currentSubmissionData.status : null;
-        
+
         if (!forceGrading && (currentStatus === 'checked' || currentStatus === 'rejected')) {
             console.log("Skipping lock: Submission is already final (" + currentStatus + ") and not forced.");
             return;
@@ -762,7 +805,7 @@ const GradingUI = {
         });
     },
 
-    saveDraft: async function() {
+    saveDraft: async function () {
         const statusMsg = document.getElementById('grading-status-msg');
         statusMsg.textContent = "Opslaan...";
         try {
@@ -777,17 +820,17 @@ const GradingUI = {
                 status: "grading",
                 gradingBy: user.email
             });
-            
+
             this.isDirty = false;
             this.closeModal();
-            
+
             // Refresh parent page list if available
             if (typeof loadSubmissions === 'function') {
                 loadSubmissions();
             } else {
                 window.location.reload();
             }
-            
+
         } catch (e) {
             console.error(e);
             statusMsg.textContent = "Fout bij opslaan!";
@@ -795,25 +838,25 @@ const GradingUI = {
         }
     },
 
-    finalizeGrade: async function() {
+    finalizeGrade: async function () {
         if (!confirm("Weet je zeker dat je dit cijfer wilt afronden? De leerling kan dit zien bij de resultaten.")) return;
-        
+
         const statusMsg = document.getElementById('grading-status-msg');
         statusMsg.textContent = "Afronden...";
-        
+
         try {
             const calculatedGrade = document.getElementById('grading-calculated-grade').textContent;
             const selectedPeriod = document.getElementById('grading-period').value; // Get Period
-            
+
             if (!selectedPeriod) {
                 alert("Selecteer eerst een periode (P1-P4) voordat je het cijfer afrondt.");
                 return;
             }
-            
+
             const user = firebase.auth().currentUser;
             const teacherEmail = user ? user.email : 'Unknown';
             const studentEmail = this.currentSubmissionData.userEmail ? this.currentSubmissionData.userEmail.toLowerCase() : null;
-            
+
             // 1. Update the Submission Document
             await firebase.firestore().collection("submissions").doc(this.currentSubmissionId).update({
                 status: "checked",
@@ -837,11 +880,11 @@ const GradingUI = {
             if (studentEmail) {
                 try {
                     const resultsRef = firebase.firestore().collection("results");
-                    
+
                     // Use robust resolveStudentDocument from student-utils.js
                     // Note: GradingUI needs access to db. We can get it from firebase.firestore()
                     const db = firebase.firestore();
-                    const userObj = { 
+                    const userObj = {
                         email: this.currentSubmissionData.userEmail || studentEmail,
                         uid: this.currentSubmissionData.userId // might be undefined, which is fine
                     };
@@ -861,11 +904,11 @@ const GradingUI = {
                         }
                         if (!snapshot.empty) studentDoc = snapshot.docs[0];
                     }
-                    
+
                     if (studentDoc) {
                         const studentData = studentDoc.data();
                         let assignments = studentData.assignments || [];
-                        
+
                         // Create assignment object
                         const assignmentTitle = this.currentSubmissionData.assignmentId || "Opdracht";
                         const assignmentObj = {
@@ -885,11 +928,11 @@ const GradingUI = {
                             history: this.currentSubmissionData.history || [],
                             isLate: document.getElementById('grading-late-check')?.checked || false
                         };
-                        
+
                         // Remove existing entry for this assignment if it exists
                         assignments = assignments.filter(a => a.title !== assignmentTitle);
                         assignments.push(assignmentObj);
-                        
+
                         await studentDoc.ref.update({
                             assignments: assignments,
                             lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -902,14 +945,14 @@ const GradingUI = {
                         // We should prefer creating with the EXACT email from the submission IF it seems reliable,
                         // OR stick to lowercase to prevent duplicates if that's the policy.
                         // But user wants "Blokletters behouden".
-                        
+
                         // If the submission email HAS capitals, we use that for the NEW document email field.
                         const newEmail = this.currentSubmissionData.userEmail || studentEmail;
                         console.log("Creating new student record in 'results' for:", newEmail);
-                        
+
                         const studentName = this.currentSubmissionData.userName || this.currentSubmissionData.name || newEmail.split('@')[0];
                         const studentClass = this.currentSubmissionData.userClass || this.currentSubmissionData.class || 'Onbekend';
-                        
+
                         const assignmentTitle = this.currentSubmissionData.assignmentId || "Opdracht";
                         const assignmentObj = {
                             title: assignmentTitle,
@@ -928,11 +971,11 @@ const GradingUI = {
                             history: this.currentSubmissionData.history || [],
                             isLate: document.getElementById('grading-late-check')?.checked || false
                         };
-                        
+
                         // Use sanitized ID to prevent weird chars in Doc ID
-                        const newDocId = (typeof sanitizeDocId === 'function') 
-                                        ? sanitizeDocId(newEmail) 
-                                        : newEmail.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                        const newDocId = (typeof sanitizeDocId === 'function')
+                            ? sanitizeDocId(newEmail)
+                            : newEmail.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
                         await resultsRef.doc(newDocId).set({
                             email: newEmail, // Keep original casing in field
@@ -950,7 +993,7 @@ const GradingUI = {
 
             this.isDirty = false;
             this.closeModal();
-            
+
             // Refresh parent
             if (typeof refreshDashboard === 'function') {
                 refreshDashboard();
@@ -959,7 +1002,7 @@ const GradingUI = {
             } else {
                 window.location.reload();
             }
-            
+
         } catch (e) {
             console.error(e);
             statusMsg.textContent = "Fout bij afronden!";
@@ -967,22 +1010,22 @@ const GradingUI = {
         }
     },
 
-    deleteGrading: async function() {
+    deleteGrading: async function () {
         if (!confirm("LET OP: Weet je zeker dat je deze beoordeling wilt verwijderen?\n\n- Het cijfer wordt gewist.\n- De inzending wordt VOLLEDIG VERWIJDERD (ook geen backup meer).\n\nWil je doorgaan?")) return;
-        
+
         const statusMsg = document.getElementById('grading-status-msg');
         statusMsg.textContent = "Wissen...";
-        
+
         try {
             const studentEmail = this.currentSubmissionData.userEmail;
             const assignmentTitle = this.currentSubmissionData.assignmentId || "Opdracht";
-            
+
             // 1. Remove from 'results' collection
             if (studentEmail) {
                 const resultsRef = firebase.firestore().collection("results");
                 // Try exact match first
                 let snapshot = await resultsRef.where("email", "==", studentEmail).limit(1).get();
-                 if (snapshot.empty && studentEmail) {
+                if (snapshot.empty && studentEmail) {
                     snapshot = await resultsRef.where("email", "==", studentEmail.toLowerCase()).limit(1).get();
                 }
 
@@ -990,11 +1033,11 @@ const GradingUI = {
                     const studentDoc = snapshot.docs[0];
                     const studentData = studentDoc.data();
                     let assignments = studentData.assignments || [];
-                    
+
                     // Filter out this assignment
                     const originalLength = assignments.length;
                     assignments = assignments.filter(a => a.title !== assignmentTitle && a.assignmentId !== assignmentTitle);
-                    
+
                     if (assignments.length < originalLength) {
                         await studentDoc.ref.update({
                             assignments: assignments,
@@ -1011,7 +1054,7 @@ const GradingUI = {
 
             this.isDirty = false;
             this.closeModal();
-            
+
             // Refresh parent
             if (typeof refreshDashboard === 'function') {
                 refreshDashboard();
@@ -1028,11 +1071,11 @@ const GradingUI = {
         }
     },
 
-    releaseGrading: async function() {
+    releaseGrading: async function () {
         // Reset status to pending so others can pick it up
         const statusMsg = document.getElementById('grading-status-msg');
         statusMsg.textContent = "Vrijgeven...";
-        
+
         try {
             await firebase.firestore().collection("submissions").doc(this.currentSubmissionId).update({
                 status: "pending",
@@ -1043,13 +1086,13 @@ const GradingUI = {
                 // If we keep draft, the colleague sees my draft. That might be confusing or helpful. 
                 // Let's Keep the draft! Just unlock it.
             });
-            
+
             // Note: If we really want to remove the "lock", we should probably remove the field `gradingBy`.
             // Done above.
 
             this.isDirty = false; // No need to save
             this.closeModal();
-            
+
             // Refresh parent
             if (typeof loadSubmissions === 'function') {
                 loadSubmissions();
@@ -1064,37 +1107,37 @@ const GradingUI = {
         }
     },
 
-    closeModal: async function() {
+    closeModal: async function () {
         if (this.isDirty) {
             if (!confirm("Je hebt wijzigingen die nog niet zijn opgeslagen als concept. Wil je toch sluiten?")) return;
         }
-        
+
         document.getElementById('grading-modal').style.display = 'none';
         document.body.style.overflow = '';
     },
 
-    checkForPreviousGrade: async function(submissionData) {
+    checkForPreviousGrade: async function (submissionData) {
         try {
             const db = firebase.firestore();
             const studentEmail = submissionData.userEmail;
             const assignmentId = submissionData.assignmentId;
-            
+
             if (!studentEmail || !assignmentId) return null;
 
             // Use resolveStudentDocument if available (it is in docenten.html now)
             let studentDoc = null;
             if (typeof resolveStudentDocument === 'function') {
-                 const docSnapshot = await resolveStudentDocument(db, { email: studentEmail }, () => {});
-                 if (docSnapshot && docSnapshot.exists) studentDoc = docSnapshot;
+                const docSnapshot = await resolveStudentDocument(db, { email: studentEmail }, () => { });
+                if (docSnapshot && docSnapshot.exists) studentDoc = docSnapshot;
             }
-            
+
             if (!studentDoc) return null;
-            
+
             const data = studentDoc.data();
             if (data.assignments && Array.isArray(data.assignments)) {
                 // Find matching assignment
                 // Assuming assignmentId matches 'title' or 'assignmentId' in result object
-                const found = data.assignments.find(a => 
+                const found = data.assignments.find(a =>
                     a.title === assignmentId || a.assignmentId === assignmentId
                 );
                 return found || null;
