@@ -60,9 +60,7 @@ def reset_2fa():
         # 2. Remove Enrolled Factors via REST API (since SDK is missing support)
         # We manually call Identity Toolkit API to disable MFA.
         import requests
-        import json
         import google.auth.transport.requests
-        from google.oauth2 import service_account
         
         # Get Service Account Credential & Token
         # We need to refresh the credential to get a raw token
