@@ -489,20 +489,28 @@ const GradingUI = {
                 }
             }
 
-            // Restore Selection and State
-            // 1. DRAFT (Highest priority)
-            if (this.currentSubmissionData.gradingDraft && this.currentSubmissionData.gradingDraft.selectedCells) {
-                // Normalize "row-X" to "X" for AI backward compatibility
-                const normalizedCells = {};
-                for (const [key, value] of Object.entries(this.currentSubmissionData.gradingDraft.selectedCells)) {
-                    normalizedCells[key.toString().replace("row-", "")] = value;
-                }
-                this.selectedCells = normalizedCells;
+        // Initialize per-category AI styling tracking
+        this.aiGradedCategories = {};
+
+        // Restore Selection and State
+        // 1. DRAFT (Highest priority)
+        if (this.currentSubmissionData.gradingDraft && this.currentSubmissionData.gradingDraft.selectedCells) {
+            // Normalize "row-X" to "X" for AI backward compatibility
+            const normalizedCells = {};
+            for (const [key, value] of Object.entries(this.currentSubmissionData.gradingDraft.selectedCells)) {
+                const normalizedKey = key.toString().replace("row-", "");
+                normalizedCells[normalizedKey] = value;
                 
-                this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
-                this.updateUISelection();
-                this.updateUISelection();
-                this.updateCalculation();
+                // If this is an AI draft, mark these specific categories as AI graded initially
+                if (this.isAIGraded) {
+                    this.aiGradedCategories[normalizedKey] = true;
+                }
+            }
+            this.selectedCells = normalizedCells;
+            
+            this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
+            this.updateUISelection();
+            this.updateCalculation();
 
                 // CRITICAL: If restoring DRAFT, and we are NOT read-only, ensure status is synced?
                 // No, usually status is already 'grading' if draft exists. 
@@ -657,6 +665,9 @@ const GradingUI = {
 
                 if (points >= 0 && points <= category.rawMaxPoints) {
                     this.selectedCells[catIndex] = points; // Set directly to avoid UI redraw loops
+                    if (this.aiGradedCategories) {
+                        this.aiGradedCategories[catIndex] = false;
+                    }
                 }
             }
         });
@@ -740,6 +751,12 @@ const GradingUI = {
             console.log("Ignored click in read-only mode");
             return;
         }
+
+        // If the teacher manually changes a rubric score, remove AI styling for THIS category
+        if (this.aiGradedCategories && this.aiGradedCategories[catIndex]) {
+            this.aiGradedCategories[catIndex] = false;
+        }
+
         this.selectedCells[catIndex] = points;
 
         this.updateUISelection();
@@ -754,9 +771,9 @@ const GradingUI = {
             el.classList.remove('ai-selected');
         });
 
-        // Apply selected classes — geel als AI-concept, blauw als door docent
-        const cellClass = this.isAIGraded ? 'ai-selected' : 'selected';
+        // Apply selected classes — geel als AI-concept (per categorie), blauw als door docent
         for (const [catIndex, points] of Object.entries(this.selectedCells)) {
+            const cellClass = (this.aiGradedCategories && this.aiGradedCategories[catIndex]) ? 'ai-selected' : 'selected';
             const cell = document.querySelector(`.rubric-cell[data-cat-index="${catIndex}"][data-points="${points}"]`);
             if (cell) cell.classList.add(cellClass);
         }

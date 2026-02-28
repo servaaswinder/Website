@@ -12,9 +12,15 @@ _site/
 vendor/
 .bundle/
 
-# Security Rules
+# Security Rules & Admin Scripts
 firestore.rules
 serviceAccountKey.json
+private_scripts/
+venv/
+
+# Logs
+*.log
+server_v2.log
 
 # Microbit test files
 Informatica/opdrachten/microbit_test/

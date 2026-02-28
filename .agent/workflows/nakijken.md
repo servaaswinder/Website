@@ -18,10 +18,20 @@ Haal de rubric op: lees de categoriën, wegingen en beschrijvingen per puntenniv
 ## Stap 3 — Bekijk het werk van de leerling
 
 Open `assignmentUrl` via de browser of analyseer de bestanden via tools:
+- **Verifieer Niveau**: Kijk in de submission of in de `results` collectie of de leerling **HAVO** of **VWO** is. Pas je strengheid hierop aan (VWO = kritischer).
+- Let op: "Bas" kan Bastiaan Eelman (HAVO) of Bas Zwanenburg (VWO) zijn. Controleer het e-mailadres.
 - Als de link een **repository** is (bijv. github.com of codeberg.org) in plaats van een live website: zoek in de header of zijbalk naar een knop zoals "Visit Page", "Website" of een link eindingend op `.page` of `.github.io`. Gebruik deze link om naar de live versie van de opdracht te surfen en deze normaliter na te kijken. Mocht je écht geen live link vinden, navigeer dan naar de benodigde HTML/CSS bestanden in de repo en beoordeel de code zelf. Voeg wel ALTIJD aan je uiteindelijke opmerking toe: "Voor de volgende keer: lever a.u.b. direct de werkende live link (pages link) naar de website in, in plaats van de broncode/repository link."
 - Als de pagina een **voorpagina** is: navigeer naar de juiste opdrachtpagina.
 - Als **inloggen vereist** is (bijv. Google Colab): noteer dit en sla aan op basis van wat wél zichtbaar is.
 - Als er **geen directe link** is of de link werkt niet: voeg toe aan opmerking: "Voor de volgende keer: lever een directe link in naar de pagina waarop de opdracht staat, niet naar je startpagina."
+
+## Stap 3.5 — Doe extern onderzoek (indien relevant)
+
+Als de opdracht gaat over een **echte gebeurtenis** (bijv. een specifiek datalek zoals Odido, een hack, of een nieuwsbericht):
+- Zoek online naar details over deze gebeurtenis (gebruik bijv. Tweakers, Security.nl, of officiële rapporten).
+- Vergelijk de feiten (oorzaak, schaal, datatypes, maatregelen) met wat de leerling schrijft.
+- Controleer specifiek de bronnen die de leerling zelf opgeeft.
+- Wees kritisch: mist de leerling cruciale context, vaktermen (zoals Social Engineering, MFA, Data-minimalisatie) of architecturale missers? Pas de score hierop aan.
 
 ## Stap 4 — Check herkansing
 
@@ -50,10 +60,10 @@ Schrijf een korte opmerking voor de leerling. Regels:
 
 7. **Concept opslaan in Firebase:**  
    Als je tevreden bent met je beoordeling, sla je deze op in Firebase in de `submissions` collectie.  
-   - Gebruik **ALTIJD** het Python script `scripts/save_ai_drafts.py` om te schrijven naar Firestore, omdat MCP geen document-writerechten heeft.
+   - Gebruik **ALTIJD** het Python script `private_scripts/save_ai_drafts.py` om te schrijven naar Firestore, omdat MCP geen document-writerechten heeft.
    - Run in the terminal:
      ```bash
-     python3 scripts/save_ai_drafts.py '[{"id": "DOCUMENT_ID", "pts": {"0": 1, "1": 2, "2": 1}, "c": "Je opmerking hier. --- HERBEOORDELING (Vorig cijfer: 4.0) --- indien van toepassing"}]'
+     python3 private_scripts/save_ai_drafts.py '[{"id": "DOCUMENT_ID", "pts": {"0": 1, "1": 2, "2": 1}, "c": "Je opmerking hier. --- HERBEOORDELING (Vorig cijfer: 4.0) --- indien van toepassing"}]'
      ```
      *(Je mag meerdere inleveringen tegelijk in de JSON array stoppen).*
    - **Let op**: Zorg dat je de daadwerkelijke indices als string gebruikt voor de punten (bijv. `"0"`, `"1"`, niet `"row-0"`).
