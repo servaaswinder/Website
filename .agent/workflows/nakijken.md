@@ -17,7 +17,8 @@ Haal de rubric op: lees de categoriën, wegingen en beschrijvingen per puntenniv
 
 ## Stap 3 — Bekijk het werk van de leerling
 
-Open `assignmentUrl` via de browser:
+Open `assignmentUrl` via de browser of analyseer de bestanden via tools:
+- Als de link een **repository** is (bijv. github.com of codeberg.org) in plaats van een live website: zoek in de header of zijbalk naar een knop zoals "Visit Page", "Website" of een link eindingend op `.page` of `.github.io`. Gebruik deze link om naar de live versie van de opdracht te surfen en deze normaliter na te kijken. Mocht je écht geen live link vinden, navigeer dan naar de benodigde HTML/CSS bestanden in de repo en beoordeel de code zelf. Voeg wel ALTIJD aan je uiteindelijke opmerking toe: "Voor de volgende keer: lever a.u.b. direct de werkende live link (pages link) naar de website in, in plaats van de broncode/repository link."
 - Als de pagina een **voorpagina** is: navigeer naar de juiste opdrachtpagina.
 - Als **inloggen vereist** is (bijv. Google Colab): noteer dit en sla aan op basis van wat wél zichtbaar is.
 - Als er **geen directe link** is of de link werkt niet: voeg toe aan opmerking: "Voor de volgende keer: lever een directe link in naar de pagina waarop de opdracht staat, niet naar je startpagina."
@@ -31,11 +32,13 @@ Controleer of het een herkansing is: kijk of er een eerder `checked`-inlevering 
 
 ## Stap 5 — Beoordeel per rubriekcategorie
 
-Wijs per categorie een puntenaantal toe. Schrijf je redenering intern op maar zet die niet in de opmerking.
+Wijs per categorie een puntenaantal toe. Schrijf je redenering intern op en zet het in de opmerking.
 
 Regels:
-- Bij herkansing: minimumscore per categorie = vorige score
-- Wees eerlijk maar welwillend
+- VWO-leerlingen worden strenger beoordeeld, wees hierbij zeer kritisch op details en uitwerking.
+- HAVO-leerlingen mogen rekenen op iets meer coulance (welwillendheid) en aanmoediging.
+- Een perfecte score (alles de maximale punten, dus een 10) mag alléén gegeven worden als het werk écht foutloos en compleet is. Zoek actief naar foutjes of verbeterpunten in theorie en code voordat je de maximale score toekent. Let hierbij op de nieuwe conrete rubrics.
+- Bij herkansing: minimumscore per categorie = vorige score. (Tenzij de leerling elementen duidelijk heeft verwijderd/verslechterd, maar benoem dat. Erg zeldzame situatie).
 
 ## Stap 6 — Schrijf de opmerking
 
