@@ -45,28 +45,16 @@ Schrijf een korte opmerking voor de leerling. Regels:
 - Noem wat goed is, wat beter kan, en (bij herkansing) wat verbeterd is
 - Max 3-4 zinnen — direct doorstuurbaar zonder aanpassingen
 
-## Stap 7 — Schrijf concept naar Firebase
+7. **Concept opslaan in Firebase:**  
+   Als je tevreden bent met je beoordeling, sla je deze op in Firebase in de `submissions` collectie.  
+   - Gebruik **ALTIJD** het Python script `scripts/save_ai_drafts.py` om te schrijven naar Firestore, omdat MCP geen document-writerechten heeft.
+   - Run in the terminal:
+     ```bash
+     python3 scripts/save_ai_drafts.py '[{"id": "DOCUMENT_ID", "pts": {"0": 1, "1": 2, "2": 1}, "c": "Je opmerking hier. --- HERBEOORDELING (Vorig cijfer: 4.0) --- indien van toepassing"}]'
+     ```
+     *(Je mag meerdere inleveringen tegelijk in de JSON array stoppen).*
+   - **Let op**: Zorg dat je de daadwerkelijke indices als string gebruikt voor de punten (bijv. `"0"`, `"1"`, niet `"row-0"`).
+   - De velden worden door het script automatisch in `submissions.gradingDraft` gezet en `status` wordt `pending`.
 
-Update het Firestore document via Firebase MCP:
-
-```json
-{
-  "gradedByAI": true,
-  "gradingBy": "AI",
-  "gradingDraft": {
-    "selectedCells": { "0": <punten_cat0>, "1": <punten_cat1>, ... },
-    "comment": "<opmerking voor leerling>"
-  },
-  "status": "pending"
-}
-```
-
-Belangrijk: `status` blijft `"pending"` — niet `"grading"`. Zo is de inlevering niet op slot voor de docent.
-
-## Stap 8 — Rapporteer
-
-Na alle inleveringen: geef een overzicht:
-- Leerling + opdracht
-- Voorgesteld cijfer (op basis van `(punten / max) * 9 + 1`)
-- Of het een herkansing was
-- Of de link bruikbaar was
+8. **Rapportage:**  
+   Laat me weten welke leerlingen zijn nagekeken. Geef een kort overzicht (bijv. in een tabel) met hun voorletters, opdracht, voorgesteld cijfer en de belangrijkste reden voor dat cijfer.

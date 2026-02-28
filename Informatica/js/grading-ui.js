@@ -492,7 +492,13 @@ const GradingUI = {
             // Restore Selection and State
             // 1. DRAFT (Highest priority)
             if (this.currentSubmissionData.gradingDraft && this.currentSubmissionData.gradingDraft.selectedCells) {
-                this.selectedCells = this.currentSubmissionData.gradingDraft.selectedCells;
+                // Normalize "row-X" to "X" for AI backward compatibility
+                const normalizedCells = {};
+                for (const [key, value] of Object.entries(this.currentSubmissionData.gradingDraft.selectedCells)) {
+                    normalizedCells[key.toString().replace("row-", "")] = value;
+                }
+                this.selectedCells = normalizedCells;
+                
                 this.teacherComment = this.currentSubmissionData.gradingDraft.comment || this.teacherComment;
                 this.updateUISelection();
                 this.updateUISelection();
