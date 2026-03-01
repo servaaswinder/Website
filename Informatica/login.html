@@ -267,7 +267,6 @@
                 login: document.getElementById('view-login'),
                 mfaVerify: document.getElementById('view-mfa-verify'),
                 enroll: document.getElementById('view-enroll'),
-                enroll: document.getElementById('view-enroll'),
                 reset: document.getElementById('view-reset'),
                 newPassword: document.getElementById('view-new-password')
             };
@@ -279,6 +278,16 @@
 
             // --- AUTH STATE OBSERVER (The "Traffic Cop") ---
             onAuthStateChanged(auth, async (user) => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const mode = urlParams.get('mode');
+                const actionCode = urlParams.get('oobCode');
+
+                // CRITICAL FIX: Don't perform standard redirects or show login if we are doing a password reset!
+                if (mode === 'resetPassword' && actionCode) {
+                    console.log("Password Reset Mode detected. Bypassing auth state observer.");
+                    return;
+                }
+
                 if (user) {
                     console.log("User logged in:", user.email);
                     
@@ -287,7 +296,6 @@
                     if (enrolledFactors && enrolledFactors.length > 0) {
                         // User HAS 2FA -> Allow Access
                         console.log("2FA Active. Redirecting...");
-                        const urlParams = new URLSearchParams(window.location.search);
                         const redirectUrl = urlParams.get('redirect') || 'leerlingportaal.html';
                         window.location.href = redirectUrl;
                     } else {
@@ -298,15 +306,6 @@
                 } else {
                     // Not logged in -> Show Login Form
                     console.log("User not logged in.");
-                    
-                    // CRITICAL FIX: Don't show login view if we are doing a password reset!
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const mode = urlParams.get('mode');
-                    if (mode === 'resetPassword') {
-                        console.log("Password Reset Mode detected. Suppressing login view.");
-                        return; 
-                    }
-
                     showView('login');
                 }
             });

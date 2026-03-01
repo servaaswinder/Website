@@ -95,3 +95,31 @@ async function resolveStudentDocument(db, user, logFn = console.log) {
     logFn(`[StudentUtils] Niks gevonden na 5 pogingen.`);
     return null;
 }
+
+/**
+ * Generates a secure random string of specified length.
+ * @param {number} length - The length of the string to generate.
+ * @returns {string} - De beveiligde willekeurige tekenreeks.
+ */
+function generateSecureRandomString(length) {
+    const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const values = new Uint32Array(length);
+    window.crypto.getRandomValues(values);
+    for (let i = 0; i < length; i++) {
+        result += charset[values[i] % charset.length];
+    }
+    return result;
+}
+
+/**
+ * Generates a secure temporary password based on an email.
+ * @param {string} email - Het email adres.
+ * @returns {string} - Het beveiligde tijdelijke wachtwoord.
+ */
+function generateTemporaryPassword(email) {
+    const prefix = (email || "").split("@")[0].replace(/[^a-zA-Z0-9]/g, "").slice(0, 8);
+    const safePrefix = prefix || "leerling";
+    const randomPart = generateSecureRandomString(6);
+    return `${safePrefix}-${randomPart}-${new Date().getFullYear()}`;
+}

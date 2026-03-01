@@ -1173,15 +1173,6 @@
 				};
 			}
 
-			function generateTemporaryPassword(email) {
-				const prefix = (email || "")
-					.split("@")[0]
-					.replace(/[^a-zA-Z0-9]/g, "")
-					.slice(0, 8);
-				const safePrefix = prefix || "leerling";
-				const randomPart = Math.random().toString(36).slice(-6);
-				return `${safePrefix}-${randomPart}-${new Date().getFullYear()}`;
-			}
 
 			async function createAuthUserSilently(email, password) {
 				if (!email || !password) {

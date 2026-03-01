@@ -311,9 +311,6 @@ const GradingUI = {
         this.isReadOnly = !!readOnly; // Ensure boolean
         this.isAIGraded = !!submissionData.gradedByAI; // Track AI concept
 
-        console.log(`[GradingUI] Opening submission ${submissionId}. ReadOnly: ${this.isReadOnly}. AI-concept: ${this.isAIGraded}`);
-
-
         // Setup Modal Title
         const displayName = submissionData.userName || submissionData.name || submissionData.userEmail || "Onbekend";
         document.getElementById('grading-student-name').textContent = displayName + (readOnly ? " (Inzien)" : "");
@@ -434,7 +431,6 @@ const GradingUI = {
 
         // Load Rubric
         const tryFetch = async (url) => {
-            console.log(`[GradingUI] Trying to fetch: ${url}`);
             const response = await fetch(url);
             if (!response.ok) {
                 // Try relative to current location if absolute failed?
@@ -539,8 +535,6 @@ const GradingUI = {
                 // NOTE: checkForPreviousGrade might trigger logic? No, just reads.
                 this.checkForPreviousGrade(submissionData).then(prevData => {
                     if (prevData) {
-                        console.log("Restoring previous grade data:", prevData);
-
                         // Fill Rubric if Rubric Empty?
                         //  if (prevData.rubric && Array.isArray(prevData.rubric)) {
                         //      // Only if we want to AUTO-FILL. User asked: "Als deze opdracht al een eerder is nagekeken moet in de rubric de vakjes aangekruist zijn".
@@ -571,7 +565,6 @@ const GradingUI = {
                             prevData.rubric.forEach(item => {
                                 this.applyCsvRubric([item]);
                             });
-                            console.log("Pre-filled rubric from previous grading.");
                             this.updateUISelection();
                             this.updateCalculation();
                         }
@@ -627,8 +620,6 @@ const GradingUI = {
 
     applyCsvRubric: function (csvRubric) {
         if (!this.currentRubricData || !csvRubric) return;
-
-        console.log("Applying CSV Rubric:", csvRubric);
 
         // Helper to clean strings for comparison
         const cleanStr = (s) => (s || "").toLowerCase().replace(/[:\.\s]+/g, ' ').trim();
@@ -748,7 +739,6 @@ const GradingUI = {
 
     selectCell: function (catIndex, points) {
         if (this.isReadOnly) {
-            console.log("Ignored click in read-only mode");
             return;
         }
 
@@ -816,7 +806,6 @@ const GradingUI = {
         const currentStatus = this.currentSubmissionData ? this.currentSubmissionData.status : null;
 
         if (!forceGrading && (currentStatus === 'checked' || currentStatus === 'rejected')) {
-            console.log("Skipping lock: Submission is already final (" + currentStatus + ") and not forced.");
             return;
         }
 
@@ -914,7 +903,7 @@ const GradingUI = {
 
                     let studentDoc = null;
                     if (typeof resolveStudentDocument === 'function') {
-                        const docSnapshot = await resolveStudentDocument(db, userObj, console.log);
+                        const docSnapshot = await resolveStudentDocument(db, userObj, () => {});
                         if (docSnapshot && docSnapshot.exists) {
                             studentDoc = docSnapshot;
                         }
@@ -960,7 +949,6 @@ const GradingUI = {
                             assignments: assignments,
                             lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        console.log("Synced result to student record:", studentDoc.id);
                     } else {
                         // Create new result document
                         // IMPORTANT: Only create if really not found. 
@@ -971,7 +959,6 @@ const GradingUI = {
 
                         // If the submission email HAS capitals, we use that for the NEW document email field.
                         const newEmail = this.currentSubmissionData.userEmail || studentEmail;
-                        console.log("Creating new student record in 'results' for:", newEmail);
 
                         const studentName = this.currentSubmissionData.userName || this.currentSubmissionData.name || newEmail.split('@')[0];
                         const studentClass = this.currentSubmissionData.userClass || this.currentSubmissionData.class || 'Onbekend';
@@ -1066,7 +1053,6 @@ const GradingUI = {
                             assignments: assignments,
                             lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        console.log("Removed result from student record.");
                     }
                 }
             }
