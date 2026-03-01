@@ -548,18 +548,58 @@
                         item.style.marginBottom = "10px";
                         item.style.borderLeft = "4px solid #dc3545";
                         
-                        item.innerHTML = `
-                            <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 5px;">${data.assignmentId}</div>
-                            <div style="font-style: italic; color: #555; margin-bottom: 10px;">"${data.teacherComment || 'Geen opmerking'}"</div>
-                            <div style="font-size: 0.85em; color: #666;">
-                                Afgewezen op: ${date} door ${data.checkedBy || 'docent'}
-                                <br>
-                                <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center;">
-                                    <a href="inleveren.html" class="inf-button" style="padding: 4px 10px; font-size: 0.9em; text-decoration: none;">Opnieuw inleveren</a>
-                                    <button onclick="deleteSubmission('${doc.id}')" style="background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; font-size: 0.9em;">Melding verwijderen</button>
-                                </div>
-                            </div>
-                        `;
+                        const titleDiv = document.createElement("div");
+                        titleDiv.style.fontWeight = "bold";
+                        titleDiv.style.fontSize = "1.1em";
+                        titleDiv.style.marginBottom = "5px";
+                        titleDiv.textContent = data.assignmentId;
+
+                        const commentDiv = document.createElement("div");
+                        commentDiv.style.fontStyle = "italic";
+                        commentDiv.style.color = "#555";
+                        commentDiv.style.marginBottom = "10px";
+                        commentDiv.textContent = `"${data.teacherComment || 'Geen opmerking'}"`;
+
+                        const metaDiv = document.createElement("div");
+                        metaDiv.style.fontSize = "0.85em";
+                        metaDiv.style.color = "#666";
+                        metaDiv.textContent = `Afgewezen op: ${date} door ${data.checkedBy || 'docent'}`;
+
+                        const br = document.createElement("br");
+                        metaDiv.appendChild(br);
+
+                        const actionsDiv = document.createElement("div");
+                        actionsDiv.style.marginTop = "8px";
+                        actionsDiv.style.display = "flex";
+                        actionsDiv.style.gap = "10px";
+                        actionsDiv.style.alignItems = "center";
+
+                        const retryLink = document.createElement("a");
+                        retryLink.href = "inleveren.html";
+                        retryLink.className = "inf-button";
+                        retryLink.style.padding = "4px 10px";
+                        retryLink.style.fontSize = "0.9em";
+                        retryLink.style.textDecoration = "none";
+                        retryLink.textContent = "Opnieuw inleveren";
+
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.style.background = "none";
+                        deleteBtn.style.border = "none";
+                        deleteBtn.style.color = "#666";
+                        deleteBtn.style.textDecoration = "underline";
+                        deleteBtn.style.cursor = "pointer";
+                        deleteBtn.style.fontSize = "0.9em";
+                        deleteBtn.textContent = "Melding verwijderen";
+                        const deleteDocId = doc.id;
+                        deleteBtn.addEventListener("click", () => window.deleteSubmission(deleteDocId));
+
+                        actionsDiv.appendChild(retryLink);
+                        actionsDiv.appendChild(deleteBtn);
+                        metaDiv.appendChild(actionsDiv);
+
+                        item.appendChild(titleDiv);
+                        item.appendChild(commentDiv);
+                        item.appendChild(metaDiv);
                         list.appendChild(item);
                     });
                      // Ensuring proper closure of logic
