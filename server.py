@@ -5,6 +5,7 @@ from firebase_admin import credentials, auth, firestore
 import os
 import secrets
 import string
+from functools import wraps
 
 app = Flask(__name__)
 # Allow CORS request from our frontend (port 4000)
@@ -20,11 +21,29 @@ if os.path.exists(cred_path):
 else:
     print("⚠️  WARNING: serviceAccountKey.json not found. Admin features will fail.")
 
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({"success": False, "error": "Missing or invalid Authorization header"}), 401
+
+        id_token = auth_header.split('Bearer ')[1]
+        try:
+            decoded_token = auth.verify_id_token(id_token)
+            # You can also set request.user = decoded_token if needed
+        except Exception as e:
+            return jsonify({"success": False, "error": "Invalid token", "details": str(e)}), 401
+
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/api/health', methods=['GET'])
 def health():
     return jsonify({"status": "ok", "message": "Admin backend is running"})
 
 @app.route('/api/reset-2fa', methods=['POST'])
+@require_auth
 def reset_2fa():
     """
     Resets Multi-Factor Authentication for a given user UID.
@@ -110,6 +129,7 @@ def reset_2fa():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/create-student', methods=['POST'])
+@require_auth
 def create_student():
     """
     Creates a new student account in Firebase Auth and Firestore.
@@ -180,6 +200,7 @@ def create_student():
 
 
 @app.route('/api/delete-student', methods=['POST'])
+@require_auth
 def delete_student():
     """
     Deletes a student account from Firebase Auth and Firestore.
