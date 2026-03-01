@@ -32,10 +32,17 @@ class TestServerDeleteStudent(unittest.TestCase):
     def tearDownClass(cls):
         cls.patcher.stop()
 
-    def test_delete_student_missing_uid(self):
-        """Test that missing UID in delete_student returns 400."""
-        # Send a POST request with an empty JSON payload
-        response = self.app.post('/api/delete-student', json={})
+    @patch('server.auth.verify_id_token')
+    def test_delete_student_missing_uid(self, mock_verify):
+        """Test that missing UID in delete_student returns 400 when authenticated."""
+        mock_verify.return_value = {"uid": "admin-user"}
+
+        # Send a POST request with an empty JSON payload and a valid token
+        response = self.app.post(
+            '/api/delete-student',
+            json={},
+            headers={'Authorization': 'Bearer valid_token'}
+        )
         
         # Assert the status code is 400 Bad Request
         self.assertEqual(response.status_code, 400)
@@ -46,6 +53,31 @@ class TestServerDeleteStudent(unittest.TestCase):
         # Assert the expected response body
         self.assertFalse(data.get('success'))
         self.assertEqual(data.get('error'), 'UID is required')
+
+    def test_delete_student_missing_auth(self):
+        """Test that missing Authorization header returns 401."""
+        response = self.app.post('/api/delete-student', json={"uid": "student1"})
+
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertFalse(data.get('success'))
+        self.assertIn('Missing or invalid Authorization header', data.get('error'))
+
+    @patch('server.auth.verify_id_token')
+    def test_delete_student_invalid_auth(self, mock_verify):
+        """Test that an invalid token returns 401."""
+        mock_verify.side_effect = Exception("Token expired")
+
+        response = self.app.post(
+            '/api/delete-student',
+            json={"uid": "student1"},
+            headers={'Authorization': 'Bearer invalid_token'}
+        )
+
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertFalse(data.get('success'))
+        self.assertEqual(data.get('error'), 'Invalid token')
 
 if __name__ == '__main__':
     unittest.main()

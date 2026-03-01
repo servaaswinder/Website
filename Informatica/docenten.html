@@ -869,10 +869,12 @@
                 const email = student ? student.email : null;
                 
                 try {
+                    const token = await firebase.auth().currentUser.getIdToken();
                     const response = await fetch('http://localhost:5000/api/reset-2fa', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify({ 
                             uid: window.activeStudentId,
@@ -2350,9 +2352,13 @@
                 
                 try {
                     // 1. Create Account via Backend (generates temp password)
+                    const token = await firebase.auth().currentUser.getIdToken();
                     const response = await fetch('http://localhost:5000/api/create-student', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                         body: JSON.stringify({ name, email, class: cls })
                     });
                     
@@ -2406,9 +2412,13 @@
                 btn.innerHTML = "Bezig...";
                 
                 try {
+                    const token = await firebase.auth().currentUser.getIdToken();
                     const response = await fetch('http://localhost:5000/api/delete-student', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
                         body: JSON.stringify({ uid: window.activeStudentId })
                     });
                      
