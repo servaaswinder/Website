@@ -37,7 +37,7 @@ Via `checkForPreviousGrade()` haalt de app al de vorige beoordeling op. De AI:
 `feature/ai-nakijken` van `main`
 
 ### 5. `/nakijken` workflow
-Bestand: `.agent/workflows/nakijken.md` (al aangemaakt op deze branch)
+Bestand: `~/.claude/scheduled-tasks/nakijken/SKILL.md` (anthropic-skills scheduled task, on-demand)
 
 Stappenplan dat Antigravity volgt als je `/nakijken` typt:
 1. Lees openstaande `submissions` (status: `pending`) via Firebase MCP
@@ -69,7 +69,7 @@ Beschrijft welke MCP servers geïnstalleerd moeten worden + hoe.
 - [x] Branch `feature/ai-nakijken` aangemaakt
 - [x] `grading-ui.js` aangepast (gele cellen, AI-banner)
 - [x] `docenten.html` aangepast (🤖 badge)
-- [x] `.agent/workflows/nakijken.md` aangemaakt
+- [x] `/nakijken` skill aangemaakt (`~/.claude/scheduled-tasks/nakijken/SKILL.md`)
 - [x] `SETUP_AI.md` aangemaakt
 - [ ] Handmatig testen op Mac
 - [ ] Mergen naar `main`
