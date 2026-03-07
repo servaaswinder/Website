@@ -202,22 +202,20 @@
 							comments: comments,
 							timestamp: firebase.firestore.FieldValue.serverTimestamp(),
 							status: "pending",
+							isResubmission: !!existingGrade,
+							// Clear stale grading fields from previous round
+							gradedByAI: firebase.firestore.FieldValue.delete(),
+							gradingDraft: firebase.firestore.FieldValue.delete(),
+							finalRubric: firebase.firestore.FieldValue.delete(),
+							grade: firebase.firestore.FieldValue.delete(),
+							gradingBy: firebase.firestore.FieldValue.delete(),
+							teacherComment: firebase.firestore.FieldValue.delete(),
                             history: firebase.firestore.FieldValue.arrayUnion({
                                 action: 'resubmitted',
-                                timestamp: new Date(), // using client date for arrayUnion, serverTimestamp only works in top-level fields for some SDK versions, but let's try to be safe with client date for history array items or use Timestamp.now() if available. 
-                                // Actually, Firestore arrayUnion with serverTimestamp() inside objects is tricky. 
-                                // Let's use new Date().toISOString() or just new Date() which Firestore SDK converts.
-                                timestamp: new Date(), 
+                                timestamp: new Date(),
                                 email: user.email
                             })
 						};
-
-                        // If inheriting from a grade, maybe mark it? 
-                        // Actually, grading-ui will look it up dynamically.
-                        // But we could add a flag: 'isResubmission: true'
-                        if (existingGrade) {
-                            updateData.isResubmission = true;
-                        }
 
 						await docRef.update(updateData);
 					

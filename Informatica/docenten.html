@@ -704,7 +704,8 @@
 							<td>${assignDisplay}</td>
 							<td>${linkDisplay}</td>
                             <td>
-                                <div style="font-size: 0.9em; color: #555;">${data.gradedByAI ? '🤖 AI-concept' : (data.gradingBy ? data.gradingBy.split('@')[0] : '-')}</div>
+                                ${data.isResubmission ? '<span style="background:#dc3545;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold;display:inline-block;margin-bottom:2px;">🔄 Herbeoordeling</span><br>' : ''}
+                                <div style="font-size: 0.9em; color: #555;">${data.isResubmission ? (data.gradingBy ? data.gradingBy.split('@')[0] : '-') : (data.gradedByAI ? '🤖 AI-concept' : (data.gradingBy ? data.gradingBy.split('@')[0] : '-'))}</div>
                                 ${data.status === 'grading' ? '<span class="status-badge status-pending" style="font-size: 10px; padding: 2px 4px;">Bezig</span>' : ''}
                             </td>
 							<td>

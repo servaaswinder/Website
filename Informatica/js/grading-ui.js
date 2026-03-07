@@ -592,6 +592,23 @@ const GradingUI = {
                 });
             }
 
+            // Show resubmission label regardless of rubric source
+            if (submissionData.isResubmission) {
+                this.checkForPreviousGrade(submissionData).then(prevData => {
+                    if (prevData) {
+                        const titleEl = document.getElementById('grading-assignment-title');
+                        if (titleEl && !titleEl.innerHTML.includes('Herkansing')) {
+                            const prevDate = prevData.gradedAt ? new Date(prevData.gradedAt).toLocaleString() : "Eerder";
+                            const curDate = submissionData.timestamp ? new Date(submissionData.timestamp.toDate()).toLocaleString() : "Nu";
+                            titleEl.innerHTML += `<div style="font-size: 0.6em; margin-top: 4px; color: #d63384; background: #fff0f6; padding: 2px 6px; border-radius: 4px; display: inline-block;">
+                                ⚠️ <strong>Herkansing</strong> (Vorige: ${prevData.grade} op ${prevDate})<br>
+                                Ingeleverd: ${curDate}
+                            </div>`;
+                        }
+                    }
+                });
+            }
+
             // Apply Comment to UI
             document.getElementById('grading-comment').value = this.teacherComment;
             this.updateUISelection();
