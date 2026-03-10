@@ -269,7 +269,8 @@ const GradingUI = {
         "C4": "opdrachten/c4_standaard_representaties.html",
         "E1": "opdrachten/e1_decompositie.html",
         "Eind1": "opdrachten/eindopdracht_gamedev.html",
-        "Eind2": "opdrachten/eindopdracht_webshop.html"
+        "Eind2": "opdrachten/eindopdracht_webshop.html",
+        "Eind3": "opdrachten/eindopdracht_encryptie.html"
     },
 
     // Human Readable Titles
@@ -300,7 +301,8 @@ const GradingUI = {
         "C4": "Standaard representaties",
         "E1": "Decompositie",
         "Eind1": "Game Development",
-        "Eind2": "Webshop"
+        "Eind2": "Webshop",
+        "Eind3": "Encryptie"
     },
 
     open: async function (submissionId, submissionData, forceGrading = false, readOnly = false) {
