@@ -10,6 +10,30 @@
 				"panel": "shared"
 			},
 			"problemMatcher": []
+		},
+		{
+			"label": "Flash to Micro:bit",
+			"type": "shell",
+			"command": "/Users/servaaswinder/Library/Python/3.9/bin/uflash \"${file}\"",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Read Serial Monitor",
+			"type": "shell",
+			"command": "python3 -m serial.tools.miniterm /dev/cu.usbmodem1102 115200",
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"problemMatcher": []
 		}
 	]
 }
