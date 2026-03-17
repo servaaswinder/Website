@@ -4,6 +4,12 @@
  * Dependencies: RubricParser (must be loaded)
  */
 
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 const GradingUI = {
     currentSubmissionId: null,
     currentRubricData: null,
@@ -318,7 +324,7 @@ const GradingUI = {
         document.getElementById('grading-student-name').textContent = displayName + (readOnly ? " (Inzien)" : "");
 
         const title = this.ASSIGNMENT_TITLES[submissionData.assignmentId] || submissionData.assignmentId;
-        document.getElementById('grading-assignment-title').innerHTML = `${submissionData.assignmentId} <small style="font-weight:normal; color:#666;"> - ${title}</small>`;
+        document.getElementById('grading-assignment-title').innerHTML = `${escapeHtml(submissionData.assignmentId)} <small style="font-weight:normal; color:#666;"> - ${escapeHtml(title)}</small>`;
 
         // Comment Handling
         if (submissionData.status === 'pending') {
@@ -557,8 +563,8 @@ const GradingUI = {
                             const curDate = submissionData.timestamp ? new Date(submissionData.timestamp.toDate()).toLocaleString() : "Nu";
 
                             titleEl.innerHTML += `<div style="font-size: 0.6em; margin-top: 4px; color: #d63384; background: #fff0f6; padding: 2px 6px; border-radius: 4px; display: inline-block;">
-                                 ⚠️ <strong>Herkansing</strong> (Vorige: ${prevData.grade} op ${prevDate})<br>
-                                 Ingeleverd: ${curDate}
+                                 ⚠️ <strong>Herkansing</strong> (Vorige: ${escapeHtml(String(prevData.grade))} op ${escapeHtml(prevDate)})<br>
+                                 Ingeleverd: ${escapeHtml(curDate)}
                              </div>`;
                         }
 
@@ -603,8 +609,8 @@ const GradingUI = {
                             const prevDate = prevData.gradedAt ? new Date(prevData.gradedAt).toLocaleString() : "Eerder";
                             const curDate = submissionData.timestamp ? new Date(submissionData.timestamp.toDate()).toLocaleString() : "Nu";
                             titleEl.innerHTML += `<div style="font-size: 0.6em; margin-top: 4px; color: #d63384; background: #fff0f6; padding: 2px 6px; border-radius: 4px; display: inline-block;">
-                                ⚠️ <strong>Herkansing</strong> (Vorige: ${prevData.grade} op ${prevDate})<br>
-                                Ingeleverd: ${curDate}
+                                ⚠️ <strong>Herkansing</strong> (Vorige: ${escapeHtml(String(prevData.grade))} op ${escapeHtml(prevDate)})<br>
+                                Ingeleverd: ${escapeHtml(curDate)}
                             </div>`;
                         }
                     }
@@ -628,12 +634,11 @@ const GradingUI = {
             errorDiv.style.padding = '20px';
             errorDiv.style.background = '#ffe6e6';
             errorDiv.style.border = '1px solid red';
-            errorDiv.innerHTML = `<strong>Fout bij laden beoordelingsmodel:</strong><br>${error.message}<br><br><em>Tried fetching: ${submissionData.assignmentUrl}</em>`;
+            errorDiv.innerHTML = `<strong>Fout bij laden beoordelingsmodel:</strong><br>${escapeHtml(error.message)}<br><br><em>Tried fetching: ${escapeHtml(submissionData.assignmentUrl || '')}</em>`;
             document.getElementById('grading-rubric-container').innerHTML = '';
             document.getElementById('grading-rubric-container').appendChild(errorDiv);
 
-            // Explicit alert for user to see
-            alert(`DEBUG INFO:\nFout bij ophalen pagina.\nOorspronkelijke URL: ${submissionData.assignmentUrl}\nFoutmelding: ${error.message}`);
+            alert("Er ging iets mis bij het laden van het beoordelingsmodel. Probeer het opnieuw of neem contact op met de beheerder.");
         }
     },
 
@@ -865,7 +870,7 @@ const GradingUI = {
         } catch (e) {
             console.error(e);
             statusMsg.textContent = "Fout bij opslaan!";
-            alert("Fout bij opslaan concept: " + e.message);
+            alert("Fout bij opslaan concept. Probeer het opnieuw.");
         }
     },
 
@@ -1016,7 +1021,7 @@ const GradingUI = {
                     }
                 } catch (syncErr) {
                     console.error("Error syncing to results collection:", syncErr);
-                    alert("Let op: Cijfer is opgeslagen in inlevering, maar NIET in leerlingdossier (results). Fout: " + syncErr.message);
+                    alert("Let op: Cijfer is opgeslagen in inlevering, maar NIET in leerlingdossier (results). Neem contact op met de beheerder.");
                 }
             }
 
@@ -1035,7 +1040,7 @@ const GradingUI = {
         } catch (e) {
             console.error(e);
             statusMsg.textContent = "Fout bij afronden!";
-            alert("Fout bij afronden: " + e.message);
+            alert("Fout bij afronden. Probeer het opnieuw.");
         }
     },
 
@@ -1095,7 +1100,7 @@ const GradingUI = {
         } catch (e) {
             console.error(e);
             statusMsg.textContent = "Fout bij wissen!";
-            alert("Fout bij wissen: " + e.message);
+            alert("Fout bij wissen. Probeer het opnieuw.");
         }
     },
 
@@ -1131,7 +1136,7 @@ const GradingUI = {
         } catch (e) {
             console.error(e);
             statusMsg.textContent = "Fout bij vrijgeven!";
-            alert("Fout bij vrijgeven: " + e.message);
+            alert("Fout bij vrijgeven. Probeer het opnieuw.");
         }
     },
 

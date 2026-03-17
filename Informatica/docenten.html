@@ -749,7 +749,7 @@
 
 				} catch (error) {
 					console.error("Error loading submissions:", error);
-					loadingMessage.textContent = "Er ging iets mis bij het laden van de inzendingen: " + error.message;
+					loadingMessage.textContent = "Er ging iets mis bij het laden van de inzendingen. Vernieuw de pagina.";
                     loadingMessage.style.color = "red";
 				}
 			}
@@ -825,7 +825,7 @@
 
 				} catch (error) {
 					console.error("Error loading history:", error);
-					alert("Fout bij laden geschiedenis: " + error.message);
+					alert("Fout bij laden geschiedenis. Probeer het opnieuw.");
 					btn.textContent = "Probeer opnieuw";
 					btn.disabled = false;
 				}
@@ -1664,7 +1664,7 @@
                 if (error.code === 'permission-denied') {
                     alert("Je hebt geen rechten om deze actie uit te voeren. Ben je ingelogd als docent?");
                 } else {
-                    alert("Er ging iets mis: " + error.message);
+                    alert("Er ging iets mis. Probeer het opnieuw.");
                 }
             }
 
@@ -2102,13 +2102,13 @@
 						} catch (error) {
 							console.error(error);
                             parsedCsvData = null;
-							setStatusMessage(csvUploadMessage, `Fout: ${error.message}`, "error");
+							setStatusMessage(csvUploadMessage, "Fout bij verwerken van het bestand.", "error");
 						}
 					},
 					error: (error) => {
 						console.error(error);
                         parsedCsvData = null;
-						setStatusMessage(csvUploadMessage, `CSV Fout: ${error.message}`, "error");
+						setStatusMessage(csvUploadMessage, "CSV kon niet gelezen worden. Controleer het bestandsformaat.", "error");
 					}
 				});
 			}
@@ -2283,7 +2283,7 @@
                     
                 } catch (error) {
                     console.error("Sync error:", error);
-                    setStatusMessage(csvUploadMessage, "Fout: " + error.message, "error");
+                    setStatusMessage(csvUploadMessage, "Synchroniseren mislukt. Probeer het opnieuw.", "error");
                 } finally {
                     syncCsvBtn.disabled = false;
                 }

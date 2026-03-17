@@ -337,7 +337,7 @@
                         mfaResolver = getMultiFactorResolver(auth, error);
                         showView('mfaVerify');
                     } else {
-                        errorDiv.textContent = "Inloggen mislukt: " + error.message;
+                        errorDiv.textContent = "Inloggen mislukt. Controleer je e-mailadres en wachtwoord.";
                         errorDiv.classList.add('error');
                     }
                 }
@@ -375,7 +375,7 @@
                     // Success! onAuthStateChanged will redirect.
                 } catch (error) {
                     console.error("Verify Error:", error);
-                    errorDiv.textContent = "Foute code: " + error.message;
+                    errorDiv.textContent = "Foute code. Probeer het opnieuw.";
                     errorDiv.classList.add('error');
                 }
             });
@@ -404,7 +404,7 @@
                     
                 } catch (error) {
                     console.error("Enroll Start Error:", error);
-                    alert("Fout bij starten 2FA setup: " + error.message);
+                    alert("Fout bij starten 2FA setup. Probeer het opnieuw.");
                 }
             }
 
@@ -440,7 +440,7 @@
 
                 } catch (error) {
                     console.error("Enroll Finish Error:", error);
-                    errorDiv.textContent = "Fout bij verifiëren: " + error.message;
+                    errorDiv.textContent = "Fout bij verifiëren. Probeer het opnieuw.";
                     errorDiv.classList.add('error');
                     btn.disabled = false;
                 }
@@ -465,7 +465,7 @@
                     msg.textContent = "Reset-link verzonden! Check je spam-folder.";
                     msg.className = "status-message success";
                 } catch (error) {
-                    msg.textContent = error.message;
+                    msg.textContent = "Kon geen reset-link versturen. Controleer je e-mailadres.";
                     msg.className = "status-message error";
                     btn.disabled = false;
                     btn.textContent = "Stuur reset-link";
@@ -501,7 +501,7 @@
                              setTimeout(() => window.location.href = "login.html", 2000);
                          } catch (error) {
                              console.error("Confirm Reset Error:", error);
-                             errorDiv.textContent = "Fout bij opslaan: " + error.message;
+                             errorDiv.textContent = "Fout bij opslaan. Probeer het opnieuw.";
                              errorDiv.className = "status-message error";
                          }
                      });
@@ -512,8 +512,7 @@
                      showView('login');
                      const errorDiv = document.getElementById('login-error');
                      errorDiv.innerHTML = `<strong>Link is ongeldig of verlopen.</strong><br>
-                                           <small>Specifieke fout: ${error.code}</small><br>
-                                           Probeer het opnieuw.`;
+                                           Probeer het opnieuw via de inlogpagina.`;
                      errorDiv.className = "status-message error";
                  }
             }

@@ -246,7 +246,7 @@
 					
 				} catch (error) {
 					console.error("Error submitting assignment:", error);
-					alert("Er ging iets mis bij het versturen: " + error.message);
+					alert("Er ging iets mis bij het versturen. Probeer het opnieuw.");
 					submitBtn.disabled = false;
 				} finally {
 					loadingOverlay.style.display = "none";

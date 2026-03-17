@@ -70,7 +70,7 @@ window.BackupManager = {
 
         } catch (e) {
             console.error(e);
-            alert("Fout bij exporteren: " + e.message);
+            alert("Fout bij exporteren. Probeer het opnieuw.");
         }
     },
 
@@ -96,7 +96,7 @@ window.BackupManager = {
             skipEmptyLines: true,
             complete: async (results) => {
                 try {
-                    console.log("Parsed CSV:", results.data);
+                    // CSV parsed successfully
                     
                     // 1. Group by Email
                     const studentsMap = {};
@@ -136,7 +136,7 @@ window.BackupManager = {
                         }
                     });
 
-                    console.log("Reconstructed Data:", studentsMap);
+                    // Data reconstructed from CSV
 
                     // 2. Clear Collection (Batched or one-by-one)
                     const db = firebase.firestore();
@@ -152,7 +152,7 @@ window.BackupManager = {
                         deletePromises.push(doc.ref.delete());
                     });
                     await Promise.all(deletePromises);
-                    console.log("Cleared existing results.");
+                    // Existing results cleared
 
                     // 3. Insert New Data
                     const entries = Object.values(studentsMap);
@@ -172,7 +172,7 @@ window.BackupManager = {
 
                 } catch (e) {
                     console.error(e);
-                    alert("Fout bij importeren: " + e.message);
+                    alert("Fout bij importeren. Probeer het opnieuw.");
                 } finally {
                     event.target.value = ''; // Reset
                 }

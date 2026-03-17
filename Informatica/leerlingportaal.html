@@ -713,7 +713,7 @@
           }
         } catch (error) {
           console.error("Error deleting submission:", error);
-          alert("Kon melding niet verwijderen: " + error.message);
+          alert("Kon melding niet verwijderen. Probeer het opnieuw.");
         }
       };
 
@@ -1619,7 +1619,7 @@
               renderCsvPreview(null);
               setStatusMessage(
                 csvUploadMessage,
-                `CSV kon niet verwerkt worden: ${error.message}`,
+                "CSV kon niet verwerkt worden. Controleer het bestandsformaat.",
                 "error",
               );
             }
@@ -1630,7 +1630,7 @@
             renderCsvPreview(null);
             setStatusMessage(
               csvUploadMessage,
-              `CSV-fout: ${error.message}`,
+              "CSV kon niet gelezen worden. Controleer het bestandsformaat.",
               "error",
             );
           },
@@ -1687,7 +1687,7 @@
           await loadAllStudents();
         } catch (error) {
           console.error(error);
-          let msg = "Synchroniseren mislukt: " + error.message;
+          let msg = "Synchroniseren mislukt. Probeer het opnieuw.";
           if (error.code === "permission-denied") {
             msg =
               "Toegang geweigerd: Alleen docenten mogen resultaten synchroniseren.";
@@ -2759,7 +2759,7 @@
           console.error(error);
           setStatusMessage(
             resetResultsMessage,
-            "Verwijderen mislukt: " + error.message,
+            "Verwijderen mislukt. Probeer het opnieuw.",
             "error",
           );
         } finally {
@@ -2849,8 +2849,7 @@
           console.error("Error loading results:", error);
           studentResultsDisplay.innerHTML = `
 						<div class="error-message">
-							<p>Kon gegevens niet laden.</p>
-							<p><small>${error.message}</small></p>
+							<p>Kon gegevens niet laden. Vernieuw de pagina.</p>
 						</div>
 					`;
         }
