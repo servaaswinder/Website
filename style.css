@@ -8,6 +8,13 @@
   --border: #e6e8ee;
   --accent-50: #e9f0fb;
   --shadow: 0 10px 25px rgba(20, 30, 60, 0.08);
+  --tab-border: rgba(18, 30, 52, 0.12);
+  --tab-bg: rgba(18, 30, 52, 0.06);
+}
+
+.geen-les {
+  color: var(--muted);
+  font-style: italic;
 }
 
 * { box-sizing: border-box; }

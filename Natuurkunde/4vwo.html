@@ -23,142 +23,303 @@
 						door 2 lessen Modelleren (afgesloten met een verslag voor een
 						cijfer). De nadruk ligt op Hoofdstuk 5: Radioactiviteit.
 					</p>
-					<table>
-						<thead>
-							<tr>
-								<th>Week</th>
-								<th>Onderwerp in de les</th>
-								<th>Huiswerk</th>
-								<th>Opmerkingen</th>
-								<th>Lessen nat1/nat2</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>11</td>
-								<td>ABPS</td>
-								<td></td>
-								<td>Toetsbespreking
-									<br>Maandag 9 maart vanaf de middag afwezig (studie)</td>
-								<td>3 / 2</td>
-							</tr>
-							<tr>
-								<td>12</td>
-								<td>ABPS + Sciencefair</td>
-								<td></td>
-								<td>Dinsdag 17 maart 19:00 Sciencefair ABPS
-									<br>Donderdag 19 maart: docent afwezig</td>
-								<td>3 / 2</td>
-							</tr>
-							<tr>
-								<td>13</td>
-								<td>Hoofdstuk 6.1 + 6.2 (extra)</td>
-								<td>Alle opgaven</td>
-								<td>Donderdag 26 maart: ontwikkeldag, geen les</td>
-								<td>3 / 2</td>
-							</tr>
-							<tr>
-								<td>14</td>
-								<td>Hoofdstuk 6.3 + 6.4 (extra)</td>
-								<td>Alle opgaven</td>
-								<td>Dinsdag 31 maart: omgekeerd 40 min. rooster
-									<br>Donderdag 2 april: omgekeerd 40 min. rooster
-									<br>Vrijdag 3 april: Goede Vrijdag, geen les</td>
-								<td>2 / 3</td>
-							</tr>
-							<tr>
-								<td>15</td>
-								<td>Hoofdstuk 6.5 (extra)</td>
-								<td>Alle opgaven</td>
-								<td>Maandag 6 april: Tweede Paasdag, lesvrij</td>
-								<td>2 / 2</td>
-							</tr>
-							<tr>
-								<td>16</td>
-								<td>Modelleren les 1</td>
-								<td></td>
-								<td>Dinsdag 14 april: tafeltjesavond</td>
-								<td>3 / 3</td>
-							</tr>
-							<tr>
-								<td>17-18</td>
-								<td>Meivakantie</td>
-								<td></td>
-								<td>20 april t/m 5 mei</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>19</td>
-								<td>Inhaal / buffer</td>
-								<td></td>
-								<td></td>
-								<td>2 / 1</td>
-							</tr>
-							<tr>
-								<td>20</td>
-								<td>Inhaal / buffer</td>
-								<td></td>
-								<td>Maandag 11 mei: docent afwezig (studie)
-									<br>Dinsdag 12 mei: docent afwezig (studie)
-									<br>Woensdag 13 mei: v4 Dealbreakers (mentoruren)
-									<br>Donderdag 14 &amp; vrijdag 15 mei: Hemelvaartvakantie</td>
-								<td>0 / 0</td>
-							</tr>
-							<tr>
-								<td>21</td>
-								<td>Modelleren les 2</td>
-								<td>Verslag modelleren inleveren (cijfer)</td>
-								<td></td>
-								<td>3 / 3</td>
-							</tr>
-							<tr>
-								<td>22</td>
-								<td>Hoofdstuk 5.1</td>
-								<td>Alle opgaven</td>
-								<td>Maandag 25 mei: Tweede Pinksterdag, geen les
-									<br>Vrijdag 29 mei: Klas 3 excursies Düsseldorf/Lille</td>
-								<td>2 / 2</td>
-							</tr>
-							<tr>
-								<td>23</td>
-								<td>Hoofdstuk 5.2</td>
-								<td>Alle opgaven</td>
-								<td>Dinsdag 2 juni: omgekeerd 40 min. rooster
-									<br>Woensdag 3 juni: sportdag klas 3
-									<br>Donderdag 4 juni: omgekeerd 40 min. rooster</td>
-								<td>3 / 3</td>
-							</tr>
-							<tr>
-								<td>24</td>
-								<td>Hoofdstuk 5.3</td>
-								<td>Alle opgaven</td>
-								<td>Maandag 8 juni: sportdag 4e klas</td>
-								<td>2 / 2</td>
-							</tr>
-							<tr>
-								<td>25</td>
-								<td>Hoofdstuk 5.4 + 5.5</td>
-								<td>Alle opgaven</td>
-								<td></td>
-								<td>3 / 3</td>
-							</tr>
-							<tr>
-								<td>26</td>
-								<td>Activiteitenvrije week / Herhaling</td>
-								<td>Examenopgaven</td>
-								<td>Activiteitenvrije week
-									<br>Donderdag 25 juni: 40 min. rooster studiemiddag</td>
-								<td>3 / 3</td>
-							</tr>
-							<tr>
-								<td>27</td>
-								<td>Toetsweek</td>
-								<td>Hoofdstuk 5</td>
-								<td></td>
-								<td>—</td>
-							</tr>
-						</tbody>
-					</table>
+					<div class="tabs-card">
+						<div class="tab-buttons">
+							<button class="tab-button is-active" onclick="switchP4Tab(event,'p4-nat1')">4v.nat1</button>
+							<button class="tab-button" onclick="switchP4Tab(event,'p4-nat2')">4v.nat2</button>
+						</div>
+						<!-- ===== 4v.nat1 — maandag (uur 1) / woensdag (uur 5) / vrijdag (uur 4) ===== -->
+						<div class="tab-panel is-active" id="p4-nat1">
+							<table>
+								<thead>
+									<tr>
+										<th>Week</th>
+										<th>Ma (uur 1)</th>
+										<th>Wo (uur 5)</th>
+										<th>Vr (uur 4)</th>
+										<th>Huiswerk</th>
+										<th>Opmerkingen</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>11</td>
+										<td>ABPS</td>
+										<td>ABPS</td>
+										<td>ABPS</td>
+										<td></td>
+										<td>Toetsbespreking</td>
+									</tr>
+									<tr>
+										<td>12</td>
+										<td>ABPS</td>
+										<td>ABPS</td>
+										<td>ABPS</td>
+										<td></td>
+										<td>Di 17 mrt 19:00 Sciencefair</td>
+									</tr>
+									<tr>
+										<td>13</td>
+										<td>H6.1</td>
+										<td>H6.1 + H6.2</td>
+										<td>H6.2</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>14</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>15</td>
+										<td class="geen-les">Tweede Paasdag</td>
+										<td>H6.5</td>
+										<td>H6.5</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>16</td>
+										<td>Modelleren 1</td>
+										<td>Modelleren 2</td>
+										<td>Modelleren 3</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>17-18</td>
+										<td class="geen-les" colspan="3" style="text-align:center;">Meivakantie (20 april t/m 5 mei)</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>19</td>
+										<td class="geen-les">Bevrijdingsdag</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>20</td>
+										<td class="geen-les">Docent afwezig</td>
+										<td class="geen-les">Dealbreakers</td>
+										<td class="geen-les">Hemelvaart</td>
+										<td></td>
+										<td>Geen lessen deze week</td>
+									</tr>
+									<tr>
+										<td>21</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>Verslag modelleren inleveren (cijfer)</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>22</td>
+										<td class="geen-les">Tweede Pinksterdag</td>
+										<td>H5.1</td>
+										<td>H5.1</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>23</td>
+										<td>H5.2</td>
+										<td>H5.2</td>
+										<td>H5.2</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>24</td>
+										<td class="geen-les">Sportdag</td>
+										<td>H5.3</td>
+										<td>H5.3</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>25</td>
+										<td>H5.4</td>
+										<td>H5.4 + H5.5</td>
+										<td>H5.5</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>26</td>
+										<td>Herhaling</td>
+										<td>Herhaling</td>
+										<td>Herhaling</td>
+										<td>Examenopgaven</td>
+										<td>Activiteitenvrije week</td>
+									</tr>
+									<tr>
+										<td>27</td>
+										<td class="geen-les" colspan="3" style="text-align:center;">Toetsweek &mdash; Hoofdstuk 5</td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<!-- ===== 4v.nat2 — maandag (uur 7) / dinsdag (uur 5) / donderdag (uur 2) ===== -->
+						<div class="tab-panel" id="p4-nat2">
+							<table>
+								<thead>
+									<tr>
+										<th>Week</th>
+										<th>Ma (uur 7)</th>
+										<th>Di (uur 5)</th>
+										<th>Do (uur 2)</th>
+										<th>Huiswerk</th>
+										<th>Opmerkingen</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>11</td>
+										<td class="geen-les">Docent afwezig (middag)</td>
+										<td>ABPS</td>
+										<td>ABPS</td>
+										<td></td>
+										<td>Toetsbespreking</td>
+									</tr>
+									<tr>
+										<td>12</td>
+										<td>ABPS</td>
+										<td>ABPS</td>
+										<td class="geen-les">Docent afwezig</td>
+										<td></td>
+										<td>Di 17 mrt 19:00 Sciencefair</td>
+									</tr>
+									<tr>
+										<td>13</td>
+										<td>H6.1</td>
+										<td>H6.1 + H6.2</td>
+										<td class="geen-les">Ontwikkeldag</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>14</td>
+										<td></td>
+										<td><small>(40 min)</small></td>
+										<td><small>(40 min)</small></td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>15</td>
+										<td class="geen-les">Tweede Paasdag</td>
+										<td>H6.5</td>
+										<td>H6.5</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>16</td>
+										<td>Modelleren 1</td>
+										<td>Modelleren 2</td>
+										<td>Modelleren 3</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>17-18</td>
+										<td class="geen-les" colspan="3" style="text-align:center;">Meivakantie (20 april t/m 5 mei)</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>19</td>
+										<td class="geen-les">Bevrijdingsdag</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>Check agenda</td>
+									</tr>
+									<tr>
+										<td>20</td>
+										<td class="geen-les">Docent afwezig</td>
+										<td class="geen-les">Docent afwezig</td>
+										<td class="geen-les">Hemelvaart</td>
+										<td></td>
+										<td>Geen lessen deze week</td>
+									</tr>
+									<tr>
+										<td>21</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>Verslag modelleren inleveren (cijfer)</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>22</td>
+										<td class="geen-les">Tweede Pinksterdag</td>
+										<td>H5.1</td>
+										<td>H5.1</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>23</td>
+										<td>H5.2</td>
+										<td>H5.2 <small>(40 min)</small></td>
+										<td>H5.2 <small>(40 min)</small></td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>24</td>
+										<td class="geen-les">Sportdag</td>
+										<td>H5.3</td>
+										<td>H5.3</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>25</td>
+										<td>H5.4</td>
+										<td>H5.4 + H5.5</td>
+										<td>H5.5</td>
+										<td>Alle opgaven</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>26</td>
+										<td>Herhaling</td>
+										<td>Herhaling</td>
+										<td>Herhaling <small>(40 min)</small></td>
+										<td>Examenopgaven</td>
+										<td>Activiteitenvrije week</td>
+									</tr>
+									<tr>
+										<td>27</td>
+										<td class="geen-les" colspan="3" style="text-align:center;">Toetsweek &mdash; Hoofdstuk 5</td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<script>
+						function switchP4Tab(e, tabId) {
+							var card = e.target.closest('.tabs-card');
+							card.querySelectorAll('.tab-button').forEach(function(b) { b.classList.remove('is-active'); });
+							card.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('is-active'); });
+							e.target.classList.add('is-active');
+							document.getElementById(tabId).classList.add('is-active');
+						}
+					</script>
 				</section>
 			</div>
 			<div class="section">
@@ -189,7 +350,7 @@
 								<td>Hoofdstuk 4.1 + ABPS</td>
 								<td>alle opgave</td>
 								<td>Dinsdag 13 januari WIN 5e uur bezet
-									<br>Woensdag 14 januari Kick-Off MDT 
+									<br>Woensdag 14 januari Kick-Off MDT
 									<br>Donderdag 15 januari VNN dag</td>
 							</tr>
 							<tr>
@@ -217,7 +378,7 @@
 								<td>7</td>
 								<td>Hoofdstuk 4.5 + ABPS</td>
 								<td>alle opgave</td>
-								<td>Dinsdag 10 februari iets met Lile? 
+								<td>Dinsdag 10 februari iets met Lile?
 									<br>Vrijdag 13 februari ontwikkeldag</td>
 							</tr>
 							<tr>
