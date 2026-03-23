@@ -710,7 +710,12 @@ const GradingUI = {
             this.aiGradedCategories[catIndex] = false;
         }
 
-        this.selectedCells[catIndex] = points;
+        // Toggle: clicking an already-selected cell deselects it
+        if (this.selectedCells[catIndex] === points) {
+            delete this.selectedCells[catIndex];
+        } else {
+            this.selectedCells[catIndex] = points;
+        }
 
         this.updateUISelection();
         this.updateCalculation();
