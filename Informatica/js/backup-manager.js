@@ -121,7 +121,7 @@ window.BackupManager = {
                                 if (row.Rubric_JSON) {
                                     rubric = JSON.parse(row.Rubric_JSON);
                                 }
-                            } catch (e) { console.warn("Rubric parse error", e); }
+                            } catch (e) { throw new Error('Error parsing rubric JSON for ' + email + ': ' + e.message); }
 
                             studentsMap[email].assignments.push({
                                 assignmentId: row.AssignmentID,
@@ -142,29 +142,41 @@ window.BackupManager = {
                     const db = firebase.firestore();
                     const resultsRef = db.collection("results");
                     
-                    // Delete all existing docs
+                    // Delete all existing docs (Batched)
                     const snapshot = await resultsRef.get();
-                    const deleteBatchSize = 400; // Limit
-                    // Simple approach: delete one by one or in chunks.
-                    // For safety vs speed: delete all first.
-                    const deletePromises = [];
-                    snapshot.forEach(doc => {
-                        deletePromises.push(doc.ref.delete());
-                    });
-                    await Promise.all(deletePromises);
+                    let count = 0;
+                    let batch = db.batch();
+                    for (const doc of snapshot.docs) {
+                        batch.delete(doc.ref);
+                        count++;
+                        if (count % 500 === 0) {
+                            await batch.commit();
+                            batch = db.batch();
+                        }
+                    }
+                    if (count % 500 !== 0) await batch.commit();
                     // Existing results cleared
 
-                    // 3. Insert New Data
+                    // 3. Insert New Data (Batched)
                     const entries = Object.values(studentsMap);
+                    count = 0;
+                    batch = db.batch();
                     for (const student of entries) {
-                        await resultsRef.add({
+                        const newDocRef = resultsRef.doc();
+                        batch.set(newDocRef, {
                             email: student.email,
                             name: student.name,
                             class: student.class,
                             assignments: student.assignments,
                             lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
+                        count++;
+                        if (count % 500 === 0) {
+                            await batch.commit();
+                            batch = db.batch();
+                        }
                     }
+                    if (count % 500 !== 0) await batch.commit();
 
                     if (statusMsg) statusMsg.textContent = "Herstel voltooid!";
                     alert("Backup succesvol teruggezet. Pagina wordt herladen.");

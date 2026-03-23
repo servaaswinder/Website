@@ -248,4 +248,5 @@ def delete_student():
 
 if __name__ == '__main__':
     print("🚀 Starting Admin Backend on port 5000...")
-    app.run(port=5000, debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 'yes')
+    app.run(port=5000, debug=debug_mode)
