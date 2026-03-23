@@ -17,11 +17,11 @@
 <p class="subtitle">Representeren (C3)</p>
 <div class="meta" style="margin-top: 10px; color: #666;">
     <span><strong>Tijdsindicatie:</strong> 1 tot 2 uur</span> |
-    <span><strong>Niveau:</strong> 2</span> |
+    <span><strong>Niveau:</strong> 1</span> |
     <span><strong>Domein:</strong> C3</span>
 </div>
 </section>
-<section class='content' style="max-width: 800px; margin: 0 auto; padding: 20px;">
+<section class='content' style="max-width: 1100px; margin: 0 auto; padding: 20px;">
 <h2>Doel van de opdracht</h2>
 <p>In deze opdracht leer je hoe je een dataset omzet naar een duidelijke grafiek of diagram. Je gebruikt de Eredivisie 2023/2024 dataset en Python in Google Colab om zelf te kiezen welke informatie je visueel wilt maken.</p>
 
@@ -31,6 +31,8 @@
     <li>Het bestand <a href="https://www.football-data.co.uk/mmz4281/2526/N1.csv" download>Voetbaldata 2023_2024.csv</a></li>
     <li>Uitleg over de afkortingen: <a href="https://www.football-data.co.uk/notes.txt" target="_blank" rel="noopener">football-data.co.uk/notes.txt</a></li>
 </ul>
+
+<p style="background-color: #e8f4f8; padding: 10px; border-left: 5px solid #17a2b8; font-size: 0.9em;"><strong>Voorkennis:</strong> Je hebt bij C5 (Gestructureerde data) geleerd hoe je data laadt met <code>pd.read_csv()</code>, verkent met <code>df.head()</code>, en grafieken maakt met matplotlib. In deze opdracht pas je die vaardigheden zelfstandig toe op een onderwerp naar keuze.</p>
 
 <h2>Opdracht</h2>
 <ul>
@@ -45,7 +47,7 @@
     </li>
     <li>Maak met behulp van <strong>matplotlib</strong> of <strong>pandas</strong> een grafiek (bijvoorbeeld staafdiagram, cirkeldiagram of histogram).</li>
     <li>Zorg dat je grafiek een <strong>titel</strong>, <strong>as-labels</strong> en, indien nodig, een <strong>legenda</strong> heeft.</li>
-    <li>Plaats de grafiek in je portfolio met een korte uitleg (2-3 zinnen) wat je ziet.</li>
+    <li>Plaats de grafiek in je portfolio met een uitleg waarin je beschrijft wat de grafiek laat zien, welke patronen of opvallendheden je herkent, en wat een mogelijke verklaring is.</li>
 </ul>
 
 <h2>Beoordelingsmodel</h2>
@@ -58,6 +60,7 @@
             <th style="padding: 12px; text-align: left;">1 punt</th>
             <th style="padding: 12px; text-align: left;">2 punten</th>
             <th style="padding: 12px; text-align: left;">3 punten</th>
+            <th style="padding: 12px; text-align: left;">4 punten</th>
         </tr>
     </thead>
     <tbody>
@@ -66,26 +69,41 @@
             <td style="padding: 12px;">Geen data ingeladen of fout bestand.</td>
             <td style="padding: 12px;">Data is ingeladen maar niet gebruikt.</td>
             <td style="padding: 12px;">Data correct ingeladen en gebruikt voor eenvoudige analyse.</td>
-            <td style="padding: 12px;">Data correct ingeladen en bewerkt zodat deze goed bruikbaar is.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Data correct ingeladen en bewerkt zodat deze goed bruikbaar is.<br>
+                <strong>VWO:</strong> Daarnaast heeft de leerling de data zelf gefilterd of getransformeerd (bijv. groeperen, sorteren, berekeningen) voor de gekozen visualisatie.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Visualisatie</strong></td>
             <td style="padding: 12px;">Geen grafiek gemaakt.</td>
             <td style="padding: 12px;">Grafiek is onduidelijk of onvolledig.</td>
             <td style="padding: 12px;">Grafiek is correct maar mist afwerking (labels/titel).</td>
-            <td style="padding: 12px;">Grafiek is volledig, duidelijk en professioneel opgemaakt.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Grafiek is volledig, duidelijk en professioneel opgemaakt (titel, labels, legenda).<br>
+                <strong>VWO:</strong> Daarnaast is het grafiektype bewust gekozen en kan de leerling uitleggen waarom dit type het beste past bij de gekozen data.
+            </td>
+            <td style="padding: 12px;">De leerling heeft een onverwachte toevoeging gedaan, zoals meerdere grafieken die samen een verhaal vertellen, of een interactieve visualisatie.</td>
         </tr>
         <tr style="border-bottom: 1px solid #e6e8ee;">
             <td style="padding: 12px;"><strong>Uitleg</strong></td>
             <td style="padding: 12px;">Geen uitleg.</td>
             <td style="padding: 12px;">Uitleg is onjuist of onvolledig.</td>
-            <td style="padding: 12px;">Uitleg is juist maar summier.</td>
-            <td style="padding: 12px;">Uitleg is juist, volledig en duidelijk.</td>
+            <td style="padding: 12px;">Uitleg beschrijft wat de grafiek laat zien, maar zonder analyse.</td>
+            <td style="padding: 12px;">
+                <strong>Havo:</strong> Uitleg beschrijft wat de grafiek laat zien én benoemt patronen of opvallendheden.<br>
+                <strong>VWO:</strong> Daarnaast geeft de leerling een mogelijke verklaring voor de gevonden patronen en benoemt beperkingen van de data.
+            </td>
+            <td style="padding: 12px; color: #999; font-style: italic;">N.v.t.</td>
         </tr>
     </tbody>
 </table>
 </div>
-<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 9) * 9 + 1</p>
+<div style="background-color: #fff3cd; padding: 10px; border-left: 5px solid #ffc107; margin-top: 15px; font-size: 0.9em;">
+    <strong>Let op:</strong> Je moet in <em>elke</em> categorie minimaal 1 punt halen. Als je op een onderdeel 0 punten scoort, wordt de opdracht <strong>niet nagekeken</strong> en moet je deze eerst aanvullen.
+</div>
+<p style="margin-top: 20px; font-style: italic; color: #666;">Cijfer = (totaal aantal punten / 10) * 9 + 1</p>
 </section>
 </main>
 {% include site-footer-informatica.html %}

@@ -1,0 +1,989 @@
+---
+---
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Informatica - Opdrachtenboom</title>
+		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script
+			type="text/javascript"
+			src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+		></script>
+		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
+		<script src="js/student-utils.js"></script>
+		<style>
+			#mynetwork {
+				width: 100%;
+				height: 80vh;
+				border: 1px solid lightgray;
+				background-color: #f9f9f9;
+			}
+
+			main.site-content {
+				max-width: none;
+				width: 100%;
+				padding: 40px clamp(20px, 5vw, 80px);
+			}
+
+			.tree-container {
+				max-width: none;
+			}
+
+			.network-tooltip {
+				position: absolute;
+				padding: 0.4rem 0.6rem;
+				background: rgba(34, 34, 34, 0.9);
+				color: #fff;
+				border-radius: 4px;
+				font-size: 0.85rem;
+				pointer-events: none;
+				white-space: nowrap;
+				opacity: 0;
+				transition: opacity 0.15s ease;
+				z-index: 10;
+			}
+
+			.network-tooltip.is-visible {
+				opacity: 1;
+			}
+
+			#mynetwork.node-hover,
+			#mynetwork.node-hover canvas {
+				cursor: pointer !important;
+			}
+
+			html,
+			body {
+				min-width: fit-content;
+			}
+
+			.zoom-controls {
+				position: absolute;
+				bottom: 20px;
+				right: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				z-index: 100;
+			}
+
+			.zoom-controls button {
+				width: 36px;
+				height: 36px;
+				border: 1px solid #ccc;
+				background: #fff;
+				border-radius: 4px;
+				font-size: 18px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+				transition: background-color 0.2s;
+				color: #333;
+			}
+
+			.zoom-controls button:hover {
+				background-color: #f0f0f0;
+			}
+		</style>
+	</head>
+	<body>
+		{% include site-header-informatica.html %}
+		<main class="site-content">
+			<section class="assignments-hero">
+				<h1>Opdrachtenoverzicht Informatica</h1>
+				<p>
+					Hieronder vind je de opdrachtenboom (skill tree). Werk van boven naar
+					beneden: begin bij de portfoliostartopdracht en volg de lijnen naar de
+					vervolgopdrachten. Sleep om te bewegen, gebruik de knoppen om te zoomen.
+				</p>
+			</section>
+
+			<section id="guest-banner" class="auth-card" style="display: none; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e6e8ee; border-radius: 14px; background: #fff; box-shadow: 0 10px 25px rgba(20, 30, 60, 0.08); text-align: center;">
+				<h2 style="margin-top: 0;">Welkom bij Informatica</h2>
+				<p>Log in om de opdrachtenboom te bekijken en je voortgang te zien.</p>
+				<a href="login.html?redirect=informatica_opdrachten.html" class="inf-button" style="display: inline-block; text-decoration: none;">Inloggen</a>
+			</section>
+
+			<div id="logged-in-controls" style="display: none; max-width: 1200px; margin: 0 auto 20px; padding: 0 20px; text-align: right;">
+				<!-- 'Ingelogd als' removed as per request -->
+			</div>
+
+			<section class="tree-container" style="display: none; position: relative;">
+				<div id="mynetwork"></div>
+				<div class="zoom-controls">
+					<button id="zoom-in" title="Inzoomen">+</button>
+					<button id="zoom-out" title="Uitzoomen">−</button>
+					<button id="zoom-reset" title="Reset zoom">⟲</button>
+				</div>
+
+			</section>
+
+
+
+			<script type="text/javascript">
+				// Create an array with nodes
+				var nodes = new vis.DataSet([
+					// Root
+					{
+						id: "A3",
+						label: "<b>Portfoliostartopdracht (A3)</b>\nMaak je eigen website\nNiveau 1",
+						title: "Bouw je eigen portfolio-site, voeg achtergrondinformatie toe en deel de link met je docenten.",
+						shape: "box",
+						borderWidth: 4,
+						color: { background: "#fff", border: "#4a90d9" },
+						font: { multi: "html", size: 15 },
+						url: "opdrachten/portfoliostartopdracht_a3.html",
+						x: 0, y: -420
+					},
+
+					// Thema 1: Communiceren
+					{
+						id: "A2",
+						label: "<b>Communiceren (A2)</b>\nSamenwerken\nNiveau 2",
+						title: "Maak een infografic over internetveiligheid",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a2_communiceren.html",
+						x: -250, y: -280
+					},
+					{
+						id: "A5",
+						label: "<b>Onderzoeken (A5)</b>\nOnderzoeksmethoden\nNiveau 1",
+						title: "Doe onderzoek naar sociale media gebruik en analyseer de resultaten.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a5_onderzoeken.html",
+						x: -750, y: -280
+					},
+					{
+						id: "F2",
+						label: "<b>Maatschappelijke aspecten (F2)</b>\nImpact op samenleving\nNiveau 2",
+						title: "Onderzoek hoe sociale media persoonlijke relaties beïnvloeden en schrijf hierover een onderbouwd verslag.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f2_maatschappij.html",
+						x: -750, y: 280
+					},
+					{
+						id: "A4",
+						label: "<b>Orienteren op studie en beroep (A4)\nToekomstorientatie",
+						title: "Hier komt uitleg over orienteren op studie en beroep...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a4_orienteren.html",
+						x: -500, y: -140
+					},
+					{
+						id: "A1",
+						label: "<b>Informatievaardigheden (A1)</b>\nInfo zoeken\nNiveau 2",
+						title: "Zoek een recent datalek, analyseer de oorzaken en stel maatregelen voor in een kort verslag.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a1_informatievaardigheden.html",
+						x: -250, y: 0
+					},
+					{
+						id: "A7",
+						label: "<b>Waarderen en oordelen (A7)</b>\nKritische blik\nNiveau 2",
+						title: "Bereid een debat voor over ethische dilemma's rondom AI en reflecteer op de uitkomst.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a7_waarderen.html",
+						x: -500, y: 0
+					},
+					{
+						id: "E2",
+						label: "<b>Security (E2)</b>\nGegevens veilig houden\nNiveau 2",
+						title: "Maak een overzicht van cyberdreigingen (phishing, malware, DDoS) en preventie.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/e2_security.html",
+						x: -250, y: 140
+					},
+					{
+						id: "F4",
+						label: "<b>Security (F4)</b>\nWachtwoorden\nNiveau 1",
+						title: "Ontwerp een poster met tips voor veilige wachtwoorden.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f4_security.html",
+						x: -250, y: 280
+					},
+					{
+						id: "F3",
+						label: "<b>Privacy (F3)</b>\nPrivacy\nNiveau 1",
+						title: "Analyseer een recente privacyschending en stel maatregelen voor.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f3_privacy.html",
+						x: -250, y: 420
+					},
+
+					// Thema 2: Modelleren
+					{
+						id: "ModIntro",
+						label: "<b>Cursus Leren Modelleren\nIntroductie",
+						title: "Hier komt uitleg over de cursus leren modelleren...",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/modintro_leren_modelleren.html",
+						x: 0, y: -280
+					},
+					{
+						id: "A6",
+						label: "<b>Modelleren (A6)</b>\nModellen opstellen\nNiveau 1",
+						title: "Simuleer de populatie van vossen en konijnen op Terschelling met een wiskundig model.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/a6_modelleren.html",
+						x: 0, y: -140
+					},
+					{
+						id: "C5",
+						label: "<b>Gestructureerde data (C5)</b>\nDatabases\nNiveau 1",
+						title: "Analyseer Eredivisie-data met Python en Pandas.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c5_gestructureerde_data.html",
+						x: 0, y: 0
+					},
+					{
+						id: "C1",
+						label: "<b>Warming Stripes (C1)</b>\nData visualisatie\nNiveau 2",
+						title: "Visualiseer klimaatverandering met Python en data van het KNMI.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c1_warming_stripes.html",
+						x: 0, y: 420
+					},
+					{
+						id: "C2",
+						label: "<b>Identificeren (C2)</b>\nPatronen herkennen\nNiveau 1",
+						title: "Analyseer voetbaldata met Python en pandas en identificeer trends.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c2_identificeren.html",
+						x: 0, y: 280
+					},
+					{
+						id: "B3",
+						label: "<b>Automaten (B3)</b>\nToestandsdiagrammen\nNiveau 1",
+						title: "Bouw en programmeer een digitale thermometer met Arduino.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b3_automaten.html",
+						x: 250, y: -140
+					},
+					{
+						id: "B1",
+						label: "<b>Algoritme (B1)</b>\nStappenplannen\nNiveau 2",
+						title: "Ontwerp en programmeer een slim lichtsysteem met Arduino dat reageert op aanwezigheid.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b1_algoritme.html",
+						x: 250, y: 0
+					},
+					{
+						id: "B2",
+						label: "<b>Datastructuren (B2)</b>\nKies structuur\nNiveau 2",
+						title: "Vergelijk de efficiëntie van lijsten en sets door de zoeksnelheid te meten in Python.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b2_datastructuren.html",
+						x: 500, y: 0
+					},
+					{
+						id: "C3",
+						label: "<b>Representaren (C3)</b>\nStructuren herkennen\nNiveau 1",
+						title: "Analyseer voetbaldata met Python en pandas en identificeer trends.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c3_representeren.html",
+						x: 0, y: 140
+					},
+					{
+						id: "D1",
+						label: "<b>Ontwikkelen (D1)</b>\nProgrammeren\nNiveau 2",
+						title: "Programmeer een rekenspel met Python (random getallen, input/output).",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/d1_ontwikkelen.html",
+						x: 250, y: 140
+					},
+					{
+						id: "D2",
+						label: "<b>Inspecteren en aanpassen (D2)</b>\nTesten\nNiveau 2",
+						title: "Test en corrigeer een Python programma met gebruik van een debugger.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/d2_inspecteren.html",
+						x: 500, y: 140
+					},
+
+					// Thema 3: HTML
+					{
+						id: "B4",
+						label: "<b>Introductie HTML (B4)</b>\nNieuwe website\nNiveau 1",
+						title: "Leer de basis van HTML en bouw je eerste eigen webpagina.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/b4_introductie_html.html",
+						x: 500, y: -140
+					},
+					{
+						id: "F1",
+						label: "<b>Usability (F1)</b>\nGebruiksvriendelijkheid\nNiveau 2",
+						title: "Analyseer de usability en toegankelijkheid van je site en maak een redesign.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/f1_usability.html",
+						x: 750, y: -140
+					},
+
+					// Thema 4: Standaard-representaties
+					{
+						id: "C4",
+						label: "<b>Standaard representaties (C4)</b>\nBinair rekenen\nNiveau 1",
+						title: "Leer binair rekenen en maak een uitlegpagina op je portfolio.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/c4_standaard_representaties.html",
+						x: 500, y: -280
+					},
+
+					// Thema 5: Decompositie
+					{
+						id: "E1",
+						label: "<b>Decompositie (E1)</b>\nHardware\nNiveau 2",
+						title: "Haal een computer uit elkaar, benoem de onderdelen en geef hardware-advies.",
+						shape: "box",
+						color: { background: "#fff", border: "#ccc" },
+						font: { multi: "html" },
+						url: "opdrachten/e1_decompositie.html",
+						x: 500, y: -420
+					},
+
+					// Eindopdracht
+					{
+						id: "Eind1",
+						label: "<b>Game Development (Eind)</b>\nEindopdracht\nNiveau 3",
+						title: "Ontwikkel drie games (Pong, Snake, Flappy Bird) en versla de eindbaas met je eigen creatie.",
+						shape: "box",
+						color: { background: "#ffeaea", border: "#ff4444" },
+						font: { multi: "html" },
+						url: "opdrachten/eindopdracht_gamedev.html",
+						x: -250, y: 560
+					},
+					{
+						id: "Eind2",
+						label: "<b>Webshop (Eind)</b>\nEindopdracht\nNiveau 3",
+						title: "Ontwerp en bouw een volledig werkende webshop.",
+						shape: "box",
+						color: { background: "#ffeaea", border: "#ff4444" },
+						font: { multi: "html" },
+						url: "opdrachten/eindopdracht_webshop.html",
+						x: 0, y: 560
+					},
+				]);
+
+				var STATUS_STYLES = {
+					locked: {
+						background: "#eff1f5",
+						border: "#c9cedb",
+						label: "🔒 Vergrendeld",
+					},
+					unlocked: {
+						background: "#fff7e3",
+						border: "#f5c461",
+						label: "🔓 Vrij",
+					},
+					completed: {
+						background: "#e6f5ec",
+						border: "#2d8f5b",
+						label: "✔️ Voltooid",
+					},
+				};
+
+				// Default logic for visitors (non-logged in)
+				var startNodeId = "A3";
+				var unlockedAfterStart = ["A2", "B4", "C4", "E1"]; // ModIntro removed as it is now completed
+				var nodeStatusMap = {};
+				
+				// Initialize default status
+				nodes.get().forEach(function (node) {
+					nodeStatusMap[node.id] = "locked";
+				});
+				nodeStatusMap[startNodeId] = "completed";
+				nodeStatusMap["ModIntro"] = "completed"; // Always completed
+
+				unlockedAfterStart.forEach(function (id) {
+					if (nodeStatusMap[id] !== "completed") {
+						nodeStatusMap[id] = "unlocked";
+					}
+				});
+
+				// Firebase Initialisatie (Gecentraliseerd in header)
+				const auth = firebase.auth();
+				const db = firebase.firestore();
+
+				// Haal studentdata op (Resultaten én Inzendingen) en update de boom
+				async function loadStudentProgress(user) {
+					try {
+                        const resultsPromise = (async () => {
+                            const doc = await resolveStudentDocument(db, user, /* logFn= */ console.log);
+                            return (doc && doc.exists) ? (doc.data().assignments || []) : [];
+                        })();
+
+                        const submissionsPromise = db.collection("submissions")
+                            .where("userId", "==", user.uid)
+                            .get()
+                            .then(snapshot => snapshot.docs.map(doc => doc.data()));
+
+                        const [assignments, submissions] = await Promise.all([resultsPromise, submissionsPromise]);
+                        
+                        // Get user class from the doc we already resolved
+                        let userClass = "";
+                        const doc = await resolveStudentDocument(db, user, () => {});
+                        if (doc && doc.exists) {
+                            userClass = doc.data().userClass || doc.data().klas || "";
+                        }
+                        
+						updateTreeWithProgress(assignments, submissions, userClass);
+
+					} catch (error) {
+						console.error("Fout bij ophalen voortgang:", error);
+					}
+				}
+
+				function updateTreeWithProgress(assignments, submissions, userClass) {
+					const completedMap = new Map(); // Real grades
+                    const submissionMap = new Map(); // Pending/Rejected states
+
+					assignments.forEach((a) => {
+						if (a.title) {
+							const cleanTitle = String(a.title).trim();
+							completedMap.set(cleanTitle, a);
+						}
+					});
+                    
+                    if (submissions) {
+                        submissions.forEach(s => {
+                           if (s.assignmentId) {
+                               // Keep latest status if multiple (though rules imply 1 active usually)
+                               // Logic: Rejected overwrites Pending. Graded overwrites everything (but handled by completedMap).
+                               // We just store the object.
+                               submissionMap.set(s.assignmentId, s);
+                           } 
+                        });
+                    }
+
+					// Force ModIntro to be completed for everyone
+					completedMap.set("ModIntro", { title: "ModIntro", grade: null });
+
+					// Bouw een map van parent-relaties om dependencies te checken
+					const parentsMap = {}; // childId -> [parentIds]
+					nodes.getIds().forEach((id) => {
+						parentsMap[id] = [];
+					});
+					edges.get().forEach((edge) => {
+						if (parentsMap[edge.to]) {
+							parentsMap[edge.to].push(edge.from);
+						}
+					});
+
+					// Bepaal status voor elke node
+					const updates = [];
+					nodes.get().forEach((node) => {
+						let status = "locked";
+						let grade = null;
+                        let badgeIcon = ""; // custom icon badge
+                        let borderColorOverride = null;
+                        let bgColorOverride = null;
+
+						if (completedMap.has(node.id)) {
+							status = "completed";
+							const assignment = completedMap.get(node.id);
+							if (assignment && assignment.grade) {
+								grade = assignment.grade;
+							}
+						} else if (submissionMap.has(node.id)) {
+                            // No grade yet, but has submission
+                            const sub = submissionMap.get(node.id);
+                            if (sub.status === 'rejected') {
+                                status = 'rejected';
+                                borderColorOverride = "#dc3545"; // Red
+                                bgColorOverride = "#f8d7da";
+                                badgeIcon = "⚠️";
+                            } else if (sub.status === 'pending' || sub.status === 'checked') {
+                                status = 'pending';
+                                borderColorOverride = "#fd7e14"; // Orange
+                                bgColorOverride = "#fff3cd";
+                                badgeIcon = "🕒";
+                            } else {
+                                // Fallback logic (e.g. graded but not in CSV yet? unlikely with clean workflow)
+                                status = 'pending';
+                            }
+                        } 
+                        
+                        // --- FINAL PROJECT LOGIC (YEAR FILTER) ---
+                        // Rule: 4th graders = Locked. 5th graders = Unlocked.
+                        // We check if node is a final project (Eind1, Eind2)
+                        // If it is ALREADY COMPLETED or HAS SUBMISSION, we respect that status (don't lock it back).
+                        // Otherwise, we apply the year filter.
+                        if ((node.id === "Eind1" || node.id === "Eind2") && status !== 'completed' && status !== 'pending' && status !== 'rejected') {
+                             if (userClass) {
+                                 // Check for '4' at start (e.g. 4H, 4V, 4 Havo)
+                                 const normalizedClass = userClass.trim().toUpperCase();
+                                 if (normalizedClass.startsWith("4")) {
+                                     status = "locked"; // Force lock for 4th year
+                                 } else if (normalizedClass.startsWith("5")) {
+                                     status = "unlocked"; // Force unlock for 5th year
+                                 }
+                                 // If class is unknown or empty, we stick to default (which is unlocked for these orphans), or maybe lock?
+                                 // Let's stick to default behavior if class is unclear, or maybe lock safe?
+                                 // User said "alle 5e klassers VRIJ, alle 4e klassers LOCK".
+                                 // Safe default: Lock if not explicitly 5? No, let's just implement the request strict.
+                             }
+                        } 
+                        
+                        if (status === 'locked' || status === 'unlocked') {
+							// Check of alle parents voltooid zijn
+							const parents = parentsMap[node.id];
+							if (parents.length === 0) {
+								status = "unlocked";
+							} else {
+								const allParentsCompleted = parents.every((parentId) =>
+									completedMap.has(parentId)
+								);
+								if (allParentsCompleted) {
+									status = "unlocked";
+								}
+							}
+						}
+
+						const config = STATUS_STYLES[status] || STATUS_STYLES.locked;
+						
+						let currentBaseLabel = node.baseLabel;
+						if (!currentBaseLabel) {
+							currentBaseLabel = node.label; 
+						}
+						
+						let badge = "\n" + config.label;
+                        if (status === 'rejected') badge = "\n❌ Afgekeurd";
+                        if (status === 'pending') badge = "\n🕒 Ingeleverd";
+						
+						updates.push({
+							id: node.id,
+							label: currentBaseLabel + badge,
+							shape: 'box',
+							color: {
+								background: bgColorOverride || config.background,
+								border: borderColorOverride || config.border,
+							},
+							status: status,
+							baseLabel: currentBaseLabel,
+							grade: grade // Store grade for canvas drawing
+						});
+					});
+
+					nodes.update(updates);
+				}
+
+				// Auth UI elements
+				const guestBanner = document.getElementById("guest-banner");
+				const treeContainer = document.querySelector(".tree-container");
+				const loggedInControls = document.getElementById("logged-in-controls");
+
+
+
+				function applyStatusStyles() {
+					nodes.get().forEach(function (node) {
+						var status = node.status || nodeStatusMap[node.id] || "locked";
+						var config = STATUS_STYLES[status] || STATUS_STYLES.locked;
+						
+						var baseLabel = node.baseLabel;
+						if (!baseLabel) {
+							baseLabel = node.label;
+						}
+
+						var badge = "\n" + config.label;
+						var font = Object.assign({}, node.font || {});
+						font.multi = "html";
+						font.color = "#333";
+						
+						nodes.update({
+							id: node.id,
+							baseLabel: baseLabel,
+							label: baseLabel + badge,
+							shape: 'box',
+							image: undefined,
+							color: {
+								background: config.background,
+								border: config.border,
+							},
+							font: font,
+							status: status,
+							grade: null
+						});
+					});
+				}
+
+				applyStatusStyles();
+
+				// Create an array with edges
+				var edges = new vis.DataSet([
+					// Root connections
+					{ from: "A3", to: "A2" },
+					{ from: "A3", to: "ModIntro" },
+					{ from: "A3", to: "B4" },
+					{ from: "A3", to: "C4" },
+					{ from: "A3", to: "E1" },
+
+					// Thema 1: Communiceren
+					{ from: "A2", to: "A5" },
+					{ from: "A2", to: "A4" },
+					{ from: "A2", to: "A1" },
+					{ from: "A5", to: "F2" },
+					{ from: "A1", to: "A7" },
+					{ from: "A1", to: "E2" },
+					{ from: "E2", to: "F4" },
+					{ from: "F4", to: "F3" },
+
+					// Thema 2: Modelleren
+					{ from: "ModIntro", to: "A6" },
+					{ from: "A6", to: "C5" },
+					{ from: "A6", to: "B3" },
+					{ from: "C5", to: "C3" },
+					{ from: "C3", to: "C2" },
+					{ from: "C2", to: "C1" },
+					{ from: "B3", to: "B1" },
+					{ from: "B1", to: "B2" },
+					{ from: "C3", to: "D1" },
+					{ from: "D1", to: "D2" },
+
+					// Thema 3: HTML
+					{ from: "B4", to: "F1" },
+
+					// Cross-links
+					{ from: "F2", to: "F3" },
+				]);
+
+				// Create a network
+				var container = document.getElementById("mynetwork");
+				var data = {
+					nodes: nodes,
+					edges: edges,
+				};
+				var options = {
+					nodes: {
+						borderWidth: 2,
+						shadow: true,
+						margin: 10,
+						font: {
+							face: "Segoe UI",
+							size: 14,
+							color: "#333",
+						},
+						widthConstraint: { minimum: 200, maximum: 200 },
+						fixed: {
+							x: true,
+							y: true
+						}
+					},
+					edges: {
+						smooth: {
+                            type: 'cubicBezier',
+                            roundness: 0.4,
+							forceDirection: "none"
+                        },
+						arrows: {
+							to: { enabled: true, scaleFactor: 0.5 },
+						},
+						color: {
+							color: "#ccc",
+							highlight: "#94a0b4",
+						},
+					},
+					physics: {
+						enabled: false
+					},
+					interaction: {
+						dragNodes: false,
+						hover: true,
+						zoomView: false,
+					},
+				};
+                
+                var network = null;
+
+                function initNetwork() {
+                    if (network !== null) return; // Already initialized
+
+                    // Check if container is visible
+                    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+                        setTimeout(initNetwork, 200);
+                        return;
+                    }
+
+                    network = new vis.Network(container, data, options);
+                    
+                    // Theme Clusters Definition
+                    var clusters = [
+                        {
+                            label: "Thema 1: Maatschappij & Interactie",
+                            color: "rgba(232, 240, 254, 0.6)", // Blue
+                            nodes: ["A2", "A5", "F2", "A4", "A1", "A7", "E2", "F4", "F3"]
+                        },
+                        {
+                            label: "Thema 2: Modelleren, Data & Programmeren",
+                            color: "rgba(230, 244, 234, 0.6)", // Green
+                            nodes: ["ModIntro", "A6", "C5", "C1", "C2", "C3", "B1", "B2", "B3", "D1", "D2"]
+                        },
+                        {
+                            label: "Thema 3, 4 & 5: Web & Systeem", 
+                            color: "rgba(254, 239, 195, 0.6)", // Yellow
+                            nodes: ["B4", "F1", "C4", "E1"]
+                        },
+                        {
+                            label: "Eindopdrachten",
+                            color: "rgba(252, 232, 230, 0.6)", // Red
+                            nodes: ["Eind1", "Eind2"]
+                        }
+                    ];
+
+                    // Draw backgrounds for clusters
+                    network.on("beforeDrawing", function(ctx) {
+                        clusters.forEach(function(cluster) {
+                            var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                            var hasNodes = false;
+                            
+                            cluster.nodes.forEach(function(nodeId) {
+                                // We use getBoundingBox to ensure we cover the whole node size
+                                try {
+                                    var box = network.getBoundingBox(nodeId); 
+                                    if (box) {
+                                        hasNodes = true;
+                                        minX = Math.min(minX, box.left);
+                                        maxX = Math.max(maxX, box.right);
+                                        minY = Math.min(minY, box.top);
+                                        maxY = Math.max(maxY, box.bottom);
+                                    }
+                                } catch (e) {
+                                    // Node might not be present or visible yet
+                                }
+                            });
+
+                            if (hasNodes) {
+                                var padding = 20; // Padding around the nodes
+                                minX -= padding;
+                                maxX += padding;
+                                minY -= padding;
+                                maxY += padding;
+                                
+                                // Draw rounded rectangle
+                                var radius = 15;
+                                ctx.fillStyle = cluster.color;
+                                ctx.beginPath();
+                                ctx.moveTo(minX + radius, minY);
+                                ctx.lineTo(maxX - radius, minY);
+                                ctx.quadraticCurveTo(maxX, minY, maxX, minY + radius);
+                                ctx.lineTo(maxX, maxY - radius);
+                                ctx.quadraticCurveTo(maxX, maxY, maxX - radius, maxY);
+                                ctx.lineTo(minX + radius, maxY);
+                                ctx.quadraticCurveTo(minX, maxY, minX, maxY - radius);
+                                ctx.lineTo(minX, minY + radius);
+                                ctx.quadraticCurveTo(minX, minY, minX + radius, minY);
+                                ctx.fill();
+                                
+                                // Draw Label
+                                ctx.font = "bold 14px 'Segoe UI', Arial, sans-serif";
+                                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                                ctx.textAlign = "left";
+                                ctx.textBaseline = "bottom";
+                                ctx.fillText(cluster.label.toUpperCase(), minX, minY - 8);
+                            }
+                        });
+                    });
+
+                    // Tooltip that appears when hovering nodes
+                    var tooltip = document.createElement("div");
+                    tooltip.className = "network-tooltip";
+                    document.body.appendChild(tooltip);
+                    var hoveredNodeId = null;
+
+                    function setTooltipPosition(pointer) {
+                        var rect = container.getBoundingClientRect();
+                        tooltip.style.left = rect.left + pointer.x + 15 + "px";
+                        tooltip.style.top = rect.top + pointer.y - 10 + "px";
+                    }
+
+                    function hideTooltip() {
+                        hoveredNodeId = null;
+                        tooltip.classList.remove("is-visible");
+                        container.classList.remove("node-hover");
+                    }
+
+                    network.on("hoverNode", function (params) {
+                        hoveredNodeId = params.node;
+                        var nodeData = nodes.get(params.node) || {};
+                        var tooltipContent =
+                            nodeData.title || "Hier komt later meer info over deze opdracht.";
+                        tooltip.textContent = tooltipContent;
+                        setTooltipPosition(params.event.pointer.DOM);
+                        tooltip.classList.add("is-visible");
+                        container.classList.add("node-hover");
+                    });
+
+                    network.on("pointerMove", function (params) {
+                        if (hoveredNodeId !== null) {
+                            setTooltipPosition(params.pointer.DOM);
+                        }
+                    });
+
+                    network.on("blurNode", hideTooltip);
+                    network.on("dragStart", hideTooltip);
+                    network.on("zoom", hideTooltip);
+
+                    network.on("click", function (params) {
+                        if (params.nodes.length === 0) {
+                            return;
+                        }
+                        var nodeId = params.nodes[0];
+                        var nodeData = nodes.get(nodeId) || {};
+                        if (nodeData.url) {
+                            window.location.href = nodeData.url;
+                        }
+                    });
+
+                    // Custom drawing for grade badges
+                    network.on("afterDrawing", function (ctx) {
+                        nodes.get().forEach(function (node) {
+                            if (node.status === "completed" && node.grade) {
+                                var box = network.getBoundingBox(node.id);
+                                var x = box.right;
+                                var y = box.top;
+                                
+                                ctx.fillStyle = "#007bff";
+                                ctx.beginPath();
+                                var text = String(node.grade);
+                                var padding = 6;
+                                var fontSize = 12;
+                                ctx.font = "bold " + fontSize + "px Arial";
+                                var textWidth = ctx.measureText(text).width;
+                                var badgeWidth = textWidth + padding * 2;
+                                var badgeHeight = fontSize + padding;
+                                
+                                var badgeX = x - badgeWidth / 2;
+                                var badgeY = y - badgeHeight / 2;
+                                
+                                var r = 8;
+                                ctx.beginPath();
+                                ctx.moveTo(badgeX + r, badgeY);
+                                ctx.lineTo(badgeX + badgeWidth - r, badgeY);
+                                ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + r);
+                                ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - r);
+                                ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - r, badgeY + badgeHeight);
+                                ctx.lineTo(badgeX + r, badgeY + badgeHeight);
+                                ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - r);
+                                ctx.lineTo(badgeX, badgeY + r);
+                                ctx.quadraticCurveTo(badgeX, badgeY, badgeX + r, badgeY);
+                                ctx.fill();
+                                
+                                ctx.fillStyle = "#ffffff";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText(text, badgeX + badgeWidth / 2, badgeY + badgeHeight / 2);
+                            }
+                        });
+                    });
+
+                    // Initial fit
+                    network.fit();
+                }
+
+				// Zoom controls functionality
+				document.getElementById("zoom-in").addEventListener("click", function() {
+                    if (!network) return;
+					var scale = network.getScale();
+					network.moveTo({
+						scale: scale * 1.2,
+						animation: { duration: 300, easingFunction: "easeInOutQuad" }
+					});
+				});
+
+				document.getElementById("zoom-out").addEventListener("click", function() {
+                    if (!network) return;
+					var scale = network.getScale();
+					network.moveTo({
+						scale: scale * 0.8,
+						animation: { duration: 300, easingFunction: "easeInOutQuad" }
+					});
+				});
+
+				document.getElementById("zoom-reset").addEventListener("click", function() {
+                    if (!network) return;
+					network.fit({
+						animation: { duration: 500, easingFunction: "easeInOutQuad" }
+					});
+				});
+
+				// Luister naar auth status
+				auth.onAuthStateChanged((user) => {
+					if (user) {
+						console.log("Ingelogd: " + user.email);
+						// Show logged in state
+						guestBanner.style.display = "none";
+						loggedInControls.style.display = "block";
+						treeContainer.style.display = "block"; // Show tree
+						
+						loadStudentProgress(user);
+
+                        if (typeof initNetwork === 'function') {
+                            // Wait for display:block to take effect
+                            setTimeout(function() {
+                                initNetwork();
+                            }, 100);
+                        }
+					} else {
+						// Show guest state
+						guestBanner.style.display = "block";
+						loggedInControls.style.display = "none";
+						treeContainer.style.display = "none"; // Hide tree for guests
+						userDisplay.textContent = "";
+						
+						// Reset tree to default state (not visible anyway)
+						applyStatusStyles(); 
+					}
+				});
+			</script>
+		</main>
+		{% include site-footer-informatica.html %}
+	</body>
+</html>
