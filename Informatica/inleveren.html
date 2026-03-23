@@ -159,7 +159,8 @@
                         if (resp.ok) {
                             const html = await resp.text();
                             const parsed = RubricParser.parse(html);
-                            if (!parsed.error) rubricSnapshot = parsed;
+                            // Sanitize: Firestore rejects undefined values
+                            if (!parsed.error) rubricSnapshot = JSON.parse(JSON.stringify(parsed));
                         }
                     }
                 } catch (err) {
