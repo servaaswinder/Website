@@ -13,6 +13,8 @@
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
         <script src="js/student-utils.js"></script>
+        <script src="js/assignment-map.js"></script>
+        <script src="js/rubric-parser.js"></script>
 
 
 	<body class="auth-page">
@@ -148,6 +150,22 @@
 				loadingOverlay.style.display = "flex";
 				submitBtn.disabled = true;
 
+                // Capture rubric snapshot for fair grading
+                let rubricSnapshot = null;
+                try {
+                    const assignmentPath = ASSIGNMENT_MAP[assignment];
+                    if (assignmentPath) {
+                        const resp = await fetch(assignmentPath);
+                        if (resp.ok) {
+                            const html = await resp.text();
+                            const parsed = RubricParser.parse(html);
+                            if (!parsed.error) rubricSnapshot = parsed;
+                        }
+                    }
+                } catch (err) {
+                    console.warn("Could not capture rubric snapshot:", err);
+                }
+
                 try {
                     // --- STEP 1: Check for existing grade in 'results' collection ---
                     // Using student-utils.js resolveStudentDocument for robust lookup
@@ -217,12 +235,13 @@
                                 email: user.email
                             })
 						};
+						if (rubricSnapshot) updateData.rubricSnapshot = rubricSnapshot;
 
 						await docRef.update(updateData);
 					
 					} else {
 						// Nieuwe maken
-						await db.collection("submissions").add({
+						const newSubmission = {
 							userId: user.uid,
 							userEmail: user.email,
 							period: period,
@@ -237,7 +256,9 @@
                                 timestamp: new Date(),
                                 email: user.email
                             }]
-						});
+						};
+						if (rubricSnapshot) newSubmission.rubricSnapshot = rubricSnapshot;
+						await db.collection("submissions").add(newSubmission);
 					}
 
 					// Show success (common for both)

@@ -247,69 +247,9 @@ const GradingUI = {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     },
 
-    // Mapping of Assignment IDs to their definition files
-    ASSIGNMENT_MAP: {
-        "A3": "opdrachten/portfoliostartopdracht_a3.html",
-        "A2": "opdrachten/a2_communiceren.html",
-        "A5": "opdrachten/a5_onderzoeken.html",
-        "F2": "opdrachten/f2_maatschappij.html",
-        "A4": "opdrachten/a4_orienteren.html",
-        "A1": "opdrachten/a1_informatievaardigheden.html",
-        "A7": "opdrachten/a7_waarderen.html",
-        "E2": "opdrachten/e2_security.html",
-        "F4": "opdrachten/f4_security.html",
-        "F3": "opdrachten/f3_privacy.html",
-        "ModIntro": "opdrachten/modintro_leren_modelleren.html",
-        "A6": "opdrachten/a6_modelleren.html",
-        "C5": "opdrachten/c5_gestructureerde_data.html",
-        "C1": "opdrachten/c1_warming_stripes.html",
-        "C2": "opdrachten/c2_identificeren.html",
-        "B3": "opdrachten/b3_automaten.html",
-        "B1": "opdrachten/b1_algoritme.html",
-        "B2": "opdrachten/b2_datastructuren.html",
-        "C3": "opdrachten/c3_representeren.html",
-        "D1": "opdrachten/d1_ontwikkelen.html",
-        "D2": "opdrachten/d2_inspecteren.html",
-        "B4": "opdrachten/b4_introductie_html.html",
-        "F1": "opdrachten/f1_usability.html",
-        "C4": "opdrachten/c4_standaard_representaties.html",
-        "E1": "opdrachten/e1_decompositie.html",
-        "Eind1": "opdrachten/eindopdracht_gamedev.html",
-        "Eind2": "opdrachten/eindopdracht_webshop.html",
-        "Eind3": "opdrachten/eindopdracht_encryptie.html"
-    },
-
-    // Human Readable Titles
-    ASSIGNMENT_TITLES: {
-        "A3": "Portfoliostartopdracht",
-        "A2": "Communiceren",
-        "A5": "Onderzoeken",
-        "F2": "Maatschappelijke aspecten",
-        "A4": "Orienteren op studie/beroep",
-        "A1": "Informatievaardigheden",
-        "A7": "Waarderen en oordelen",
-        "E2": "Security (Algemeen)",
-        "F4": "Security (Wachtwoorden)",
-        "F3": "Privacy",
-        "ModIntro": "Leren Modelleren (Intro)",
-        "A6": "Modelleren",
-        "C5": "Gestructureerde data",
-        "C1": "Warming Stripes",
-        "C2": "Identificeren",
-        "B3": "Automaten",
-        "B1": "Algoritme",
-        "B2": "Datastructuren",
-        "C3": "Representeren",
-        "D1": "Ontwikkelen",
-        "D2": "Inspecteren en aanpassen",
-        "B4": "Introductie HTML",
-        "F1": "Usability",
-        "C4": "Standaard representaties",
-        "E1": "Decompositie",
-        "Eind1": "Game Development",
-        "Eind2": "Webshop",
-        "Eind3": "Encryptie"
-    },
+    // Mapping loaded from shared assignment-map.js
+    ASSIGNMENT_MAP: ASSIGNMENT_MAP,
+    ASSIGNMENT_TITLES: ASSIGNMENT_TITLES,
 
     open: async function (submissionId, submissionData, forceGrading = false, readOnly = false) {
         this.currentSubmissionId = submissionId;
@@ -437,50 +377,49 @@ const GradingUI = {
             }
         }
 
-        // Load Rubric
-        const tryFetch = async (url) => {
-            const response = await fetch(url);
-            if (!response.ok) {
-                // Try relative to current location if absolute failed?
-                // But fetch handles relative fine.
-                throw new Error(`${response.status} ${response.statusText}`);
-            }
-            return await response.text();
-        };
-
+        // Load Rubric — prefer snapshot from submission, fallback to live fetch
         try {
-            // 1. Try relative path
-            let html = "";
-            let finalUrl = "";
-            const variants = [
-                this.ASSIGNMENT_MAP[submissionData.assignmentId], // Preferred
-                `opdrachten/${submissionData.assignmentId}.html`, // Fallback 1
-                `${submissionData.assignmentId}.html`             // Fallback 2
-            ];
+            if (submissionData.rubricSnapshot &&
+                submissionData.rubricSnapshot.categories &&
+                submissionData.rubricSnapshot.categories.length > 0) {
+                // Use stored rubric snapshot (captured at submission time)
+                this.currentRubricData = submissionData.rubricSnapshot;
+                this.renderRubric(submissionData.rubricSnapshot);
+            } else {
+                // Fallback: fetch rubric from live HTML file
+                const tryFetch = async (url) => {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+                    return await response.text();
+                };
 
-            for (const path of variants) {
-                if (!path) continue;
-                try {
-                    html = await tryFetch(path);
-                    finalUrl = path;
-                    break;
-                } catch (e) { console.warn("Fetch failed:", path); }
+                let html = "";
+                const variants = [
+                    this.ASSIGNMENT_MAP[submissionData.assignmentId],
+                    `opdrachten/${submissionData.assignmentId}.html`,
+                    `${submissionData.assignmentId}.html`
+                ];
+
+                for (const path of variants) {
+                    if (!path) continue;
+                    try {
+                        html = await tryFetch(path);
+                        break;
+                    } catch (e) { console.warn("Fetch failed:", path); }
+                }
+
+                if (!html) throw new Error("Kan opdrachtbestand niet laden locaal.");
+
+                if (typeof RubricParser === 'undefined') {
+                    throw new Error("RubricParser library not loaded.");
+                }
+
+                const result = RubricParser.parse(html);
+                if (result.error) throw new Error(result.error);
+
+                this.currentRubricData = result;
+                this.renderRubric(result);
             }
-
-            if (!html) throw new Error("Kan opdrachtbestand niet laden locaal.");
-
-            // Use RubricParser (must be available globally)
-            if (typeof RubricParser === 'undefined') {
-                throw new Error("RubricParser library not loaded.");
-            }
-
-            const result = RubricParser.parse(html);
-            if (result.error) {
-                throw new Error(result.error);
-            }
-
-            this.currentRubricData = result;
-            this.renderRubric(result);
 
             // Set Period if available
             if (submissionData.period) {
