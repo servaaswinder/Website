@@ -22,5 +22,8 @@ venv/
 *.log
 server_v2.log
 
+# Python
+__pycache__/
+
 # Lokale testbestanden
 Informatica/opdrachten/microbit_test/
