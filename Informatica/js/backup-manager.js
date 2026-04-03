@@ -1,4 +1,13 @@
 window.BackupManager = {
+    // Sanitize CSV cell values to prevent formula injection in Excel/LibreOffice
+    sanitizeCsvCell: function(value) {
+        const str = String(value);
+        if (/^[=+\-@\t\r]/.test(str)) {
+            return "'" + str;
+        }
+        return str;
+    },
+
     // CSV Header Definition
     HEADERS: [
         "Email", 
@@ -38,17 +47,18 @@ window.BackupManager = {
                         // Serialize Rubric
                         const rubricJson = a.rubric ? JSON.stringify(a.rubric).replace(/"/g, '""') : ""; // Escape quotes for CSV
                         
+                        const s = this.sanitizeCsvCell.bind(this);
                         const row = [
-                            `"${studentEmail}"`,
-                            `"${studentName}"`,
-                            `"${studentClass}"`,
-                            `"${a.assignmentId || a.title}"`,
-                            `"${a.period || ""}"`,
-                            `"${a.grade || ""}"`,
-                            `"${(a.comment || "").replace(/"/g, '""')}"`,
+                            `"${s(studentEmail)}"`,
+                            `"${s(studentName)}"`,
+                            `"${s(studentClass)}"`,
+                            `"${s(a.assignmentId || a.title)}"`,
+                            `"${s(a.period || "")}"`,
+                            `"${s(a.grade || "")}"`,
+                            `"${s((a.comment || "").replace(/"/g, '""'))}"`,
                             `"${rubricJson}"`,
-                            `"${a.gradedBy || ""}"`,
-                            `"${a.gradedAt || ""}"`
+                            `"${s(a.gradedBy || "")}"`,
+                            `"${s(a.gradedAt || "")}"`,
                         ];
                         csvRows.push(row.join(","));
                     });
@@ -94,6 +104,12 @@ window.BackupManager = {
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
+            error: function(error) {
+                console.error("CSV parse error:", error);
+                alert("Fout bij het lezen van het CSV-bestand: " + error.message);
+                event.target.value = '';
+                if (statusMsg) statusMsg.textContent = "CSV-fout.";
+            },
             complete: async (results) => {
                 try {
                     // CSV parsed successfully

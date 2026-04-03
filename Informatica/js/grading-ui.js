@@ -10,6 +10,20 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
+function sanitizeHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    tmp.querySelectorAll('script, iframe, object, embed, link').forEach(el => el.remove());
+    tmp.querySelectorAll('*').forEach(el => {
+        for (const attr of Array.from(el.attributes)) {
+            if (attr.name.startsWith('on') || attr.value.trim().toLowerCase().startsWith('javascript:')) {
+                el.removeAttribute(attr.name);
+            }
+        }
+    });
+    return tmp.innerHTML;
+}
+
 const GradingUI = {
     currentSubmissionId: null,
     currentRubricData: null,
@@ -631,6 +645,11 @@ const GradingUI = {
     renderRubric: function (data) {
         const container = document.getElementById('grading-rubric-container');
 
+        if (!data || !Array.isArray(data.categories)) {
+            container.innerHTML = '<p style="color:#c00;">Ongeldig beoordelingsmodel: geen categorieën gevonden.</p>';
+            return;
+        }
+
         // Determine max columns for header (0 to Max)
         let maxCols = 0;
         data.categories.forEach(c => maxCols = Math.max(maxCols, c.rawMaxPoints + 1));
@@ -674,7 +693,7 @@ const GradingUI = {
 
             // Category Column
             html += `<td class="category-col">`;
-            html += `<div class="category-title">${cat.name}</div>`;
+            html += `<div class="category-title">${escapeHtml(cat.name)}</div>`;
             html += `<div class="category-weight">Weging: ${cat.weight}x</div>`;
             html += `</td>`;
 
@@ -682,7 +701,8 @@ const GradingUI = {
             for (let i = minCol; i < maxCols; i++) {
                 if (i <= cat.rawMaxPoints) {
                     const isSelected = GradingUI.selectedCells[index] === i;
-                    const desc = cat.descriptions && cat.descriptions[i] ? cat.descriptions[i] : '<span style="color:#999; font-style:italic;">Geen beschrijving</span>';
+                    const rawDesc = cat.descriptions && cat.descriptions[i] ? cat.descriptions[i] : '';
+                    const desc = rawDesc ? sanitizeHtml(rawDesc) : '<span style="color:#999; font-style:italic;">Geen beschrijving</span>';
 
                     html += `<td class="rubric-cell ${isSelected ? 'selected' : ''}" data-cat-index="${index}" data-points="${i}" onclick="GradingUI.selectCell(${index}, ${i})">`;
                     html += `<div class="point-badge">${i}</div>`;
