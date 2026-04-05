@@ -1,15 +1,18 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import firebase_admin
-from firebase_admin import credentials, auth, firestore
 import os
 import secrets
 import string
 from functools import wraps
 
+import firebase_admin
+import google.auth.transport.requests
+import requests
+from firebase_admin import credentials, auth, firestore
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 app = Flask(__name__)
-# Allow CORS request from our frontend (port 4000)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+# Allow CORS request from our frontend (port 4000) and production domain
+CORS(app, resources={r"/api/*": {"origins": ["https://servaaswinder.nl", "http://localhost:4000", "http://127.0.0.1:4000"]}})
 
 # Initialize Firebase Admin SDK
 # We assume serviceAccountKey.json is in the same directory
@@ -33,7 +36,7 @@ def require_auth(f):
             decoded_token = auth.verify_id_token(id_token)
             # You can also set request.user = decoded_token if needed
         except Exception as e:
-            return jsonify({"success": False, "error": "Invalid token", "details": str(e)}), 401
+            return jsonify({"success": False, "error": "Invalid token"}), 401
 
         return f(*args, **kwargs)
     return decorated
@@ -78,9 +81,6 @@ def reset_2fa():
         
         # 2. Remove Enrolled Factors via REST API (since SDK is missing support)
         # We manually call Identity Toolkit API to disable MFA.
-        import requests
-        import google.auth.transport.requests
-        
         # Get Service Account Credential & Token
         # We need to refresh the credential to get a raw token
         app = firebase_admin.get_app()
@@ -115,7 +115,7 @@ def reset_2fa():
         
         if resp.status_code != 200:
              print(f"❌ API Error: {resp.text}")
-             return jsonify({"success": False, "error": f"API Error: {resp.text}"}), 500
+             return jsonify({"success": False, "error": "External API Error"}), 500
              
         # Success logic continues...
         print(f"✅ Success: 2FA reset (via API) for {user.email}")
@@ -126,7 +126,7 @@ def reset_2fa():
 
     except Exception as e:
         print(f"❌ Error resetting 2FA: {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal Server Error"}), 500
 
 @app.route('/api/create-student', methods=['POST'])
 @require_auth
@@ -166,7 +166,7 @@ def create_student():
             return jsonify({"success": False, "error": "User already exists"}), 409
         except Exception as e:
             print(f"❌ Auth Error: {str(e)}")
-            return jsonify({"success": False, "error": f"Auth Error: {str(e)}"}), 500
+            return jsonify({"success": False, "error": "Auth Error"}), 500
 
         # 2. Create Firestore Document in 'results'
         try:
@@ -190,13 +190,13 @@ def create_student():
         except Exception as e:
             print(f"❌ Firestore Error: {str(e)}")
             # Cleanup auth user if firestore fails? Maybe too complex for now.
-            return jsonify({"success": False, "error": f"Firestore Error: {str(e)}"}), 500
+            return jsonify({"success": False, "error": "Firestore Error"}), 500
 
         return jsonify({"success": True, "message": f"Account aangemaakt voor {name}", "uid": user.uid})
 
     except Exception as e:
         print(f"❌ General Error creating student: {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal Server Error"}), 500
 
 
 @app.route('/api/delete-student', methods=['POST'])
@@ -238,13 +238,13 @@ def delete_student():
              print(f"⚠️ Auth user not found: {uid}")
         except Exception as e:
              print(f"❌ Auth delete error: {str(e)}")
-             return jsonify({"success": False, "error": f"Auth Error: {str(e)}"}), 500
+             return jsonify({"success": False, "error": "Auth Error"}), 500
 
         return jsonify({"success": True, "message": "Account verwijderd."})
 
     except Exception as e:
         print(f"❌ Error deleting student: {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':
     print("🚀 Starting Admin Backend on port 5000...")

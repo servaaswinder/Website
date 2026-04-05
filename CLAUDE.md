@@ -15,7 +15,8 @@ Gehost via GitHub Pages. Authenticatie en data via Firebase (Auth + Firestore).
 ```
 ├── Informatica/          # Leerling/docent-portaal met beoordelingssysteem
 │   ├── js/
-│   │   ├── grading-ui.js       # Kern: rubric-modal, ASSIGNMENT_MAP, AI-grading, cijferberekening
+│   │   ├── grading-ui.js       # Kern: rubric-modal, AI-grading, cijferberekening
+│   │   ├── assignment-map.js   # ASSIGNMENT_MAP: opdracht-ID → HTML-pad (gedeeld door inleveren + grading)
 │   │   ├── rubric-parser.js    # Parst rubric-tabellen uit opdracht-HTML
 │   │   ├── student-utils.js    # Robuuste leerling-lookup (5-stappen email-matching)
 │   │   └── backup-manager.js   # CSV export/import van cijfers (PapaParse)
@@ -49,6 +50,7 @@ Gehost via GitHub Pages. Authenticatie en data via Firebase (Auth + Firestore).
 - `assignmentId`, `assignmentUrl`, `status` (`pending`/`grading`/`checked`)
 - `gradingDraft` (`selectedCells`, `comment`), `gradedByAI`, `gradingBy`
 - `grade`, `finalRubric`, `teacherComment`, `period`
+- `rubricSnapshot` (bij inlevering opgeslagen rubric voor eerlijke beoordeling)
 
 **`results`** — leerlinggegevens
 - `email` (LLN uppercase, domein lowercase: `LLN10656@northgo-college.nl`)
@@ -80,9 +82,14 @@ Gehost via GitHub Pages. Authenticatie en data via Firebase (Auth + Firestore).
 ## Branches
 
 - `main` — productie
-- `feature/ai-nakijken` — AI-beoordelingsfeature (nog niet gemerged)
 
 ## Roadmap
 
+### Gamification
+- **XP / Check-in systeem** — Leerlingen verdienen XP door opdrachten met een voldoende af te ronden (meer XP bij hoger niveau/cijfer). Opdrachten unlocken kost XP + prerequisites moeten af zijn. Check-in bij starten opdracht legt rubric-versie vast.
+- **Visuele opdrachtenboom** — Donkere achtergrond, SVG-paden met glow-effecten. Afgeronde paden lichten op, beschikbare nodes pulseren, locked nodes grijs met stippellijn. Per domein een kleur.
+- **Badges** — Achievements voor milestones (alle A-opdrachten, expert challenges, perfecte scores). Kwalitatieve visuals (pixel art of flat vector via game-icons.net / Media & Design klas).
+
+### Overig
 - Themaoverhaul
-- Migratie naar Railway + PostgreSQL
+- Migratie naar School-PC (waar ook nakijkapp.nl op draait)

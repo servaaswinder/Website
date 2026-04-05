@@ -477,6 +477,13 @@
 
 			// Check auth state
 			auth.onAuthStateChanged((user) => {
+				// CRITICAL FIX: Don't redirect during password reset
+				const urlParams = new URLSearchParams(window.location.search);
+				if (urlParams.get('mode') === 'resetPassword' && urlParams.get('oobCode')) {
+					window.location.href = `login.html${window.location.search}`;
+					return;
+				}
+
 				if (!user) {
 					// Redirect to login if not logged in
 					window.location.href = "login.html?redirect=docenten.html";
@@ -499,7 +506,6 @@
             // Preload student names mapping
             async function preloadStudentMap() {
                 try {
-                    console.log("Fetching student map...");
                     const snapshot = await db.collection("results").get();
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -509,7 +515,6 @@
                         }
                         // Also store by name-key just in case, though submissions usually have email
                     });
-                    console.log("Student map loaded. Size:", studentMap.size);
                 } catch (error) {
                     console.error("Error loading student map:", error);
                     // Non-critical, we can fallback to emails

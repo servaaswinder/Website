@@ -120,6 +120,13 @@
 
 			// Check auth state
 			auth.onAuthStateChanged((user) => {
+				// CRITICAL FIX: Don't redirect during password reset
+				const urlParams = new URLSearchParams(window.location.search);
+				if (urlParams.get('mode') === 'resetPassword' && urlParams.get('oobCode')) {
+					window.location.href = `login.html${window.location.search}`;
+					return;
+				}
+
 				if (!user) {
 					// Redirect to login if not logged in
 					window.location.href = "login.html?redirect=inleveren.html";

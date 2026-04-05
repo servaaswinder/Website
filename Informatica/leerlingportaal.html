@@ -2857,6 +2857,13 @@
 
       // Toon/hide panelen afhankelijk van loginstatus
       auth.onAuthStateChanged(async (user) => {
+        // CRITICAL FIX: Don't redirect during password reset
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'resetPassword' && urlParams.get('oobCode')) {
+          window.location.href = `login.html${window.location.search}`;
+          return;
+        }
+
         if (user) {
           loginSection.classList.add("hidden");
           if (ADMIN_EMAILS.includes(user.email)) {

@@ -77,6 +77,17 @@
                     }
 
 					firebase.auth().onAuthStateChanged(function(user) {
+						// CRITICAL FIX: Don't perform standard redirects or 2FA checks during password reset
+						const urlParams = new URLSearchParams(window.location.search);
+						const mode = urlParams.get('mode');
+						const actionCode = urlParams.get('oobCode');
+						if (mode === 'resetPassword' && actionCode) {
+							if (!window.location.pathname.includes('login.html')) {
+								window.location.href = `{{ site.baseurl }}/Informatica/login.html${window.location.search}`;
+							}
+							return;
+						}
+
 						if (user) {
                             // --- SECURITY GATE: Enforce 2FA Enrollment ---
                             // Check if user has 2FA enrolled. If not, force them to login.html to enroll.
