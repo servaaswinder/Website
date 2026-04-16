@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Jekyll Frontend",
+      "runtimeExecutable": "bundle",
+      "runtimeArgs": ["exec", "jekyll", "serve", "--livereload", "--port", "4000"],
+      "port": 4000
+    },
+    {
+      "name": "Flask Admin Backend",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["server.py"],
+      "port": 5000
+    },
+    {
+      "name": "Informatica App",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /Users/servaaswinder/Documents/GitHub/informatica-app && FLASK_ENV=development .venv/bin/python run.py"],
+      "port": 5001
+    }
+  ]
+}
