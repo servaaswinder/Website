@@ -3,673 +3,636 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>4 VWO - Servaas Winder</title>
-		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	</head>
 
-	<body class="klas">
-		{% include site-header.html %}
+<head>
+	<title>4 VWO - Servaas Winder</title>
+	<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-		<main>
-			<div class="section">
-				<section class="inf-hero">
-					<h2>Periode 4</h2>
-					<p>
-						Hier vind je de benodigde materialen en informatie om je voor te
-						bereiden op Toetsweek 4. We starten met het ABPS project tot de
-						Sciencefair. Daarna behandelen we Hoofdstuk 6 als extra, gevolgd
-						door een modelleeropdracht over radioactiviteit (afgesloten met
-						een verslag voor een cijfer). De nadruk ligt op Hoofdstuk 5:
-						Radioactiviteit.
-					</p>
-					<div class="tabs-card">
-						<div class="tab-buttons">
-							<button class="tab-button is-active" onclick="switchP4Tab(event,'p4-nat1')">4v.nat1</button>
-							<button class="tab-button" onclick="switchP4Tab(event,'p4-nat2')">4v.nat2</button>
-						</div>
-						<!-- ===== 4v.nat1 — maandag (uur 1) / woensdag (uur 5) / vrijdag (uur 4) ===== -->
-						<div class="tab-panel is-active" id="p4-nat1">
-							<table>
-								<thead>
-									<tr>
-										<th>Week</th>
-										<th>Ma (uur 1)</th>
-										<th>Wo (uur 5)</th>
-										<th>Vr (uur 4)</th>
-										<th>Huiswerk</th>
-										<th>Opmerkingen</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>11</td>
-										<td>ABPS</td>
-										<td>ABPS</td>
-										<td>ABPS</td>
-										<td></td>
-										<td>Toetsbespreking</td>
-									</tr>
-									<tr>
-										<td>12</td>
-										<td>ABPS</td>
-										<td>ABPS</td>
-										<td>H6.1</td>
-										<td></td>
-										<td>Di 17 mrt 19:00 Sciencefair</td>
-									</tr>
-									<tr>
-										<td>13</td>
-										<td>H6.1</td>
-										<td>H6.2</td>
-										<td>H6.2</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>14</td>
-										<td>H6.5</td>
-										<td>H6.5</td>
-										<td>Modelleren 1</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>15</td>
-										<td class="geen-les">Tweede Paasdag</td>
-										<td class="geen-les">Docent afwezig (excursie)</td>
-										<td>Modelleren 2</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>16</td>
-										<td>Modelleren 3</td>
-										<td class="geen-les">Examentraining 5H</td>
-										<td class="geen-les">Stuntdag</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>17-18</td>
-										<td class="geen-les" colspan="3" style="text-align:center;">Meivakantie (20 april t/m 5 mei)</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>19</td>
-										<td class="geen-les">Bevrijdingsdag</td>
-										<td>H5.1</td>
-										<td>H5.2</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>20</td>
-										<td>Hoe werkt een kernreactor?</td>
-										<td class="geen-les">Dealbreakers</td>
-										<td class="geen-les">Hemelvaart</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>21</td>
-										<td>H5.2</td>
-										<td>H5.3</td>
-										<td>H5.3</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>22</td>
-										<td class="geen-les">Tweede Pinksterdag</td>
-										<td>H5.4</td>
-										<td>H5.4</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>23</td>
-										<td>H5.5</td>
-										<td>H5.5</td>
-										<td>Modelleren 4</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>24</td>
-										<td class="geen-les">Sportdag</td>
-										<td>Modelleren 5</td>
-										<td>Modelleren 6</td>
-										<td>Verslag modelleren inleveren (cijfer)</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>25</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>26</td>
-										<td>Herhaling</td>
-										<td>Herhaling</td>
-										<td>Herhaling</td>
-										<td>Examenopgaven</td>
-										<td>Activiteitenvrije week</td>
-									</tr>
-									<tr>
-										<td>27</td>
-										<td class="geen-les" colspan="3" style="text-align:center;">Toetsweek &mdash; Hoofdstuk 5</td>
-										<td></td>
-										<td></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<!-- ===== 4v.nat2 — maandag (uur 7) / dinsdag (uur 5) / donderdag (uur 2) ===== -->
-						<div class="tab-panel" id="p4-nat2">
-							<table>
-								<thead>
-									<tr>
-										<th>Week</th>
-										<th>Ma (uur 7)</th>
-										<th>Di (uur 5)</th>
-										<th>Do (uur 2)</th>
-										<th>Huiswerk</th>
-										<th>Opmerkingen</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>11</td>
-										<td class="geen-les">Docent afwezig (middag)</td>
-										<td>ABPS</td>
-										<td>ABPS</td>
-										<td></td>
-										<td>Toetsbespreking</td>
-									</tr>
-									<tr>
-										<td>12</td>
-										<td>ABPS</td>
-										<td>ABPS</td>
-										<td class="geen-les">Docent afwezig</td>
-										<td></td>
-										<td>Di 17 mrt 19:00 Sciencefair</td>
-									</tr>
-									<tr>
-										<td>13</td>
-										<td>H6.1</td>
-										<td>H6.1</td>
-										<td class="geen-les">Ontwikkeldag</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>14</td>
-										<td>H6.2</td>
-										<td>H6.2 <small>(40 min)</small></td>
-										<td class="geen-les">Voortgangsvergadering</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>15</td>
-										<td class="geen-les">Tweede Paasdag</td>
-										<td>H6.5</td>
-										<td>Modelleren 1</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>16</td>
-										<td>Modelleren 2</td>
-										<td>Modelleren 3</td>
-										<td>H5.1</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>17-18</td>
-										<td class="geen-les" colspan="3" style="text-align:center;">Meivakantie (20 april t/m 5 mei)</td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>19</td>
-										<td class="geen-les">Bevrijdingsdag</td>
-										<td>H5.1</td>
-										<td>H5.2</td>
-										<td>Alle opgaven</td>
-										<td>Check agenda</td>
-									</tr>
-									<tr>
-										<td>20</td>
-										<td class="geen-les">Docent afwezig</td>
-										<td class="geen-les">Docent afwezig</td>
-										<td class="geen-les">Hemelvaart</td>
-										<td></td>
-										<td>Geen lessen deze week</td>
-									</tr>
-									<tr>
-										<td>21</td>
-										<td>H5.2</td>
-										<td>H5.3</td>
-										<td>H5.3</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>22</td>
-										<td class="geen-les">Tweede Pinksterdag</td>
-										<td>H5.4</td>
-										<td>H5.4</td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>23</td>
-										<td>H5.5</td>
-										<td>H5.5 <small>(40 min)</small></td>
-										<td>Modelleren 4 <small>(40 min)</small></td>
-										<td>Alle opgaven</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>24</td>
-										<td class="geen-les">Sportdag</td>
-										<td>Modelleren 5</td>
-										<td>Modelleren 6</td>
-										<td>Verslag modelleren inleveren (cijfer)</td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>25</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-									</tr>
-									<tr>
-										<td>26</td>
-										<td>Herhaling</td>
-										<td>Herhaling</td>
-										<td>Herhaling <small>(40 min)</small></td>
-										<td>Examenopgaven</td>
-										<td>Activiteitenvrije week</td>
-									</tr>
-									<tr>
-										<td>27</td>
-										<td class="geen-les" colspan="3" style="text-align:center;">Toetsweek &mdash; Hoofdstuk 5</td>
-										<td></td>
-										<td></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+<body class="klas">
+	{% include site-header.html %}
+
+	<main>
+		<div class="section">
+			<section class="inf-hero">
+				<h2>Periode 4</h2>
+				<p>
+					Hier vind je de benodigde materialen en informatie om je voor te
+					bereiden op Toetsweek 4. We starten met het ABPS project tot de
+					Sciencefair. Daarna behandelen we Hoofdstuk 6 als extra, gevolgd
+					door een modelleeropdracht over radioactiviteit (afgesloten met
+					een verslag voor een cijfer). De nadruk ligt op Hoofdstuk 5:
+					Radioactiviteit.
+				</p>
+				<div class="tabs-card">
+					<div class="tab-buttons">
+						<button class="tab-button is-active" onclick="switchP4Tab(event,'p4-nat1')">4v.nat1</button>
+						<button class="tab-button" onclick="switchP4Tab(event,'p4-nat2')">4v.nat2</button>
 					</div>
-					<script>
-						function switchP4Tab(e, tabId) {
-							var card = e.target.closest('.tabs-card');
-							card.querySelectorAll('.tab-button').forEach(function(b) { b.classList.remove('is-active'); });
-							card.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('is-active'); });
-							e.target.classList.add('is-active');
-							document.getElementById(tabId).classList.add('is-active');
-						}
-					</script>
-				</section>
-			</div>
-			<div class="section">
-				<section class="inf-hero">
-					<h2>Periode 3</h2>
-					<p>
-						Hier vind je de benodigde materialen en informatie om je voor te
-						bereiden op Toetsweek 3.
-					</p>
-					<table>
-						<thead>
-							<tr>
-								<th>Week</th>
-								<th>Onderwerp in de les</th>
-								<th>Huiswerk</th>
-								<th>Opmerkingen</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>2</td>
-								<td>Start ABPS</td>
-								<td>Onderzoeksvraag ABPS vaststellen</td>
-								<td>Toetsbespreking</td>
-							</tr>
-							<tr>
-								<td>3</td>
-								<td>Hoofdstuk 4.1 + ABPS</td>
-								<td>alle opgave</td>
-								<td>Dinsdag 13 januari WIN 5e uur bezet
-									<br>Woensdag 14 januari Kick-Off MDT
-									<br>Donderdag 15 januari VNN dag</td>
-							</tr>
-							<tr>
-								<td>4</td>
-								<td>Hoofdstuk 4.2 + ABPS</td>
-								<td>alle opgave</td>
-								<td>Dinsdag 20 januari ontwikkeldag <br>
+					<!-- ===== 4v.nat1 — maandag (uur 1) / woensdag (uur 5) / vrijdag (uur 4) ===== -->
+					<div class="tab-panel is-active" id="p4-nat1">
+						<table>
+							<thead>
+								<tr>
+									<th>Week</th>
+									<th>Ma (uur 1)</th>
+									<th>Wo (uur 5)</th>
+									<th>Vr (uur 4)</th>
+									<th>Huiswerk</th>
+									<th>Opmerkingen</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>11</td>
+									<td>ABPS</td>
+									<td>ABPS</td>
+									<td>ABPS</td>
+									<td></td>
+									<td>Toetsbespreking</td>
+								</tr>
+								<tr>
+									<td>12</td>
+									<td>ABPS</td>
+									<td>ABPS</td>
+									<td>H6.1</td>
+									<td></td>
+									<td>Di 17 mrt 19:00 Sciencefair</td>
+								</tr>
+								<tr>
+									<td>13</td>
+									<td>H6.1</td>
+									<td>H6.2</td>
+									<td>H6.2</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>14</td>
+									<td>H6.5</td>
+									<td>H6.5</td>
+									<td>Modelleren 1</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>15</td>
+									<td class="geen-les">Tweede Paasdag</td>
+									<td class="geen-les">Docent afwezig (excursie)</td>
+									<td>Modelleren 2</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>16</td>
+									<td>Modelleren 3</td>
+									<td class="geen-les">Examentraining 5H</td>
+									<td class="geen-les">Stuntdag</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>17-18</td>
+									<td class="geen-les" colspan="3" style="text-align:center;">Meivakantie (20 april
+										t/m 5 mei)</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>19</td>
+									<td class="geen-les">Bevrijdingsdag</td>
+									<td>H5.1</td>
+									<td>H5.2</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>20</td>
+									<td>Hoe werkt een kernreactor?</td>
+									<td class="geen-les">Dealbreakers</td>
+									<td class="geen-les">Hemelvaart</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>21</td>
+									<td>H5.2</td>
+									<td>H5.3</td>
+									<td>H5.3</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>22</td>
+									<td class="geen-les">Tweede Pinksterdag</td>
+									<td>H5.4</td>
+									<td>H5.4</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>23</td>
+									<td>H5.5</td>
+									<td>H5.5</td>
+									<td>Modelleren 4</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>24</td>
+									<td class="geen-les">Sportdag</td>
+									<td>Modelleren 5</td>
+									<td>Modelleren 6</td>
+									<td>Verslag modelleren inleveren (cijfer)</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>25</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>26</td>
+									<td>Herhaling</td>
+									<td>Herhaling</td>
+									<td>Herhaling</td>
+									<td>Examenopgaven</td>
+									<td>Activiteitenvrije week</td>
+								</tr>
+								<tr>
+									<td>27</td>
+									<td class="geen-les" colspan="3" style="text-align:center;">Toetsweek &mdash;
+										Hoofdstuk 5</td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<!-- ===== 4v.nat2 — maandag (uur 7) / dinsdag (uur 5) / donderdag (uur 2) ===== -->
+					<div class="tab-panel" id="p4-nat2">
+						<table>
+							<thead>
+								<tr>
+									<th>Week</th>
+									<th>Ma (uur 7)</th>
+									<th>Di (uur 5)</th>
+									<th>Do (uur 2)</th>
+									<th>Huiswerk</th>
+									<th>Opmerkingen</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>11</td>
+									<td class="geen-les">Docent afwezig (middag)</td>
+									<td>ABPS</td>
+									<td>ABPS</td>
+									<td></td>
+									<td>Toetsbespreking</td>
+								</tr>
+								<tr>
+									<td>12</td>
+									<td>ABPS</td>
+									<td>ABPS</td>
+									<td class="geen-les">Docent afwezig</td>
+									<td></td>
+									<td>Di 17 mrt 19:00 Sciencefair</td>
+								</tr>
+								<tr>
+									<td>13</td>
+									<td>H6.1</td>
+									<td>H6.1</td>
+									<td class="geen-les">Ontwikkeldag</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>14</td>
+									<td>H6.2</td>
+									<td>H6.2 <small>(40 min)</small></td>
+									<td class="geen-les">Voortgangsvergadering</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>15</td>
+									<td class="geen-les">Tweede Paasdag</td>
+									<td>H6.5</td>
+									<td>Modelleren 1</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>16</td>
+									<td>Modelleren 2</td>
+									<td>Modelleren 3</td>
+									<td>H5.1</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>17-18</td>
+									<td class="geen-les" colspan="3" style="text-align:center;">Meivakantie (20 april
+										t/m 5 mei)</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>19</td>
+									<td class="geen-les">Bevrijdingsdag</td>
+									<td>H5.1</td>
+									<td>H5.2</td>
+									<td>Alle opgaven</td>
+									<td>Check agenda</td>
+								</tr>
+								<tr>
+									<td>20</td>
+									<td class="geen-les">Docent afwezig</td>
+									<td class="geen-les">Docent afwezig</td>
+									<td class="geen-les">Hemelvaart</td>
+									<td></td>
+									<td>Geen lessen deze week</td>
+								</tr>
+								<tr>
+									<td>21</td>
+									<td>H5.2</td>
+									<td>H5.3</td>
+									<td>H5.3</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>22</td>
+									<td class="geen-les">Tweede Pinksterdag</td>
+									<td>H5.4</td>
+									<td>H5.4</td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>23</td>
+									<td>H5.5</td>
+									<td>H5.5 <small>(40 min)</small></td>
+									<td>Modelleren 4 <small>(40 min)</small></td>
+									<td>Alle opgaven</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>24</td>
+									<td class="geen-les">Sportdag</td>
+									<td>Modelleren 5</td>
+									<td>Modelleren 6</td>
+									<td>Verslag modelleren inleveren (cijfer)</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>25</td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>26</td>
+									<td>Herhaling</td>
+									<td>Herhaling</td>
+									<td>Herhaling <small>(40 min)</small></td>
+									<td>Examenopgaven</td>
+									<td>Activiteitenvrije week</td>
+								</tr>
+								<tr>
+									<td>27</td>
+									<td class="geen-les" colspan="3" style="text-align:center;">Toetsweek &mdash;
+										Hoofdstuk 5</td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<script>
+					function switchP4Tab(e, tabId) {
+						var card = e.target.closest('.tabs-card');
+						card.querySelectorAll('.tab-button').forEach(function (b) { b.classList.remove('is-active'); });
+						card.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('is-active'); });
+						e.target.classList.add('is-active');
+						document.getElementById(tabId).classList.add('is-active');
+					}
+				</script>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="https://drive.google.com/file/d/1PTq1voP-7sqq8fwbGm9wpQ0-91qPGnGi/view?usp=sharing"
+						target="_blank">Uitwerkingen H4
+					</a>
+				</div>
+			</section>
+		</div>
+		<div class="section">
+			<section class="inf-hero">
+				<h2>Periode 3</h2>
+				<p>
+					Hier vind je de benodigde materialen en informatie om je voor te
+					bereiden op Toetsweek 3.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Week</th>
+							<th>Onderwerp in de les</th>
+							<th>Huiswerk</th>
+							<th>Opmerkingen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>2</td>
+							<td>Start ABPS</td>
+							<td>Onderzoeksvraag ABPS vaststellen</td>
+							<td>Toetsbespreking</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>Hoofdstuk 4.1 + ABPS</td>
+							<td>alle opgave</td>
+							<td>Dinsdag 13 januari WIN 5e uur bezet
+								<br>Woensdag 14 januari Kick-Off MDT
+								<br>Donderdag 15 januari VNN dag
+							</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>Hoofdstuk 4.2 + ABPS</td>
+							<td>alle opgave</td>
+							<td>Dinsdag 20 januari ontwikkeldag <br>
 								Woensdag 21 januari herkansingen PTB <br>
 								Donderdag 22 januari omgk. 40 min. rooster VGV <br>
 								Vrijdag 23 januari 40 min. rooster opendag</td>
-							</tr>
-							<tr>
-								<td>5</td>
-								<td>Hoofdstuk 4.3 + ABPS</td>
-								<td>alle opgave</td>
-								<td>Dinsdag 27 januari omgk. 40 min. rooster VGV</td>
-							</tr>
-							<tr>
-								<td>6</td>
-								<td>Hoofdstuk 4.4 + ABPS</td>
-								<td>alle opgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>7</td>
-								<td>Hoofdstuk 4.5 + ABPS</td>
-								<td>alle opgave</td>
-								<td>Dinsdag 10 februari iets met Lile?
-									<br>Vrijdag 13 februari ontwikkeldag</td>
-							</tr>
-							<tr>
-								<td>8</td>
-								<td>Voorjaarsvakantie</td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>9</td>
-								<td>Practicum + ABPS</td>
-								<td>Practicum verslag</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>10</td>
-								<td>Toetsweek</td>
-								<td>Hoofdstuk 4</td>
-								<td></td>
-							</tr>
-						</tbody>
-					</table>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td>Hoofdstuk 4.3 + ABPS</td>
+							<td>alle opgave</td>
+							<td>Dinsdag 27 januari omgk. 40 min. rooster VGV</td>
+						</tr>
+						<tr>
+							<td>6</td>
+							<td>Hoofdstuk 4.4 + ABPS</td>
+							<td>alle opgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>7</td>
+							<td>Hoofdstuk 4.5 + ABPS</td>
+							<td>alle opgave</td>
+							<td>Dinsdag 10 februari iets met Lile?
+								<br>Vrijdag 13 februari ontwikkeldag
+							</td>
+						</tr>
+						<tr>
+							<td>8</td>
+							<td>Voorjaarsvakantie</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>9</td>
+							<td>Practicum + ABPS</td>
+							<td>Practicum verslag</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>10</td>
+							<td>Toetsweek</td>
+							<td>Hoofdstuk 4</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
 
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="https://drive.google.com/file/d/14R2ndeLk6smVKW_st_GFa4FFCHVqNJdg/view?usp=sharing"
-							target="_blank"
-							>Uitwerkingen H4
-						</a>
-					</div>
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW3/2026.NA_VWOFOU.oefentoets-v4-trillingen-en-golven-2025.Opgavenblad.pdf"
-							target="_blank"
-							>Oefentoets TW3</a
-						>
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW3/2026.NA_VWOFOU.oefentoets-v4-trillingen-en-golven-2025.Uitwerkbijlage.pdf"
-							target="_blank"
-							>Uitwerkbijlage</a
-						>
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW3/2026.NA_VWOFOU.oefentoets-v4-trillingen-en-golven-2025.Correctievoorschrift.pdf"
-							target="_blank"
-							>Correctievoorschrift</a
-						>
-					</div>
-				</section>
-			</div>
-			<div class="section">
-				<section class="inf-hero">
-					<h2>Periode 2</h2>
-					<p>
-						Hier vind je de benodigde materialen en informatie om je voor te
-						bereiden op Toetsweek 2.
-					</p>
-					<table>
-						<thead>
-							<tr>
-								<th>Week</th>
-								<th>Onderwerp</th>
-								<th>Huiswerk</th>
-								<th>Opmerkingen</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>44</td>
-								<td>Hoofdstuk 2.1 + verslag</td>
-								<td>oneven opgave</td>
-								<td>Toetsbespreking</td>
-							</tr>
-							<tr>
-								<td>45</td>
-								<td>Hoofdstuk 2.2 + verslag</td>
-								<td>oneven opgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>46</td>
-								<td>practicum</td>
-								<td>Practicum verslag</td>
-								<td>40 minuten rooster ivm voortgangsvergaderingen</td>
-							</tr>
-							<tr>
-								<td>47</td>
-								<td>Hoofdstuk 2.3 + 2.4</td>
-								<td>oneven opgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>48</td>
-								<td>Hoofdstuk 6.3</td>
-								<td>Alle opgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>49</td>
-								<td>Hoofdstuk 6.4</td>
-								<td>Alle opgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>50</td>
-								<td>Herhaling</td>
-								<td>Examenopgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>51</td>
-								<td>Toetsweek</td>
-								<td>H2 + H6.3 + H6.4 Electriciteit</td>
-								<td></td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="https://drive.google.com/file/d/14R2ndeLk6smVKW_st_GFa4FFCHVqNJdg/view?usp=sharing"
+						target="_blank">Uitwerkingen H4
+					</a>
+				</div>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="4V/Oefentoets TW3/2026.NA_VWOFOU.oefentoets-v4-trillingen-en-golven-2025.Opgavenblad.pdf"
+						target="_blank">Oefentoets TW3</a>
+					<a class="klas_knop"
+						href="4V/Oefentoets TW3/2026.NA_VWOFOU.oefentoets-v4-trillingen-en-golven-2025.Uitwerkbijlage.pdf"
+						target="_blank">Uitwerkbijlage</a>
+					<a class="klas_knop"
+						href="4V/Oefentoets TW3/2026.NA_VWOFOU.oefentoets-v4-trillingen-en-golven-2025.Correctievoorschrift.pdf"
+						target="_blank">Correctievoorschrift</a>
+				</div>
+			</section>
+		</div>
+		<div class="section">
+			<section class="inf-hero">
+				<h2>Periode 2</h2>
+				<p>
+					Hier vind je de benodigde materialen en informatie om je voor te
+					bereiden op Toetsweek 2.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Week</th>
+							<th>Onderwerp</th>
+							<th>Huiswerk</th>
+							<th>Opmerkingen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>44</td>
+							<td>Hoofdstuk 2.1 + verslag</td>
+							<td>oneven opgave</td>
+							<td>Toetsbespreking</td>
+						</tr>
+						<tr>
+							<td>45</td>
+							<td>Hoofdstuk 2.2 + verslag</td>
+							<td>oneven opgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>46</td>
+							<td>practicum</td>
+							<td>Practicum verslag</td>
+							<td>40 minuten rooster ivm voortgangsvergaderingen</td>
+						</tr>
+						<tr>
+							<td>47</td>
+							<td>Hoofdstuk 2.3 + 2.4</td>
+							<td>oneven opgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>48</td>
+							<td>Hoofdstuk 6.3</td>
+							<td>Alle opgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>49</td>
+							<td>Hoofdstuk 6.4</td>
+							<td>Alle opgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>50</td>
+							<td>Herhaling</td>
+							<td>Examenopgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>51</td>
+							<td>Toetsweek</td>
+							<td>H2 + H6.3 + H6.4 Electriciteit</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
 
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="https://drive.google.com/file/d/1qh1HXBaAf-kqzN28asjODo3jSBsPz13k/view?usp=drive_link"
-							target="_blank"
-							>Uitwerkingen H2</a
-						>
-						<a
-							class="klas_knop"
-							href="https://drive.google.com/file/d/1dKNnoyZCxokNfuQWYh_KxEVwJ26-3WWY/view?usp=drive_link"
-							target="_blank"
-							>Uitwerkingen H6</a
-						>
-					</div>
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="https://drive.google.com/drive/folders/1UkF6yPmDwugj5qG4dWWcslZUOoBLWP8V?usp=drive_link"
-							target="_blank"
-							>Uitleg filmpjes</a
-						>
-						<a
-							class="klas_knop"
-							href="4V/Diode karakteristiek.pdf"
-							target="_blank"
-							>Practicum diode karakteristiek <br> (geen cijfer)</a
-						>
-						<a
-							class="klas_knop"
-							href="4V/elektriciteit_begrippen_en_formules.pdf"
-							target="_blank"
-							>Elektriciteit begrippen en formules</a
-						>
-					</div>
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW2/2025.NA_VWOFOU.Toets-22.Opgavenblad.pdf"
-							target="_blank"
-							>Oefentoets TW2</a
-						>
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW2/2025.NA_VWOFOU.Toets-22.Uitwerkbijlage.pdf"
-							target="_blank"
-							>Uitwerkbijlage</a
-						>
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW2/2025.NA_VWOFOU.Toets-22.Correctievoorschrift.pdf"
-							target="_blank"
-							>Correctievoorschrift</a
-						>
-					</div>
-				</section>
-			</div>
-						<div class="section">
-				<section class="inf-hero">
-					<h2>Periode 1</h2>
-					<p>
-						Hier vind je de benodigde materialen en informatie om je voor te
-						bereiden op Toetsweek 1.
-					</p>
-					<table>
-						<thead>
-							<tr>
-								<th>Week</th>
-								<th>Onderwerp</th>
-								<th>Huiswerk</th>
-								<th>Opmerkingen</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>36</td>
-								<td>Hoofdstuk 1.1 + 1.2</td>
-								<td>Opgave 1 t/m 15</td>
-								<td>Di: into activiteit</td>
-							</tr>
-							<tr>
-								<td>37</td>
-								<td>Hoofdstuk 1.3 + 1.4 + Voorbereiding practicum</td>
-								<td>Alle oneven opgave</td>
-								<td>Do: info avond</td>
-							</tr>
-							<tr>
-								<td>38</td>
-								<td>
-									Hoofdstuk 1.5 + 3.1 + Practicum (4V cluster 2 mist §3.1)
-								</td>
-								<td>Alle oneven opgave</td>
-								<td>Do 3e: ontruimingsoefening</td>
-							</tr>
-							<tr>
-								<td>39</td>
-								<td>
-									Hoofdstuk 3.2 + 3.3 (4V cluster 2 loopt een paragraaf achter)
-								</td>
-								<td>Alle oneven opgave</td>
-								<td>Week tegen pesten Do/Vr: Lustrum</td>
-							</tr>
-							<tr>
-								<td>40</td>
-								<td>
-									Hoofdstuk 3.4 + 3.5 + inhalen/herhalen gemiste paragrafen
-								</td>
-								<td>Alle oneven opgave</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>41</td>
-								<td>Toetsweek</td>
-								<td>H1 + H3</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td>42</td>
-								<td>Studiereizen</td>
-								<td></td>
-								<td></td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="https://drive.google.com/file/d/1qh1HXBaAf-kqzN28asjODo3jSBsPz13k/view?usp=drive_link"
+						target="_blank">Uitwerkingen H2</a>
+					<a class="klas_knop"
+						href="https://drive.google.com/file/d/1dKNnoyZCxokNfuQWYh_KxEVwJ26-3WWY/view?usp=drive_link"
+						target="_blank">Uitwerkingen H6</a>
+				</div>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="https://drive.google.com/drive/folders/1UkF6yPmDwugj5qG4dWWcslZUOoBLWP8V?usp=drive_link"
+						target="_blank">Uitleg filmpjes</a>
+					<a class="klas_knop" href="4V/Diode karakteristiek.pdf" target="_blank">Practicum diode
+						karakteristiek <br> (geen cijfer)</a>
+					<a class="klas_knop" href="4V/elektriciteit_begrippen_en_formules.pdf" target="_blank">Elektriciteit
+						begrippen en formules</a>
+				</div>
+				<div class="inf-actions">
+					<a class="klas_knop" href="4V/Oefentoets TW2/2025.NA_VWOFOU.Toets-22.Opgavenblad.pdf"
+						target="_blank">Oefentoets TW2</a>
+					<a class="klas_knop" href="4V/Oefentoets TW2/2025.NA_VWOFOU.Toets-22.Uitwerkbijlage.pdf"
+						target="_blank">Uitwerkbijlage</a>
+					<a class="klas_knop" href="4V/Oefentoets TW2/2025.NA_VWOFOU.Toets-22.Correctievoorschrift.pdf"
+						target="_blank">Correctievoorschrift</a>
+				</div>
+			</section>
+		</div>
+		<div class="section">
+			<section class="inf-hero">
+				<h2>Periode 1</h2>
+				<p>
+					Hier vind je de benodigde materialen en informatie om je voor te
+					bereiden op Toetsweek 1.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Week</th>
+							<th>Onderwerp</th>
+							<th>Huiswerk</th>
+							<th>Opmerkingen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>36</td>
+							<td>Hoofdstuk 1.1 + 1.2</td>
+							<td>Opgave 1 t/m 15</td>
+							<td>Di: into activiteit</td>
+						</tr>
+						<tr>
+							<td>37</td>
+							<td>Hoofdstuk 1.3 + 1.4 + Voorbereiding practicum</td>
+							<td>Alle oneven opgave</td>
+							<td>Do: info avond</td>
+						</tr>
+						<tr>
+							<td>38</td>
+							<td>
+								Hoofdstuk 1.5 + 3.1 + Practicum (4V cluster 2 mist §3.1)
+							</td>
+							<td>Alle oneven opgave</td>
+							<td>Do 3e: ontruimingsoefening</td>
+						</tr>
+						<tr>
+							<td>39</td>
+							<td>
+								Hoofdstuk 3.2 + 3.3 (4V cluster 2 loopt een paragraaf achter)
+							</td>
+							<td>Alle oneven opgave</td>
+							<td>Week tegen pesten Do/Vr: Lustrum</td>
+						</tr>
+						<tr>
+							<td>40</td>
+							<td>
+								Hoofdstuk 3.4 + 3.5 + inhalen/herhalen gemiste paragrafen
+							</td>
+							<td>Alle oneven opgave</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>41</td>
+							<td>Toetsweek</td>
+							<td>H1 + H3</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>42</td>
+							<td>Studiereizen</td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
 
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="https://drive.google.com/file/d/1BYRK_ao6elOXtDF0LZPPYvQpo0BhSOLu/view?usp=sharing"
-							target="_blank"
-							>Uitwerkingen H1
-						</a>
-						<a
-							class="klas_knop"
-							href="https://drive.google.com/file/d/1qXHgaErG3A0PRDo8IOBu3RiGB8XaUaKg/view?usp=sharing"
-							target="_blank"
-							>Uitwerkingen H3
-						</a>
-					</div>
-					<div class="inf-actions">
-						<a class="klas_knop" href="4V/luchtweerstand.html" target="_blank"
-							>Onderzoek naar luchtweerstand
-						</a>
-					</div>
-					<div class="inf-actions">
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW1/2025.NA_VWOFOU.Oefentoets-TW1-Kracht-en-Beweging.Opgavenblad.pdf"
-							target="_blank"
-							>Oefentoets
-						</a>
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW1/2025.NA_VWOFOU.Oefentoets-TW1-Kracht-en-Beweging.Uitwerkbijlage.pdf"
-							target="_blank"
-							>Uitwerkbijlage
-						</a>
-						<a
-							class="klas_knop"
-							href="4V/Oefentoets TW1/2025.NA_VWOFOU.Oefentoets-TW1-Kracht-en-Beweging.Correctievoorschrift.pdf"
-							target="_blank"
-							>Correctievoorschrift
-						</a>
-					</div>
-				</section>
-			</div>
-		</main>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="https://drive.google.com/file/d/1BYRK_ao6elOXtDF0LZPPYvQpo0BhSOLu/view?usp=sharing"
+						target="_blank">Uitwerkingen H1
+					</a>
+					<a class="klas_knop"
+						href="https://drive.google.com/file/d/1qXHgaErG3A0PRDo8IOBu3RiGB8XaUaKg/view?usp=sharing"
+						target="_blank">Uitwerkingen H3
+					</a>
+				</div>
+				<div class="inf-actions">
+					<a class="klas_knop" href="4V/luchtweerstand.html" target="_blank">Onderzoek naar luchtweerstand
+					</a>
+				</div>
+				<div class="inf-actions">
+					<a class="klas_knop"
+						href="4V/Oefentoets TW1/2025.NA_VWOFOU.Oefentoets-TW1-Kracht-en-Beweging.Opgavenblad.pdf"
+						target="_blank">Oefentoets
+					</a>
+					<a class="klas_knop"
+						href="4V/Oefentoets TW1/2025.NA_VWOFOU.Oefentoets-TW1-Kracht-en-Beweging.Uitwerkbijlage.pdf"
+						target="_blank">Uitwerkbijlage
+					</a>
+					<a class="klas_knop"
+						href="4V/Oefentoets TW1/2025.NA_VWOFOU.Oefentoets-TW1-Kracht-en-Beweging.Correctievoorschrift.pdf"
+						target="_blank">Correctievoorschrift
+					</a>
+				</div>
+			</section>
+		</div>
+	</main>
 
-		<footer>
-			<p>&copy; 2025 Servaas Winder</p>
-		</footer>
-	</body>
+	<footer>
+		<p>&copy; 2025 Servaas Winder</p>
+	</footer>
+</body>
+
 </html>
