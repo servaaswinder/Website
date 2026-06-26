@@ -1,79 +1,61 @@
 ---
+title: Home
+nav: home
 ---
 
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Servaas Winder</title>
-		<link rel="stylesheet" href="style.css" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	</head>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
 
-	<body>
-		{% include site-header.html %}
+	<section class="home-hero">
+		<div class="home-hero__inner">
+			<div class="home-hero__eyebrow">LESPORTAAL · NATUURKUNDE</div>
+			<h1 class="home-hero__title">Welkom op mijn lesportaal</h1>
+			<p class="home-hero__sub">
+				Planning, bestanden, oefentoetsen, practica en verslagen.
+			</p>
+		</div>
+	</section>
 
-		<main>
-			<div class="container">
-				<section class="inf-hero home-intro">
-					<div class="home-intro-layout">
-						<div class="profile-picture" id="profile-pic">
-							<img
-								src="images/Dual_exposure.jpg"
-								alt="Profielfoto"
-								class="responsive-img"
-							/>
-						</div>
-						<script>
-							const profilePic = document.getElementById("profile-pic");
-							if (profilePic) {
-								profilePic.addEventListener("click", function () {
-									// Remove class if it exists to restart animation
-									profilePic.classList.remove("rotate-360");
-									// Force reflow
-									void profilePic.offsetWidth;
-									// Add class back
-									profilePic.classList.add("rotate-360");
-								});
-							}
-						</script>
-						<div class="intro-copy">
-							<h1>Welkom op mijn lesportaal</h1>
-							<p>
-								Hier verzamel ik alles wat je nodig hebt voor mijn vakken. Van
-								planning tot practica en voorbeeldverslagen: je vindt het op één
-								plek zodat je snel kunt doorpakken.
-							</p>
-							<ul class="feature-list">
-								<li>
-									<strong>Natuurkunde:</strong> Planningen, extra opgaven en
-									nakijkmodellen.
-								</li>
-								<li>
-									<strong>Verslagen:</strong> Structuur, eisen en voorbeelden om
-									je verslag strak op te bouwen.
-								</li>
-								<li>
-									<strong>Informatica:</strong> Link naar de Google Site met
-									alle opdrachten en bronnen.
-								</li>
-								
-							</ul>
-						</div>
-					</div>
-						<div class="inf-actions">
-							<a class="square_button" href="Natuurkunde/klassen.html"
-								>Natuurkunde</a
-							>
-							<a class="square_button" href="Informatica/informatica_home.html"
-								>Informatica</a
-							>
-						</div>
-				</section>
+	<main class="home-entries" id="klassen">
+		<div class="section-label">KIES JE KLAS</div>
+		<div class="klas-grid">
+			<a class="klas-card" href="{{ '/Natuurkunde/3havo.html' | relative_url }}">
+				<span class="klas-card__name">3 havo</span>
+				<span class="klas-card__desc">Planning, practica &amp; oefentoetsen.</span>
+				<span class="klas-card__cta">Bekijk planning →</span>
+			</a>
+			<a class="klas-card" href="{{ '/Natuurkunde/4vwo.html' | relative_url }}">
+				<span class="klas-card__name">4 vwo</span>
+				<span class="klas-card__desc">Planning, practica &amp; oefentoetsen.</span>
+				<span class="klas-card__cta">Bekijk planning →</span>
+			</a>
+			<a class="klas-card" href="{{ '/Natuurkunde/5havo.html' | relative_url }}">
+				<span class="klas-card__name">5 havo</span>
+				<span class="klas-card__desc">Planning, practica &amp; oefentoetsen.</span>
+				<span class="klas-card__cta">Bekijk planning →</span>
+			</a>
+			<a class="klas-card" href="{{ '/Natuurkunde/6vwo.html' | relative_url }}">
+				<span class="klas-card__name">6 vwo</span>
+				<span class="klas-card__desc">Planning, oefentoetsen &amp; examenstof.</span>
+				<span class="klas-card__cta">Bekijk planning →</span>
+			</a>
+		</div>
+
+		<div class="verslag-card">
+			<div>
+				<div class="verslag-card__title">Verslagen</div>
+				<div class="verslag-card__desc">Nakijkmodellen en voorbeeldverslagen</div>
 			</div>
-		</main>
+			<div class="verslag-card__actions">
+				<a class="chip-btn" href="{{ '/Natuurkunde/Verslagen/onderbouw.html' | relative_url }}">Onderbouw</a>
+				<a class="chip-btn" href="{{ '/Natuurkunde/Verslagen/bovenbouw.html' | relative_url }}">Bovenbouw</a>
+			</div>
+		</div>
+	</main>
 
-		<footer>
-			<p>&copy; 2025 Servaas Winder</p>
-		</footer>
-	</body>
+	{% include site-footer-nk.html %}
+</body>
 </html>

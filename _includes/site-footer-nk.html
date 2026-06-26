@@ -1,0 +1,19 @@
+<footer class="photoband">
+	<picture>
+		<source media="(max-width: 760px)" srcset="{{ '/images/hero-mobile.webp' | relative_url }}" type="image/webp" />
+		<source media="(max-width: 760px)" srcset="{{ '/images/hero-mobile.jpg' | relative_url }}" />
+		<source srcset="{{ '/images/hero-desktop.webp' | relative_url }}" type="image/webp" />
+		<img
+			class="photoband__img"
+			src="{{ '/images/hero-desktop.jpg' | relative_url }}"
+			alt="Twee mensen kijken uit over een besneeuwd Noors bergdal"
+		/>
+	</picture>
+	<div class="photoband__overlay"></div>
+	<div class="photoband__footer">
+		<div class="photoband__footer-inner">
+			<span>© 2025 Servaas Winder</span>
+			<span>Docent natuurkunde · Northgo College</span>
+		</div>
+	</div>
+</footer>
