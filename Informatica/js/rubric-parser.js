@@ -161,11 +161,24 @@ const RubricParser = {
             }
         }
 
+        // Extract the grade scale and offset from the formula, e.g. "... ) * 8 + 2".
+        // Supports * × x as the multiplication sign. Falls back to null so the
+        // caller can apply the standard * 9 + 1.
+        let formulaScale = null;
+        let formulaOffset = null;
+        const scaleOffsetMatch = bodyText.match(/Cijfer\s*=\s*.*?[\*×x]\s*(\d+(?:[.,]\d+)?)\s*\+\s*(\d+(?:[.,]\d+)?)/i);
+        if (scaleOffsetMatch) {
+            formulaScale = parseFloat(scaleOffsetMatch[1].replace(',', '.'));
+            formulaOffset = parseFloat(scaleOffsetMatch[2].replace(',', '.'));
+        }
+
         return {
             categories: categories,
             totalMaxPoints: totalMaxPoints,
             expectedTotalFromFormula: expectedTotal,
-            match: expectedTotal ? (totalMaxPoints === expectedTotal) : null
+            match: expectedTotal ? (totalMaxPoints === expectedTotal) : null,
+            formulaScale: formulaScale,
+            formulaOffset: formulaOffset
         };
     }
 };
