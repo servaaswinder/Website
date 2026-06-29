@@ -773,9 +773,12 @@ const GradingUI = {
 
         document.getElementById('grading-total-points').textContent = totalPoints;
 
-        // Calculate Grade: (Points / Max) * 9 + 1
+        // Calculate Grade using the assignment's own formula: (Points / Max) * scale + offset.
+        // Falls back to the standard (Points / Max) * 9 + 1 when the rubric has no parsed formula.
         const max = this.currentRubricData.totalMaxPoints;
-        let grade = ((totalPoints / max) * 9) + 1;
+        const scale = (typeof this.currentRubricData.formulaScale === 'number') ? this.currentRubricData.formulaScale : 9;
+        const offset = (typeof this.currentRubricData.formulaOffset === 'number') ? this.currentRubricData.formulaOffset : 1;
+        let grade = ((totalPoints / max) * scale) + offset;
 
         // --- TOO LATE CHECK ---
         const isLate = document.getElementById('grading-late-check')?.checked;
