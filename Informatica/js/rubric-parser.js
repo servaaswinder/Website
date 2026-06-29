@@ -142,22 +142,27 @@ const RubricParser = {
         // We look for patterns.
         
         let expectedTotal = 0;
-        
+        let formulaSubtract = 0;       // bv. de "- 2" in ((punten - 2) / 10)
+        let formulaDenominator = null; // de deler; null -> gebruik totalMaxPoints
+
         // Check for Strict Formula: ((Totaal - Deduction) / Scale) * 9 + 1
         // Example: ((Totaal - 2) / 10)
         let strictMatch = bodyText.match(/Cijfer\s*=\s*\(\(.*?-\s*(\d+)\)\s*\/\s*(\d+)\)/i);
         if (strictMatch) {
-            expectedTotal = parseInt(strictMatch[2], 10) + parseInt(strictMatch[1], 10);
+            formulaSubtract = parseInt(strictMatch[1], 10);
+            formulaDenominator = parseInt(strictMatch[2], 10);
+            expectedTotal = formulaDenominator + formulaSubtract;
         } else {
             // Standard Formula: (Totaal / Max) * 9 + 1
             let formulaMatch = bodyText.match(/Cijfer\s*=\s*.*?(\d+)\s*\)\s*[\*×x]/i) || bodyText.match(/Cijfer\s*=\s*.*?(\d+)\s*[\*×x]/i);
-            
+
             if (!formulaMatch) {
                 if (bodyText.match(/Cijfer\s*=\s*.*?aantal punten\s*\+\s*1/i)) {
                      expectedTotal = 9;
                 }
             } else {
                  expectedTotal = parseInt(formulaMatch[1], 10);
+                 formulaDenominator = expectedTotal; // bv. Eind3: (punten / 30) -> deler 30
             }
         }
 
@@ -178,7 +183,9 @@ const RubricParser = {
             expectedTotalFromFormula: expectedTotal,
             match: expectedTotal ? (totalMaxPoints === expectedTotal) : null,
             formulaScale: formulaScale,
-            formulaOffset: formulaOffset
+            formulaOffset: formulaOffset,
+            formulaSubtract: formulaSubtract,
+            formulaDenominator: formulaDenominator
         };
     }
 };
