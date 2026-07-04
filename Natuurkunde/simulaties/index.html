@@ -1,0 +1,38 @@
+---
+title: Simulaties
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<h1 class="hero__title">Simulaties</h1>
+			<p class="hero__sub">Interactieve natuurkunde die je direct in je browser uitprobeert. Kies een simulatie om te beginnen.</p>
+		</div>
+	</section>
+
+	<main class="main">
+		<section class="card">
+			<div class="section-label">KIES EEN SIMULATIE</div>
+			<div class="sim-grid">
+				<a class="klas-card" href="{{ '/Natuurkunde/simulaties/etmaal.html' | relative_url }}">
+					<span class="klas-card__name">Etmaal &amp; ellipsbaan</span>
+					<span class="klas-card__desc">Waarom niet elk etmaal even lang duurt: de aarde beweegt sneller dicht bij de zon. Met een uitleg over de seizoenen.</span>
+					<span class="klas-card__cta">Open simulatie →</span>
+				</a>
+				<a class="klas-card" href="{{ '/Natuurkunde/simulaties/spanning.html' | relative_url }}">
+					<span class="klas-card__name">Spanning, stroom &amp; weerstand</span>
+					<span class="klas-card__desc">Spanning als elektrische hoogte, met een schakeling naast het hoogteprofiel: één weerstand, serie en parallel.</span>
+					<span class="klas-card__cta">Open simulatie →</span>
+				</a>
+			</div>
+		</section>
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>
