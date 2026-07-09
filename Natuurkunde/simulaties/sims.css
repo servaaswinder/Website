@@ -1,0 +1,45 @@
+/* ============================================================
+   Simulaties — gedeeld design system (bovenop nk.css)
+   Gebruikt door alle pagina's in /Natuurkunde/simulaties/.
+   Wordt geladen via head-nk.html wanneer een pagina `sim: true`
+   in de front matter heeft. Pagina-eigen stijlen (grafieken,
+   diagrammen, tabs) blijven in de <style> van die pagina zelf.
+   ============================================================ */
+
+.sim-layout { display: grid; grid-template-columns: 1fr 280px; gap: 22px; align-items: start; }
+@media (max-width: 860px) { .sim-layout { grid-template-columns: 1fr; } }
+
+.sim-stage { position: relative; }
+.sim-canvas { width: 100%; height: auto; display: block; border-radius: 16px; }
+
+.sim-legend { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.sim-legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+.sim-panel { display: flex; flex-direction: column; gap: 16px; }
+.sim-panel__block { background: var(--bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 16px; }
+.sim-panel__label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; color: var(--muted-2); margin-bottom: 10px; }
+
+.sim-btn {
+  width: 100%; font-family: var(--font-body); font-weight: 600; font-size: 13.5px;
+  padding: 9px 12px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--btn-border); background: var(--card); color: var(--night-2);
+  transition: border-color .15s ease, background .15s ease;
+}
+.sim-btn:hover { border-color: var(--btn-border-hover); }
+.sim-btn--primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.sim-btn--primary:hover { background: #232c9e; }
+.sim-btn-row { display: flex; gap: 8px; }
+
+.sim-slider { margin-bottom: 12px; }
+.sim-slider:last-child { margin-bottom: 0; }
+.sim-slider__row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13.5px; color: var(--ink-cell); margin-bottom: 4px; }
+.sim-slider__val { font-family: var(--font-mono); font-size: 13px; color: var(--accent); }
+.sim-slider input[type="range"] { width: 100%; accent-color: var(--accent); }
+.sim-note { font-size: 12.5px; color: var(--muted-2); line-height: 1.45; margin-top: 10px; }
+
+.sim-stat { display: flex; justify-content: space-between; align-items: baseline; font-size: 13.5px; color: var(--ink-cell); padding: 3px 0; }
+.sim-stat b { font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--night-2); }
+.sim-stat b.accent { color: var(--accent); }
+
+.uitleg p { font-size: 14.5px; color: var(--ink-cell); line-height: 1.65; margin: 0 0 12px; }
+.uitleg p:last-child { margin-bottom: 0; }

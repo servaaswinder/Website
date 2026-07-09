@@ -1,0 +1,784 @@
+---
+title: Spanning, stroom & weerstand
+nav: natuurkunde
+sim: true
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+
+<body>
+  {% include site-header-nk.html %}
+
+
+  <style>
+    /* Alleen spanning-eigen stijlen; de gedeelde sim-stijlen staan in sims.css */
+    .sim-canvas { touch-action: none; } /* deze sim heeft sleepbare pennen */
+
+    .sim-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .sim-tab {
+      padding: 8px 16px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--btn-border); background: var(--card);
+      font-family: var(--font-body); font-weight: 600; font-size: 13.5px; color: var(--night-2);
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+    .sim-tab:hover { border-color: var(--btn-border-hover); }
+    .sim-tab.is-active { background: var(--night); border-color: var(--night); color: #fff; }
+
+    .sim-key { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex: none; }
+
+    .sim-volt { font-family: var(--font-mono); font-weight: 600; font-size: 26px; color: var(--accent); }
+
+    .sim-extra { margin-top: 18px; }
+    .sim-extra-title { font-family: var(--font-head); font-weight: 600; font-size: 15px; color: var(--night-2); margin-bottom: 8px; }
+    .sim-vbar { display: flex; height: 46px; border-radius: 10px; overflow: hidden; border: 1px solid var(--card-border); }
+    .sim-vbar div {
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      font-family: var(--font-mono); font-size: 12.5px; white-space: nowrap; overflow: hidden; min-width: 0;
+      transition: flex-grow .15s ease;
+    }
+    .sim-rbar-row { display: grid; grid-template-columns: 110px 1fr 90px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 13px; color: var(--ink-cell); }
+    .sim-rbar-row b { font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--night-2); text-align: right; }
+    .sim-rbar { height: 14px; border-radius: 7px; background: var(--accent-soft); overflow: hidden; }
+    .sim-rbar i { display: block; height: 100%; border-radius: 7px; background: #8a93ea; transition: width .15s ease; }
+    .sim-rbar i.accent { background: var(--accent); }
+  </style>
+
+  <section class="hero"><div class="hero__inner">
+    <h1 class="hero__title">Spanning, stroom en weerstand</h1>
+    <p class="hero__sub">Spanning is een verschil in elektrische hoogte tussen twee punten. De bron tilt ladingen op, weerstanden verdelen de afdaling en dat bepaalt de stroom. Bekijk de schakeling en het bijbehorende hoogteprofiel naast elkaar.</p>
+  </div></section>
+
+  <main class="main">
+
+    <section class="card">
+      <div class="sim-tabs">
+        <button class="sim-tab is-active" data-scene="een">Eén weerstand</button>
+        <button class="sim-tab" data-scene="serie">Serieschakeling</button>
+        <button class="sim-tab" data-scene="par">Parallelschakeling</button>
+      </div>
+
+      <div class="sim-layout">
+        <div class="sim-stage">
+          <canvas class="sim-canvas" id="cirCanvas" role="img" aria-label="Schakeling met daaronder het hoogteprofiel (potentiaaldiagram)"></canvas>
+          <div class="sim-legend">
+            <span><i class="sim-key" style="background:#e14b4b"></i><i class="sim-key" style="background:#262c52;margin-left:-13px"></i> sleep de pennen: de voltmeter meet het hoogteverschil</span>
+            <span><i class="sim-key" id="dotKey" style="background:#ffd166;width:9px;height:9px"></i> <span id="dotLabel">positieve lading (conventionele richting)</span></span>
+            <span><i class="sim-key" style="background:linear-gradient(90deg,#5f9bff,#ffaa50);width:26px;height:5px;border-radius:3px"></i> kleur = elektrische hoogte</span>
+          </div>
+          <div class="sim-extra" id="sceneExtra"></div>
+        </div>
+
+        <div class="sim-panel">
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">INSTELLINGEN</div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Bronspanning</span><span class="sim-slider__val" id="valU">9,0 V</span></div>
+              <input type="range" id="sldU" min="0" max="12" step="0.5" value="9" />
+            </div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Weerstand R<sub>1</sub></span><span class="sim-slider__val" id="valR1">40 Ω</span></div>
+              <input type="range" id="sldR1" min="10" max="100" step="5" value="40" />
+            </div>
+            <div class="sim-slider" id="rowR2" hidden>
+              <div class="sim-slider__row"><span>Weerstand R<sub>2</sub></span><span class="sim-slider__val" id="valR2">60 Ω</span></div>
+              <input type="range" id="sldR2" min="10" max="100" step="5" value="60" />
+            </div>
+            <div id="rowLucht" hidden style="margin-top:12px">
+              <button class="sim-btn sim-btn--primary" id="btnLucht">Vervang de lucht door R<sub>2</sub></button>
+            </div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">VOLTMETER</div>
+            <div class="sim-volt" id="voltRead">9,0 V</div>
+            <div class="sim-note" style="margin-top:6px">Hoogteverschil tussen de rode en de zwarte pen. Sleep ze naar andere meetpunten.</div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">METERS</div>
+            <div id="meterBlock"></div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">STROOMRICHTING</div>
+            <div class="sim-btn-row">
+              <button class="sim-btn sim-btn--primary" id="btnConv">+ → −</button>
+              <button class="sim-btn" id="btnElek">elektronen</button>
+            </div>
+            <div class="sim-note" id="richtingNote">Conventionele richting: van + naar −, zoals in je boek.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card uitleg">
+      <div class="card__eyebrow">HET MODEL</div>
+      <h2 class="card__title">Een schakeling is een berglandschap</h2>
+      <p>De spanningsbron is een lift: hij tilt elke lading op van elektrische hoogte 0 naar bijvoorbeeld 9 volt. Dat hoogte<em>verschil</em> is de spanning, en het is de drijvende kracht achter de stroom. Een voltmeter meet daarom altijd een verschil tussen twéé punten — zet je beide pennen op dezelfde draad (hetzelfde plateau), dan meet je gewoon 0 V.</p>
+      <p>Een weerstand is een afdaling die het tempo van de ladingen begrenst: hoe groter de totale weerstand, hoe minder ladingen er per seconde rondgaan. Dat is de wet van Ohm: I&nbsp;=&nbsp;U&nbsp;/&nbsp;R. Draden zijn vlakke plateaus: daar verlies je geen hoogte.</p>
+      <p>In een serieschakeling valt er precies één lifthoogte te verdalen — meer bestaat er niet in het landschap. De weerstanden verdelen die vaste afdaling onder elkaar, eerlijk naar grootte: een grotere weerstand krijgt een groter <em>aandeel</em>, maar de som is altijd precies de bronspanning. En omdat het één doorgaande route is, komt elke lading overal even vaak langs: de stroom is in serie overal even groot.</p>
+      <p>Een parallelle weerstand is een tweede afdaling tussen dezelfde twee plateaus. Dat pad bestond stiekem al: het liep door de lucht, met een gigantische weerstand, en er sijpelde een verwaarloosbaar stroompje doorheen. Door er een weerstand in te zetten vervang je dat waardeloze pad door een veel beter geleidend pad. Je knijpt dus nergens iets af — je kunt de stroom alleen maar vergroten. Daarom is de vervangingsweerstand altijd kleiner dan de kleinste van de twee.</p>
+    </section>
+
+    <section class="card uitleg">
+      <div class="card__eyebrow">VOOR DE BOVENBOUW</div>
+      <h2 class="card__title">Van elektrische hoogte naar potentiaal</h2>
+      <p>De „elektrische hoogte" heet officieel de <em>potentiaal</em> V (in volt). Spanning is een potentiaal<em>verschil</em>: U&nbsp;=&nbsp;V<sub>A</sub>&nbsp;−&nbsp;V<sub>B</sub>. Het hoogteprofiel in de simulatie is dus een potentiaaldiagram, precies zoals je dat op het examen tegenkomt.</p>
+      <p>In serie geldt R<sub>v</sub>&nbsp;=&nbsp;R<sub>1</sub>&nbsp;+&nbsp;R<sub>2</sub> en krijgt elke weerstand het aandeel U<sub>1</sub>&nbsp;=&nbsp;(R<sub>1</sub>&nbsp;/&nbsp;R<sub>v</sub>)&nbsp;·&nbsp;U<sub>bron</sub>. Parallel staat over beide takken dezelfde spanning (zelfde twee plateaus!), tellen de stromen op en geldt 1/R<sub>v</sub>&nbsp;=&nbsp;1/R<sub>1</sub>&nbsp;+&nbsp;1/R<sub>2</sub> — met als gevolg dat R<sub>v</sub> altijd kleiner is dan de kleinste weerstand.</p>
+      <p>De stroomrichting is een afspraak: we rekenen van + naar − (conventioneel), terwijl de elektronen in werkelijkheid andersom bewegen. Zet de simulatie maar eens op elektronen: dan zie je ze in het potentiaaldiagram „omhoog rollen". Dat klopt ook — elektronen zijn negatief, dus hun energie is juist láág waar de potentiaal hoog is. Precies daarom is de conventionele richting zo'n handige afspraak: dan werkt het berglandschap gewoon.</p>
+    </section>
+
+  </main>
+
+  <footer class="photoband">
+	<picture>
+		<source media="(max-width: 760px)" srcset="/images/hero-mobile.webp" type="image/webp" />
+		<source media="(max-width: 760px)" srcset="/images/hero-mobile.jpg" />
+		<source srcset="/images/hero-desktop.webp" type="image/webp" />
+		<img
+			class="photoband__img"
+			src="/images/hero-desktop.jpg"
+			alt="Twee mensen kijken uit over een besneeuwd Noors bergdal"
+		/>
+	</picture>
+	<div class="photoband__overlay"></div>
+	<div class="photoband__footer">
+		<div class="photoband__footer-inner">
+			<span>© 2025 Servaas Winder</span>
+			<span>Docent natuurkunde · Northgo College</span>
+		</div>
+	</div>
+</footer>
+
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ---------- toestand ----------
+      var R_AIR = 5e10; // Ω, "weerstand" van het luchtpad (didactische orde van grootte)
+      var params = { U: 9, R1: 40, R2: 60, replaced: false, electrons: false };
+      var scene = "een";
+      var pens = { red: 0, black: 0 }; // indexen in snaps[]
+      var walks = [];                  // geleider-paden (segmenten), elk segment precies één keer getekend
+      var snaps = [];                  // meetpunten voor de voltmeter
+      var flowDist = 0;                // gedeelde "afgelegde afstand" van alle deeltjes (px)
+      var DENSITY_K_SCHEMA = 6.75;     // afstand tussen deeltjes = K / stroom (dichter = meer stroom)
+      var DENSITY_K_PROFILE = 5.85;    // idem in het profiel
+      var FLOW_SPEED = 70;             // vaste snelheid (px/s): overal in de kring gelijk
+
+      // ---------- hulpjes ----------
+      var $ = function (id) { return document.getElementById(id); };
+      function nl(x, dec) { return x.toFixed(dec === undefined ? 1 : dec).replace(".", ","); }
+      function fmtI(i) {
+        if (i === 0) return "0,000 A";
+        if (i >= 0.0005) return nl(i, i >= 0.1 ? 2 : 3) + " A";
+        var s = i.toFixed(12).replace("0.", "");
+        return "0," + s.replace(/(\d{3})(?=\d)/g, "$1 ") + " A";
+      }
+      function lerp(a, b, t) { return a + (b - a) * t; }
+      function colV(V) {
+        var t = Math.max(0, Math.min(1, V / 12));
+        return "rgb(" + Math.round(lerp(95, 255, t)) + "," + Math.round(lerp(155, 170, t)) + "," + Math.round(lerp(255, 80, t)) + ")";
+      }
+
+      function compute() {
+        var U = params.U, R1 = params.R1, R2 = params.R2;
+        if (scene === "een") return { I: U / R1 };
+        if (scene === "serie") {
+          var I = U / (R1 + R2);
+          return { I: I, U1: I * R1, U2: I * R2 };
+        }
+        var R2e = params.replaced ? R2 : R_AIR;
+        var I1 = U / R1, I2 = U / R2e;
+        return { I1: I1, I2: I2, Itot: I1 + I2, Rv: U / (I1 + I2) };
+      }
+
+      // ---------- canvas ----------
+      var canvas = $("cirCanvas"), ctx = canvas.getContext("2d");
+      var W = 0, H = 0;
+      function sizeCanvas() {
+        W = canvas.clientWidth || canvas.parentElement.clientWidth;
+        H = Math.max(470, Math.min(620, Math.round(W * 1.02)));
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.height = H + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      // schema- en profielgebied
+      function frame() {
+        var f = {};
+        f.SL = 64; f.SR = W - 44; f.ST = 56; f.SB = 200;
+        f.yc = (f.ST + f.SB) / 2;
+        f.PL = 60; f.PR = W - 24; f.PT = 262; f.PB = H - 44;
+        f.vy = function (V) { return f.PB - Math.max(0, V) / 12 * (f.PB - f.PT - 6); };
+        f.px = function (frac) { return f.PL + frac * (f.PR - f.PL); };
+        return f;
+      }
+
+      // ---------- geometrie per scène ----------
+      // Elk pad ("walk") = lijst segmenten met: schemapunten, profiel-x-bereik en potentiaal begin/eind.
+      // Potentialen als functies zodat sliders live doorwerken.
+      function buildScene() {
+        var fr = frame(), c = compute();
+        var U = function () { return params.U; };
+        var zero = function () { return 0; };
+        walks = []; snaps = [];
+
+        function seg(pts, f0, f1, V0, V1, curve, opts) {
+          opts = opts || {};
+          return { pts: pts, f0: f0, f1: f1, V0: V0, V1: V1, curve: curve || 0,
+                   profileOnly: !!opts.profileOnly, schemaOnly: !!opts.schemaOnly };
+        }
+        function walk(segs, speedFn) {
+          var len = 0, i, j, p;
+          for (i = 0; i < segs.length; i++) {
+            p = segs[i].pts; segs[i].len = 0;
+            for (j = 1; j < p.length; j++) segs[i].len += Math.hypot(p[j][0] - p[j - 1][0], p[j][1] - p[j - 1][1]);
+            len += segs[i].len;
+            segs[i].speed = speedFn; // elk segment kent zijn eigen lokale stroom
+          }
+          walks.push({ segs: segs, len: len });
+        }
+
+        if (scene === "een") {
+          var mx = (fr.SL + fr.SR) / 2, hw = Math.min(40, (fr.SR - fr.SL) * 0.14);
+          walk([
+            seg([[fr.SL, fr.yc + 13], [fr.SL, fr.yc - 13]], 0.035, 0.10, zero, U),
+            seg([[fr.SL, fr.yc - 13], [fr.SL, fr.ST], [mx - hw, fr.ST]], 0.10, 0.34, U, U),
+            seg([[mx - hw, fr.ST], [mx + hw, fr.ST]], 0.34, 0.62, U, zero),
+            seg([[mx + hw, fr.ST], [fr.SR, fr.ST], [fr.SR, fr.SB], [fr.SL, fr.SB], [fr.SL, fr.yc + 13]], 0.62, 0.965, zero, zero)
+          ], function () { return compute().I; });
+          snaps = [
+            { x: fr.SL + (mx - hw - fr.SL) * 0.5, y: fr.ST, f: 0.22, V: U },
+            { x: mx - hw - 12, y: fr.ST, f: 0.335, V: U },
+            { x: mx + hw + 12, y: fr.ST, f: 0.625, V: zero },
+            { x: fr.SR, y: fr.yc, f: 0.76, V: zero },
+            { x: mx, y: fr.SB, f: 0.86, V: zero }
+          ];
+          walks[0].boxes = [{ x0: mx - hw, x1: mx + hw, y: fr.ST, V0: U, V1: zero, label: function () { return "R₁ = " + params.R1 + " Ω"; } }];
+          walks[0].meters = [{ x: mx - (fr.SR - fr.SL) * 0.22, y: fr.SB, val: function () { return compute().I; } }];
+        }
+
+        if (scene === "serie") {
+          var w = fr.SR - fr.SL, hw2 = Math.min(34, w * 0.115);
+          var c1 = fr.SL + w * 0.38, c2 = fr.SL + w * 0.72;
+          var Vm = function () { var cc = compute(); return params.U - cc.U1; };
+          walk([
+            seg([[fr.SL, fr.yc + 13], [fr.SL, fr.yc - 13]], 0.035, 0.10, zero, U),
+            seg([[fr.SL, fr.yc - 13], [fr.SL, fr.ST], [c1 - hw2, fr.ST]], 0.10, 0.27, U, U),
+            seg([[c1 - hw2, fr.ST], [c1 + hw2, fr.ST]], 0.27, 0.47, U, Vm),
+            seg([[c1 + hw2, fr.ST], [c2 - hw2, fr.ST]], 0.47, 0.56, Vm, Vm),
+            seg([[c2 - hw2, fr.ST], [c2 + hw2, fr.ST]], 0.56, 0.76, Vm, zero),
+            seg([[c2 + hw2, fr.ST], [fr.SR, fr.ST], [fr.SR, fr.SB], [fr.SL, fr.SB], [fr.SL, fr.yc + 13]], 0.76, 0.965, zero, zero)
+          ], function () { return compute().I; });
+          snaps = [
+            { x: fr.SL + (c1 - hw2 - fr.SL) * 0.68, y: fr.ST, f: 0.21, V: U },
+            { x: c1 - hw2 - 12, y: fr.ST, f: 0.265, V: U },
+            { x: (c1 + c2) / 2, y: fr.ST, f: 0.515, V: Vm },
+            { x: c2 + hw2 + 12, y: fr.ST, f: 0.765, V: zero },
+            { x: (fr.SL + fr.SR) / 2, y: fr.SB, f: 0.885, V: zero }
+          ];
+          walks[0].boxes = [
+            { x0: c1 - hw2, x1: c1 + hw2, y: fr.ST, V0: U, V1: Vm, label: function () { return "R₁ = " + params.R1 + " Ω"; } },
+            { x0: c2 - hw2, x1: c2 + hw2, y: fr.ST, V0: Vm, V1: zero, label: function () { return "R₂ = " + params.R2 + " Ω"; } }
+          ];
+          walks[0].meters = [
+            { x: fr.SL + w * 0.07, y: fr.ST, val: function () { return compute().I; } },
+            { x: (fr.SL + fr.SR) / 2 + w * 0.11, y: fr.SB, val: function () { return compute().I; } }
+          ];
+        }
+
+        if (scene === "par") {
+          var wp = fr.SR - fr.SL;
+          var xb1 = fr.SL + wp * 0.52, xb2 = fr.SL + wp * 0.84, hh = Math.min(32, (fr.SB - fr.ST) * 0.24);
+          // gemeenschappelijk pad (door de bron), tak 1 (R1), tak 2 (R2 of lucht)
+          // Beide takken hangen tussen dezelfde twee plateaus (9 V en 0 V); in het profiel
+          // tekenen we ze als twee losse hellingen naast elkaar, R2 rechts van R1.
+          // walk 0 = gemeenschappelijk pad: retour onderlangs + bron + bovenrail tot de splitsing.
+          walk([
+            seg([[xb1, fr.SB], [fr.SL, fr.SB], [fr.SL, fr.yc + 13]], 0.70, 0.95, zero, zero),
+            seg([[fr.SL, fr.yc + 13], [fr.SL, fr.yc - 13]], 0.035, 0.10, zero, U),
+            seg([[fr.SL, fr.yc - 13], [fr.SL, fr.ST], [xb1, fr.ST]], 0.10, 0.33, U, U)
+          ], function () { return compute().Itot; });
+          // walk 1 = tak R1: de helling (echte draad). In het profiel loopt R1 daarna nog een
+          // stuk over de 0V-lijn naar de samenvoeging: een profileOnly-segment (géén echte
+          // draad, dus geen deeltje in het schema — dat voorkomt het "vastzittende" deeltje).
+          walk([
+            seg([[xb1, fr.ST], [xb1, fr.SB]], 0.33, 0.47, U, zero),
+            seg([[xb1, fr.SB], [xb1, fr.SB]], 0.47, 0.70, zero, zero, 0, { profileOnly: true })
+          ], function () { return compute().I1; });
+          // walk 2 = tak R2: bovenrail + helling (getekend). De onderdraad terug naar de
+          // samenvoeging is schemaOnly — in het profiel valt die samen met R1's 0V-stuk, dus
+          // daar tekenen we hem niet (voorkomt dubbele dichtheid onderaan het profiel).
+          walk([
+            seg([[xb1, fr.ST], [xb2, fr.ST]], 0.33, 0.56, U, U),
+            seg([[xb2, fr.ST], [xb2, fr.SB]], 0.56, 0.70, U, zero),
+            seg([[xb2, fr.SB], [xb1, fr.SB]], 0.70, 0.70, zero, zero, 0, { schemaOnly: true })
+          ], function () {
+            var cc = compute();
+            return params.replaced ? cc.I2 : params.U * 0.0008; // luchtpad: bijna geen stroom → hooguit af en toe één deeltje (schaalt mee met U, dus 0 bij U=0)
+          });
+          walks[1].boxes = [{ vert: true, side: "L", y0: fr.yc - hh, y1: fr.yc + hh, x: xb1, V0: U, V1: zero, label: function () { return "R₁ = " + params.R1 + " Ω"; } }];
+          walks[2].boxes = [{ vert: true, side: "R", y0: fr.yc - hh, y1: fr.yc + hh, x: xb2, V0: U, V1: zero, lucht: !params.replaced, label: function () { return params.replaced ? "R₂ = " + params.R2 + " Ω" : "lucht"; } }];
+          walks[2].dashed = !params.replaced;
+          walks[0].meters = [{ x: fr.SL + wp * 0.2, y: fr.SB, val: function () { return compute().Itot; } }];
+          walks[1].meters = [{ x: xb1, y: fr.SB - 26, vert: true, val: function () { return compute().I1; } }];
+          walks[2].meters = [{ x: xb2, y: fr.SB - 26, vert: true, val: function () { return compute().I2; } }];
+          snaps = [
+            { x: fr.SL + wp * 0.3, y: fr.ST, f: 0.22, V: U },
+            { x: xb1 + (xb2 - xb1) / 2, y: fr.ST, f: 0.47, V: U },
+            { x: fr.SL + wp * 0.34, y: fr.SB, f: 0.88, V: zero },
+            { x: xb1 + (xb2 - xb1) / 2, y: fr.SB, f: 0.785, V: zero }
+          ];
+        }
+
+        pens.red = 0;
+        pens.black = snaps.length - 1;
+      }
+
+      // ---------- deeltjesmodel ----------
+      // Fysisch model: alle deeltjes hebben overal dezelfde, vaste snelheid. De stroom zit
+      // volledig in de díchtheid — afstand tussen deeltjes = K / stroom, dus meer stroom =
+      // dichter op elkaar. Elke tak wordt bepaald door zijn eigen stroom (in een
+      // parallelschakeling is I = U/R per tak), dus R1 aanpassen laat R2 volledig ongemoeid.
+      // Bij een splitsing gaan er per tak minder deeltjes doorheen, bij de samenvoeging komen
+      // ze samen tot de volle dichtheid. Elk segment wordt precies één keer getekend.
+
+      // echte on-screen lengte van een segment in het profiel (breedte én hoogte tellen mee).
+      function segProfileLen(fr, s) {
+        var dx = fr.px(s.f1) - fr.px(s.f0);
+        var dy = fr.vy(s.V1()) - fr.vy(s.V0());
+        return Math.hypot(dx, dy);
+      }
+
+      function segSchemaPoint(s, t) {
+        var p = s.pts;
+        if (!s.len) return { x: p[0][0], y: p[0][1] };
+        var acc = t * s.len, j, sx = p[0][0], sy = p[0][1];
+        for (j = 1; j < p.length; j++) {
+          var L = Math.hypot(p[j][0] - p[j - 1][0], p[j][1] - p[j - 1][1]);
+          if (acc <= L || j === p.length - 1) {
+            var tt = L ? Math.min(1, acc / L) : 0;
+            sx = lerp(p[j - 1][0], p[j][0], tt); sy = lerp(p[j - 1][1], p[j][1], tt);
+            break;
+          }
+          acc -= L;
+        }
+        return { x: sx, y: sy };
+      }
+
+      function segProfilePoint(fr, s, t) {
+        var f = lerp(s.f0, s.f1, t);
+        var Vv = lerp(s.V0(), s.V1(), t);
+        return { x: fr.px(f), y: fr.vy(Vv) + (s.curve ? s.curve * Math.sin(Math.PI * t) : 0) };
+      }
+
+      // teken deeltjes langs een héél pad (een walk) — dus dóórlopend over de segmentgrenzen
+      // (knikken) heen, zodat er bij een knik geen deeltje verdwijnt of ontstaat. De stroom in
+      // een walk is overal gelijk, dus één spacing (∝ 1/stroom) voor het hele pad. De spacing
+      // wordt fijn bijgesteld zodat er een geheel aantal deeltjes op past: bij een gesloten lus
+      // (één weerstand, serie) is er dan ook bij het begin/eind geen naad.
+      function drawPathDots(fr, wk, isProfile) {
+        var Iseg = wk.segs.length ? wk.segs[0].speed() : 0;
+        if (Iseg < 1e-4) return; // geen stroom → geen deeltjes (bv. bij U = 0)
+        var spacing = (isProfile ? DENSITY_K_PROFILE : DENSITY_K_SCHEMA) / Iseg;
+        if (spacing < 8) spacing = 8;
+
+        var segs = [], lens = [], total = 0, i, s, L;
+        for (i = 0; i < wk.segs.length; i++) {
+          s = wk.segs[i];
+          if (isProfile ? s.schemaOnly : s.profileOnly) continue; // niet-getekende delen overslaan
+          L = isProfile ? segProfileLen(fr, s) : s.len;
+          if (L <= 0.01) continue;
+          segs.push(s); lens.push(L); total += L;
+        }
+        if (total <= 0.5) return;
+
+        var r = isProfile ? 3 : 3.4, off, k;
+        function drawAt(dist) {
+          var d = dist, si = 0;
+          while (si < lens.length - 1 && d > lens[si]) { d -= lens[si]; si++; }
+          var t = lens[si] > 0 ? Math.min(1, d / lens[si]) : 0;
+          var pt = isProfile ? segProfilePoint(fr, segs[si], t) : segSchemaPoint(segs[si], t);
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, r, 0, 7); ctx.fill();
+        }
+
+        if (total / spacing < 0.9) {
+          // heel weinig stroom (luchtpad): geen vaste maat afdwingen. Eén deeltje sijpelt
+          // langzaam door en daarna is het pad even leeg — een schaars, overtuigend stroompje.
+          off = ((flowDist % spacing) + spacing) % spacing;
+          if (off <= total) drawAt(off);
+          return;
+        }
+
+        var n = Math.max(1, Math.round(total / spacing));
+        spacing = total / n;                 // geheel aantal → naadloos rond een gesloten lus
+        off = ((flowDist % spacing) + spacing) % spacing;
+        for (k = 0; k < n; k++) drawAt(off + k * spacing);
+      }
+
+      // ---------- tekenen ----------
+      function drawSegLine(s, dashed) {
+        var fr = frame();
+        // schema (niet voor profileOnly-segmenten — die zijn geen echte draad)
+        if (!s.profileOnly) {
+          ctx.setLineDash(dashed ? [5, 6] : []);
+          ctx.lineWidth = 3;
+          var p = s.pts;
+          for (var j = 1; j < p.length; j++) {
+            var g = ctx.createLinearGradient(p[j - 1][0], p[j - 1][1], p[j][0], p[j][1]);
+            g.addColorStop(0, colV(s.V0())); g.addColorStop(1, colV(s.V1()));
+            ctx.strokeStyle = s.V0() === s.V1() ? colV(s.V0()) : g;
+            ctx.beginPath(); ctx.moveTo(p[j - 1][0], p[j - 1][1]); ctx.lineTo(p[j][0], p[j][1]); ctx.stroke();
+          }
+          ctx.setLineDash([]);
+        }
+        // profiel (niet voor schemaOnly-segmenten — die vallen samen met een ander stuk)
+        if (!s.schemaOnly) {
+          var x0 = fr.px(s.f0), x1 = fr.px(s.f1), y0 = fr.vy(s.V0()), y1 = fr.vy(s.V1());
+          var g2 = ctx.createLinearGradient(x0, 0, x1, 0);
+          g2.addColorStop(0, colV(s.V0())); g2.addColorStop(1, colV(s.V1()));
+          ctx.strokeStyle = g2;
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash(dashed ? [5, 6] : []); // luchtpad ook in het profiel gestippeld
+          ctx.beginPath();
+          if (s.curve) {
+            ctx.moveTo(x0, y0);
+            for (var k = 1; k <= 16; k++) {
+              var t = k / 16;
+              ctx.lineTo(lerp(x0, x1, t), lerp(y0, y1, t) + s.curve * Math.sin(Math.PI * t));
+            }
+          } else { ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); }
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+
+      function draw() {
+        var fr = frame(), c = compute();
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#0d1230";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(0, 0, W, H, 16); else ctx.rect(0, 0, W, H);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,.06)";
+        for (var gx = 13; gx < W; gx += 26) for (var gy = 13; gy < H; gy += 26) {
+          ctx.beginPath(); ctx.arc(gx, gy, 1.2, 0, 7); ctx.fill();
+        }
+
+        var fs = W < 430 ? 10 : 11;
+        ctx.font = "600 " + fs + "px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "rgba(255,255,255,.5)";
+        ctx.fillText("SCHAKELING", fr.SL, 30);
+        ctx.fillText("HOOGTEPROFIEL (rondje door de kring)", fr.PL, fr.PT - 16);
+
+        // profiel-as
+        ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(fr.PL - 8, fr.PT - 6); ctx.lineTo(fr.PL - 8, fr.PB); ctx.lineTo(fr.PR, fr.PB); ctx.stroke();
+        ctx.font = "500 9.5px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "right";
+        for (var vt = 0; vt <= 12; vt += 3) {
+          ctx.fillStyle = "rgba(255,255,255,.45)";
+          ctx.fillText(vt + " V", fr.PL - 13, fr.vy(vt) + 3);
+          ctx.strokeStyle = "rgba(255,255,255,.07)";
+          ctx.beginPath(); ctx.moveTo(fr.PL - 8, fr.vy(vt)); ctx.lineTo(fr.PR, fr.vy(vt)); ctx.stroke();
+        }
+
+        // geleiders
+        walks.forEach(function (wk) {
+          wk.segs.forEach(function (s) { drawSegLine(s, wk.dashed); });
+        });
+
+        // weerstand-blokjes + labels
+        ctx.font = "600 " + fs + "px 'IBM Plex Mono', monospace";
+        walks.forEach(function (wk) {
+          (wk.boxes || []).forEach(function (b) {
+            var g;
+            if (b.vert) {
+              g = ctx.createLinearGradient(0, b.y0, 0, b.y1);
+              g.addColorStop(0, colV(b.V0())); g.addColorStop(1, colV(b.V1()));
+              ctx.fillStyle = b.lucht ? "rgba(255,255,255,.04)" : g;
+              ctx.strokeStyle = "rgba(255,255,255,.7)";
+              ctx.lineWidth = 1.4;
+              ctx.setLineDash(b.lucht ? [4, 4] : []);
+              ctx.beginPath(); ctx.rect(b.x - 11, b.y0, 22, b.y1 - b.y0); ctx.fill(); ctx.stroke();
+              ctx.setLineDash([]);
+              ctx.fillStyle = "rgba(255,255,255,.85)";
+              if (W < 480) {
+                // smal scherm: label boven het blokje, binnen het canvas houden.
+                // R1 (links) en R2 (rechts) op verschillende hoogte zodat ze niet botsen.
+                ctx.textAlign = "center";
+                var lw = ctx.measureText(b.label()).width;
+                var lx = Math.max(8 + lw / 2, Math.min(b.x, W - 8 - lw / 2));
+                var topY = b.side === "R" ? b.y0 - 22 : b.y0 - 8;
+                ctx.fillText(b.label(), lx, topY);
+                if (b.lucht) {
+                  ctx.fillStyle = "rgba(255,255,255,.45)";
+                  ctx.fillText("± 50 GΩ", lx, b.y0 - 8);
+                }
+              } else {
+                ctx.textAlign = "left";
+                ctx.fillText(b.label(), b.x + 17, (b.y0 + b.y1) / 2 + 4);
+                if (b.lucht) {
+                  ctx.fillStyle = "rgba(255,255,255,.45)";
+                  ctx.fillText("± 50 GΩ", b.x + 17, (b.y0 + b.y1) / 2 + 19);
+                }
+              }
+            } else {
+              g = ctx.createLinearGradient(b.x0, 0, b.x1, 0);
+              g.addColorStop(0, colV(b.V0())); g.addColorStop(1, colV(b.V1()));
+              ctx.fillStyle = g;
+              ctx.strokeStyle = "rgba(255,255,255,.7)";
+              ctx.lineWidth = 1.4;
+              ctx.beginPath(); ctx.rect(b.x0, b.y - 11, b.x1 - b.x0, 22); ctx.fill(); ctx.stroke();
+              ctx.fillStyle = "rgba(255,255,255,.85)";
+              ctx.textAlign = "center";
+              ctx.fillText(b.label(), (b.x0 + b.x1) / 2, b.y - 18);
+            }
+          });
+        });
+
+        // bron (lift)
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(fr.SL - 13, fr.yc - 7); ctx.lineTo(fr.SL + 13, fr.yc - 7); ctx.stroke();
+        ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(fr.SL - 7, fr.yc + 7); ctx.lineTo(fr.SL + 7, fr.yc + 7); ctx.stroke();
+        ctx.font = "600 " + fs + "px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "rgba(255,255,255,.85)";
+        ctx.fillText("+", fr.SL + 18, fr.yc - 4);
+        ctx.fillText("−", fr.SL + 18, fr.yc + 12);
+        ctx.fillText(nl(params.U) + " V", fr.SL + 34, fr.yc + 4);
+
+        // meetpunten + pennen
+        snaps.forEach(function (s) {
+          ctx.strokeStyle = "rgba(255,255,255,.5)";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.arc(s.x, s.y, 4.5, 0, 7); ctx.stroke();
+        });
+        var same = pens.red === pens.black;
+        [["red", "#e14b4b", same ? -5 : 0], ["black", "#171d43", same ? 5 : 0]].forEach(function (pen) {
+          var s = snaps[pens[pen[0]]];
+          ctx.fillStyle = pen[1];
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 2.2;
+          ctx.beginPath(); ctx.arc(s.x + pen[2], s.y, 8, 0, 7); ctx.fill(); ctx.stroke();
+          if (pen[0] === "black") {
+            ctx.fillStyle = "#fff";
+            ctx.beginPath(); ctx.arc(s.x + pen[2], s.y, 2.2, 0, 7); ctx.fill();
+          }
+        });
+
+        // voltmeter-aflezing in het profiel: stippellijnen + verschilpijl
+        var Vr = snaps[pens.red].V(), Vb = snaps[pens.black].V();
+        var yr = fr.vy(Vr), yb = fr.vy(Vb), ax = fr.PR - 14;
+        ctx.setLineDash([3, 5]);
+        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = "#e14b4b";
+        ctx.beginPath(); ctx.moveTo(fr.PL - 4, yr); ctx.lineTo(ax, yr); ctx.stroke();
+        ctx.strokeStyle = "rgba(255,255,255,.75)";
+        ctx.beginPath(); ctx.moveTo(fr.PL - 4, yb); ctx.lineTo(ax, yb); ctx.stroke();
+        ctx.setLineDash([]);
+        if (Math.abs(yr - yb) > 3) {
+          ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.6;
+          ctx.beginPath(); ctx.moveTo(ax, yr); ctx.lineTo(ax, yb); ctx.stroke();
+          [[yr, yb], [yb, yr]].forEach(function (pr) {
+            var dirY = pr[0] < pr[1] ? 1 : -1;
+            ctx.beginPath();
+            ctx.moveTo(ax - 3.5, pr[0] + 6 * dirY); ctx.lineTo(ax, pr[0]); ctx.lineTo(ax + 3.5, pr[0] + 6 * dirY);
+            ctx.stroke();
+          });
+        }
+        ctx.font = "600 " + fs + "px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.fillText("U = " + nl(Math.abs(Vr - Vb)) + " V", ax - 7, (yr + yb) / 2 + 4);
+
+        // ampèremeters
+        ctx.font = "600 10px 'IBM Plex Mono', monospace";
+        walks.forEach(function (wk) {
+          (wk.meters || []).forEach(function (m) {
+            ctx.fillStyle = "#12183a";
+            ctx.strokeStyle = "rgba(255,255,255,.6)";
+            ctx.lineWidth = 1.4;
+            ctx.beginPath(); ctx.arc(m.x, m.y, 11, 0, 7); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.fillText("A", m.x, m.y + 3.5);
+            ctx.fillStyle = "rgba(255,255,255,.65)";
+            var v = m.val();
+            var txt = v >= 0.0005 ? nl(v, v >= 0.1 ? 2 : 3) + " A" : "≈ 0 A";
+            if (m.vert) { ctx.textAlign = "right"; ctx.fillText(txt, m.x - 16, m.y + 3.5); }
+            else ctx.fillText(txt, m.x, m.y + 24);
+          });
+        });
+
+        // ladingen — elk segment precies één keer. Deeltjes staan om de `spacing` px, met
+        // spacing ∝ 1/stroom (dus dichter = meer stroom). Alle segmenten delen dezelfde
+        // phase (flowDist), dus overal exact dezelfde snelheid; alleen de dichtheid verschilt.
+        var dotCol = params.electrons ? "#7fe0ff" : "#ffd166";
+        ctx.fillStyle = dotCol;
+        walks.forEach(function (wk) {
+          drawPathDots(fr, wk, false); // schema
+          drawPathDots(fr, wk, true);  // profiel
+        });
+
+        // as-label
+        ctx.font = "500 10px 'IBM Plex Sans', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255,255,255,.4)";
+        ctx.fillText("positie in de kring →", (fr.PL + fr.PR) / 2, fr.PB + 26);
+      }
+
+      // ---------- HTML-panelen ----------
+      function updateHTML() {
+        var c = compute();
+        $("valU").textContent = nl(params.U) + " V";
+        $("valR1").textContent = params.R1 + " Ω";
+        $("valR2").textContent = params.R2 + " Ω";
+        $("rowR2").hidden = scene === "een" || (scene === "par" && !params.replaced);
+        $("rowLucht").hidden = scene !== "par";
+        $("btnLucht").innerHTML = params.replaced ? "Haal R<sub>2</sub> weg (weer lucht)" : "Vervang de lucht door R<sub>2</sub>";
+
+        var Vr = snaps[pens.red].V(), Vb = snaps[pens.black].V();
+        $("voltRead").textContent = nl(Math.abs(Vr - Vb)) + " V";
+
+        var mb = "";
+        if (scene === "een") {
+          mb = "<div class='sim-stat'><span>Stroomsterkte I</span><b class='accent'>" + fmtI(c.I) + "</b></div>" +
+               "<div class='sim-note'>I = U / R = " + nl(params.U) + " / " + params.R1 + " = " + nl(c.I, c.I >= 0.1 ? 2 : 3) + " A</div>";
+        } else if (scene === "serie") {
+          mb = "<div class='sim-stat'><span>Stroom (overal!)</span><b class='accent'>" + fmtI(c.I) + "</b></div>" +
+               "<div class='sim-stat'><span>U over R<sub>1</sub></span><b>" + nl(c.U1) + " V</b></div>" +
+               "<div class='sim-stat'><span>U over R<sub>2</sub></span><b>" + nl(c.U2) + " V</b></div>" +
+               "<div class='sim-note'>" + nl(c.U1) + " + " + nl(c.U2) + " = " + nl(params.U) + " V — samen precies de bronspanning.</div>";
+        } else {
+          mb = "<div class='sim-stat'><span>I door R<sub>1</sub></span><b>" + fmtI(c.I1) + "</b></div>" +
+               "<div class='sim-stat'><span>I door " + (params.replaced ? "R<sub>2</sub>" : "de lucht") + "</span><b>" + fmtI(c.I2) + "</b></div>" +
+               "<div class='sim-stat'><span>I totaal</span><b class='accent'>" + fmtI(c.Itot) + "</b></div>" +
+               "<div class='sim-stat'><span>Vervangingsweerstand</span><b class='accent'>" + nl(c.Rv) + " Ω</b></div>";
+        }
+        $("meterBlock").innerHTML = mb;
+
+        var ex = "";
+        if (scene === "serie") {
+          var f1 = params.R1 / (params.R1 + params.R2) * 100;
+          ex = "<div class='sim-extra-title'>Verdeling van de bronspanning</div>" +
+               "<div class='sim-vbar'>" +
+               "<div style='flex-grow:" + params.R1 + ";background:#2a34b8'>U₁ = " + nl(c.U1) + " V</div>" +
+               "<div style='flex-grow:" + params.R2 + ";background:#8a93ea'>U₂ = " + nl(c.U2) + " V</div>" +
+               "</div>" +
+               "<div class='sim-note'>De balk is de bronspanning (" + nl(params.U) + " V) en wordt naar rato van de weerstanden verdeeld: R<sub>1</sub> krijgt " + nl(f1, 0) + "%. Samen is het altijd precies 100% — meer valt er niet te verdelen.</div>";
+        } else if (scene === "par") {
+          var maxR = Math.max(params.R1, params.replaced ? params.R2 : params.R1) * 1.12;
+          function rbar(label, val, w, accent, extra) {
+            return "<div class='sim-rbar-row'><span>" + label + "</span><div class='sim-rbar'><i" + (accent ? " class='accent'" : "") + " style='width:" + w + "%'></i></div><b>" + extra + "</b></div>";
+          }
+          ex = "<div class='sim-extra-title'>Vervangingsweerstand</div>" +
+               rbar("R<sub>1</sub>", params.R1, params.R1 / maxR * 100, false, params.R1 + " Ω") +
+               (params.replaced
+                 ? rbar("R<sub>2</sub>", params.R2, params.R2 / maxR * 100, false, params.R2 + " Ω")
+                 : rbar("lucht", 0, 100, false, "± 50 GΩ →")) +
+               rbar("R<sub>v</sub>", c.Rv, c.Rv / maxR * 100, true, nl(c.Rv) + " Ω") +
+               "<div class='sim-note'>" + (params.replaced
+                 ? "R<sub>v</sub> is kleiner dan de kleinste weerstand: je hebt een slecht pad (lucht) vervangen door een goed pad, dus er kan alleen maar méér stroom lopen."
+                 : "Het luchtpad is er al, maar met zo'n enorme weerstand dat er vrijwel niets doorheen sijpelt: R<sub>v</sub> is nog gewoon " + nl(c.Rv) + " Ω.") + "</div>";
+        }
+        $("sceneExtra").innerHTML = ex;
+
+        $("dotLabel").textContent = params.electrons ? "elektron (echte richting: van − naar +)" : "positieve lading (conventionele richting)";
+        $("dotKey").style.background = params.electrons ? "#7fe0ff" : "#ffd166";
+        $("richtingNote").textContent = params.electrons
+          ? "Elektronen zijn negatief: kijk in het hoogteprofiel — ze rollen omhoog! Daarom rekenen we liever met de conventionele richting."
+          : "Conventionele richting: van + naar −, zoals in je boek.";
+      }
+
+      // ---------- interactie ----------
+      document.querySelectorAll(".sim-tab").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".sim-tab").forEach(function (b) { b.classList.remove("is-active"); });
+          this.classList.add("is-active");
+          scene = this.dataset.scene;
+          buildScene();
+          updateHTML();
+        });
+      });
+      $("sldU").addEventListener("input", function () { params.U = parseFloat(this.value); updateHTML(); });
+      $("sldR1").addEventListener("input", function () { params.R1 = parseInt(this.value, 10); updateHTML(); });
+      $("sldR2").addEventListener("input", function () { params.R2 = parseInt(this.value, 10); updateHTML(); });
+      $("btnLucht").addEventListener("click", function () {
+        params.replaced = !params.replaced;
+        buildScene();
+        updateHTML();
+      });
+      $("btnConv").addEventListener("click", function () {
+        params.electrons = false;
+        this.classList.add("sim-btn--primary"); $("btnElek").classList.remove("sim-btn--primary");
+        updateHTML();
+      });
+      $("btnElek").addEventListener("click", function () {
+        params.electrons = true;
+        this.classList.add("sim-btn--primary"); $("btnConv").classList.remove("sim-btn--primary");
+        updateHTML();
+      });
+
+      // pennen slepen (snappen naar meetpunten)
+      var dragging = null;
+      function canvasPos(ev) {
+        var r = canvas.getBoundingClientRect();
+        return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+      }
+      function nearestSnap(p) {
+        var best = 0, bd = 1e9;
+        snaps.forEach(function (s, i) {
+          var d = Math.hypot(s.x - p.x, s.y - p.y);
+          if (d < bd) { bd = d; best = i; }
+        });
+        return best;
+      }
+      canvas.addEventListener("pointerdown", function (ev) {
+        var p = canvasPos(ev);
+        var dr = Math.hypot(snaps[pens.red].x - p.x, snaps[pens.red].y - p.y);
+        var db = Math.hypot(snaps[pens.black].x - p.x, snaps[pens.black].y - p.y);
+        if (Math.min(dr, db) < 26) {
+          dragging = dr <= db ? "red" : "black";
+          try { canvas.setPointerCapture(ev.pointerId); } catch (e) { /* synthetische events hebben geen capture nodig */ }
+        }
+      });
+      canvas.addEventListener("pointermove", function (ev) {
+        if (!dragging) return;
+        pens[dragging] = nearestSnap(canvasPos(ev));
+        updateHTML();
+      });
+      canvas.addEventListener("pointerup", function () { dragging = null; });
+
+      // ---------- animatielus ----------
+      var lastFrame = null;
+      function tick(now) {
+        if (lastFrame === null) lastFrame = now;
+        var dt = Math.min(0.1, (now - lastFrame) / 1000);
+        lastFrame = now;
+        var dir = params.electrons ? -1 : 1;
+        // vaste snelheid, overal gelijk. flowDist is de gedeelde "afgelegde afstand" (px).
+        // De stroom zit in de dichtheid (afstand tussen deeltjes), niet in de snelheid.
+        flowDist += dir * FLOW_SPEED * dt;
+        draw();
+        requestAnimationFrame(tick);
+      }
+
+      window.addEventListener("resize", function () { sizeCanvas(); buildScene(); updateHTML(); });
+
+      sizeCanvas();
+      buildScene();
+      updateHTML();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

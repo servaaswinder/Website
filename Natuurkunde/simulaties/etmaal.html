@@ -1,0 +1,526 @@
+---
+title: Etmaal & ellipsbaan
+nav: natuurkunde
+sim: true
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+
+<body>
+  {% include site-header-nk.html %}
+
+
+  <style>
+    /* Alleen etmaal-eigen stijlen; de gedeelde sim-stijlen staan in sims.css */
+    .sim-key { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+
+    .sim-meter { height: 5px; border-radius: 3px; background: var(--accent-soft); margin: 2px 0 8px; overflow: hidden; }
+    .sim-meter i { display: block; height: 100%; width: 50%; background: var(--accent); border-radius: 3px; transition: width .1s linear; }
+
+    .sim-day { font-size: 14px; color: var(--ink-cell); line-height: 1.55; }
+    .sim-day b { color: var(--night-2); }
+    .sim-day .accent { color: var(--accent); font-weight: 600; }
+
+    .sim-chart-wrap { margin-top: 26px; }
+    .sim-chart-title { font-family: var(--font-head); font-weight: 600; font-size: 16px; color: var(--night-2); margin-bottom: 4px; }
+    .sim-chart-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 16px; }
+    .sim-chart { position: relative; height: 210px; background: var(--bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 16px 30px; }
+    .sim-chart__bars { position: absolute; left: 16px; right: 120px; top: 14px; bottom: 30px; display: flex; align-items: flex-end; gap: 8px; }
+    .sim-bar { flex: 1; max-width: 44px; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; }
+    .sim-bar__fill { background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
+    .sim-bar__val { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); text-align: center; margin-bottom: 3px; white-space: nowrap; }
+    .sim-bar__num { position: absolute; top: 100%; left: 0; right: 0; text-align: center; font-family: var(--font-mono); font-size: 10.5px; color: var(--faint); margin-top: 4px; }
+    .sim-line { position: absolute; left: 16px; right: 120px; border-top: 2px dashed; pointer-events: none; }
+    .sim-line__label { position: absolute; left: 100%; margin-left: 8px; top: -9px; font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+    .sim-line--mean { border-color: var(--accent); color: var(--accent); }
+    .sim-line--sid { border-color: var(--faint); color: var(--muted-2); }
+
+    .sim-svg-wrap { margin: 18px 0 16px; overflow-x: auto; }
+    .sim-svg-wrap svg { display: block; width: 100%; min-width: 620px; }
+  </style>
+
+  <section class="hero"><div class="hero__inner">
+    <h1 class="hero__title">Het etmaal en de ellipsbaan</h1>
+    <p class="hero__sub">De aarde beweegt sneller als ze dicht bij de zon staat en langzamer als ze ver weg staat. Daardoor duurt niet elk etmaal even lang. In deze simulatie is de baan sterk overdreven, anders zou je er niets van zien.</p>
+  </div></section>
+
+  <main class="main">
+
+    <section class="card">
+      <div class="sim-layout">
+        <div class="sim-stage">
+          <canvas class="sim-canvas" id="orbitCanvas" role="img" aria-label="Simulatie van de aarde in een ellipsbaan om de zon"></canvas>
+          <div class="sim-legend">
+            <span><i class="sim-key" style="background:#ff5d5d"></i> jij (draait mee met de aarde)</span>
+            <span><i class="sim-key" style="background:#ffd166"></i> richting van de zon</span>
+            <span><i class="sim-key" style="background:rgba(120,130,180,.9)"></i> stand na precies 360° draaien</span>
+            <span><i class="sim-key" style="background:rgba(255,255,255,.4);height:5px;width:5px;border-radius:50%"></i> positie per tijdstap (gelijke tussenpozen)</span>
+          </div>
+
+          <div class="sim-chart-wrap">
+            <div class="sim-chart-title">Lengte van elk etmaal in dit jaar</div>
+            <div class="sim-chart-sub">Elk balkje is één voltooid etmaal, geschaald zodat het gemiddelde etmaal 24 uur duurt. Dicht bij de zon (begin en eind van het jaar) zijn de etmalen het langst.</div>
+            <div class="sim-chart" id="chart">
+              <div class="sim-chart__bars" id="chartBars"></div>
+              <div class="sim-line sim-line--mean" id="lineMean"><span class="sim-line__label">24 u (gemiddeld)</span></div>
+              <div class="sim-line sim-line--sid" id="lineSid"><span class="sim-line__label">precies 360°</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-panel">
+          <div class="sim-panel__block">
+            <div class="sim-btn-row">
+              <button class="sim-btn sim-btn--primary" id="btnPlay">Pauze</button>
+              <button class="sim-btn" id="btnReset">Reset</button>
+            </div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">INSTELLINGEN</div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Excentriciteit baan</span><span class="sim-slider__val" id="valE">0,50</span></div>
+              <input type="range" id="sldE" min="0" max="0.6" step="0.05" value="0.5" />
+            </div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Rotaties per jaar</span><span class="sim-slider__val" id="valN">10</span></div>
+              <input type="range" id="sldN" min="6" max="20" step="1" value="10" />
+            </div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Simulatiesnelheid</span><span class="sim-slider__val" id="valSpeed">1,0×</span></div>
+              <input type="range" id="sldSpeed" min="0.25" max="4" step="0.25" value="1" />
+            </div>
+            <div class="sim-note">Sterk overdreven waarden. De echte aarde: excentriciteit 0,017 en ruim 366 rotaties per jaar. Aanpassen start het jaar opnieuw.</div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">LIVE</div>
+            <div class="sim-stat"><span>Afstand tot de zon</span><b id="statR">1,00</b></div>
+            <div class="sim-meter"><i id="meterR"></i></div>
+            <div class="sim-stat"><span>Baansnelheid</span><b id="statV">1,00</b></div>
+            <div class="sim-meter"><i id="meterV"></i></div>
+            <div class="sim-note" style="margin-top:6px">1,00 = gemiddelde waarde</div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">ETMAAL</div>
+            <div class="sim-day" id="dayInfo">
+              Jaar <b>1</b> · etmaal <b>1</b> is bezig.
+            </div>
+            <div class="sim-day" id="lastDay" style="margin-top:8px">Nog geen etmaal voltooid.</div>
+            <div class="sim-note" id="sidInfo"></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="card uitleg">
+      <div class="card__eyebrow">HOE ZIT DAT?</div>
+      <h2 class="card__title">Waarom duurt niet elk etmaal even lang?</h2>
+      <p>Een etmaal is de tijd tussen twee momenten waarop de zon precies in het zuiden staat. Dat is <em>niet</em> hetzelfde als één keer ronddraaien. Terwijl de aarde om haar as draait, schuift ze ook een stukje op langs haar baan — vanaf de aarde gezien is de zon daardoor een stukje verplaatst. De aarde moet dus iets méér dan 360° draaien voordat de zon weer in het zuiden staat.</p>
+      <p>Hoe groot dat extra stukje is, hangt af van hoe snel de aarde langs haar baan beweegt. Volgens de tweede wet van Kepler beweegt een planeet sneller naarmate hij dichter bij de zon staat. Dicht bij de zon legt de aarde per rotatie dus een groter stuk van haar baan af: het extra stukje is groot en het etmaal duurt langer. Ver van de zon is het extra stukje klein en is het etmaal korter — dan zit het dicht bij de tijd van precies 360° draaien (de sterrendag).</p>
+      <p>Bij de echte aarde is de baan bijna een cirkel (excentriciteit 0,017). Het perihelium valt rond 3 januari, dan staat de aarde 147,1 miljoen km van de zon; het aphelium valt rond 4 juli, op 152,1 miljoen km. Het verschil per etmaal is daardoor maar zo'n 8 seconden. Dat lijkt niets, maar het telt dag na dag op. Samen met het effect van de scheve aardas loopt een zonnewijzer daardoor in de loop van het jaar tot ruim een kwartier voor of achter op de klok: de tijdsvereffening.</p>
+    </section>
+
+    <section class="card uitleg">
+      <div class="card__eyebrow">ZOMER &amp; WINTER</div>
+      <h2 class="card__title">Dicht bij de zon is niet hetzelfde als zomer</h2>
+      <p>Je zou denken: hoe dichter bij de zon, hoe warmer. Toch heeft het noordelijk halfrond winter als de aarde het dichtst bij de zon staat. De seizoenen hebben namelijk niets met de afstand te maken: ze komen door de schuine draaias, die het hele jaar dezelfde kant op wijst. Staat de noordpool naar de zon gekanteld, dan staat de zon op het noordelijk halfrond hoger aan de hemel en zijn de dagen langer: zomer. De kalenderpunten van de seizoenen zijn daarom niet het perihelium en het aphelium, maar de <em>wendes</em>.</p>
+
+      <div class="sim-svg-wrap">
+        <svg viewBox="0 0 760 318" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zijaanzicht: de zon in het midden, de aarde bij de zomerwende (links) en de winterwende (rechts), beide met dezelfde schuine draaias">
+          <defs>
+            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(255,222,120,1)"/>
+              <stop offset="45%" stop-color="rgba(255,180,70,.85)"/>
+              <stop offset="100%" stop-color="rgba(255,160,60,0)"/>
+            </radialGradient>
+            <pattern id="nightDots" width="26" height="26" patternUnits="userSpaceOnUse">
+              <circle cx="13" cy="13" r="1.2" fill="rgba(255,255,255,.07)"/>
+            </pattern>
+          </defs>
+
+          <rect width="760" height="318" rx="16" fill="#0d1230"/>
+          <rect width="760" height="318" rx="16" fill="url(#nightDots)"/>
+
+          <text x="380" y="28" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" fill="rgba(255,255,255,.65)">de aardas staat 23,5° scheef en wijst het hele jaar dezelfde kant op</text>
+
+          <!-- afstanden -->
+          <line x1="156" y1="150" x2="348" y2="150" stroke="rgba(255,255,255,.3)" stroke-dasharray="4 5"/>
+          <line x1="412" y1="150" x2="604" y2="150" stroke="rgba(255,255,255,.3)" stroke-dasharray="4 5"/>
+          <text x="252" y="138" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="rgba(255,255,255,.6)">≈ 152 mln km</text>
+          <text x="508" y="138" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="rgba(255,255,255,.6)">≈ 147 mln km</text>
+
+          <!-- zon -->
+          <circle cx="380" cy="150" r="60" fill="url(#sunGlow)"/>
+          <circle cx="380" cy="150" r="26" fill="#ffd166"/>
+          <text x="380" y="228" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="rgba(255,255,255,.55)">zon</text>
+
+          <!-- aarde bij de zomerwende (links): noordpool maximaal naar de zon gekanteld -->
+          <g>
+            <circle cx="110" cy="150" r="44" fill="#5f9bff"/>
+            <path d="M 110 106 A 44 44 0 0 0 110 194 Z" fill="rgba(9,13,38,.78)"/>
+            <circle cx="110" cy="150" r="44" fill="none" stroke="rgba(255,255,255,.35)"/>
+            <line x1="69.6" y1="132.5" x2="150.4" y2="167.5" stroke="rgba(255,255,255,.35)" stroke-dasharray="3 4"/>
+            <line x1="86.1" y1="205" x2="133.9" y2="95" stroke="#fff" stroke-width="2"/>
+            <g transform="translate(133.9,95) rotate(23.5)">
+              <path d="M -13 2 A 13 6 0 0 0 13 2 M 13 2 L 6 -1 M 13 2 L 7 6" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.6"/>
+            </g>
+            <text x="144" y="90" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#fff">N</text>
+            <text x="66" y="216" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#fff">Z</text>
+          </g>
+          <text x="120" y="248" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="rgba(255,255,255,.9)">zomerwende · ± 21 juni</text>
+          <text x="120" y="268" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#ffd166">zomer begint op het noordelijk halfrond</text>
+          <text x="120" y="285" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="rgba(255,255,255,.5)">noordpool maximaal naar de zon toe</text>
+          <text x="120" y="303" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="rgba(255,255,255,.5)">± 13 dagen later: aphelium (4 juli)</text>
+
+          <!-- aarde bij de winterwende (rechts): noordpool maximaal van de zon af gekanteld -->
+          <g>
+            <circle cx="650" cy="150" r="44" fill="#5f9bff"/>
+            <path d="M 650 106 A 44 44 0 0 1 650 194 Z" fill="rgba(9,13,38,.78)"/>
+            <circle cx="650" cy="150" r="44" fill="none" stroke="rgba(255,255,255,.35)"/>
+            <line x1="609.6" y1="132.5" x2="690.4" y2="167.5" stroke="rgba(255,255,255,.35)" stroke-dasharray="3 4"/>
+            <line x1="626.1" y1="205" x2="673.9" y2="95" stroke="#fff" stroke-width="2"/>
+            <g transform="translate(673.9,95) rotate(23.5)">
+              <path d="M -13 2 A 13 6 0 0 0 13 2 M 13 2 L 6 -1 M 13 2 L 7 6" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.6"/>
+            </g>
+            <text x="684" y="90" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#fff">N</text>
+            <text x="606" y="216" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#fff">Z</text>
+          </g>
+          <text x="640" y="248" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="rgba(255,255,255,.9)">winterwende · ± 21 december</text>
+          <text x="640" y="268" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#9aa6ff">winter begint op het noordelijk halfrond</text>
+          <text x="640" y="285" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="rgba(255,255,255,.5)">noordpool maximaal van de zon af</text>
+          <text x="640" y="303" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="rgba(255,255,255,.5)">± 13 dagen later: perihelium (3 januari)</text>
+
+          <text x="748" y="26" text-anchor="end" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="rgba(255,255,255,.35)">afstanden niet op schaal</text>
+        </svg>
+      </div>
+
+      <p>Bij de winterwende staat de noordpool maximaal van de zon af en begint op het noordelijk halfrond de winter; bij de zomerwende begint de zomer. Tussen de wendes liggen de nachteveningen (± 20 maart en ± 23 september): dan staat de zon recht boven de evenaar en duren dag en nacht overal even lang. Op het zuidelijk halfrond is alles precies omgekeerd — daar valt de zomer dus wél samen met het perihelium.</p>
+      <p>Waarom staan de seizoenen dan toch bij de simulatie hierboven? Puur vanwege de kalender: het perihelium (3 januari) valt toevallig zo'n dertien dagen ná de winterwende, en het aphelium (4 juli) dertien dagen na de zomerwende. Toeval, geen oorzaak: het afstandsverschil (147,1 tegenover 152,1 miljoen km, zo'n 3 procent) is veel te klein om seizoenen te maken. De aardas en de ellipsbaan verschuiven bovendien heel langzaam ten opzichte van elkaar: over zo'n tienduizend jaar valt het perihelium juist midden in de noordelijke zomer.</p>
+    </section>
+
+  </main>
+
+  <footer class="photoband">
+	<picture>
+		<source media="(max-width: 760px)" srcset="/images/hero-mobile.webp" type="image/webp" />
+		<source media="(max-width: 760px)" srcset="/images/hero-mobile.jpg" />
+		<source srcset="/images/hero-desktop.webp" type="image/webp" />
+		<img
+			class="photoband__img"
+			src="/images/hero-desktop.jpg"
+			alt="Twee mensen kijken uit over een besneeuwd Noors bergdal"
+		/>
+	</picture>
+	<div class="photoband__overlay"></div>
+	<div class="photoband__footer">
+		<div class="photoband__footer-inner">
+			<span>© 2025 Servaas Winder</span>
+			<span>Docent natuurkunde · Northgo College</span>
+		</div>
+	</div>
+</footer>
+
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ---------- parameters ----------
+      var T = 60;                 // seconden per jaar bij snelheid 1×
+      var params = { e: 0.5, N: 10, speed: 1 };
+
+      // ---------- toestand ----------
+      var t = 0;                  // simulatietijd (s)
+      var running = true;
+      var prevF = 0;              // vorige waarde van hoekverschil (voor middag-detectie)
+      var lastNoonT = 0;          // tijdstip van de vorige zonne-middag
+      var alphaNoon = Math.PI;    // richting van de zon bij de vorige middag (vaste richting in de ruimte)
+      var bars = [];              // etmaalduren (in sim-seconden) van dit jaar
+      var yearOfBars = 0;
+
+      // ---------- hulpjes ----------
+      function wrapPi(a) { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; }
+      function nl(x, dec) { return x.toFixed(dec === undefined ? 2 : dec).replace(".", ","); }
+
+      function kepler(M, e) {
+        var E = M, i, d;
+        for (i = 0; i < 20; i++) {
+          d = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+          E -= d;
+          if (Math.abs(d) < 1e-10) break;
+        }
+        return E;
+      }
+
+      // positie + hoeken op tijdstip tt (halve lange as a = 1, zon in brandpunt op oorsprong)
+      function orbitState(tt) {
+        var e = params.e;
+        var M = 2 * Math.PI * ((tt / T) % 1);
+        var E = kepler(M, e);
+        var nu = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+        var r = 1 - e * Math.cos(E);
+        var x = r * Math.cos(nu), y = r * Math.sin(nu);
+        return {
+          x: x, y: y, r: r,
+          alpha: Math.atan2(-y, -x),                       // richting aarde → zon
+          phi: Math.PI + 2 * Math.PI * params.N * tt / T,  // rotatiehoek van de waarnemer
+          v: Math.sqrt(2 / r - 1)                          // baansnelheid (vis-viva, gemiddeld ≈ 1)
+        };
+      }
+
+      function hoursOf(dur) { return dur * (params.N - 1) * 24 / T; }
+      function meanDay() { return T / (params.N - 1); }
+      function sidHours() { return 24 * (params.N - 1) / params.N; }
+
+      // ---------- DOM ----------
+      var $ = function (id) { return document.getElementById(id); };
+      var canvas = $("orbitCanvas"), ctx = canvas.getContext("2d");
+      var chartBars = $("chartBars"), lineMean = $("lineMean"), lineSid = $("lineSid");
+
+      // ---------- middag-detectie + grafiek ----------
+      function onNoon(tNoon) {
+        var dur = tNoon - lastNoonT;
+        // een etmaal hoort bij het jaar waarin het begon: het laatste etmaal van een
+        // jaar eindigt precies op de jaargrens en mag niet naar het nieuwe jaar schuiven
+        var yr = Math.floor((tNoon - dur + 1e-6) / T);
+        lastNoonT = tNoon;
+        alphaNoon = orbitState(tNoon).alpha;
+        if (bars.length >= params.N - 1 || yr !== yearOfBars) { bars = []; yearOfBars = yr; }
+        bars.push(dur);
+        renderChart();
+        var extra = dur / T * params.N * 360 - 360;
+        $("lastDay").innerHTML =
+          "Laatste etmaal: <span class='accent'>" + nl(hoursOf(dur), 1) + " uur</span> — de aarde draaide " +
+          nl(360 + extra, 0) + "° (dus " + nl(extra, 0) + "° extra).";
+      }
+
+      function chartMax() {
+        var m = 27;
+        for (var i = 0; i < bars.length; i++) m = Math.max(m, hoursOf(bars[i]) + 2);
+        return m;
+      }
+
+      function renderChart() {
+        var hMax = chartMax();
+        var html = "";
+        for (var i = 0; i < bars.length; i++) {
+          var h = hoursOf(bars[i]);
+          html += "<div class='sim-bar'><div class='sim-bar__val'>" + nl(h, 1) + "</div>" +
+                  "<div class='sim-bar__fill' style='height:" + (h / hMax * 100) + "%'></div>" +
+                  "<div class='sim-bar__num'>" + (i + 1) + "</div></div>";
+        }
+        // lege plekken zodat de balkjes niet verspringen terwijl het jaar loopt
+        for (var j = bars.length; j < params.N - 1; j++) html += "<div class='sim-bar'></div>";
+        chartBars.innerHTML = html;
+        var innerH = chartBars.clientHeight;
+        lineMean.style.bottom = (30 + 24 / hMax * innerH) + "px";
+        lineSid.style.bottom = (30 + sidHours() / hMax * innerH) + "px";
+      }
+
+      // ---------- simulatiestap ----------
+      function step(dt) {
+        var tNew = t + dt;
+        var st = orbitState(tNew);
+        var f = wrapPi(st.phi - st.alpha);
+        if (prevF < 0 && f >= 0 && (f - prevF) < Math.PI) {
+          var frac = prevF / (prevF - f);
+          onNoon(t + dt * frac);
+        }
+        prevF = f;
+        t = tNew;
+      }
+
+      // ---------- tekenen ----------
+      function sizeCanvas() {
+        var w = canvas.clientWidth || canvas.parentElement.clientWidth;
+        var h = Math.max(260, Math.min(500, Math.round(w * 0.62)));
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        canvas.style.height = h + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function draw() {
+        var W = canvas.clientWidth, H = parseFloat(canvas.style.height);
+        var e = params.e, b = Math.sqrt(1 - e * e);
+        var s = Math.min((W - 110) / 2, (H - 90) / (2 * b));   // schaal: halve lange as = 1
+        var cx = W / 2, cy = H / 2;                            // scherm-middelpunt = middelpunt ellips
+        function sx(x) { return cx + (x + e) * s; }            // wereld → scherm (zon in brandpunt)
+        function sy(y) { return cy - y * s; }
+
+        // achtergrond (nachtvlak met stippenraster, zoals de hero)
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#0d1230";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(0, 0, W, H, 16); else ctx.rect(0, 0, W, H);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,.07)";
+        for (var gx = 13; gx < W; gx += 26) for (var gy = 13; gy < H; gy += 26) {
+          ctx.beginPath(); ctx.arc(gx, gy, 1.2, 0, 7); ctx.fill();
+        }
+
+        // baan-ellips
+        ctx.strokeStyle = "rgba(255,255,255,.2)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, s, b * s, 0, 0, 7);
+        ctx.stroke();
+
+        // posities op gelijke tijdstappen (Kepler 2: dichtbij grote stappen, ver weg kleine)
+        ctx.fillStyle = "rgba(255,255,255,.38)";
+        var steps = 72;
+        for (var k = 0; k < steps; k++) {
+          var p = orbitState(k * T / steps);
+          ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), 2, 0, 7); ctx.fill();
+        }
+
+        // perihelium en aphelium markeren, met seizoen op het noordelijk halfrond
+        ctx.fillStyle = "rgba(255,255,255,.8)";
+        ctx.beginPath(); ctx.arc(sx(1 - e), sy(0), 2.8, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.arc(sx(-1 - e), sy(0), 2.8, 0, 7); ctx.fill();
+        ctx.font = "600 11px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "right";
+        ctx.fillStyle = "rgba(255,255,255,.85)";
+        ctx.fillText("perihelium (± 3 jan)", W - 12, sy(0) + 54);
+        ctx.fillStyle = "rgba(255,255,255,.55)";
+        ctx.fillText("winter op het N-halfrond", W - 12, sy(0) + 69);
+        ctx.textAlign = "left";
+        ctx.fillStyle = "rgba(255,255,255,.85)";
+        ctx.fillText("aphelium (± 4 jul)", 12, sy(0) - 66);
+        ctx.fillStyle = "rgba(255,255,255,.55)";
+        ctx.fillText("zomer op het N-halfrond", 12, sy(0) - 51);
+
+        // zon
+        var sunR = 24;
+        var grd = ctx.createRadialGradient(sx(0), sy(0), 2, sx(0), sy(0), sunR * 2.2);
+        grd.addColorStop(0, "rgba(255,222,120,1)");
+        grd.addColorStop(0.45, "rgba(255,180,70,.85)");
+        grd.addColorStop(1, "rgba(255,160,60,0)");
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(sx(0), sy(0), sunR * 2.2, 0, 7); ctx.fill();
+        ctx.fillStyle = "#ffd166";
+        ctx.beginPath(); ctx.arc(sx(0), sy(0), sunR * 0.62, 0, 7); ctx.fill();
+
+        // aarde
+        var st = orbitState(t);
+        var ex = sx(st.x), ey = sy(st.y), eR = 17;
+        var aS = -st.alpha, aP = -st.phi, aG = -alphaNoon;     // hoeken in schermcoördinaten (y omlaag)
+
+        // lijn naar de zon
+        ctx.strokeStyle = "rgba(255,209,102,.75)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ex + Math.cos(aS) * (eR + 26), ey + Math.sin(aS) * (eR + 26));
+        ctx.lineTo(sx(0) - Math.cos(aS) * sunR * 0.7, sy(0) - Math.sin(aS) * sunR * 0.7);
+        ctx.stroke();
+
+        // 360°-richting (waar je heen kijkt na precies één rotatie sinds de vorige middag)
+        ctx.strokeStyle = "rgba(120,130,180,.9)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex + Math.cos(aG) * (eR + 24), ey + Math.sin(aG) * (eR + 24));
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // aardbol met dag- en nachtzijde
+        ctx.fillStyle = "#5f9bff";
+        ctx.beginPath(); ctx.arc(ex, ey, eR, 0, 7); ctx.fill();
+        ctx.fillStyle = "rgba(9,13,38,.78)";
+        ctx.beginPath(); ctx.arc(ex, ey, eR, aS + Math.PI / 2, aS + 3 * Math.PI / 2); ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(ex, ey, eR, 0, 7); ctx.stroke();
+
+        // de waarnemer
+        ctx.strokeStyle = "#ff5d5d";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex + Math.cos(aP) * (eR + 14), ey + Math.sin(aP) * (eR + 14));
+        ctx.stroke();
+        ctx.fillStyle = "#ff5d5d";
+        ctx.beginPath(); ctx.arc(ex + Math.cos(aP) * eR, ey + Math.sin(aP) * eR, 3.5, 0, 7); ctx.fill();
+      }
+
+      // ---------- panelen bijwerken ----------
+      function updatePanel() {
+        var st = orbitState(t);
+        var e = params.e;
+        $("statR").textContent = nl(st.r);
+        $("statV").textContent = nl(st.v);
+        var rMin = 1 - e, rMax = 1 + e;
+        var vMax = Math.sqrt((1 + e) / (1 - e)), vMin = 1 / vMax;
+        $("meterR").style.width = (e < 0.01 ? 50 : (st.r - rMin) / (rMax - rMin) * 100) + "%";
+        $("meterV").style.width = (e < 0.01 ? 50 : (st.v - vMin) / (vMax - vMin) * 100) + "%";
+        $("dayInfo").innerHTML = "Jaar <b>" + (Math.floor(t / T) + 1) + "</b> · etmaal <b>" +
+          (bars.length % (params.N - 1) + 1) + " van " + (params.N - 1) + "</b> is bezig.";
+      }
+
+      function updateStatics() {
+        $("sidInfo").innerHTML = "Precies 360° draaien (de sterrendag) duurt hier altijd " +
+          nl(sidHours(), 1) + " uur. Met " + params.N + " rotaties per jaar zijn er " + (params.N - 1) + " etmalen.";
+      }
+
+      // ---------- reset & bediening ----------
+      function resetSim() {
+        t = 0; prevF = 0; lastNoonT = 0; bars = []; yearOfBars = 0;
+        alphaNoon = orbitState(0).alpha;
+        $("lastDay").textContent = "Nog geen etmaal voltooid.";
+        renderChart();
+        updateStatics();
+        updatePanel();
+        draw();
+      }
+
+      $("btnPlay").addEventListener("click", function () {
+        running = !running;
+        this.textContent = running ? "Pauze" : "Start";
+        this.classList.toggle("sim-btn--primary", running);
+      });
+      $("btnReset").addEventListener("click", resetSim);
+
+      $("sldE").addEventListener("input", function () {
+        params.e = parseFloat(this.value);
+        $("valE").textContent = nl(params.e);
+        resetSim();
+      });
+      $("sldN").addEventListener("input", function () {
+        params.N = parseInt(this.value, 10);
+        $("valN").textContent = params.N;
+        resetSim();
+      });
+      $("sldSpeed").addEventListener("input", function () {
+        params.speed = parseFloat(this.value);
+        $("valSpeed").textContent = nl(params.speed, 1) + "×";
+      });
+
+      // ---------- animatielus ----------
+      var lastFrame = null;
+      function frame(now) {
+        if (lastFrame === null) lastFrame = now;
+        var dt = Math.min(0.1, (now - lastFrame) / 1000);
+        lastFrame = now;
+        if (running) {
+          step(dt * params.speed);
+          updatePanel();
+        }
+        draw();
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener("resize", function () { sizeCanvas(); renderChart(); draw(); });
+
+      sizeCanvas();
+      resetSim();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

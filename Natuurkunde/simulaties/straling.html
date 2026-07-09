@@ -1,0 +1,947 @@
+---
+title: Dracht & halveringsdikte
+nav: natuurkunde
+sim: true
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+  {% include site-header-nk.html %}
+
+  <style>
+    /* Alleen straling-eigen stijlen; de gedeelde sim-stijlen staan in sims.css */
+    .sim-canvas { touch-action: none; } /* de achterkant van het blok is sleepbaar */
+
+    .sim-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .sim-tab {
+      padding: 8px 16px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--btn-border); background: var(--card);
+      font-family: var(--font-body); font-weight: 600; font-size: 13.5px; color: var(--night-2);
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+    .sim-tab:hover { border-color: var(--btn-border-hover); }
+    .sim-tab.is-active { background: var(--night); border-color: var(--night); color: #fff; }
+
+    .sim-key { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
+    .sim-key--wave { width: 20px; height: 4px; border-radius: 2px; }
+
+    .mat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+
+    .sim-volt { font-family: var(--font-mono); font-weight: 600; font-size: 26px; color: var(--accent); }
+  </style>
+
+  <section class="hero"><div class="hero__inner">
+    <h1 class="hero__title">Dracht en halveringsdikte</h1>
+    <p class="hero__sub">Schiet alfa-, bèta-, gamma- en röntgenstraling door een blok materiaal en kijk wat de teller nog meet. Geladen deeltjes spelen een ander spel dan fotonen — en precies dát verschil bepaalt of straling een dracht heeft of een halveringsdikte.</p>
+  </div></section>
+
+  <main class="main">
+
+    <section class="card">
+      <div class="sim-tabs">
+        <button class="sim-tab is-active" data-type="alfa">Alfa (α)</button>
+        <button class="sim-tab" data-type="beta">Bèta (β)</button>
+        <button class="sim-tab" data-type="gamma">Gamma (γ)</button>
+        <button class="sim-tab" data-type="rontgen">Röntgen</button>
+      </div>
+
+      <div class="sim-layout">
+        <div class="sim-stage">
+          <canvas class="sim-canvas" id="strCanvas" role="img" aria-label="Stralingsbron schiet deeltjes door een blok materiaal naar een teller, met daaronder de grafiek van intensiteit tegen diepte"></canvas>
+          <div class="sim-legend" id="legend"></div>
+        </div>
+
+        <div class="sim-panel">
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">MATERIAAL</div>
+            <div class="mat-grid">
+              <button class="sim-btn" data-mat="lucht">Lucht</button>
+              <button class="sim-btn sim-btn--primary" data-mat="papier">Papier</button>
+              <button class="sim-btn" data-mat="aluminium">Aluminium</button>
+              <button class="sim-btn" data-mat="lood">Lood</button>
+            </div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Dikte van het blok</span><span class="sim-slider__val" id="valD">0,90 cm</span></div>
+              <input type="range" id="sldD" min="0.05" max="2" step="0.05" value="0.9" />
+            </div>
+            <div class="sim-slider">
+              <div class="sim-slider__row"><span>Energie van de straling</span><span class="sim-slider__val" id="valE">5,5 MeV</span></div>
+              <input type="range" id="sldE" min="3" max="9" step="0.5" value="5.5" />
+            </div>
+            <div class="sim-note" id="energieNote"></div>
+            <div class="sim-note">Je kunt ook de achterkant van het blok slepen. De diktes, energieën en halveringsdiktes zijn echt — alleen de atomen zijn sterk uitvergroot.</div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label">TELLER</div>
+            <div class="sim-volt" id="tellerPct">— %</div>
+            <div class="sim-note" id="tellerNote" style="margin-top:6px">De teller warmt nog op…</div>
+            <div style="margin-top:10px"><button class="sim-btn" id="btnReset">Teller op nul</button></div>
+          </div>
+
+          <div class="sim-panel__block">
+            <div class="sim-panel__label" id="kernLabel">KERNBEGRIP</div>
+            <div id="kernBlock"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__eyebrow">WAAROM</div>
+      <h2 class="card__title">Waarom een dracht — en waarom een halveringsdikte?</h2>
+      <p class="card__intro">Twee keer precies dezelfde wereld, en elk deeltje draagt een energiebalkje. Links betaalt een geladen deeltje bij ieder atoom een beetje van zijn budget: het balkje loopt leeg en bepaalt exact hoe ver het komt. Rechts blijft het balkje vol — een foton verliest onderweg niets, tot één voltreffer alles in één keer afpakt. En wáár die valt, is puur toeval.</p>
+      <canvas class="sim-canvas" id="whyCanvas" role="img" aria-label="Links verliezen geladen deeltjes geleidelijk energie en stoppen allemaal op dezelfde diepte; rechts verdwijnen fotonen op willekeurige dieptes, per halveringsdikte de helft"></canvas>
+      <div class="sim-legend">
+        <span><i class="sim-key" style="background:#ffb454"></i> geladen deeltje — balkje loopt leeg, stopt als het op is</span>
+        <span><i class="sim-key sim-key--wave" style="background:#c9a0ff"></i> foton — balkje blijft vol, tot de voltreffer</span>
+      </div>
+    </section>
+
+    <section class="card uitleg">
+      <div class="card__eyebrow">HET MODEL</div>
+      <h2 class="card__title">Twee verschillende spellen</h2>
+      <p>Alfa- en bètadeeltjes zijn <em>geladen</em>. Daardoor voelen ze elk atoom waar ze langs komen en betalen ze bij iedere ontmoeting een beetje bewegingsenergie: ze trekken elektronen los (ionisatie — de gele flitsen). Duizenden kleine tolheffingen, tot het energiebudget op is en het deeltje stilvalt. Omdat elk deeltje met hetzelfde budget vertrekt en dezelfde tol betaalt, stoppen ze vrijwel allemaal op dezelfde diepte: de <strong>dracht</strong>. Vóór de dracht komt alles door, erachter niets.</p>
+      <p>Gamma- en röntgenstraling zijn <em>ongeladen</em> fotonen. Die voelen de atomen niet en vliegen er onveranderd doorheen — tot ze één keer vol raak schieten en in één klap verdwijnen. Per laagje materiaal is er een vaste raakkans, dus per <strong>halveringsdikte</strong> valt precies de helft af: 100% → 50% → 25% → 12,5%… Maar nul wordt het nooit: er is geen dikte die álle fotonen tegenhoudt. En let op de overlevers: die zijn volkomen onveranderd, even snel en even energierijk als bij de bron.</p>
+      <p>Het is dus geen gradueel verschil („gamma dringt gewoon wat dieper door"), maar een ander mechanisme. Een dracht is een <em>energiebudget dat opraakt</em>; een halveringsdikte is een <em>kansspel per ontmoeting</em>. Daarom hoort röntgen bij gamma: het speelt hetzelfde kansspel, alleen met een grotere raakkans per atoom — dus een kleinere halveringsdikte. Vandaar het loodschort bij de tandarts.</p>
+      <p>Aan de flitsen zie je meteen het <em>ioniserend vermogen</em>: alfa laat een dicht spoor van schade achter op een piepklein stukje, bèta ioniseert veel spaarzamer, gamma geeft losse flitsen. Doordringend en ioniserend vermogen zijn elkaars spiegelbeeld — en precies daarom is een alfabron zo gevaarlijk als hij <em>ín</em> je lichaam zit, terwijl een velletje papier je er al tegen beschermt.</p>
+    </section>
+
+    <section class="card uitleg">
+      <div class="card__eyebrow">ECHTE GETALLEN</div>
+      <h2 class="card__title">De diktes en energieën zijn echt</h2>
+      <p>De simulatie rekent met echte natuurkunde: de dracht van alfa volgt R&nbsp;≈&nbsp;0,31·E<sup>1,5</sup>&nbsp;cm in lucht (E in MeV, geschaald naar de andere materialen via hun dichtheid), voor bèta geldt de vuistregel R·ρ&nbsp;≈&nbsp;0,41·E<sup>1,27</sup>&nbsp;g/cm², en voor fotonen d½&nbsp;=&nbsp;ln&nbsp;2&nbsp;/&nbsp;μ met verzwakkingscoëfficiënten per materiaal en energie. Controleer maar: alfa van 5,5 MeV komt zo'n 4 cm ver in lucht, bèta van 1 MeV ongeveer anderhalve millimeter in aluminium, gamma van cesium-137 halveert in ruwweg een halve centimeter lood, en tandarts-röntgen (70 keV) al in een tiende millimeter — vandaar het loodschort. Alleen de atomen zijn schematisch: in het echt passen er geen paar honderd maar zo'n 10<sup>23</sup> in het blok.</p>
+      <p>Let op wat de energieslider doet: bij alfa en bèta groeit het energie<em>budget</em>, dus de dracht (ongeveer met E<sup>1,5</sup>). Bij fotonen wordt de <em>raakkans</em> per atoom kleiner, dus de halveringsdikte groter — hardere gamma is lastiger tegen te houden. Elektronvolt en joule reken je om met 1&nbsp;eV&nbsp;=&nbsp;1,6·10<sup>−19</sup>&nbsp;J; de omrekening staat live onder de slider.</p>
+      <p>Voor fotonen reken je met I&nbsp;=&nbsp;I₀&nbsp;·&nbsp;(½)<sup>d/d½</sup>. Na drie halveringsdiktes is er nog 12,5% over, na tien nog ongeveer 0,1% — weinig, maar nooit nul. Die formule geldt <em>alleen</em> voor gamma en röntgen. Voor alfa en bèta bestaat er geen halveringsdikte: daar gebruik je de dracht, en daarachter komt echt niets meer.</p>
+    </section>
+
+  </main>
+
+  {% include site-footer-nk.html %}
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ---------- toestand ----------
+      // De diktes en energieën zijn ECHT. Elk materiaal heeft zijn eigen dikte-as (maxCm),
+      // omdat de echte schalen mijlenver uiteenlopen (alfa in lood: micrometers; bèta in
+      // lucht: meters). rho = echte dichtheid (g/cm3), A = effectieve massagetal (voor de
+      // Bragg-Kleeman-schaling van de alfadracht), mu = verzwakkingstabel [E in MeV,
+      // mu/rho in cm2/g] voor fotonen (log-log geinterpoleerd). vis = visuele dichtheid,
+      // alleen voor de frequentie van ionisatieflitsen en verstrooiing in beeld.
+      var MATS = {
+        lucht:     { rho: 0.00120, A: 14.4, maxCm: 50, dStep: 1,    dDef: 20,  vis: 0.055, nAtoms: 26,  atomR: 2.1, label: "lucht",
+                     mu: [[0.01, 5.0], [0.02, 0.77], [0.05, 0.21], [0.1, 0.154], [0.2, 0.123], [0.5, 0.087], [1, 0.064], [3, 0.036]] },
+        papier:    { rho: 0.80,    A: 12.5, maxCm: 2,  dStep: 0.05, dDef: 0.9, vis: 0.34,  nAtoms: 150, atomR: 2.5, label: "papier",
+                     mu: [[0.01, 5.3], [0.02, 0.81], [0.05, 0.23], [0.1, 0.17], [0.2, 0.14], [0.5, 0.097], [1, 0.071], [3, 0.040]] },
+        aluminium: { rho: 2.70,    A: 27,   maxCm: 5,  dStep: 0.1,  dDef: 2,   vis: 0.62,  nAtoms: 260, atomR: 2.9, label: "aluminium",
+                     mu: [[0.01, 26], [0.02, 3.4], [0.05, 0.37], [0.1, 0.17], [0.2, 0.12], [0.5, 0.084], [1, 0.061], [3, 0.035]] },
+        lood:      { rho: 11.35,   A: 207,  maxCm: 3,  dStep: 0.05, dDef: 1.2, vis: 1.0,   nAtoms: 380, atomR: 3.6, label: "lood",
+                     mu: [[0.01, 131], [0.02, 86], [0.05, 8.0], [0.1, 5.55], [0.2, 0.94], [0.5, 0.16], [1, 0.070], [3, 0.042]] }
+      };
+      // energie-slider per soort: eMin/eMax/eStep in de weergave-eenheid (unit)
+      var TYPES = {
+        alfa:    { kind: "charged", jitter: 0.035, speed: 75,  color: "#ffb454", r: 4.4, ionStep: 6,
+                   unit: "MeV", eMin: 3,   eMax: 9,   eStep: 0.5, eDef: 5.5, anchor: "5,5 MeV = americium-241 (rookmelder)", label: "alfadeeltje (2+, zwaar)" },
+        beta:    { kind: "charged", jitter: 0.09,  speed: 165, color: "#7fe0ff", r: 2.6, ionStep: 48,
+                   unit: "MeV", eMin: 0.1, eMax: 3,   eStep: 0.1, eDef: 1,   anchor: "typische bètastraler: 0,5 tot 2,3 MeV", label: "bètadeeltje (1−, licht)" },
+        gamma:   { kind: "photon", speed: 230, color: "#c9a0ff",
+                   unit: "MeV", eMin: 0.1, eMax: 3,   eStep: 0.1, eDef: 0.7, anchor: "cesium-137: 0,7 MeV · kobalt-60: 1,3 MeV", label: "gammafoton" },
+        rontgen: { kind: "photon", speed: 230, color: "#8fb8ff",
+                   unit: "keV", eMin: 20,  eMax: 150, eStep: 5,   eDef: 70,  anchor: "tandartsfoto: ± 70 keV", label: "röntgenfoton" }
+      };
+      var params = { type: "alfa", mat: "papier", dikteCm: 0.9,
+                     E: { alfa: 5.5, beta: 1, gamma: 0.7, rontgen: 70 } }; // E in de eenheid van de soort
+      var particles = [], sparks = [], stats = null;
+      var NB = 44; // bins voor de gemeten transmissiecurve
+
+      // ---------- echte natuurkunde ----------
+      function eMeV() {
+        var t = TYPES[params.type], v = params.E[params.type];
+        return t.unit === "keV" ? v / 1000 : v;
+      }
+      // mu/rho (cm2/g) log-log geinterpoleerd uit de tabel
+      function muRho(m, E) {
+        var tb = m.mu;
+        if (E <= tb[0][0]) return tb[0][1];
+        for (var i = 1; i < tb.length; i++) {
+          if (E <= tb[i][0]) {
+            var u = (Math.log(E) - Math.log(tb[i - 1][0])) / (Math.log(tb[i][0]) - Math.log(tb[i - 1][0]));
+            return Math.exp(lerp(Math.log(tb[i - 1][1]), Math.log(tb[i][1]), u));
+          }
+        }
+        return tb[tb.length - 1][1];
+      }
+      // dracht (geladen) of halveringsdikte (foton) in echte cm
+      function kernCm() {
+        var m = MATS[params.mat], E = eMeV();
+        if (params.type === "alfa") {
+          var Rlucht = 0.31 * Math.pow(E, 1.5); // Geiger, cm in lucht
+          return Rlucht * (0.00120 / m.rho) * Math.sqrt(m.A / 14.4); // Bragg-Kleeman
+        }
+        if (params.type === "beta") {
+          var n = 1.265 - 0.0954 * Math.log(E); // Katz-Penfold, g/cm2
+          return 0.412 * Math.pow(E, n) / m.rho;
+        }
+        return Math.LN2 / (muRho(m, E) * m.rho); // d1/2 = ln 2 / mu
+      }
+      // nette weergave van een lengte in cm
+      function fmtLen(cm) {
+        if (cm >= 100) return Math.round(cm / 100) >= 10 ? Math.round(cm / 100) + " m" : nl(cm / 100) + " m";
+        if (cm >= 1) return nl(cm, cm < 10 ? 1 : 0) + " cm";
+        if (cm >= 0.1) return nl(cm * 10, 1) + " mm";
+        if (cm >= 0.005) return nl(cm * 10, 2) + " mm";
+        return Math.max(1, Math.round(cm * 1e4)) + " µm";
+      }
+      function fmtE() {
+        var t = TYPES[params.type], v = params.E[params.type];
+        return (t.unit === "keV" ? Math.round(v) : nl(v, 1)) + " " + t.unit;
+      }
+      function fmtJoule() {
+        var J = eMeV() * 1.602e-13;
+        var exp = Math.floor(Math.log(J) / Math.LN10);
+        return nl(J / Math.pow(10, exp), 1) + "·10<sup>" + exp + "</sup> J";
+      }
+
+      // ---------- hulpjes ----------
+      var $ = function (id) { return document.getElementById(id); };
+      function nl(x, dec) { return x.toFixed(dec === undefined ? 1 : dec).replace(".", ","); }
+      function lerp(a, b, t) { return a + (b - a) * t; }
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = a + 0x6D2B79F5 | 0;
+          var t = Math.imul(a ^ a >>> 15, 1 | a);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+
+      // dracht of halveringsdikte in schermpixels, voor de huidige instellingen
+      function rangePx(fr) { return kernCm() * fr.pxPerCm; }
+
+      function resetStats() {
+        // finished = deeltjes waarvan het lot beslist is (gestopt, geabsorbeerd of doorgelaten).
+        // Alleen die tellen mee in de statistiek — deeltjes die nog onderweg zijn zouden de
+        // gemeten curve anders systematisch omlaag drukken.
+        stats = { finished: 0, exited: 0, reach: new Array(NB).fill(0) };
+        particles = []; sparks = [];
+      }
+
+      // ---------- canvas ----------
+      var canvas = $("strCanvas"), ctx = canvas.getContext("2d");
+      var W = 0, H = 0;
+      function sizeCanvas() {
+        W = canvas.clientWidth || canvas.parentElement.clientWidth;
+        H = Math.max(470, Math.min(600, Math.round(W * 0.98)));
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.height = H + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function frame() {
+        var f = {};
+        f.BT = 54; f.BB = 252;                 // bundelgebied (doorsnede)
+        f.bmid = (f.BT + f.BB) / 2;
+        f.srcX = 50;                            // bron
+        f.detX = W - 52;                        // teller
+        f.mx0 = 96;                             // voorkant blok
+        f.maxD = f.detX - 30 - f.mx0;           // maximale blokdikte in px
+        f.pxPerCm = f.maxD / MATS[params.mat].maxCm; // schaal: echte cm -> schermpixels
+        f.mx1 = f.mx0 + params.dikteCm * f.pxPerCm;  // achterkant blok (sleepbaar)
+        f.PL = 60; f.PR = W - 24; f.PT = 316; f.PB = H - 46; // grafiek
+        f.gx = function (d) { return f.PL + d / f.maxD * (f.PR - f.PL); };  // diepte -> x
+        f.gy = function (T) { return f.PB - T * (f.PB - f.PT - 8); };        // fractie -> y
+        return f;
+      }
+
+      // ---------- atomen ----------
+      // Per materiaal één vast, gezaaid veld over de maximale blokbreedte; bij een dunner
+      // blok tekenen we alleen de atomen die erin liggen. Zo verspringt niets bij het slepen.
+      var atomCache = {};
+      function atoms(fr) {
+        var key = params.mat + "|" + W;
+        if (!atomCache[key]) {
+          var m = MATS[params.mat], rnd = mulberry32(1234567 + m.nAtoms), list = [];
+          for (var i = 0; i < m.nAtoms; i++) {
+            list.push({ x: rnd() * fr.maxD, y: fr.BT + 8 + rnd() * (fr.BB - fr.BT - 16), glow: 0 });
+          }
+          atomCache = {}; atomCache[key] = list;
+        }
+        return atomCache[key];
+      }
+
+      // ---------- deeltjes ----------
+      var spawnAcc = 0, SPAWN_RATE = 12; // deeltjes per seconde
+      function spawn(fr) {
+        var t = TYPES[params.type];
+        var y = fr.bmid + (Math.random() - 0.5) * (fr.BB - fr.BT - 60);
+        var p = { x: fr.srcX + 12, y: y, ang: 0, depth: 0, done: false, fade: 1 };
+        if (t.kind === "charged") {
+          p.myRange = rangePx(fr) * (1 + (Math.random() * 2 - 1) * t.jitter);
+          p.ionAcc = 0;
+          p.zigAcc = 0;
+        } else {
+          p.phase = Math.random() * 7;
+          // absorptiediepte vooraf exact geloot (exponentieel met halfwaarde d1/2):
+          // zo hangt de meting niet van de framerate af en klopt de statistiek precies
+          p.myAbsDepth = -rangePx(fr) * Math.log(1 - Math.random()) / Math.LN2;
+        }
+        particles.push(p);
+      }
+
+      // registreer hoe diep dit deeltje kwam (voor de gemeten transmissiecurve)
+      function recordReach(fr, d) {
+        stats.finished++;
+        for (var k = 0; k < NB; k++) {
+          if ((k / (NB - 1)) * fr.maxD <= d + 0.001) stats.reach[k]++;
+        }
+      }
+
+      function addSpark(x, y, big) {
+        sparks.push({ x: x, y: y, age: 0, big: !!big,
+                      ex: x + 2, ey: y, evx: 40 + Math.random() * 60, evy: (Math.random() - 0.5) * 90 });
+        if (sparks.length > 70) sparks.shift();
+      }
+
+      function tick(dt, fr) {
+        var t = TYPES[params.type], m = MATS[params.mat];
+        spawnAcc += dt * SPAWN_RATE;
+        while (spawnAcc >= 1) { spawnAcc -= 1; spawn(fr); }
+
+        for (var i = particles.length - 1; i >= 0; i--) {
+          var p = particles[i];
+          if (p.done) {
+            p.fade -= dt * 2.2;
+            if (p.fade <= 0) particles.splice(i, 1);
+            continue;
+          }
+          var inMat = p.x >= fr.mx0 && p.x < fr.mx1;
+          var v = t.speed;
+          if (t.kind === "charged" && inMat) {
+            // energiebudget: bijna op -> zichtbaar afremmen ("kruipend tot stilstand")
+            var rest = 1 - p.depth / p.myRange;
+            if (rest < 0.18) v *= Math.max(0.25, rest / 0.18);
+          }
+          var step = v * dt;
+          p.x += Math.cos(p.ang) * step;
+          p.y += Math.sin(p.ang) * step;
+
+          if (inMat) {
+            if (t.kind === "charged") {
+              p.depth += step;
+              // ionisatieflitsen: tol betalen bij de atomen (visuele dichtheid bepaalt de frequentie)
+              p.ionAcc += step;
+              var ionEvery = t.ionStep / m.vis;
+              while (p.ionAcc >= ionEvery) {
+                p.ionAcc -= ionEvery;
+                addSpark(p.x + (Math.random() - 0.5) * 8, p.y + (Math.random() - 0.5) * 10, false);
+              }
+              if (params.type === "beta") {
+                // lichte zigzag: verstrooiing aan atomen
+                p.zigAcc += step;
+                var zigEvery = 30 / m.vis;
+                while (p.zigAcc >= zigEvery) {
+                  p.zigAcc -= zigEvery;
+                  p.ang = Math.max(-0.32, Math.min(0.32, p.ang + (Math.random() - 0.5) * 0.4));
+                }
+              }
+              if (p.depth >= p.myRange) {
+                p.done = true;
+                recordReach(fr, Math.min(p.depth, p.myRange)); // exact op de dracht, niet de overshoot van één frame
+                addSpark(p.x, p.y, false);
+              }
+            } else {
+              // kansspel: de vooraf gelote absorptiediepte is bereikt (alles of niets)
+              if (p.x - fr.mx0 >= p.myAbsDepth) {
+                p.x = fr.mx0 + p.myAbsDepth; // exact op het geloote punt
+                p.done = true;
+                recordReach(fr, p.myAbsDepth);
+                addSpark(p.x, p.y, true);
+              }
+            }
+          }
+          if (!p.done && p.y < fr.BT + 6)  { p.y = fr.BT + 6;  p.ang = Math.abs(p.ang) * 0.5; }
+          if (!p.done && p.y > fr.BB - 6)  { p.y = fr.BB - 6;  p.ang = -Math.abs(p.ang) * 0.5; }
+          if (!p.done && p.x >= fr.detX - 6) {
+            stats.exited++;
+            recordReach(fr, fr.mx1 - fr.mx0);
+            p.done = true; p.fade = 0.35; p.blip = true;
+            blip = 1;
+          }
+          if (p.x > W + 20) particles.splice(i, 1);
+        }
+
+        for (var s = sparks.length - 1; s >= 0; s--) {
+          sparks[s].age += dt;
+          if (sparks[s].age > 0.55) sparks.splice(s, 1);
+        }
+        if (blip > 0) blip = Math.max(0, blip - dt * 4);
+      }
+      var blip = 0;
+
+      // ---------- theorie ----------
+      function theoryT(fr, d) {
+        var t = TYPES[params.type];
+        if (t.kind === "photon") return Math.pow(0.5, d / rangePx(fr));
+        var R = rangePx(fr), j = TYPES[params.type].jitter * 2;
+        if (d < R * (1 - j)) return 1;
+        if (d > R * (1 + j)) return 0;
+        return 0.5 * (1 + Math.cos(Math.PI * (d - R * (1 - j)) / (2 * R * j)));
+      }
+
+      // ---------- tekenen ----------
+      function drawWave(x, y, ang, phase, color) {
+        ctx.strokeStyle = color; ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        for (var k = 0; k <= 8; k++) {
+          var u = k / 8, lx = -14 + u * 20;
+          var ly = Math.sin(u * 12.6 + phase) * 3;
+          var rx = x + lx * Math.cos(ang) - ly * Math.sin(ang);
+          var ry = y + lx * Math.sin(ang) + ly * Math.cos(ang);
+          if (k === 0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
+        }
+        ctx.stroke();
+      }
+
+      function draw(fr, now) {
+        var t = TYPES[params.type], m = MATS[params.mat];
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#0d1230";
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(0, 0, W, H, 16); else ctx.rect(0, 0, W, H);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,.05)";
+        for (var gx = 13; gx < W; gx += 26) for (var gy = 13; gy < H; gy += 26) {
+          ctx.beginPath(); ctx.arc(gx, gy, 1.1, 0, 7); ctx.fill();
+        }
+
+        var fs = W < 430 ? 10 : 11;
+        ctx.font = "600 " + fs + "px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "rgba(255,255,255,.5)";
+        ctx.fillText("DOORSNEDE", 24, 32);
+        ctx.fillText("INTENSITEIT tegen DIEPTE in het materiaal", fr.PL, fr.PT - 14);
+
+        // blok materiaal
+        ctx.fillStyle = "rgba(120,140,220,.07)";
+        ctx.fillRect(fr.mx0, fr.BT, fr.mx1 - fr.mx0, fr.BB - fr.BT);
+        ctx.strokeStyle = "rgba(160,175,240,.5)";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(fr.mx0, fr.BT, fr.mx1 - fr.mx0, fr.BB - fr.BT);
+        // sleepgreep achterkant
+        ctx.fillStyle = "rgba(255,255,255,.75)";
+        ctx.fillRect(fr.mx1 - 2, fr.bmid - 15, 4, 30);
+        ctx.font = "500 9.5px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = "rgba(255,255,255,.55)";
+        ctx.textAlign = "center";
+        ctx.fillText(m.label.toUpperCase(), (fr.mx0 + fr.mx1) / 2, fr.BT - 8);
+        ctx.fillText("⟷", fr.mx1, fr.BB + 14);
+
+        // atomen (alleen binnen het blok)
+        var list = atoms(fr);
+        for (var a = 0; a < list.length; a++) {
+          var at = list[a];
+          if (at.x > fr.mx1 - fr.mx0) continue;
+          var ax = fr.mx0 + at.x;
+          if (at.glow > 0) at.glow = Math.max(0, at.glow - 0.03);
+          ctx.fillStyle = "rgba(150,170,255," + (0.30 + at.glow * 0.6) + ")";
+          ctx.beginPath(); ctx.arc(ax, at.y, m.atomR, 0, 7); ctx.fill();
+        }
+
+        // bron
+        ctx.fillStyle = "#1a2150";
+        ctx.strokeStyle = "rgba(255,255,255,.6)"; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.roundRect ? ctx.roundRect(fr.srcX - 16, fr.bmid - 26, 28, 52, 6) : ctx.rect(fr.srcX - 16, fr.bmid - 26, 28, 52);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = t.color;
+        ctx.beginPath(); ctx.arc(fr.srcX - 2, fr.bmid, 5, 0, 7); ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,.55)";
+        ctx.font = "500 9.5px 'IBM Plex Mono', monospace";
+        ctx.fillText("BRON", fr.srcX - 2, fr.BB + 14);
+
+        // teller (GM-buis)
+        ctx.fillStyle = blip > 0 ? "rgba(120,255,170," + (0.10 + blip * 0.25) + ")" : "#1a2150";
+        ctx.strokeStyle = "rgba(255,255,255,.6)";
+        ctx.beginPath(); ctx.roundRect ? ctx.roundRect(fr.detX - 10, fr.BT + 14, 24, fr.BB - fr.BT - 28, 8) : ctx.rect(fr.detX - 10, fr.BT + 14, 24, fr.BB - fr.BT - 28);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "rgba(255,255,255,.55)";
+        ctx.fillText("TELLER", fr.detX + 2, fr.BB + 14);
+
+        // ionisatie- en absorptieflitsen
+        for (var s = 0; s < sparks.length; s++) {
+          var sp = sparks[s], u = sp.age / 0.55;
+          var rad = sp.big ? 4 + u * 13 : 2 + u * 7;
+          ctx.strokeStyle = sp.big ? "rgba(240,210,255," + (0.85 * (1 - u)) + ")" : "rgba(255,224,130," + (0.8 * (1 - u)) + ")";
+          ctx.lineWidth = sp.big ? 2 : 1.4;
+          ctx.beginPath(); ctx.arc(sp.x, sp.y, rad, 0, 7); ctx.stroke();
+          if (!sp.big) { // weggeschoten elektron
+            ctx.fillStyle = "rgba(127,224,255," + (0.9 * (1 - u)) + ")";
+            ctx.beginPath(); ctx.arc(sp.ex + sp.evx * sp.age, sp.ey + sp.evy * sp.age, 1.6, 0, 7); ctx.fill();
+          }
+        }
+
+        // deeltjes
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          var alpha = p.done ? Math.max(0, p.fade) : 1;
+          if (t.kind === "photon") {
+            ctx.globalAlpha = alpha;
+            drawWave(p.x, p.y, p.ang, (p.phase + now * 0.02), t.color);
+            ctx.globalAlpha = 1;
+          } else {
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = t.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, t.r, 0, 7); ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+        }
+
+        // ---------- grafiek ----------
+        ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(fr.PL - 8, fr.PT - 4); ctx.lineTo(fr.PL - 8, fr.PB); ctx.lineTo(fr.PR, fr.PB); ctx.stroke();
+        ctx.font = "500 9.5px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "right";
+        [[1, "100%"], [0.5, "50%"], [0, "0%"]].forEach(function (g) {
+          ctx.fillStyle = "rgba(255,255,255,.45)";
+          ctx.fillText(g[1], fr.PL - 13, fr.gy(g[0]) + 3);
+          ctx.strokeStyle = "rgba(255,255,255,.07)";
+          ctx.beginPath(); ctx.moveTo(fr.PL - 8, fr.gy(g[0])); ctx.lineTo(fr.PR, fr.gy(g[0])); ctx.stroke();
+        });
+
+        // echte cm-schaal op de x-as
+        var maxCm = MATS[params.mat].maxCm;
+        var tickCm = [0.5, 1, 2, 5, 10, 20].find(function (iv) { return maxCm / iv <= 6; }) || 20;
+        ctx.textAlign = "center";
+        for (var tc = tickCm; tc <= maxCm + 0.001; tc += tickCm) {
+          var tx = fr.gx(tc * fr.pxPerCm);
+          ctx.strokeStyle = "rgba(255,255,255,.25)";
+          ctx.beginPath(); ctx.moveTo(tx, fr.PB); ctx.lineTo(tx, fr.PB + 4); ctx.stroke();
+          ctx.fillStyle = "rgba(255,255,255,.45)";
+          ctx.fillText(nl(tc, tickCm < 1 ? 1 : 0), tx, fr.PB + 14);
+        }
+
+        var dikPx = fr.mx1 - fr.mx0;
+        // achterkant blok in de grafiek
+        ctx.strokeStyle = "rgba(255,255,255,.4)";
+        ctx.setLineDash([3, 4]);
+        ctx.beginPath(); ctx.moveTo(fr.gx(dikPx), fr.PT); ctx.lineTo(fr.gx(dikPx), fr.PB); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "rgba(255,255,255,.45)";
+        ctx.textAlign = "center";
+        ctx.fillText("achterkant blok", Math.min(fr.gx(dikPx), fr.PR - 44), fr.PT + 2);
+
+        // markeringen: dracht of halveringsdiktes
+        if (t.kind === "photon") {
+          var hp = rangePx(fr);
+          var hpGap = fr.gx(hp) - fr.gx(0); // px tussen de markeringen: bepaalt of labels passen
+          for (var n = 1; n <= 3; n++) {
+            if (n * hp > fr.maxD) break;
+            var Tn = Math.pow(0.5, n);
+            ctx.strokeStyle = "rgba(201,160,255,.35)";
+            ctx.setLineDash([2, 4]);
+            ctx.beginPath(); ctx.moveTo(fr.gx(n * hp), fr.gy(Tn)); ctx.lineTo(fr.gx(n * hp), fr.PB); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(fr.PL - 8, fr.gy(Tn)); ctx.lineTo(fr.gx(n * hp), fr.gy(Tn)); ctx.stroke();
+            ctx.setLineDash([]);
+            if (n === 1 || hpGap >= 32) { // bij een kleine d½ alleen het eerste label, anders botsen ze
+              ctx.fillStyle = "rgba(201,160,255,.85)";
+              ctx.textAlign = "left";
+              ctx.fillText(n === 1 ? "d½" : n + "·d½", fr.gx(n * hp) + 5, fr.gy(Tn) - 5);
+              ctx.textAlign = "center";
+            }
+          }
+        } else {
+          var R = rangePx(fr);
+          if (R <= fr.maxD) {
+            ctx.fillStyle = "rgba(255,180,84,.9)";
+            ctx.fillText("dracht", fr.gx(R), fr.PT + 24);
+            ctx.strokeStyle = "rgba(255,180,84,.5)";
+            ctx.setLineDash([2, 4]);
+            ctx.beginPath(); ctx.moveTo(fr.gx(R), fr.PT + 28); ctx.lineTo(fr.gx(R), fr.PB); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+
+        // theoretische curve: doorgetrokken binnen het blok, gestippeld erachter ("als het
+        // materiaal daar door zou lopen")
+        function plotTheory(from, to, dash) {
+          ctx.setLineDash(dash ? [4, 5] : []);
+          ctx.strokeStyle = dash ? "rgba(120,140,230,.45)" : "#8a93ea";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          var steps = 90;
+          for (var k = 0; k <= steps; k++) {
+            var d = from + (to - from) * k / steps;
+            var x = fr.gx(d), y = fr.gy(theoryT(fr, d));
+            if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        plotTheory(0, dikPx, false);
+        if (dikPx < fr.maxD) plotTheory(dikPx, fr.maxD, true);
+
+        // gemeten curve (pas als er genoeg deeltjes geteld zijn)
+        if (stats.finished >= 12) {
+          ctx.fillStyle = "#ffd166";
+          for (var k = 0; k < NB; k++) {
+            var d = (k / (NB - 1)) * fr.maxD;
+            if (d > dikPx) break;
+            ctx.beginPath(); ctx.arc(fr.gx(d), fr.gy(stats.reach[k] / stats.finished), 2.2, 0, 7); ctx.fill();
+          }
+        }
+
+        ctx.font = "500 10px 'IBM Plex Sans', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255,255,255,.4)";
+        ctx.fillText("diepte in het materiaal (cm) →", (fr.PL + fr.PR) / 2, fr.PB + 30);
+      }
+
+      // ---------- HTML-panelen ----------
+      function updateHTML() {
+        var fr = frame(), t = TYPES[params.type], m = MATS[params.mat];
+        var dec = m.dStep >= 1 ? 0 : (m.dStep >= 0.1 ? 1 : 2);
+        $("valD").textContent = nl(params.dikteCm, dec) + " cm";
+        $("valE").textContent = fmtE();
+        $("energieNote").innerHTML = "= " + fmtJoule() + " &nbsp;·&nbsp; " + t.anchor;
+
+        var pctM = stats.finished >= 12 ? 100 * stats.exited / stats.finished : null;
+        var pctT = 100 * theoryT(fr, fr.mx1 - fr.mx0);
+        $("tellerPct").textContent = pctM === null ? "— %" : nl(pctM, pctM > 0 && pctM < 10 ? 1 : 0) + " %";
+        $("tellerNote").innerHTML = stats.finished < 12
+          ? "De teller warmt nog op…"
+          : "Gemeten: " + stats.exited + " van " + stats.finished + " deeltjes kwam door het blok. Theorie: " +
+            nl(pctT, pctT > 0 && pctT < 10 ? 1 : 0) + "%. Straling is een kansspel — de meting wiebelt rond de theorie.";
+
+        var kern = kernCm(), dikCm = params.dikteCm;
+        if (t.kind === "photon") {
+          $("kernLabel").textContent = "HALVERINGSDIKTE";
+          var nHalf = dikCm / kern;
+          $("kernBlock").innerHTML =
+            "<div class='sim-stat'><span>d½ in " + m.label + "</span><b>" + fmtLen(kern) + "</b></div>" +
+            "<div class='sim-stat'><span>Blok = " + nl(nHalf, nHalf < 10 ? 1 : 0) + " × d½</span><b class='accent'>theorie " + nl(pctT, pctT > 0 && pctT < 10 ? 1 : 0) + "%</b></div>" +
+            "<div class='sim-note'>Elke halveringsdikte haalt precies de helft weg — maar nul wordt het nooit. Meer energie = kleinere raakkans = grotere d½.</div>";
+        } else {
+          $("kernLabel").textContent = "DRACHT";
+          var past = dikCm > kern;
+          $("kernBlock").innerHTML =
+            "<div class='sim-stat'><span>Dracht in " + m.label + "</span><b>" + fmtLen(kern) + "</b></div>" +
+            "<div class='sim-stat'><span>Blok is " + fmtLen(dikCm) + "</span><b class='accent'>" + (past ? "0% komt door" : "alles komt door") + "</b></div>" +
+            "<div class='sim-note'>Elk deeltje verbruikt onderweg zijn energie en stopt. Meer energie = groter budget = grotere dracht. Sleep de achterkant van het blok over de dracht heen en zie de teller omklappen.</div>";
+        }
+      }
+
+      var legendHTML = {
+        alfa:    "<span><i class='sim-key' style='background:#ffb454;width:14px;height:14px'></i> alfadeeltje — zwaar, 2+ geladen</span><span><i class='sim-key' style='background:#ffe082'></i> ionisatie: atoom raakt een elektron kwijt</span>",
+        beta:    "<span><i class='sim-key' style='background:#7fe0ff'></i> bètadeeltje — licht, 1− geladen</span><span><i class='sim-key' style='background:#ffe082'></i> ionisatie: atoom raakt een elektron kwijt</span>",
+        gamma:   "<span><i class='sim-key sim-key--wave' style='background:#c9a0ff'></i> gammafoton — ongeladen</span><span><i class='sim-key' style='background:#f0d2ff'></i> voltreffer: foton in één klap geabsorbeerd</span>",
+        rontgen: "<span><i class='sim-key sim-key--wave' style='background:#8fb8ff'></i> röntgenfoton — ongeladen, minder energie</span><span><i class='sim-key' style='background:#f0d2ff'></i> voltreffer: foton in één klap geabsorbeerd</span>"
+      };
+      function updateLegend() {
+        $("legend").innerHTML = legendHTML[params.type] +
+          "<span><i class='sim-key' style='background:rgba(150,170,255,.5)'></i> atoom van het materiaal</span>";
+      }
+
+      // ---------- interactie ----------
+      // de sliders krijgen per materiaal/stralingssoort hun eigen echte bereik
+      function syncDikteSlider() {
+        var m = MATS[params.mat], s = $("sldD");
+        s.min = m.dStep; s.max = m.maxCm; s.step = m.dStep; s.value = params.dikteCm;
+      }
+      function syncEnergieSlider() {
+        var t = TYPES[params.type], s = $("sldE");
+        s.min = t.eMin; s.max = t.eMax; s.step = t.eStep; s.value = params.E[params.type];
+      }
+      document.querySelectorAll(".sim-tab").forEach(function (b) {
+        b.addEventListener("click", function () {
+          document.querySelectorAll(".sim-tab").forEach(function (x) { x.classList.remove("is-active"); });
+          b.classList.add("is-active");
+          params.type = b.dataset.type;
+          syncEnergieSlider();
+          resetStats(); updateLegend(); updateHTML();
+        });
+      });
+      document.querySelectorAll("[data-mat]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          document.querySelectorAll("[data-mat]").forEach(function (x) { x.classList.remove("sim-btn--primary"); });
+          b.classList.add("sim-btn--primary");
+          params.mat = b.dataset.mat;
+          params.dikteCm = MATS[params.mat].dDef; // elk materiaal heeft zijn eigen echte schaal
+          syncDikteSlider();
+          resetStats(); updateHTML();
+        });
+      });
+      $("sldD").addEventListener("input", function () {
+        params.dikteCm = parseFloat(this.value);
+        resetStats(); updateHTML();
+      });
+      $("sldE").addEventListener("input", function () {
+        params.E[params.type] = parseFloat(this.value);
+        resetStats(); updateHTML();
+      });
+      $("btnReset").addEventListener("click", function () { resetStats(); updateHTML(); });
+
+      // achterkant van het blok slepen
+      var dragging = false;
+      function canvasPos(e) {
+        var r = canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+      }
+      canvas.addEventListener("pointerdown", function (e) {
+        var fr = frame(), p = canvasPos(e);
+        if (Math.abs(p.x - fr.mx1) < 16 && p.y > fr.BT - 10 && p.y < fr.BB + 20) {
+          dragging = true;
+          canvas.setPointerCapture(e.pointerId);
+        }
+      });
+      canvas.addEventListener("pointermove", function (e) {
+        var fr = frame(), p = canvasPos(e), m = MATS[params.mat];
+        canvas.style.cursor = (Math.abs(p.x - fr.mx1) < 16 && p.y > fr.BT - 10 && p.y < fr.BB + 20) || dragging ? "col-resize" : "default";
+        if (!dragging) return;
+        var cm = (p.x - fr.mx0) / fr.pxPerCm;
+        cm = Math.round(cm / m.dStep) * m.dStep; // op de sliderstap, dan blijven beide gelijk
+        params.dikteCm = Math.max(m.dStep, Math.min(m.maxCm, cm));
+        $("sldD").value = params.dikteCm;
+        resetStats(); updateHTML();
+      });
+      canvas.addEventListener("pointerup", function () { dragging = false; });
+
+      // ---------- animatielus ----------
+      var lastFrame = null, htmlAcc = 0;
+      function loop(now) {
+        if (lastFrame === null) lastFrame = now;
+        var dt = Math.min(0.05, (now - lastFrame) / 1000);
+        lastFrame = now;
+        var fr = frame();
+        tick(dt, fr);
+        draw(fr, now);
+        htmlAcc += dt;
+        if (htmlAcc > 0.4) { htmlAcc = 0; updateHTML(); } // teller-tekst hoeft niet elk frame
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("resize", function () { sizeCanvas(); atomCache = {}; resetStats(); updateHTML(); });
+
+      sizeCanvas();
+      syncDikteSlider();
+      syncEnergieSlider();
+      resetStats();
+      updateLegend();
+      updateHTML();
+      requestAnimationFrame(loop);
+    })();
+
+    // ================= WAAROM-animatie: energiebudget naast kansspel =================
+    // Twee identieke werelden. Links: geladen deeltjes waarvan het energiebalkje leegloopt
+    // (zelfde budget -> allemaal even ver: dracht). Rechts: fotonen met een vol balkje dat
+    // in één voltreffer verdwijnt, op een vooraf gelote diepte (kansspel -> per d1/2 de helft).
+    (function () {
+      "use strict";
+      var canvas = document.getElementById("whyCanvas"), ctx = canvas.getContext("2d");
+      var W = 0, H = 0, stacked = false;
+
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = a + 0x6D2B79F5 | 0;
+          var t = Math.imul(a ^ a >>> 15, 1 | a);
+          t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+
+      function sizeCanvas() {
+        W = canvas.clientWidth || canvas.parentElement.clientWidth;
+        stacked = W < 520; // smal scherm: helften onder elkaar
+        H = stacked ? 500 : Math.max(290, Math.min(330, Math.round(W * 0.42)));
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.height = H + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function halves() {
+        if (stacked) {
+          var hh = (H - 3) / 2;
+          return [{ x0: 0, y0: 0, x1: W, y1: hh }, { x0: 0, y0: hh + 3, x1: W, y1: H }];
+        }
+        var hw = (W - 3) / 2;
+        return [{ x0: 0, y0: 0, x1: hw, y1: H }, { x0: hw + 3, y0: 0, x1: W, y1: H }];
+      }
+      function geo(h) {
+        var srcX = h.x0 + 40;
+        return { srcX: srcX, beamT: h.y0 + 50, beamB: h.y1 - 52,
+                 U: h.x1 - 16 - srcX,
+                 range: srcX + 0.64 * (h.x1 - 16 - srcX),  // drachtpositie
+                 d12: 0.21 * (h.x1 - 16 - srcX) };          // halveringsdikte in px
+      }
+
+      var atomsCache = null;
+      function atoms() {
+        if (!atomsCache) {
+          var hs = halves(); atomsCache = [[], []];
+          for (var k = 0; k < 2; k++) {
+            var rnd = mulberry32(97531), h = hs[k], g = geo(h); // zelfde seed: identieke wereld
+            for (var i = 0; i < 64; i++) {
+              atomsCache[k].push({ x: g.srcX + 16 + rnd() * (g.U - 12), y: g.beamT + 5 + rnd() * (g.beamB - g.beamT - 10) });
+            }
+          }
+        }
+        return atomsCache;
+      }
+
+      var alfas = [], fotons = [], sparks = [];
+      var tA = 10, tF = 10; // meteen bij de start spawnen
+
+      function tick(dt) {
+        var hs = halves(), gL = geo(hs[0]), gR = geo(hs[1]);
+        tA += dt; tF += dt;
+        if (tA > 0.9 && alfas.length < 9) {
+          tA = 0;
+          alfas.push({ x: gL.srcX, y: gL.beamT + 10 + Math.random() * (gL.beamB - gL.beamT - 20),
+                       E: 1, jit: 1 + (Math.random() * 2 - 1) * 0.03, done: false, fade: 1, ion: 0 });
+        }
+        if (tF > 0.75 && fotons.length < 9) {
+          tF = 0;
+          fotons.push({ x: gR.srcX, y: gR.beamT + 10 + Math.random() * (gR.beamB - gR.beamT - 20),
+                        abs: gR.srcX - gR.d12 * Math.log(1 - Math.random()) / Math.LN2, // exact exponentieel geloot
+                        phase: Math.random() * 7, done: false, fade: 1 });
+        }
+        for (var i = alfas.length - 1; i >= 0; i--) {
+          var a = alfas[i];
+          if (a.done) { a.fade -= dt * 0.7; if (a.fade <= 0) alfas.splice(i, 1); continue; }
+          var v = 52 * (a.E < 0.25 ? 0.35 + 0.65 * a.E / 0.25 : 1); // kruipen als het budget bijna op is
+          var step = v * dt;
+          a.x += step;
+          a.E -= step / ((gL.range - gL.srcX) * a.jit); // tol per afgelegde afstand
+          a.ion += step;
+          if (a.ion > 16) { a.ion = 0; sparks.push({ x: a.x, y: a.y + (Math.random() - 0.5) * 9, age: 0, big: false }); }
+          if (a.E <= 0) { a.E = 0; a.done = true; }
+        }
+        for (var j = fotons.length - 1; j >= 0; j--) {
+          var f = fotons[j];
+          if (f.done) { f.fade -= dt * 2; if (f.fade <= 0) fotons.splice(j, 1); continue; }
+          f.x += 150 * dt;
+          if (f.x >= f.abs) { f.x = f.abs; f.done = true; sparks.push({ x: f.x, y: f.y, age: 0, big: true }); }
+          else if (f.x > hs[1].x1 + 18) fotons.splice(j, 1); // ontsnapt naar rechts
+        }
+        for (var s = sparks.length - 1; s >= 0; s--) { sparks[s].age += dt; if (sparks[s].age > 0.5) sparks.splice(s, 1); }
+      }
+
+      function bar(x, y, frac, col) {
+        ctx.fillStyle = "rgba(255,255,255,.18)";
+        ctx.fillRect(x - 8, y - 13, 16, 3.5);
+        ctx.fillStyle = col;
+        ctx.fillRect(x - 8, y - 13, 16 * Math.max(0, frac), 3.5);
+      }
+
+      function draw(now) {
+        ctx.clearRect(0, 0, W, H);
+        var hs = halves(), at = atoms();
+        var fs = W < 430 ? 9.5 : 11;
+        for (var k = 0; k < 2; k++) {
+          var h = hs[k], g = geo(h);
+          ctx.fillStyle = "#0d1230";
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(h.x0, h.y0, h.x1 - h.x0, h.y1 - h.y0, 16); else ctx.rect(h.x0, h.y0, h.x1 - h.x0, h.y1 - h.y0);
+          ctx.fill();
+          ctx.fillStyle = "rgba(150,170,255,.30)";
+          for (var i = 0; i < at[k].length; i++) {
+            ctx.beginPath(); ctx.arc(at[k][i].x, at[k][i].y, 2.6, 0, 7); ctx.fill();
+          }
+          ctx.font = "600 " + fs + "px 'IBM Plex Mono', monospace";
+          ctx.textAlign = "left";
+          ctx.fillStyle = "rgba(255,255,255,.65)";
+          ctx.fillText(k === 0 ? "GELADEN (α, β)" : "ONGELADEN (γ, RÖNTGEN)", h.x0 + 18, h.y0 + 24);
+          ctx.font = "500 " + (fs - 1) + "px 'IBM Plex Mono', monospace";
+          ctx.fillStyle = "rgba(255,255,255,.42)";
+          ctx.fillText(k === 0 ? "voelt élk atoom: betaalt overal tol" : "voelt niets — tot één voltreffer", h.x0 + 18, h.y0 + 40);
+          // bron
+          ctx.fillStyle = "#1a2150"; ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1.3;
+          var my = (g.beamT + g.beamB) / 2;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(g.srcX - 24, my - 19, 17, 38, 5); else ctx.rect(g.srcX - 24, my - 19, 17, 38);
+          ctx.fill(); ctx.stroke();
+          ctx.fillStyle = k === 0 ? "#ffb454" : "#c9a0ff";
+          ctx.beginPath(); ctx.arc(g.srcX - 15, my, 3.6, 0, 7); ctx.fill();
+          // onderregel: de conclusie van deze helft
+          ctx.font = "500 10px 'IBM Plex Sans', sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillStyle = "rgba(255,255,255,.45)";
+          ctx.fillText(k === 0 ? "zelfde budget → allemaal even ver: de dracht"
+                               : "zelfde kans per stukje → per d½ de helft weg",
+                       (h.x0 + h.x1) / 2, h.y1 - 12);
+        }
+        var gL = geo(hs[0]), gR = geo(hs[1]);
+        // dracht-lijn (links): hier is elk budget op
+        ctx.strokeStyle = "rgba(255,180,84,.55)";
+        ctx.setLineDash([3, 4]); ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(gL.range, gL.beamT); ctx.lineTo(gL.range, gL.beamB); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = "600 9.5px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255,180,84,.85)";
+        ctx.fillText("dracht", gL.range, gL.beamB + 16);
+        // d½-lijnen (rechts): per halveringsdikte de helft over
+        ["50%", "25%", "12,5%"].forEach(function (lbl, idx) {
+          var x = gR.srcX + (idx + 1) * gR.d12;
+          ctx.strokeStyle = "rgba(201,160,255,.4)";
+          ctx.setLineDash([3, 4]); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(x, gR.beamT); ctx.lineTo(x, gR.beamB); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = "rgba(201,160,255,.85)";
+          ctx.fillText(lbl, x, gR.beamB + 16);
+        });
+        // flitsen
+        for (var s = 0; s < sparks.length; s++) {
+          var sp = sparks[s], u = sp.age / 0.5;
+          ctx.strokeStyle = sp.big ? "rgba(240,210,255," + (0.85 * (1 - u)) + ")" : "rgba(255,224,130," + (0.75 * (1 - u)) + ")";
+          ctx.lineWidth = sp.big ? 2 : 1.3;
+          ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.big ? 4 + u * 12 : 2 + u * 6, 0, 7); ctx.stroke();
+        }
+        // alfa's met leeglopend balkje
+        for (var a2 = 0; a2 < alfas.length; a2++) {
+          var a = alfas[a2];
+          ctx.globalAlpha = a.done ? Math.max(0, a.fade) : 1;
+          ctx.fillStyle = "#ffb454";
+          ctx.beginPath(); ctx.arc(a.x, a.y, 4.2, 0, 7); ctx.fill();
+          bar(a.x, a.y, a.E, "#ffb454");
+          ctx.globalAlpha = 1;
+        }
+        // fotonen met vol balkje
+        for (var f2 = 0; f2 < fotons.length; f2++) {
+          var f = fotons[f2];
+          ctx.globalAlpha = f.done ? Math.max(0, f.fade) : 1;
+          ctx.strokeStyle = "#c9a0ff"; ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          for (var q = 0; q <= 8; q++) {
+            var lx = f.x - 14 + q / 8 * 20, ly = f.y + Math.sin(q / 8 * 12.6 + f.phase + now * 0.02) * 3;
+            if (q === 0) ctx.moveTo(lx, ly); else ctx.lineTo(lx, ly);
+          }
+          ctx.stroke();
+          if (!f.done) bar(f.x, f.y, 1, "#c9a0ff"); // blijft vol — tot de klap
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      var last = null;
+      function loop(now) {
+        if (last === null) last = now;
+        var dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        tick(dt);
+        draw(now);
+        requestAnimationFrame(loop);
+      }
+      window.addEventListener("resize", function () {
+        sizeCanvas(); atomsCache = null; alfas = []; fotons = []; sparks = [];
+      });
+      sizeCanvas();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
