@@ -230,6 +230,7 @@ img { max-width: 100%; display: block; }
   min-height: 44px;
 }
 .switcher__btn.is-active { background: #fff; color: var(--night-2); }
+a.switcher__btn { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* ===================== MAIN / KAARTEN ===================== */
 .main {
