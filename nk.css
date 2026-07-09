@@ -230,7 +230,21 @@ img { max-width: 100%; display: block; }
   min-height: 44px;
 }
 .switcher__btn.is-active { background: #fff; color: var(--night-2); }
-a.switcher__btn { text-decoration: none; display: inline-flex; align-items: center; }
+/* jaar-navigatie (klaspagina's) */
+.jaar-nav {
+  margin-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .55);
+}
+.jaar-nav a {
+  color: rgba(255, 255, 255, .78);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.jaar-nav a:hover, .jaar-nav a:focus-visible { color: #fff; }
 
 /* ===================== MAIN / KAARTEN ===================== */
 .main {
