@@ -40,7 +40,7 @@ dicht. `serviceAccountKey.json` staat alleen lokaal (gitignored).
 ## Conventies
 
 - **Taal**: code en commits in het Engels; teksten op de site in het Nederlands
-- **Styling**: `nk.css` (nieuwe stijl, Natuurkunde) en `style.css` (oude stijl) — consolidatie loopt
+- **Styling**: alles gebruikt `nk.css` (style.css is in juli 2026 uitgefaseerd); paginaspecifieke stijl in een klein `<style>`-blok met nk-CSS-variabelen
 
 ## Branches
 
@@ -48,5 +48,5 @@ dicht. `serviceAccountKey.json` staat alleen lokaal (gitignored).
 
 ## Roadmap
 
-- Themaoverhaul (CSS-consolidatie style.css vs nk.css)
+- ~~Themaoverhaul (CSS-consolidatie)~~ — afgerond juli 2026
 - ~~Gamification (XP, opdrachtenboom, badges)~~ — vervallen; Informatica is verhuisd
