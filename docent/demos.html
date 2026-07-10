@@ -1,50 +1,61 @@
+---
+title: Demonstraties per les
+description: Privépagina — demonstraties per les.
+noindex: true
+sitemap: false
+---
+
 <!DOCTYPE html>
 <html lang="nl">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="robots" content="noindex, nofollow">
-	<title>Demonstraties per les</title>
-	<style>
-		:root { color-scheme: light dark; }
-		* { box-sizing: border-box; }
-		body {
-			margin: 0;
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-			line-height: 1.55;
-			background: #14181d;
-			color: #e6e9ec;
-		}
-		.wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
-		h1 { font-size: 1.6rem; margin: 0 0 4px; }
-		.meta { color: #8b949e; font-size: 0.85rem; margin-bottom: 28px; }
-		h2 { font-size: 1.3rem; margin-top: 44px; border-bottom: 2px solid #2d333b; padding-bottom: 6px; }
-		h3 { font-size: 1.05rem; margin-top: 28px; color: #b8c0c8; }
-		.intro { color: #b8c0c8; }
-		table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-		th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid #2d333b; }
-		th { color: #8b949e; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
-		td:first-child { white-space: nowrap; color: #8b949e; }
-		.plan-scroll { overflow-x: auto; }
-		#status { padding: 24px; background: #1c2128; border: 1px solid #2d333b; border-radius: 10px; }
-		#status a, #status button {
-			display: inline-block; margin-top: 12px; margin-right: 10px;
-			padding: 9px 16px; border-radius: 8px; border: 1px solid #3d444d;
-			background: #238636; color: #fff; text-decoration: none;
-			font-size: 0.95rem; cursor: pointer;
-		}
-		#status button { background: #21262d; }
-		@media print { body { background: #fff; color: #000; } #status { display: none; } }
-	</style>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-</head>
+{% include head-nk.html %}
 <body>
-	<div class="wrap">
-		<h1>Demonstraties per les</h1>
-		<div class="meta" id="meta">Privépagina — inhoud wordt geladen na inloggen.</div>
-		<div id="status">Bezig met controleren van je login…</div>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">PRIVÉ · DOCENT</div>
+			<h1 class="hero__title" id="page-title">Demonstraties per les</h1>
+			<p class="hero__sub" id="meta">Privépagina — inhoud wordt geladen na inloggen.</p>
+		</div>
+	</section>
+
+	<main class="main">
+		<section class="card" id="status">Bezig met controleren van je login…</section>
 		<div id="content"></div>
-	</div>
+	</main>
+
+	{% include site-footer-nk.html %}
+
+	<style>
+		#status .btns { margin-top: 14px; }
+		/* Typografie voor de geladen Firestore-inhoud, in nk-idioom */
+		#content section.card + section.card { margin-top: 26px; }
+		#content h2 {
+			font-family: var(--font-head);
+			font-weight: 600;
+			font-size: clamp(21px, 3vw, 26px);
+			color: var(--ink);
+			margin: 28px 0 10px;
+		}
+		#content h2:first-child { margin-top: 0; }
+		#content h3 {
+			font-family: var(--font-head);
+			font-weight: 600;
+			font-size: 17px;
+			color: var(--muted);
+			margin: 22px 0 8px;
+		}
+		#content p { font-size: 15px; line-height: 1.6; color: var(--ink-cell); }
+		#content .plan { margin: 12px 0 4px; }
+		@media print {
+			.site-header, .photoband, #status { display: none !important; }
+			.hero { background: #fff; }
+			.hero__title { color: #000; }
+			.hero__eyebrow, .hero__sub { color: #444; }
+			body { background: #fff; }
+			#content section.card { border: none; box-shadow: none; padding: 0; }
+		}
+	</style>
 
 	<script type="module">
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -64,9 +75,11 @@
 		const status = document.getElementById("status");
 
 		function showLogin() {
-			status.innerHTML = `Je bent niet ingelogd.<br>
-				<a href="/docent/login.html?redirect=/docent/demos.html">Inloggen</a>
-				<button onclick="location.reload()">Opnieuw proberen</button>`;
+			status.innerHTML = `Je bent niet ingelogd.
+				<div class="btns">
+					<a class="btn" href="/docent/login.html?redirect=/docent/demos.html">Inloggen</a>
+					<a class="btn" href="#" onclick="location.reload(); return false;">Opnieuw proberen</a>
+				</div>`;
 		}
 
 		onAuthStateChanged(auth, async (user) => {
@@ -76,24 +89,26 @@
 				const snap = await getDoc(doc(db, "docent", "demonstraties"));
 				if (!snap.exists()) { status.textContent = "Document niet gevonden."; return; }
 				const data = snap.data();
-				document.title = data.title;
-				document.querySelector("h1").textContent = data.title;
+				document.title = data.title + " · Servaas Winder";
+				document.getElementById("page-title").textContent = data.title;
 				const updated = data.updated?.toDate?.();
 				document.getElementById("meta").textContent = updated
 					? "Bijgewerkt: " + updated.toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })
 					: "";
 				status.remove();
-				const content = document.getElementById("content");
-				content.innerHTML = data.html;
-				// Brede tabellen horizontaal scrollbaar maken op mobiel
-				content.querySelectorAll("table").forEach((t) => {
+				const card = document.createElement("section");
+				card.className = "card";
+				card.innerHTML = data.html;
+				document.getElementById("content").appendChild(card);
+				// Brede tabellen krijgen de nk-tabelstijl + horizontaal scrollen op mobiel
+				card.querySelectorAll("table").forEach((t) => {
 					const w = document.createElement("div");
-					w.className = "plan-scroll";
+					w.className = "plan";
 					t.parentNode.insertBefore(w, t);
 					w.appendChild(t);
 				});
 			} catch (e) {
-				status.innerHTML = e.code === "permission-denied"
+				status.textContent = e.code === "permission-denied"
 					? `Dit account (${user.email}) heeft geen toegang tot deze pagina.`
 					: `Laden mislukt: ${e.message}`;
 			}
