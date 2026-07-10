@@ -8,10 +8,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Docenten Dashboard - Informatica</title>
 		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-		<!-- Load Firebase SDKs from CDN -->
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+		<!-- Firebase SDKs worden geladen via site-header-informatica.html -->
 		<!-- PapaParse for CSV -->
 		<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
         <!-- Custom Scripts -->
@@ -190,7 +187,8 @@
                 display: block;
             }
 		</style>
-	</head>
+	  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
 	<body class="auth-page">
 		{% include site-header-informatica.html %}
 
@@ -1942,10 +1940,7 @@
 				return raw;
 			}
 
-            function sanitizeDocId(value) {
-				if (!value) return `leerling-${Date.now()}`;
-				return (value.toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 120) || `leerling-${Date.now()}`);
-			}
+            // sanitizeDocId komt uit js/student-utils.js
 
             function slugify(value) {
 				if (!value) return "";

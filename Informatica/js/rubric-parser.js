@@ -78,10 +78,6 @@ const RubricParser = {
             const weightMatch = categoryText.match(/\(weging\s+(\d+)\)/i);
             if (weightMatch) {
                 weight = parseInt(weightMatch[1], 10);
-            } else if (categoryText.toLowerCase().includes('(max 2pt)')) {
-                 // Explicit max point override in text? 
-                 // Actually relying on "N.v.t." detection is better, but this is a safety.
-                 // Let's stick to column detection mostly.
             }
 
             // Determine max points for this row
