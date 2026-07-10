@@ -16,6 +16,10 @@ sitemap: false
 			<div class="hero__eyebrow">PRIVÉ · DOCENT</div>
 			<h1 class="hero__title" id="page-title">Demonstraties per les</h1>
 			<p class="hero__sub" id="meta">Privépagina — inhoud wordt geladen na inloggen.</p>
+			<div class="switcher" id="klas-switcher" hidden>
+				<div class="switcher__label">KLAS</div>
+				<div class="switcher__group" id="klas-knoppen"></div>
+			</div>
 		</div>
 	</section>
 
@@ -28,34 +32,119 @@ sitemap: false
 
 	<style>
 		#status .btns { margin-top: 14px; }
+		#content > div { display: flex; flex-direction: column; gap: 26px; }
+		#content > div[hidden] { display: none; }
 		/* Typografie voor de geladen Firestore-inhoud, in nk-idioom */
-		#content section.card + section.card { margin-top: 26px; }
-		#content h2 {
-			font-family: var(--font-head);
-			font-weight: 600;
-			font-size: clamp(21px, 3vw, 26px);
-			color: var(--ink);
-			margin: 28px 0 10px;
-		}
-		#content h2:first-child { margin-top: 0; }
-		#content h3 {
-			font-family: var(--font-head);
-			font-weight: 600;
-			font-size: 17px;
-			color: var(--muted);
-			margin: 22px 0 8px;
-		}
 		#content p { font-size: 15px; line-height: 1.6; color: var(--ink-cell); }
+		#content p.intro { color: var(--muted); margin-top: 0; }
 		#content .plan { margin: 12px 0 4px; }
+		@media (max-width: 560px) {
+			.switcher__btn { padding: 10px 14px; font-size: 13.5px; }
+		}
 		@media print {
-			.site-header, .photoband, #status { display: none !important; }
+			.site-header, .photoband, #status, .switcher { display: none !important; }
 			.hero { background: #fff; }
 			.hero__title { color: #000; }
 			.hero__eyebrow, .hero__sub { color: #444; }
 			body { background: #fff; }
-			#content section.card { border: none; box-shadow: none; padding: 0; }
+			#content section.card { border: none; box-shadow: none; padding: 0 0 18px; }
+			#content > div { display: block !important; } /* alle klassen afdrukken */
 		}
 	</style>
+
+	<script>
+		// Deelt de Firestore-HTML (h2 = klas, h3 = periode) op in klas-panelen met een switcher.
+		function renderDemos(html) {
+			const tpl = document.createElement("template");
+			tpl.innerHTML = html;
+			const intro = [];
+			const klassen = [];
+			let huidige = null;
+			for (const node of [...tpl.content.childNodes]) {
+				if (node.nodeName === "H2") {
+					huidige = { naam: node.textContent.trim(), nodes: [] };
+					klassen.push(huidige);
+				} else if (huidige) {
+					huidige.nodes.push(node);
+				} else {
+					intro.push(node);
+				}
+			}
+
+			const content = document.getElementById("content");
+			content.innerHTML = "";
+
+			// Elke klas wordt een paneel; elke h3 (periode) een eigen card
+			const panelen = klassen.map((klas) => {
+				const paneel = document.createElement("div");
+				paneel.hidden = true;
+				let card = null;
+				const introTekst = intro
+					.filter((n) => n.textContent && n.textContent.trim())
+					.map((n) => n.outerHTML || n.textContent)
+					.join("");
+				if (introTekst) {
+					card = document.createElement("section");
+					card.className = "card";
+					card.innerHTML = introTekst;
+					paneel.appendChild(card.cloneNode(true));
+					card = null;
+				}
+				for (const node of klas.nodes) {
+					if (node.nodeName === "H3") {
+						card = document.createElement("section");
+						card.className = "card";
+						const kop = document.createElement("h2");
+						kop.className = "card__title";
+						kop.textContent = node.textContent;
+						card.appendChild(kop);
+						paneel.appendChild(card);
+					} else {
+						// lege tekstnodes tussen secties geen eigen card laten maken
+						if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) continue;
+						if (!card) {
+							card = document.createElement("section");
+							card.className = "card";
+							paneel.appendChild(card);
+						}
+						card.appendChild(node);
+					}
+				}
+				content.appendChild(paneel);
+				return paneel;
+			});
+
+			// Tabellen in nk-stijl + horizontaal scrollbaar
+			content.querySelectorAll("table").forEach((t) => {
+				const wrap = document.createElement("div");
+				wrap.className = "plan";
+				t.parentNode.insertBefore(wrap, t);
+				wrap.appendChild(t);
+			});
+
+			// Switcher-knoppen
+			const knoppen = document.getElementById("klas-knoppen");
+			knoppen.innerHTML = "";
+			klassen.forEach((klas, i) => {
+				const btn = document.createElement("button");
+				btn.type = "button";
+				btn.className = "switcher__btn";
+				btn.textContent = klas.naam;
+				btn.addEventListener("click", () => {
+					panelen.forEach((p, j) => { p.hidden = j !== i; });
+					knoppen.querySelectorAll(".switcher__btn").forEach((b) => b.classList.remove("is-active"));
+					btn.classList.add("is-active");
+				});
+				knoppen.appendChild(btn);
+			});
+			if (panelen.length) {
+				panelen[0].hidden = false;
+				knoppen.firstChild.classList.add("is-active");
+			}
+			document.getElementById("klas-switcher").hidden = false;
+		}
+		window.renderDemos = renderDemos;
+	</script>
 
 	<script type="module">
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -96,17 +185,7 @@ sitemap: false
 					? "Bijgewerkt: " + updated.toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })
 					: "";
 				status.remove();
-				const card = document.createElement("section");
-				card.className = "card";
-				card.innerHTML = data.html;
-				document.getElementById("content").appendChild(card);
-				// Brede tabellen krijgen de nk-tabelstijl + horizontaal scrollen op mobiel
-				card.querySelectorAll("table").forEach((t) => {
-					const w = document.createElement("div");
-					w.className = "plan";
-					t.parentNode.insertBefore(w, t);
-					w.appendChild(t);
-				});
+				renderDemos(data.html);
 			} catch (e) {
 				status.textContent = e.code === "permission-denied"
 					? `Dit account (${user.email}) heeft geen toegang tot deze pagina.`
