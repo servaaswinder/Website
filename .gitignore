@@ -12,20 +12,12 @@ _site/
 vendor/
 .bundle/
 
-# Security Rules & Admin Scripts
-firestore.rules
+# Firebase admin key (nooit committen)
 serviceAccountKey.json
-private_scripts/
 venv/
 
 # Logs
 *.log
 
-# Lokale werkbestanden
-temp_drafts.json
-
 # Python
 __pycache__/
-
-# Lokale testbestanden
-Informatica/opdrachten/microbit_test/

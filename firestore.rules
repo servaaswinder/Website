@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Het beoordelingssysteem (submissions/results) is uitgefaseerd; Informatica
+    // draait op northgo-informatica.nl. Dit project wordt alleen nog gebruikt
+    // voor de privé docent-pagina's (docent/demos.html op servaaswinder.nl).
+    // Alles wat hieronder niet expliciet gematcht wordt, is dicht.
+
+    match /docent/{docId} {
+      allow read, write: if request.auth != null &&
+        request.auth.token.email == 'servaas.winder@northgo-college.nl';
+    }
+  }
+}
