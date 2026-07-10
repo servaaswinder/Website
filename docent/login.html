@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+	<title>Docent-login</title>
+	<style>
+		:root { color-scheme: light dark; }
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			line-height: 1.55;
+			background: #14181d;
+			color: #e6e9ec;
+			display: flex;
+			min-height: 100vh;
+			align-items: center;
+			justify-content: center;
+		}
+		.card {
+			width: min(400px, 92vw);
+			padding: 28px;
+			background: #1c2128;
+			border: 1px solid #2d333b;
+			border-radius: 10px;
+		}
+		h1 { font-size: 1.3rem; margin: 0 0 18px; }
+		label { display: block; font-size: 0.85rem; color: #8b949e; margin: 14px 0 4px; }
+		input {
+			width: 100%; padding: 9px 12px; border-radius: 8px;
+			border: 1px solid #3d444d; background: #14181d; color: #e6e9ec;
+			font-size: 1rem;
+		}
+		button {
+			width: 100%; margin-top: 18px; padding: 10px 16px;
+			border-radius: 8px; border: 1px solid #3d444d;
+			background: #238636; color: #fff; font-size: 0.95rem; cursor: pointer;
+		}
+		button:disabled { opacity: 0.6; cursor: wait; }
+		.error { margin-top: 12px; color: #f85149; font-size: 0.9rem; }
+		.hidden { display: none; }
+	</style>
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+	<div class="card">
+		<form id="login-form">
+			<h1>Docent-login</h1>
+			<label for="email">E-mailadres</label>
+			<input type="email" id="email" autocomplete="username" required />
+			<label for="password">Wachtwoord</label>
+			<input type="password" id="password" autocomplete="current-password" required />
+			<button id="btn-login" type="submit">Inloggen</button>
+		</form>
+		<div id="mfa-form" class="hidden">
+			<h1>2FA-verificatie</h1>
+			<label for="mfa-code">6-cijferige code uit je authenticator-app</label>
+			<input type="text" id="mfa-code" inputmode="numeric" placeholder="123456" autocomplete="one-time-code" />
+			<button id="btn-mfa" type="button">Verifiëren</button>
+		</div>
+		<div id="error" class="error"></div>
+	</div>
+
+	<script type="module">
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+		import {
+			getAuth, signInWithEmailAndPassword, onAuthStateChanged,
+			getMultiFactorResolver, TotpMultiFactorGenerator,
+			setPersistence, browserLocalPersistence
+		} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+		const app = initializeApp({
+			apiKey: "AIzaSyDkye8-F8VZQD30HzJQK1Z_9VNgEZPJayY",
+			authDomain: "leerling-accounts.firebaseapp.com",
+			projectId: "leerling-accounts",
+			storageBucket: "leerling-accounts.firebasestorage.app",
+			messagingSenderId: "884081904341",
+			appId: "1:884081904341:web:5ce26ac295a4bf3d79305c",
+		});
+		const auth = getAuth(app);
+		setPersistence(auth, browserLocalPersistence);
+
+		// Alleen doorsturen naar eigen pagina's, nooit naar een extern adres uit de URL
+		const requested = new URLSearchParams(location.search).get("redirect") || "/docent/demos.html";
+		const target = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/docent/demos.html";
+
+		const errorDiv = document.getElementById("error");
+		let mfaResolver = null;
+
+		onAuthStateChanged(auth, (user) => {
+			if (user) window.location.replace(target);
+		});
+
+		document.getElementById("login-form").addEventListener("submit", async (e) => {
+			e.preventDefault();
+			errorDiv.textContent = "";
+			const btn = document.getElementById("btn-login");
+			btn.disabled = true;
+			try {
+				await signInWithEmailAndPassword(auth,
+					document.getElementById("email").value,
+					document.getElementById("password").value);
+				// onAuthStateChanged stuurt door
+			} catch (error) {
+				btn.disabled = false;
+				if (error.code === "auth/multi-factor-auth-required") {
+					mfaResolver = getMultiFactorResolver(auth, error);
+					document.getElementById("login-form").classList.add("hidden");
+					document.getElementById("mfa-form").classList.remove("hidden");
+					document.getElementById("mfa-code").focus();
+				} else {
+					errorDiv.textContent = "Inloggen mislukt. Controleer je e-mailadres en wachtwoord.";
+				}
+			}
+		});
+
+		document.getElementById("mfa-code").addEventListener("keydown", (e) => {
+			if (e.key === "Enter") document.getElementById("btn-mfa").click();
+		});
+
+		document.getElementById("btn-mfa").addEventListener("click", async () => {
+			if (!mfaResolver) return;
+			errorDiv.textContent = "";
+			const hint = mfaResolver.hints.find(h => h.factorId === TotpMultiFactorGenerator.FACTOR_ID);
+			if (!hint) { errorDiv.textContent = "Geen TOTP-methode gevonden op dit account."; return; }
+			try {
+				const assertion = TotpMultiFactorGenerator.assertionForSignIn(
+					hint.uid, document.getElementById("mfa-code").value.trim());
+				await mfaResolver.resolveSignIn(assertion);
+				// onAuthStateChanged stuurt door
+			} catch {
+				errorDiv.textContent = "Foute code. Probeer het opnieuw.";
+			}
+		});
+	</script>
+</body>
+</html>
