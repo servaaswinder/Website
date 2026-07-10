@@ -1,123 +1,106 @@
+---
+title: Leerlingblokkeersysteem
+description: "Technasium-project Leerlingblokkeersysteem: een oplossing voor het thermostaatprobleem in warme lokalen op het Northgo College."
+---
 <!DOCTYPE html>
 <html lang="nl">
-  <head>
-    <title>Technasium</title>
-    <link rel="stylesheet" href="../style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% include head-nk.html %}
+<body>
+  {% include site-header-nk.html %}
 
+  <section class="hero">
+    <div class="hero__inner">
+      <div class="hero__eyebrow">TECHNASIUM · O&amp;O</div>
+      <h1 class="hero__title">Leerlingblokkeersysteem</h1>
+      <p class="hero__sub">Projectpagina — opdrachtomschrijving en mogelijke oplossingen.</p>
+    </div>
+  </section>
+
+  <main class="main">
     <style>
-      .projects-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
+      .prose h3 {
+        font-family: var(--font-head);
+        font-weight: 600;
+        font-size: 18px;
+        color: var(--ink);
+        margin: 24px 0 8px;
       }
-
-      .project {
-        flex: 1 1 calc(50% - 1rem); /* Hier zorgen we ervoor dat het project 50% van de container in beslag neemt, rekening houdend met de gap. */
-        box-sizing: border-box; /* Hiermee zorgen we ervoor dat padding en border binnen de opgegeven breedte van het element blijven. */
+      .prose h3:first-of-type { margin-top: 0; }
+      .prose p {
+        font-size: 15.5px;
+        line-height: 1.6;
+        color: var(--muted);
+        margin: 0 0 16px;
+        max-width: 840px;
       }
-
+      .prose ul {
+        list-style-type: disc;
+        margin: 0 0 18px;
+        padding-left: 22px;
+      }
+      .prose li {
+        font-size: 15.5px;
+        line-height: 1.6;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
       .project-image img {
+        max-width: 480px;
         width: 100%;
-        display: block;
+        border-radius: 14px;
+        border: 1px solid var(--card-border);
+        margin: 8px 0 20px;
       }
     </style>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-</head>
 
-  <body class="portfolio">
-    <header>
-      <h1>Servaas Winder</h1>
-      <p>Docent Natuurkunde</p>
-      <nav>
-        <button class="menu-toggle">&#9776;</button>
-        <ul>
-          <li><a href="../index.html">Home</a></li>
-          <li><a href="../Natuurkunde/klassen.html">Klassen</a></li>
-          <li>
-            <a class="active" href="Technasium.html">Technasium</a>
-          </li>
-          <li><a href="../Fotografie/index.html">Fotografie</a></li>
-        </ul>
-      </nav>
+    <!-- Opdracht uitleggen -->
+    <section class="card prose">
+      <div class="card__eyebrow">OPDRACHT</div>
+      <h2 class="card__title">Leerlingblokkeersysteem: Opdrachtomschrijving</h2>
 
-      <script>
-        // selecteer de hamburgerknop en het navigatiemenu
-        const menuToggle = document.querySelector(".menu-toggle");
-        const navigation = document.querySelector("nav ul");
+      <section>
+        <h3>Inleiding:</h3>
+        <p>
+          Bij ons op school loop ik vraag tegen een probleem aan dat een
+          lokaal erg heet is en stinkt naar zweet. Ik krijg dan veel klagende
+          leerlingen bij mij. Zij zitten dan een raam open. Vervolgens is het
+          weer te koud en gaan andere leerlingen tegen de kachel aanzetten.
+          Uit een klein leerling onderzoek blijkt dat leerlingen niet
+          begrijpen hoe de thermostaat knoppen werken.
+        </p>
+      </section>
 
-        // voeg een klikfunctie toe aan de hamburgerknop
-        menuToggle.addEventListener("click", function () {
-          // voeg of verwijder de "is-open" klasse toe aan de navigatiebalk
-          navigation.classList.toggle("is-open");
-        });
-      </script>
-    </header>
+      <section>
+        <h3>Doel:</h3>
+        <p>
+          Ontwerp een oplossing die ervoor zorgt dat de kachels niet meer op
+          standje sauna staan.
+        </p>
+      </section>
 
-    <main>
-      <!-- Opdracht uitleggen -->
-      <div class="project-description">
-        <style>
-          .project-description {
-            background-color: #f8f8f8;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          }
-
-          .project-description h2,
-          .project-description h3 {
-            color: #b33535;
-            margin-bottom: 20px;
-          }
-
-          .project-description p {
-            margin-bottom: 20px;
-            line-height: 1.5;
-          }
-        </style>
-
-        <h2>Prothese Project: Opdrachtomschrijving</h2>
-
-        <section>
-          <h3>Inleiding:</h3>
-          <p>
-            Bij ons op school loop ik vraag tegen een probleem aan dat een
-            lokaal erg heet is en stinkt naar zweet. Ik krijg dan veel klagende
-            leerlingen bij mij. Zij zitten dan een raam open. Vervolgens is het
-            weer te koud en gaan andere leerlingen tegen de kachel aanzetten.
-            Uit een klein leerling onderzoek blijkt dat leerlingen niet
-            begrijpen hoe de thermostaat knoppen werken.
-          </p>
-        </section>
-
-        <section>
-          <h3>Doel:</h3>
-          <p>
-            Ontwerp een oplossing die ervoor zorgt dat de kachels niet meer op
-            standje sauna staan.
-          </p>
-        </section>
-        <div class="project-image">
-          <img loading="lazy"
-            src="foto's blokeersysteem/PXL_20231208_123853155.jpg"
-            alt="Omschrijving van project 1"
-          />
-        </div>
-        <section>
-          <h3>Oplossingen</h3>
-          <ul>
-            <li>
-              Leerlingen informeren over de werking van de thermostaatknop
-            </li>
-            <li>
-              De thermostaatknoppen vervangen voor een op afstand bestuurbare
-              knop
-            </li>
-            <li>De thermostaatknop afschermen</li>
-          </ul>
-        </section>
+      <div class="project-image">
+        <img loading="lazy"
+          src="foto's blokeersysteem/PXL_20231208_123853155.jpg"
+          alt="Omschrijving van project 1"
+        />
       </div>
-    </main>
-  </body>
+
+      <section>
+        <h3>Oplossingen</h3>
+        <ul>
+          <li>
+            Leerlingen informeren over de werking van de thermostaatknop
+          </li>
+          <li>
+            De thermostaatknoppen vervangen voor een op afstand bestuurbare
+            knop
+          </li>
+          <li>De thermostaatknop afschermen</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  {% include site-footer-nk.html %}
+</body>
 </html>

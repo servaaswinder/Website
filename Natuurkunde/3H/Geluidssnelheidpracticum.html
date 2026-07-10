@@ -1,139 +1,172 @@
 ---
+title: Geluidssnelheid-practicum
+description: "Practicumvoorschrift: de snelheid van het geluid meten met de methode van Minnaert — Natuurkunde 3 havo/vwo."
+nav: natuurkunde
 ---
-
 <!DOCTYPE html>
 <html lang="nl">
-	<head>
-		<title>Geluidssnelheid Practicum - Servaas Winder</title>
-		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-</head>
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
 
-	<body class="klas">
-		{% include site-header.html %}
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">3 HAVO/VWO · PRACTICUM</div>
+			<h1 class="hero__title">De snelheid van het geluid</h1>
+			<p class="hero__sub"><strong>Vak:</strong> Natuurkunde · <strong>Klas:</strong> 3 Havo/Vwo · <strong>Onderwerp:</strong> Geluidssnelheid meten (Methode van Minnaert) · <strong>Benodigde tijd:</strong> 1 lesuur (buiten)</p>
+		</div>
+	</section>
 
-		<main>
-			<div class="section">
-				<section class="inf-hero">
-					<h1>Practicumvoorschrift: De Snelheid van het Geluid</h1>
-					<p>
-						<strong>Vak:</strong> Natuurkunde<br />
-						<strong>Klas:</strong> 3 Havo/Vwo<br />
-						<strong>Onderwerp:</strong> Geluidssnelheid meten (Methode van Minnaert)<br />
-						<strong>Benodigde tijd:</strong> 1 lesuur (buiten)
-					</p>
+	<style>
+		.card p, .card ul, .card ol {
+			font-size: 15.5px;
+			line-height: 1.6;
+			color: var(--ink-cell);
+			max-width: 840px;
+		}
+		.card ul, .card ol { padding-left: 22px; }
+		.card li { margin-bottom: 6px; }
+		.card h3 {
+			font-family: var(--font-head);
+			font-weight: 600;
+			font-size: 18px;
+			color: var(--ink);
+			margin: 22px 0 8px;
+		}
+		.card img {
+			border-radius: calc(var(--radius) - 8px);
+			border: 1px solid var(--card-border);
+			box-shadow: var(--shadow-sm);
+		}
+		.benodigd { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+		.benodigd ul { flex: 1 1 320px; }
+		.benodigd img { max-width: 200px; }
+	</style>
 
-					<h2>1. Inleiding</h2>
-					<p>
-						Licht en geluid hebben niet dezelfde snelheid. Licht gaat razendsnel (300.000 km/s), waardoor je iets op aarde vrijwel direct ziet gebeuren. Het geluid is een stuk trager. Een bekend voorbeeld is onweer: je ziet de flits direct, maar hoort de donder pas later.
-					</p>
-					<p>
-						Vandaag gaan we dit principe gebruiken om zelf te meten hoe snel het geluid zich door de lucht verplaatst. We gebruiken hiervoor een methode die bedacht is door de natuurkundige Marcel Minnaert.
-					</p>
-					<p>
-						<strong>Doel van de proef:</strong> De geluidssnelheid (<em>v</em>) in lucht bepalen door te kijken en te luisteren naar een ritmisch geluidssignaal.
-					</p>
+	<main class="main">
 
-					<h2>2. Benodigdheden</h2>
-					<div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-						<ul>
-							<li><strong>De 'Klapper':</strong> Twee houten planken verbonden met een scharnier (voor een harde, korte knal).</li>
-							<li><strong>Metronoom:</strong> Voor het aangeven van het exacte ritme.</li>
-							<li><strong>Smartphone met internet:</strong> Voor Google Maps / GPS.</li>
-							<li><strong>Schrijfgerief:</strong> Om de metingen te noteren.</li>
-						</ul>
-						<img loading="lazy" src="{{ '/images/klapper.png' | relative_url }}" alt="De Klapper" style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-					</div>
+		<section class="card">
+			<div class="card__eyebrow">1 · INLEIDING</div>
+			<h2 class="card__title">Inleiding</h2>
+			<p class="card__intro">
+				Licht en geluid hebben niet dezelfde snelheid. Licht gaat razendsnel (300.000 km/s), waardoor je iets op aarde vrijwel direct ziet gebeuren. Het geluid is een stuk trager. Een bekend voorbeeld is onweer: je ziet de flits direct, maar hoort de donder pas later.
+			</p>
+			<p>
+				Vandaag gaan we dit principe gebruiken om zelf te meten hoe snel het geluid zich door de lucht verplaatst. We gebruiken hiervoor een methode die bedacht is door de natuurkundige Marcel Minnaert.
+			</p>
+			<p>
+				<strong>Doel van de proef:</strong> De geluidssnelheid (<em>v</em>) in lucht bepalen door te kijken en te luisteren naar een ritmisch geluidssignaal.
+			</p>
+		</section>
 
-					<h2>3. Theorie: De methode van Minnaert</h2>
-					<p>
-						Als iemand op afstand in zijn handen klapt, zie je dat direct. Het geluid heeft echter tijd nodig om naar je toe te reizen.
-					</p>
-					<img loading="lazy" src="{{ '/images/experiment_setup.png' | relative_url }}" alt="Opstelling Experiment" style="width: 100%; max-width: 600px; margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-					<p>
-						Als de persoon in een vast ritme klapt (bijvoorbeeld precies elke seconde 1 klap), en jij loopt steeds verder naar achteren, gebeurt er iets bijzonders:
-					</p>
-					<ol>
-						<li>Eerst zie en hoor je de klap (bijna) tegelijk.</li>
-						<li>Als je verder loopt, merk je dat het geluid achter gaat lopen.</li>
-						<li>Op een gegeven moment is de afstand precies zo groot dat het geluid er 1 seconde over doet om jou te bereiken.</li>
-						<li>Op dat moment hoor je de klap van een seconde geleden precies tegelijk met het zien van de nieuwe klap. Het geluid en het beeld lopen voor jouw gevoel weer synchroon!</li>
-					</ol>
-
-					<h2>4. Uitvoering</h2>
-					<p>Werk klassikaal. Verdeel de volgende taken:</p>
-					<ul>
-						<li><strong>De Bron:</strong> 1 persoon die de klapper bedient.</li>
-						<li><strong>De Tijdmeester:</strong> 1 persoon die controleert of De Bron het ritme houdt (m.b.v. de metronoom).</li>
-						<li><strong>De Waarnemers:</strong> De rest van de klas die gaat meten.</li>
-					</ul>
-
-					<h3>Stap 1: Het ritme oefenen</h3>
-					<ul>
-						<li>Ga naar een lang recht pad of open veld. De Bron en de Tijdmeester blijven op een vast punt staan. Markeer dit punt als <strong>Punt A</strong>.</li>
-						<li>Oefen met de klapper om precies 1 klap per seconde te geven, geleid door de metronoom.</li>
-						<li><em>Let op: Dit moet heel strak gebeuren, anders klopt de meting niet!</em></li>
-					</ul>
-
-					<h3>Stap 2: De afstand bepalen</h3>
-					<ul>
-						<li>De Waarnemers starten bij Punt A en lopen langzaam in een rechte lijn weg van De Bron.</li>
-						<li>Blijf goed kijken naar de klapper.</li>
-						<li>Loop net zo ver door tot je het geluid weer precies tegelijk hoort met het dichtklappen van de planken.</li>
-						<li>(Je hoort nu het geluid van de vorige klap tegelijk met het beeld van de nieuwe klap).</li>
-					</ul>
-
-					<h3>Stap 3: Positiebepaling</h3>
-					<ul>
-						<li>Als je zeker weet dat beeld en geluid synchroon lopen, stop je. Dit is <strong>punt B</strong>.</li>
-						<li>Open Google Maps op je telefoon.</li>
-						<li>Zet een speld op jouw locatie (Punt B).</li>
-						<li>Meet de afstand tot de startpositie (Punt A).</li>
-					</ul>
-
-					<h2>5. Verslaglegging</h2>
-					<p>Schrijf een kort verslag (maximaal 2 A4) met de volgende structuur:</p>
-
-					<h3>A. Inleiding</h3>
-					<p>Formuleer een duidelijke onderzoeksvraag.</p>
-
-					<h3>B. Theorie</h3>
-					<ul>
-						<li>Leg de formule <em>s = v &middot; t</em> uit (wat betekenen de letters en in welke eenheid staan ze?).</li>
-						<li>Leg uit dat de geluidssnelheid afhankelijk is van de temperatuur.</li>
-						<li><em>Tip: Voeg een tabel toe of verwijs naar Binas tabel 15A (zie website).</em></li>
-					</ul>
-
-					<h3>C. Hypothese</h3>
-					<p>Wat verwacht je dat de uitkomst zal zijn?</p>
-
-					<h3>D. Methode</h3>
-					<p>Beschrijf kort hoe het experiment is uitgevoerd.</p>
-
-					<h3>E. Resultaten (Meetgegevens)</h3>
-					<ul>
-						<li>Welk ritme (tijd <em>t</em>) is gebruikt? (Standaard is <em>t</em> = 1,0 s).</li>
-						<li>Wat was de gemeten afstand (<em>s</em>) tussen punt A en punt B in meters?</li>
-					</ul>
-
-					<h3>F. Verwerking (Berekening)</h3>
-					<p>Bereken de geluidssnelheid (<em>v</em>) met de formule: <em>v</em> = <em>s</em> / <em>t</em></p>
-					<p>(waarbij <em>s</em> de afstand in meters is en <em>t</em> de tijd in seconden)</p>
-
-					<h3>G. Conclusie & Discussie</h3>
-					<ul>
-						<li>Wat is jullie gemeten geluidssnelheid?</li>
-						<li>Zoek in Binas (tabel 15A) op wat de theoretische geluidssnelheid is bij de huidige buitentemperatuur.</li>
-						<li>Vergelijk jullie antwoord met de theoretische waarde. Is er een verschil?</li>
-						<li>Noem minimaal twee oorzaken die dit verschil kunnen verklaren (denk aan: wind, nauwkeurigheid van Google Maps, reactiesnelheid, ritme van de klapper).</li>
-					</ul>
-				</section>
+		<section class="card">
+			<div class="card__eyebrow">2 · BENODIGDHEDEN</div>
+			<h2 class="card__title">Benodigdheden</h2>
+			<div class="benodigd">
+				<ul>
+					<li><strong>De 'Klapper':</strong> Twee houten planken verbonden met een scharnier (voor een harde, korte knal).</li>
+					<li><strong>Metronoom:</strong> Voor het aangeven van het exacte ritme.</li>
+					<li><strong>Smartphone met internet:</strong> Voor Google Maps / GPS.</li>
+					<li><strong>Schrijfgerief:</strong> Om de metingen te noteren.</li>
+				</ul>
+				<img loading="lazy" src="{{ '/images/klapper.png' | relative_url }}" alt="De Klapper" />
 			</div>
-		</main>
+		</section>
 
-		<footer>
-			<p>&copy; 2025 Servaas Winder</p>
-		</footer>
-	</body>
+		<section class="card">
+			<div class="card__eyebrow">3 · THEORIE</div>
+			<h2 class="card__title">De methode van Minnaert</h2>
+			<p class="card__intro">
+				Als iemand op afstand in zijn handen klapt, zie je dat direct. Het geluid heeft echter tijd nodig om naar je toe te reizen.
+			</p>
+			<img loading="lazy" src="{{ '/images/experiment_setup.png' | relative_url }}" alt="Opstelling Experiment" style="width: 100%; max-width: 600px; margin: 4px 0 20px;" />
+			<p>
+				Als de persoon in een vast ritme klapt (bijvoorbeeld precies elke seconde 1 klap), en jij loopt steeds verder naar achteren, gebeurt er iets bijzonders:
+			</p>
+			<ol>
+				<li>Eerst zie en hoor je de klap (bijna) tegelijk.</li>
+				<li>Als je verder loopt, merk je dat het geluid achter gaat lopen.</li>
+				<li>Op een gegeven moment is de afstand precies zo groot dat het geluid er 1 seconde over doet om jou te bereiken.</li>
+				<li>Op dat moment hoor je de klap van een seconde geleden precies tegelijk met het zien van de nieuwe klap. Het geluid en het beeld lopen voor jouw gevoel weer synchroon!</li>
+			</ol>
+		</section>
+
+		<section class="card">
+			<div class="card__eyebrow">4 · UITVOERING</div>
+			<h2 class="card__title">Uitvoering</h2>
+			<p class="card__intro">Werk klassikaal. Verdeel de volgende taken:</p>
+			<ul>
+				<li><strong>De Bron:</strong> 1 persoon die de klapper bedient.</li>
+				<li><strong>De Tijdmeester:</strong> 1 persoon die controleert of De Bron het ritme houdt (m.b.v. de metronoom).</li>
+				<li><strong>De Waarnemers:</strong> De rest van de klas die gaat meten.</li>
+			</ul>
+
+			<h3>Stap 1: Het ritme oefenen</h3>
+			<ul>
+				<li>Ga naar een lang recht pad of open veld. De Bron en de Tijdmeester blijven op een vast punt staan. Markeer dit punt als <strong>Punt A</strong>.</li>
+				<li>Oefen met de klapper om precies 1 klap per seconde te geven, geleid door de metronoom.</li>
+				<li><em>Let op: Dit moet heel strak gebeuren, anders klopt de meting niet!</em></li>
+			</ul>
+
+			<h3>Stap 2: De afstand bepalen</h3>
+			<ul>
+				<li>De Waarnemers starten bij Punt A en lopen langzaam in een rechte lijn weg van De Bron.</li>
+				<li>Blijf goed kijken naar de klapper.</li>
+				<li>Loop net zo ver door tot je het geluid weer precies tegelijk hoort met het dichtklappen van de planken.</li>
+				<li>(Je hoort nu het geluid van de vorige klap tegelijk met het beeld van de nieuwe klap).</li>
+			</ul>
+
+			<h3>Stap 3: Positiebepaling</h3>
+			<ul>
+				<li>Als je zeker weet dat beeld en geluid synchroon lopen, stop je. Dit is <strong>punt B</strong>.</li>
+				<li>Open Google Maps op je telefoon.</li>
+				<li>Zet een speld op jouw locatie (Punt B).</li>
+				<li>Meet de afstand tot de startpositie (Punt A).</li>
+			</ul>
+		</section>
+
+		<section class="card">
+			<div class="card__eyebrow">5 · VERSLAGLEGGING</div>
+			<h2 class="card__title">Verslaglegging</h2>
+			<p class="card__intro">Schrijf een kort verslag (maximaal 2 A4) met de volgende structuur:</p>
+
+			<h3>A. Inleiding</h3>
+			<p>Formuleer een duidelijke onderzoeksvraag.</p>
+
+			<h3>B. Theorie</h3>
+			<ul>
+				<li>Leg de formule <em>s = v &middot; t</em> uit (wat betekenen de letters en in welke eenheid staan ze?).</li>
+				<li>Leg uit dat de geluidssnelheid afhankelijk is van de temperatuur.</li>
+				<li><em>Tip: Voeg een tabel toe of verwijs naar Binas tabel 15A (zie website).</em></li>
+			</ul>
+
+			<h3>C. Hypothese</h3>
+			<p>Wat verwacht je dat de uitkomst zal zijn?</p>
+
+			<h3>D. Methode</h3>
+			<p>Beschrijf kort hoe het experiment is uitgevoerd.</p>
+
+			<h3>E. Resultaten (Meetgegevens)</h3>
+			<ul>
+				<li>Welk ritme (tijd <em>t</em>) is gebruikt? (Standaard is <em>t</em> = 1,0 s).</li>
+				<li>Wat was de gemeten afstand (<em>s</em>) tussen punt A en punt B in meters?</li>
+			</ul>
+
+			<h3>F. Verwerking (Berekening)</h3>
+			<p>Bereken de geluidssnelheid (<em>v</em>) met de formule: <em>v</em> = <em>s</em> / <em>t</em></p>
+			<p>(waarbij <em>s</em> de afstand in meters is en <em>t</em> de tijd in seconden)</p>
+
+			<h3>G. Conclusie &amp; Discussie</h3>
+			<ul>
+				<li>Wat is jullie gemeten geluidssnelheid?</li>
+				<li>Zoek in Binas (tabel 15A) op wat de theoretische geluidssnelheid is bij de huidige buitentemperatuur.</li>
+				<li>Vergelijk jullie antwoord met de theoretische waarde. Is er een verschil?</li>
+				<li>Noem minimaal twee oorzaken die dit verschil kunnen verklaren (denk aan: wind, nauwkeurigheid van Google Maps, reactiesnelheid, ritme van de klapper).</li>
+			</ul>
+		</section>
+
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
 </html>

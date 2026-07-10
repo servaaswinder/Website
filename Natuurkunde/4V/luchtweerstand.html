@@ -1,171 +1,200 @@
 ---
+title: Practicum luchtweerstand
+description: "Onderzoek naar luchtweerstand met videometen (Tracker) — vervolgonderzoek naar het verband tussen valsnelheid en luchtweerstand, Natuurkunde 4 vwo."
+nav: natuurkunde
 ---
-
 <!DOCTYPE html>
 <html lang="nl">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Practicum Luchtweerstand - Servaas Winder</title>
-		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-	  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-</head>
-	<body class="klas">
-		{% include site-header.html %}
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
 
-		<main>
-			<section class="inf-hero">
-				<div class="hero-layout">
-					<div class="hero-content">
-						<h1>Onderzoek naar luchtweerstand – deel 2</h1>
-						<p>
-							In deze sessie werk je het vervolgonderzoek uit naar het verband
-							tussen de valsnelheid van het hoedje en de luchtweerstand. Je
-							vindt hier de opzet die je stap voor stap door het practicum
-							leidt.
-						</p>
-						<p>
-							Je voert een onderzoek uit naar de luchtweerstand. Volgens het
-							lesboek is de luchtweerstand kwadratisch evenredig met de
-							snelheid. Dat betekent dat als de snelheid twee keer zo groot
-							wordt, de luchtweerstand vier keer zo groot wordt.
-						</p>
-						<p>
-							In dit onderzoek ga je die relatie proberen te bevestigen met
-							videometen. Voor alle aanvullende instructies over verslaglegging
-							en beoordeling verwijs ik naar de algemene
-							<a href="/Natuurkunde/Verslagen/Verslagen.html" target="_blank"
-								>verslageninformatie</a
-							>.
-						</p>
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">4 VWO · PRACTICUM</div>
+			<h1 class="hero__title">Onderzoek naar luchtweerstand &ndash; deel 2</h1>
+			<p class="hero__sub">In deze sessie werk je het vervolgonderzoek uit naar het verband tussen de valsnelheid van het hoedje en de luchtweerstand. Je vindt hier de opzet die je stap voor stap door het practicum leidt.</p>
+		</div>
+	</section>
 
-						<div class="formula-callout">
-							<p class="callout-title">Formule uit het lesboek</p>
-							<p class="callout-formula">
-								<span>F<sub>w</sub> = k &middot; v<sup>2</sup></span>
-							</p>
-							<p>
-								<span>F<sub>w</sub></span> is de luchtweerstandskracht,
-								<span>k</span> is een constante die afhangt van de vorm en het
-								oppervlak van het vallende voorwerp en <span>v</span> is de
-								snelheid van het voorwerp.
-							</p>
-							<div class="callout-divider" aria-hidden="true"></div>
-							<p class="callout-formula">
-								<span>F<sub>z</sub> = m &middot; g</span>
-							</p>
-							<p>
-								<span>F<sub>z</sub></span> is de zwaartekracht op het hoedje,
-								<span>m</span> is de massa van het hoedje in kilogram en
-								<span>g</span> is de gravitatieversnelling (ongeveer 9,81
-								m/s<sup>2</sup> op aarde).
-							</p>
-						</div>
+	<style>
+		.card p, .card ul, .card ol {
+			font-size: 15.5px;
+			line-height: 1.6;
+			color: var(--ink-cell);
+			max-width: 840px;
+		}
+		.card h3 {
+			font-family: var(--font-head);
+			font-weight: 600;
+			font-size: 18px;
+			color: var(--ink);
+			margin: 0 0 6px;
+		}
+		.card a:not(.btn) {
+			color: var(--accent);
+			text-decoration: underline;
+			text-underline-offset: 3px;
+		}
+		.intro-layout { display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap; }
+		.intro-layout > div:first-child { flex: 1 1 420px; }
+		.hoedje-illustration {
+			flex: 0 1 220px;
+			max-width: 220px;
+			margin: 6px auto 0;
+			border-radius: calc(var(--radius) - 8px);
+			border: 1px solid var(--card-border);
+			box-shadow: var(--shadow-sm);
+		}
+		.formula-callout {
+			background: var(--accent-soft);
+			border: 1px solid var(--btn-border);
+			border-radius: 14px;
+			padding: 20px 24px;
+			margin: 20px 0;
+		}
+		.formula-callout .callout-title {
+			font-family: var(--font-mono);
+			font-size: 11.5px;
+			letter-spacing: .1em;
+			font-weight: 600;
+			text-transform: uppercase;
+			color: var(--accent);
+			margin: 0 0 10px;
+		}
+		.formula-callout .callout-formula {
+			font-family: var(--font-head);
+			font-size: 21px;
+			font-weight: 600;
+			color: var(--night-2);
+			margin: 0 0 8px;
+		}
+		.formula-callout p { margin: 0 0 8px; }
+		.formula-callout .callout-divider {
+			border-top: 1px solid var(--btn-border-hover);
+			margin: 16px 0;
+		}
+		.report-steps {
+			list-style: none;
+			counter-reset: stap;
+			padding: 0;
+			margin: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 18px;
+		}
+		.report-steps li {
+			counter-increment: stap;
+			position: relative;
+			padding: 16px 20px 16px 62px;
+			border: 1px solid var(--card-border);
+			border-radius: 14px;
+			background: var(--card);
+			box-shadow: var(--shadow-sm);
+		}
+		.report-steps li::before {
+			content: counter(stap);
+			position: absolute;
+			left: 18px;
+			top: 18px;
+			width: 28px;
+			height: 28px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 999px;
+			background: var(--accent-soft);
+			color: var(--accent);
+			font-family: var(--font-mono);
+			font-size: 13px;
+			font-weight: 600;
+		}
+		.report-steps p { margin: 0; }
+	</style>
 
+	<main class="main">
+
+		<section class="card">
+			<div class="card__eyebrow">HET ONDERZOEK</div>
+			<h2 class="card__title">Valsnelheid en luchtweerstand</h2>
+			<div class="intro-layout">
+				<div>
+					<p class="card__intro">
+						Je voert een onderzoek uit naar de luchtweerstand. Volgens het lesboek is de luchtweerstand kwadratisch evenredig met de snelheid. Dat betekent dat als de snelheid twee keer zo groot wordt, de luchtweerstand vier keer zo groot wordt.
+					</p>
+					<p>
+						In dit onderzoek ga je die relatie proberen te bevestigen met videometen. Voor alle aanvullende instructies over verslaglegging en beoordeling verwijs ik naar de algemene <a href="/Natuurkunde/Verslagen/bovenbouw.html" target="_blank">verslageninformatie</a>.
+					</p>
+
+					<div class="formula-callout">
+						<p class="callout-title">Formule uit het lesboek</p>
+						<p class="callout-formula"><span>F<sub>w</sub> = k &middot; v<sup>2</sup></span></p>
 						<p>
-							Door enkel de massa aan te passen, pas je de zwaartekracht aan.
-							Hierdoor verandert de valsnelheid. Met videometen meet je de
-							snelheid van het hoedje. Als blijkt dat het hoedje een terminale
-							snelheid heeft, dan is de luchtweerstand gelijk aan de
-							zwaartekracht. Zo kun je de luchtweerstandskracht bepalen.
+							<span>F<sub>w</sub></span> is de luchtweerstandskracht, <span>k</span> is een constante die afhangt van de vorm en het oppervlak van het vallende voorwerp en <span>v</span> is de snelheid van het voorwerp.
 						</p>
+						<div class="callout-divider" aria-hidden="true"></div>
+						<p class="callout-formula"><span>F<sub>z</sub> = m &middot; g</span></p>
 						<p>
-							Ik wil graag dat je de snelheid uitzet tegenover de
-							luchtweerstandskracht. Als de grafiek een parabool is, dan is het
-							verband kwadratisch. Om dat te bevestigen wil ik dat je de
-							snelheid in het kwadraat zet tegenover de luchtweerstandskracht.
-							Als dat een rechte lijn is, dan is het verband kwadratisch. Dit
-							noem je <em>coördinatentransformatie.</em>
+							<span>F<sub>z</sub></span> is de zwaartekracht op het hoedje, <span>m</span> is de massa van het hoedje in kilogram en <span>g</span> is de gravitatieversnelling (ongeveer 9,81 m/s<sup>2</sup> op aarde).
 						</p>
 					</div>
 
-					<div class="hero-visual">
-						<img loading="lazy"
-							src="Hoedje.png"
-							alt="Papieren hoedje uit het luchtweerstandonderzoek"
-							class="hoedje-illustration"
-						/>
+					<p>
+						Door enkel de massa aan te passen, pas je de zwaartekracht aan. Hierdoor verandert de valsnelheid. Met videometen meet je de snelheid van het hoedje. Als blijkt dat het hoedje een terminale snelheid heeft, dan is de luchtweerstand gelijk aan de zwaartekracht. Zo kun je de luchtweerstandskracht bepalen.
+					</p>
+					<p>
+						Ik wil graag dat je de snelheid uitzet tegenover de luchtweerstandskracht. Als de grafiek een parabool is, dan is het verband kwadratisch. Om dat te bevestigen wil ik dat je de snelheid in het kwadraat zet tegenover de luchtweerstandskracht. Als dat een rechte lijn is, dan is het verband kwadratisch. Dit noem je <em>co&ouml;rdinatentransformatie.</em>
+					</p>
+				</div>
+				<img loading="lazy" src="Hoedje.png" alt="Papieren hoedje uit het luchtweerstandonderzoek" class="hoedje-illustration" />
+			</div>
+		</section>
+
+		<section class="card" aria-labelledby="tracker-video-heading">
+			<div class="card__eyebrow">VIDEOMETEN</div>
+			<h2 class="card__title" id="tracker-video-heading">Hulp nodig met Tracker?</h2>
+			<p class="card__intro">
+				Bekijk de uitlegvideo waarin ik voordoe hoe je Tracker gebruikt om de valsnelheid van het hoedje te meten. Gebruik de video als naslag zodat je tijdens het practicum sneller kunt starten.
+			</p>
+			<div class="reslist">
+				<div>
+					<div class="reslist__label">UITLEGVIDEO</div>
+					<div class="btns">
+						<a class="btn" href="https://drive.google.com/file/d/1EPnKsBErTKxa_dj13eAUZHR8gHbSTWde/view?usp=sharing" target="_blank" rel="noopener">Bekijk de uitlegvideo <span class="btn__suffix">&#8599;</span></a>
 					</div>
 				</div>
+			</div>
+		</section>
 
-				<section
-					class="resource-callout"
-					aria-labelledby="tracker-video-heading"
-				>
-					<div class="resource-callout__content">
-						<h2 id="tracker-video-heading">Hulp nodig met Tracker?</h2>
-						<p>
-							Bekijk de uitlegvideo waarin ik voordoe hoe je Tracker gebruikt om
-							de valsnelheid van het hoedje te meten. Gebruik de video als
-							naslag zodat je tijdens het practicum sneller kunt starten.
-						</p>
-					</div>
-					<a
-						class="inf-button primary video-placeholder"
-						href="https://drive.google.com/file/d/1EPnKsBErTKxa_dj13eAUZHR8gHbSTWde/view?usp=sharing"
-						target="_blank"
-						rel="noopener"
-						role="button"
-						>Bekijk de uitlegvideo</a
-					>
-				</section>
+		<section class="card">
+			<div class="card__eyebrow">VERSLAG</div>
+			<h2 class="card__title">Verslagopzet voor dit onderdeel</h2>
+			<p class="card__intro">
+				Gebruik onderstaande volgorde in je verslag over dit onderwerp. Deze lijst bevat alleen de onderdelen die specifiek bij het luchtweerstandsonderzoek horen; alle algemene eisen en voorbeelden vind je op de pagina met <a href="/Natuurkunde/Verslagen/bovenbouw.html" target="_blank">verslageninformatie</a>.
+			</p>
 
-				<h2>Verslagopzet voor dit onderdeel</h2>
-				<p class="report-intro">
-					Gebruik onderstaande volgorde in je verslag over dit onderwerp. Deze
-					lijst bevat alleen de onderdelen die specifiek bij het
-					luchtweerstandsonderzoek horen; alle algemene eisen en voorbeelden
-					vind je op de pagina met
-					<a href="/Natuurkunde/Verslagen/Verslagen.html" target="_blank"
-						>verslageninformatie</a
-					>.
-				</p>
+			<ol class="report-steps">
+				<li>
+					<h3>Onderzoeksvraag</h3>
+					<p>Formuleer helder: &ldquo;Wat is het verband tussen de snelheid van het hoedje en de luchtweerstand?&rdquo;</p>
+				</li>
+				<li>
+					<h3>Variabelen</h3>
+					<p>Beschrijf welke grootheden je varieert en meet. De snelheid (of het kwadraat ervan) is de onafhankelijke variabele, de luchtweerstandskracht is de afhankelijke variabele. Noteer ook welke factoren je constant houdt, zoals vorm en oppervlak van het hoedje.</p>
+				</li>
+				<li>
+					<h3>Hypothese</h3>
+					<p>Gebruik de theorie uit het lesboek: als het hoedje twee keer zo snel valt, is de luchtweerstand vier keer zo groot. Licht toe waarom je dat verwacht.</p>
+				</li>
+				<li>
+					<h3>Methode</h3>
+					<p>Leg uit hoe je meet: je gebruikt videometen met <a href="https://opensourcephysics.github.io/tracker-website/" target="_blank" rel="noopener">Tracker</a>. Op Chromebook gebruik je de online versie. Op Windows of Mac download en installeer je het programma voor een stabielere verwerking.</p>
+				</li>
+			</ol>
+		</section>
 
-				<ol class="report-steps">
-					<li>
-						<h3>Onderzoeksvraag</h3>
-						<p>
-							Formuleer helder: “Wat is het verband tussen de snelheid van het
-							hoedje en de luchtweerstand?”
-						</p>
-					</li>
-					<li>
-						<h3>Variabelen</h3>
-						<p>
-							Beschrijf welke grootheden je varieert en meet. De snelheid (of
-							het kwadraat ervan) is de onafhankelijke variabele, de
-							luchtweerstandskracht is de afhankelijke variabele. Noteer ook
-							welke factoren je constant houdt, zoals vorm en oppervlak van het
-							hoedje.
-						</p>
-					</li>
-					<li>
-						<h3>Hypothese</h3>
-						<p>
-							Gebruik de theorie uit het lesboek: als het hoedje twee keer zo
-							snel valt, is de luchtweerstand vier keer zo groot. Licht toe
-							waarom je dat verwacht.
-						</p>
-					</li>
-					<li>
-						<h3>Methode</h3>
-						<p>
-							Leg uit hoe je meet: je gebruikt videometen met
-							<a
-								href="https://opensourcephysics.github.io/tracker-website/"
-								target="_blank"
-								rel="noopener"
-								>Tracker</a
-							>. Op Chromebook gebruik je de online versie. Op Windows of Mac
-							download en installeer je het programma voor een stabielere
-							verwerking.
-						</p>
-					</li>
-				</ol>
-			</section>
-		</main>
-		<footer>
-			<p>&copy; 2025 Servaas Winder</p>
-		</footer>
-	</body>
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
 </html>

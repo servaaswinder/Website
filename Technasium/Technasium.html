@@ -1,92 +1,95 @@
 ---
+title: Technasium
+description: "Technasium-projecten op het Northgo College: Floating Future, prothese-ontwerp en het leerlingblokkeersysteem."
 ---
 <!DOCTYPE html>
 <html lang="nl">
-  <head>
-  <meta name="description" content="Technasium-projecten op het Northgo College: Floating Future, prothese-ontwerp en het leerlingblokkeersysteem.">
-    <title>Technasium</title>
-    <link rel="stylesheet" href="../style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% include head-nk.html %}
+<body>
+  {% include site-header-nk.html %}
 
+  <section class="hero">
+    <div class="hero__inner">
+      <div class="hero__eyebrow">TECHNASIUM · O&amp;O</div>
+      <h1 class="hero__title">Technasium Portfolio</h1>
+      <p class="hero__sub">Op deze pagina vind je een overzicht van de diverse projecten die door onze leerlingen zijn gerealiseerd. Het doel van deze pagina is niet alleen om te laten zien wat er allemaal op het Northgo-College gebeurt, maar ook om als voorbeeld te dienen voor de leerlingen die hun eigen website willen maken.</p>
+    </div>
+  </section>
+
+  <main class="main">
     <style>
-      .projects-container {
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 18px;
+      }
+      .project-card {
         display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
+        flex-direction: column;
+        gap: 10px;
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s;
       }
-
-      .project {
-        flex: 1 1 calc(50% - 1rem); /* Hier zorgen we ervoor dat het project 50% van de container in beslag neemt, rekening houdend met de gap. */
-        box-sizing: border-box; /* Hiermee zorgen we ervoor dat padding en border binnen de opgegeven breedte van het element blijven. */
+      .project-card:hover,
+      .project-card:focus-visible {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-card);
+        border-color: var(--btn-border-hover);
       }
-
-      .project-image img {
+      .project-card h2 {
+        font-family: var(--font-head);
+        font-weight: 600;
+        font-size: 23px;
+        color: var(--ink);
+        margin: 0;
+      }
+      .project-card p {
+        font-size: 14.5px;
+        line-height: 1.55;
+        color: var(--muted);
+        margin: 0;
+      }
+      .project-card__image img {
         width: 100%;
-        height: 200px; /* of welke gewenste hoogte je ook kiest */
-        overflow: hidden; /* Verbergt alles wat buiten de container valt */
-        object-fit: cover; /* Past de afbeelding binnen de container aan en snijdt het bij indien nodig */
-
-        display: block;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid var(--card-border);
       }
+      .project-card__image { margin-top: auto; padding-top: 8px; }
     </style>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-</head>
 
-  <body class="portfolio">
-    {% include site-header.html %}
-
-    <main>
-      <div class="section">
-        <h1>Technasium Portfolio</h1>
+    <div class="project-grid">
+      <!-- Eerste project -->
+      <a class="card project-card" href="Prothese.html">
+        <h2>Prothese</h2>
         <p>
-          Op deze pagina vind je een overzicht van de diverse projecten die door
-          onze leerlingen zijn gerealiseerd. Het doel van deze pagina is niet
-          alleen om te laten zien wat er allemaal op het Northgo-College
-          gebeurt, maar ook om als voorbeeld te dienen voor de leerlingen die
-          hun eigen website willen maken.
+          De heer Scheepmaker heeft een bovenbeenprothese met een beweegbare
+          knie. Het opladen is door een onpraktische oplaadport lastig en
+          wordt vaak vergeten, wat soms leidt tot een niet-functionerende
+          prothese op cruciale momenten.
         </p>
-      </div>
-
-      <div class="projects-container">
-        <!-- Eerste project -->
-        <div class="project">
-          <a href="Prothese.html">
-            <h2>Prothese</h2>
-            <p>
-              De heer Scheepmaker heeft een bovenbeenprothese met een beweegbare
-              knie. Het opladen is door een onpraktische oplaadport lastig en
-              wordt vaak vergeten, wat soms leidt tot een niet-functionerende
-              prothese op cruciale momenten.
-            </p>
-            <div class="project-image">
-              <img loading="lazy" src="Prothese.png" alt="Ontwerp van een oplaadbare beenprothese" />
-            </div>
-          </a>
+        <div class="project-card__image">
+          <img loading="lazy" src="Prothese.png" alt="Ontwerp van een oplaadbare beenprothese" />
         </div>
+      </a>
 
-        <!-- Tweede project -->
-        <div class="project">
-          <a href="Floating-Future.html">
-            <h2>Floating Future</h2>
-            <p>
-              Floating Future, geleid door Martin Hubers & Soren Knittel,
-              creëert drijvende eilanden voor duurzame voedselproductie middels
-              hydrocultuur. Uitdaging voor de leerlingen: Hoe voorzien we
-              stedelijke gebieden, gelegen aan water, efficiënt van vers voedsel
-              met deze eilanden?
-            </p>
-            <div class="project-image">
-              <img loading="lazy" src="FF.png" alt="Ontwerp voor het project Floating Future" />
-            </div>
-          </a>
+      <!-- Tweede project -->
+      <a class="card project-card" href="Floating-Future.html">
+        <h2>Floating Future</h2>
+        <p>
+          Floating Future, geleid door Martin Hubers &amp; Soren Knittel,
+          creëert drijvende eilanden voor duurzame voedselproductie middels
+          hydrocultuur. Uitdaging voor de leerlingen: Hoe voorzien we
+          stedelijke gebieden, gelegen aan water, efficiënt van vers voedsel
+          met deze eilanden?
+        </p>
+        <div class="project-card__image">
+          <img loading="lazy" src="FF.png" alt="Ontwerp voor het project Floating Future" />
         </div>
+      </a>
+    </div>
+  </main>
 
-        
-      </div>
-    </main>
-
-    <footer>
-      <p>&copy; 2023 Servaas Winder</p>
-    </footer>
-  </body>
+  {% include site-footer-nk.html %}
+</body>
 </html>

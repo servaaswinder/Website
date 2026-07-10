@@ -1,69 +1,78 @@
 ---
+title: Fotografie
+description: "Fotogalerij en fotografie-portfolio van Servaas Winder."
 ---
-
 <!DOCTYPE html>
 <html lang="nl">
-	<head>
-  <meta name="description" content="Fotogalerij en fotografie-portfolio van Servaas Winder.">
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Foto portfolio</title>
-		<link rel="stylesheet" href="{{ '/style.css' | relative_url }}" />
-	  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-</head>
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
 
-	<body>
-		{% include site-header.html %}
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">PORTFOLIO</div>
+			<h1 class="hero__title">Fotografie</h1>
+			<p class="hero__sub">Ik ben een enthousiaste amateurfotograaf. Ik fotografeer vooral veel natuur, landschappen en cityscapes. Op deze pagina vind je een selectie van mijn foto's.</p>
+		</div>
+	</section>
 
-		<main style="max-width: 100vw">
-			<section>
-				<h2>Fotografie</h2>
-				<p>
-					Ik ben een enthousiaste amateurfotograaf. Ik fotografeer vooral veel
-					natuur, landschappen en cityscapes. Op deze pagina vind je een
-					selectie van mijn foto's.
-				</p>
-			</section>
-			<section>
-				<h2>Galerij</h2>
-				<ul class="gallery">
-					<li><img loading="lazy" src="kleinere_Pad_Noorwegen.jpg" alt="Wandelpad door een bos in Noorwegen" /></li>
-					<li>
-						<img loading="lazy"
-							class="horizontal"
-							src="kleinere_Natuur_noorwegen.jpg"
-							alt="Mistige groene bergkam in Noorwegen"
-						/>
-					</li>
-					<li><img loading="lazy" src="kleinere_Kerk_Noorwegen.jpg" alt="Groepsfoto voor een houten staafkerk in Noorwegen" /></li>
-					<li>
-						<img loading="lazy" class="horizontal" src="kleinere_Pano.jpg" alt="Panorama van bergtoppen boven een wolkendek" />
-					</li>
-					<li>
-						<img loading="lazy"
-							class="horizontal"
-							src="kleinere_ik_kwallen.jpg"
-							alt="Zelfportret leunend op een hek met de toppen van de Dolomieten op de achtergrond"
-						/>
-					</li>
-					<li><img loading="lazy" src="kleinere_Koe.jpg" alt="Wandelaar aait een koe in de bergen" /></li>
-					<li><img loading="lazy" src="kleinere_3zinnen.jpg" alt="Fotograaf voor de Drie Zinnen in de Dolomieten" /></li>
-					<li><img loading="lazy" src="kleinere_Michelle.jpg" alt="Portret op een rotsblok hoog in de Dolomieten" /></li>
-					<li><img loading="lazy" class="horizontal" src="Oos2.jpg" alt="Groene bergkam met wandelpad, deels in de mist" /></li>
-					<li><img loading="lazy" src="Oos1.jpg" alt="Rotspiek die opdoemt uit de mist" /></li>
-					<li><img loading="lazy" class="horizontal" src="Oos3.jpg" alt="Wandelaars op een mistige bergkam" /></li>
-					<li><img loading="lazy" class="horizontal" src="Aus1.jpg" alt="Bakstenen barak met blauwe deuren in voormalig kamp Auschwitz" /></li>
-					<li><img loading="lazy" src="Aus2.jpg" alt="Pad tussen dubbele prikkeldraadhekken in voormalig kamp Auschwitz" /></li>
-					<li><img loading="lazy" src="Aus3.jpg" alt="Binnenplaats met bakstenen gebouwen in voormalig kamp Auschwitz" /></li>
-					<li><img loading="lazy" src="Polen1.jpg" alt="Wandelaars beklimmen een zandduin onder een blauwe lucht in Polen" /></li>
-					<li>
-						<img loading="lazy" class="horizontal" src="Polen 2.jpg" alt="Bezoekers op een uitgestrekte zandduin in Polen" />
-					</li>
-					<li><img loading="lazy" class="horizontal" src="Tuin.jpg" alt="Glazen prieel tussen bloeiende lupines in een tuin" /></li>
-					<li><img loading="lazy" src="Veluwe.jpg" alt="Portret voor een monumentaal bakstenen gebouw op de Veluwe" /></li>
-				</ul>
-			</section>
-		</main>
-	</body>
+	<style>
+		.gallery {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+			grid-auto-rows: 320px;
+			grid-auto-flow: dense;
+			gap: 14px;
+		}
+		.gallery li {
+			overflow: hidden;
+			border-radius: calc(var(--radius) - 6px);
+			border: 1px solid var(--card-border);
+			box-shadow: var(--shadow-sm);
+			background: var(--card);
+		}
+		.gallery li:has(img.horizontal) { grid-column: span 2; }
+		.gallery img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+		@media (max-width: 560px) {
+			.gallery { grid-template-columns: 1fr; grid-auto-rows: 260px; }
+			.gallery li:has(img.horizontal) { grid-column: auto; }
+		}
+	</style>
+
+	<main class="main">
+		<section class="card">
+			<div class="card__eyebrow">SELECTIE</div>
+			<h2 class="card__title">Galerij</h2>
+			<ul class="gallery">
+				<li><img loading="lazy" src="kleinere_Pad_Noorwegen.jpg" alt="Wandelpad door een bos in Noorwegen" /></li>
+				<li><img loading="lazy" class="horizontal" src="kleinere_Natuur_noorwegen.jpg" alt="Mistige groene bergkam in Noorwegen" /></li>
+				<li><img loading="lazy" src="kleinere_Kerk_Noorwegen.jpg" alt="Groepsfoto voor een houten staafkerk in Noorwegen" /></li>
+				<li><img loading="lazy" class="horizontal" src="kleinere_Pano.jpg" alt="Panorama van bergtoppen boven een wolkendek" /></li>
+				<li><img loading="lazy" class="horizontal" src="kleinere_ik_kwallen.jpg" alt="Zelfportret leunend op een hek met de toppen van de Dolomieten op de achtergrond" /></li>
+				<li><img loading="lazy" src="kleinere_Koe.jpg" alt="Wandelaar aait een koe in de bergen" /></li>
+				<li><img loading="lazy" src="kleinere_3zinnen.jpg" alt="Fotograaf voor de Drie Zinnen in de Dolomieten" /></li>
+				<li><img loading="lazy" src="kleinere_Michelle.jpg" alt="Portret op een rotsblok hoog in de Dolomieten" /></li>
+				<li><img loading="lazy" class="horizontal" src="Oos2.jpg" alt="Groene bergkam met wandelpad, deels in de mist" /></li>
+				<li><img loading="lazy" src="Oos1.jpg" alt="Rotspiek die opdoemt uit de mist" /></li>
+				<li><img loading="lazy" class="horizontal" src="Oos3.jpg" alt="Wandelaars op een mistige bergkam" /></li>
+				<li><img loading="lazy" class="horizontal" src="Aus1.jpg" alt="Bakstenen barak met blauwe deuren in voormalig kamp Auschwitz" /></li>
+				<li><img loading="lazy" src="Aus2.jpg" alt="Pad tussen dubbele prikkeldraadhekken in voormalig kamp Auschwitz" /></li>
+				<li><img loading="lazy" src="Aus3.jpg" alt="Binnenplaats met bakstenen gebouwen in voormalig kamp Auschwitz" /></li>
+				<li><img loading="lazy" src="Polen1.jpg" alt="Wandelaars beklimmen een zandduin onder een blauwe lucht in Polen" /></li>
+				<li><img loading="lazy" class="horizontal" src="Polen 2.jpg" alt="Bezoekers op een uitgestrekte zandduin in Polen" /></li>
+				<li><img loading="lazy" class="horizontal" src="Tuin.jpg" alt="Glazen prieel tussen bloeiende lupines in een tuin" /></li>
+				<li><img loading="lazy" src="Veluwe.jpg" alt="Portret voor een monumentaal bakstenen gebouw op de Veluwe" /></li>
+			</ul>
+		</section>
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
 </html>
