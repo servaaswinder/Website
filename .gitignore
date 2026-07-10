@@ -20,7 +20,9 @@ venv/
 
 # Logs
 *.log
-server_v2.log
+
+# Lokale werkbestanden
+temp_drafts.json
 
 # Python
 __pycache__/

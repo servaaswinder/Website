@@ -1,8 +1,0 @@
-[
-  { "id": "8eEHc3PCWtEPiYJPStAV", "pts": {"0":1, "1":1, "2":1}, "c": "Je code structuur is goed op weg, maar de echte analyse en visualisatie lijken te ontbreken op je pagina. Probeer voor de volgende keer je code completer te delen." },
-  { "id": "8ox95llmHtqmpwGGs4PT", "pts": {"0":3, "1":3, "2":3}, "c": "Keurig werk! Je hebt de dataset succesvol ingeladen en een hele mooie staafdiagram gemaakt met het aantal doelpunten. Je toelichting bij de code is ook heel duidelijk. Goed gedaan!" },
-  { "id": "LBKxz0GGiahGh9eR3r4R", "pts": {"0":3, "1":3, "2":3, "3":2}, "c": "Sterke analyse van het Odido datalek! Je beschrijft de oorzaken en gevolgen heel duidelijk en je voorgestelde maatregelen (MFA, training en beperkte toegang) zijn ontzettend relevant en goed onderbouwd." },
-  { "id": "MwEOCCBUy9lCGGlcpP5u", "pts": {"0":2, "1":1, "2":2}, "c": "Je hebt 5 heel goede tips opgeschreven en de bronvermelding klopt netjes. Voor een poster mag de vormgeving nog wat meer visueel (met plaatjes en kleuren) opgemaakt worden, maar de inhoud is goed!" },
-  { "id": "WygxmEASI39uvrbRMmvo", "pts": {"0":3, "1":3, "2":3}, "c": "--- HERBEOORDELING ---\nMooi redesign! Je hebt het probleem met contrast en focus states uitstekend opgelost en je bent nu inderdaad zeer goed toegankelijk. Je Lighthouse score van 95 is top!" },
-  { "id": "hpSPV1JYo67n7lilRX3B", "pts": {"0":0, "1":0, "2":0, "3":0}, "c": "Voor de volgende keer: lever een gepubliceerde link in naar je website, niet de edit-link met /edit achteraan. Ik heb nu geen toegang tot je verslag. Geef even aan als je de link hebt aangepast!" }
-]

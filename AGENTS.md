@@ -46,14 +46,14 @@ Gehost via GitHub Pages. Authenticatie en data via Firebase (Auth + Firestore).
 ### Collecties
 
 **`submissions`** — inleveringen
-- `userEmail` (lowercase: `lln10656@northgo-college.nl`)
+- `userEmail` (lowercase: `lln00000@northgo-college.nl`)
 - `assignmentId`, `assignmentUrl`, `status` (`pending`/`grading`/`checked`)
 - `gradingDraft` (`selectedCells`, `comment`), `gradedByAI`, `gradingBy`
 - `grade`, `finalRubric`, `teacherComment`, `period`
 - `rubricSnapshot` (bij inlevering opgeslagen rubric voor eerlijke beoordeling)
 
 **`results`** — leerlinggegevens
-- `email` (LLN uppercase, domein lowercase: `LLN10656@northgo-college.nl`)
+- `email` (LLN uppercase, domein lowercase: `LLN00000@northgo-college.nl`)
 - `name`, `class` (bijv. `"Vwo 4"`, `"Havo 5"`)
 
 ### Admin-accounts (hardcoded in firestore.rules + server.py)

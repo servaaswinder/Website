@@ -24,6 +24,12 @@ if os.path.exists(cred_path):
 else:
     print("⚠️  WARNING: serviceAccountKey.json not found. Admin features will fail.")
 
+# Only these accounts may call the admin API (must match firestore.rules)
+ADMIN_EMAILS = {
+    'servaas.winder@northgo-college.nl',
+    'jaimy.treffers@northgo-college.nl',
+}
+
 def require_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -34,9 +40,14 @@ def require_auth(f):
         id_token = auth_header.split('Bearer ')[1]
         try:
             decoded_token = auth.verify_id_token(id_token)
-            # You can also set request.user = decoded_token if needed
         except Exception as e:
             return jsonify({"success": False, "error": "Invalid token"}), 401
+
+        # A valid token only proves the caller is logged in; admin endpoints
+        # must additionally check the caller is on the admin allowlist.
+        email = (decoded_token.get('email') or '').lower()
+        if email not in ADMIN_EMAILS or not decoded_token.get('email_verified'):
+            return jsonify({"success": False, "error": "Forbidden: admin account required"}), 403
 
         return f(*args, **kwargs)
     return decorated
