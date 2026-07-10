@@ -5,25 +5,17 @@ plugins:
   - jekyll-sitemap
 
 exclude:
-  - "niet gebruikt"
   - "README.md"
   - "Gemfile"
   - "Gemfile.lock"
   - "node_modules"
   - "vendor"
   - "venv"
-  # Server/dev-bestanden: nooit mee-deployen naar de live site
-  - "server.py"
-  - "requirements.txt"
-  - "start_server.sh"
-  - "start_informatica_app.sh"
-  - "private_scripts"
+  # Dev-bestanden: nooit mee-deployen naar de live site
   - "firestore.rules"
   - "serviceAccountKey.json"
   - "*.log"
-  - "temp_drafts.json"
   - "bin"
   - "docs"
   - "CLAUDE.md"
   - "AGENTS.md"
-  - "SETUP_AI.md"
