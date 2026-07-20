@@ -15,13 +15,13 @@
       "port": 4000
     },
     {
-      "name": "Informatica App",
-      "runtimeExecutable": "bash",
+      "name": "Jekyll Windows",
+      "runtimeExecutable": "cmd",
       "runtimeArgs": [
-        "-c",
-        "cd /Users/servaaswinder/Documents/GitHub/informatica-app && FLASK_ENV=development .venv/bin/python run.py"
+        "/c",
+        "set PATH=C:\\Ruby33-x64\\bin;%PATH% && bundle exec jekyll serve --livereload --port 4000"
       ],
-      "port": 5001
+      "port": 4000
     }
   ]
 }
