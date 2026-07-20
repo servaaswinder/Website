@@ -10,8 +10,15 @@ nav: natuurkunde
   {% include site-header-nk.html %}
   <section class="hero"><div class="hero__inner">
     <h1 class="hero__title">4 vwo</h1>
-    <p class="hero__sub">Schooljaar 2026-2027. Twee clusters met dezelfde lesplanning. 4v.nat1: les 1 = di 6e uur (mw. Koomen), les 2 = wo 3e uur (mw. Koomen), les 3 = do 7e uur (dhr. Winder). 4v.nat2: les 1 = do 2e uur, les 2 en 3 = vr 1e + 2e uur (dhr. Winder).</p>
+    <p class="hero__sub">Schooljaar 2026-2027. Twee clusters met dezelfde lesplanning. Kies hieronder je lesgroep, dan tonen de tabellen jouw lesdagen. Bij 4v.nat1 krijg je de lessen op dinsdag en woensdag van mw. Koomen.</p>
     <div class="pills"><a class="pill" href="#p1">Periode 1</a> <a class="pill" href="#p2">Periode 2</a> <a class="pill" href="#p3">Periode 3</a> <a class="pill" href="#p4">Periode 4</a></div>
+    <div class="switcher">
+      <div class="switcher__label">LESGROEP</div>
+      <div class="switcher__group">
+        <button type="button" class="switcher__btn is-active" data-group="nat1">4v.nat1</button>
+        <button type="button" class="switcher__btn" data-group="nat2">4v.nat2</button>
+      </div>
+    </div>
     <p class="jaar-nav">Schooljaar 2026-2027 · <a href="{{ '/Natuurkunde/archief/2526/4vwo.html' | relative_url }}">archief 2025-2026</a></p>
   </div></section>
   <main class="main">
@@ -23,7 +30,7 @@ nav: natuurkunde
       <p class="card__intro">We starten met elektriciteit. Naast de lessen werk je aan het praktisch onderzoek soortelijke weerstand (PO). In Toetsweek 1 word je getoetst over H2 (2.1–2.4) en H6.3/6.4.</p>
       <div class="plan plan--wide">
         <table>
-          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col">Les 1</th><th scope="col">Les 2</th><th scope="col">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
+          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
             <tr><th class="week" scope="row">36</th><td>31 aug</td><td class="muted" colspan="3">Introductieweek (aangepast rooster)</td><td class="empty">–</td></tr>
             <tr><th class="week" scope="row">37</th><td>7 sep</td><td>2.1 Spanning en stroomsterkte</td><td>2.2 Weerstand</td><td>Start PO soortelijke weerstand</td><td>Start lessen</td></tr>
@@ -71,7 +78,7 @@ nav: natuurkunde
       <p class="card__intro">Beweging en de wetten van Newton. Diagrammen leren we gaandeweg mee. Het PO van deze periode is een stop-motion video. In Toetsweek 2 word je getoetst over H1 en H3.</p>
       <div class="plan plan--wide">
         <table>
-          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col">Les 1</th><th scope="col">Les 2</th><th scope="col">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
+          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
             <tr><th class="week" scope="row">44</th><td>26 okt</td><td>1.1 Plaats en snelheid</td><td>1.2 Rekenen aan snelheid</td><td>Werkles + start PO stop-motion</td><td>Start P2</td></tr>
             <tr><th class="week" scope="row">45</th><td>2 nov</td><td>1.3 Plaats-tijddiagram</td><td>1.4 Versnelling</td><td>Werkles</td><td class="empty">–</td></tr>
@@ -117,7 +124,7 @@ nav: natuurkunde
       <p class="card__intro">Trillingen en golven, met een practicum en een vakoverstijgend project samen met scheikunde en biologie. In Toetsweek 3 word je getoetst over H4 (4.1–4.5).</p>
       <div class="plan plan--wide">
         <table>
-          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col">Les 1</th><th scope="col">Les 2</th><th scope="col">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
+          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
             <tr><th class="week" scope="row">1</th><td>4 jan</td><td>4.1 Trillingen</td><td>4.1 verwerken</td><td>4.1 afronden</td><td>Ma 4/1 studiedag (vrij) · start P3</td></tr>
             <tr><th class="week" scope="row">2</th><td>11 jan</td><td>4.2 Massa-veersysteem</td><td>4.2 verwerken</td><td>4.2 afronden</td><td class="empty">–</td></tr>
@@ -157,7 +164,7 @@ nav: natuurkunde
       <p class="card__intro">Het atoommodel, radioactief verval en medische beeldvorming, met een modelleeropdracht als PO. In Toetsweek 4 word je getoetst over H5 + medische beeldvorming. De toetsweekdatum is nog niet officieel.</p>
       <div class="plan plan--wide">
         <table>
-          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col">Les 1</th><th scope="col">Les 2</th><th scope="col">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
+          <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
             <tr><th class="week" scope="row">11</th><td>15 mrt</td><td>5.1 Het atoommodel</td><td>5.1 verwerken</td><td>Modelleren 1</td><td>Start P4 · start PO modelleeropdracht</td></tr>
             <tr><th class="week" scope="row">12</th><td>22 mrt</td><td>5.2 Radioactief verval</td><td>5.2 verwerken</td><td>Modelleren 2</td><td class="empty">–</td></tr>
@@ -199,5 +206,29 @@ nav: natuurkunde
 
   </main>
   {% include site-footer-nk.html %}
+  <script>
+    (function () {
+      var labels = {
+        nat1: ['Di (6e uur)', 'Wo (3e uur)', 'Do (7e uur)'],
+        nat2: ['Do (2e uur)', 'Vr (1e uur)', 'Vr (2e uur)']
+      };
+      var btns = document.querySelectorAll('.switcher__btn');
+      function apply(group) {
+        btns.forEach(function (b) { b.classList.toggle('is-active', b.dataset.group === group); });
+        [1, 2, 3].forEach(function (i) {
+          document.querySelectorAll('[data-les="' + i + '"]').forEach(function (th) {
+            th.textContent = labels[group][i - 1];
+          });
+        });
+        try { localStorage.setItem('4v-lesgroep', group); } catch (e) {}
+      }
+      btns.forEach(function (btn) {
+        btn.addEventListener('click', function () { apply(btn.dataset.group); });
+      });
+      var saved = null;
+      try { saved = localStorage.getItem('4v-lesgroep'); } catch (e) {}
+      apply(saved === 'nat2' ? 'nat2' : 'nat1');
+    })();
+  </script>
 </body>
 </html>
