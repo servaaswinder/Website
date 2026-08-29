@@ -10,7 +10,7 @@ nav: natuurkunde
   {% include site-header-nk.html %}
   <section class="hero"><div class="hero__inner">
     <h1 class="hero__title">4 vwo</h1>
-    <p class="hero__sub">Schooljaar 2026-2027. Twee clusters met dezelfde lesplanning. Kies hieronder je lesgroep, dan tonen de tabellen jouw lesdagen. Bij 4v.nat1 krijg je de lessen op dinsdag en woensdag van mw. Koomen.</p>
+    <p class="hero__sub">Schooljaar 2026-2027. De twee clusters hebben verschillende lesdagen en lopen in periode 1 daardoor niet gelijk. Kies hieronder je lesgroep, dan tonen de tabellen jouw lesdagen en jouw planning. Bij 4v.nat1 krijg je de lessen op dinsdag en woensdag van mw. Koomen.</p>
     <div class="pills"><a class="pill" href="#p1">Periode 1</a> <a class="pill" href="#p2">Periode 2</a> <a class="pill" href="#p3">Periode 3</a> <a class="pill" href="#p4">Periode 4</a></div>
     <div class="switcher">
       <div class="switcher__label">LESGROEP</div>
@@ -32,11 +32,11 @@ nav: natuurkunde
         <table>
           <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
-            <tr><th class="week" scope="row">36</th><td>31 aug</td><td>Opstart + 2.1 Spanning en stroomsterkte</td><td>2.2 Weerstand</td><td>Start PO soortelijke weerstand</td><td>50-minutenrooster · nat1: di/wo mogelijk uitval (mentorintro v3b, mw. Koomen)</td></tr>
-            <tr><th class="week" scope="row">37</th><td>7 sep</td><td>2.3 Serie- en parallelschakelingen</td><td>2.4 Elektriciteit in huis</td><td>Werkles + PO</td><td>Vanaf deze week leesbandrooster</td></tr>
-            <tr><th class="week" scope="row">38</th><td>14 sep</td><td>6.3 Elektrische en warmtegeleiding</td><td>6.4 Halfgeleiders</td><td>Werkles + PO</td><td>PO voor feedback inleveren t/m vr 18/9 · O&amp;O Kick-Off TU Delft vr-ochtend (O&amp;O-leerlingen missen de vr-lessen, nat2)</td></tr>
-            <tr><th class="week" scope="row">39</th><td>21 sep</td><td>Verwerken H2</td><td>Verwerken 6.3/6.4</td><td>Werkles + PO afronden</td><td>Definitief inleveren PO vr 25/9 · Kunstshot Leiden vr (kunstleerlingen afwezig)</td></tr>
-            <tr><th class="week" scope="row">40</th><td>28 sep</td><td>Herhaling H2</td><td>Herhaling 6.3/6.4</td><td>Toetsvoorbereiding</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">36</th><td>31 aug</td><td data-les="1" class="empty">–</td><td data-les="2" data-nat1="Opstart + 2.1 Spanning en stroomsterkte" data-nat2="–">Opstart + 2.1 Spanning en stroomsterkte</td><td data-les="3" class="empty">–</td><td>50-minutenrooster · introductieweek · alleen 4v.nat1 heeft deze week les (wo 2/9)</td></tr>
+            <tr><th class="week" scope="row">37</th><td>7 sep</td><td data-les="1" data-nat1="2.2 Weerstand" data-nat2="Opstart + 2.1 Spanning en stroomsterkte">2.2 Weerstand</td><td data-les="2" data-nat1="2.3 Serie- en parallelschakelingen" data-nat2="2.2 Weerstand">2.3 Serie- en parallelschakelingen</td><td data-les="3">Start PO soortelijke weerstand</td><td>Vanaf deze week leesbandrooster</td></tr>
+            <tr><th class="week" scope="row">38</th><td>14 sep</td><td data-les="1" data-nat1="2.4 Elektriciteit in huis" data-nat2="2.3 Serie- en parallelschakelingen">2.4 Elektriciteit in huis</td><td data-les="2" data-nat1="6.3 Elektrische en warmtegeleiding" data-nat2="2.4 Elektriciteit in huis">6.3 Elektrische en warmtegeleiding</td><td data-les="3">Werkles + PO</td><td>O&amp;O Kick-Off TU Delft vr-ochtend (O&amp;O-leerlingen missen de vr-lessen, nat2)</td></tr>
+            <tr><th class="week" scope="row">39</th><td>21 sep</td><td data-les="1" data-nat1="6.4 Halfgeleiders" data-nat2="6.3 Elektrische en warmtegeleiding">6.4 Halfgeleiders</td><td data-les="2" data-nat1="Verwerken H2 + 6.3/6.4" data-nat2="6.4 Halfgeleiders">Verwerken H2 + 6.3/6.4</td><td data-les="3">Werkles + PO afronden</td><td>PO voor feedback inleveren t/m vr 25/9 · Kunstshot Leiden vr (kunstleerlingen afwezig)</td></tr>
+            <tr><th class="week" scope="row">40</th><td>28 sep</td><td data-les="1" data-nat1="Herhaling H2" data-nat2="Verwerken H2 + 6.3/6.4">Herhaling H2</td><td data-les="2" data-nat1="Herhaling 6.3/6.4" data-nat2="Herhaling H2 + 6.3/6.4">Herhaling 6.3/6.4</td><td data-les="3">Toetsvoorbereiding</td><td>Definitief inleveren PO vr 2/10</td></tr>
             <tr class="exam"><th class="week" scope="row">41</th><td>5 okt</td><td class="center" colspan="4">Toetsweek 1 — H2 (2.1–2.4) + H6.3/6.4</td></tr>
             <tr><th class="week" scope="row">42</th><td>12 okt</td><td class="muted" colspan="3">Studiereis (geen les)</td><td class="empty">–</td></tr>
             <tr class="vac"><th class="week" scope="row">43</th><td colspan="5">Herfstvakantie (19 t/m 23 oktober)</td></tr>
@@ -80,13 +80,13 @@ nav: natuurkunde
         <table>
           <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
-            <tr><th class="week" scope="row">44</th><td>26 okt</td><td>1.1 Plaats en snelheid</td><td>1.2 Rekenen aan snelheid</td><td>Werkles + start PO luchtweerstand</td><td>Start P2</td></tr>
-            <tr><th class="week" scope="row">45</th><td>2 nov</td><td>1.3 Plaats-tijddiagram</td><td>1.4 Versnelling</td><td>Werkles</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">46</th><td>9 nov</td><td>1.5 Snelheid-tijddiagram</td><td>3.1 Eigenschappen van krachten</td><td>Werkles</td><td>Didactische week</td></tr>
-            <tr><th class="week" scope="row">47</th><td>16 nov</td><td>3.2 Eerste wet van Newton</td><td>3.3 Tweede wet van Newton</td><td>Werkles + PO</td><td>PO voor feedback inleveren t/m vr 20/11</td></tr>
-            <tr><th class="week" scope="row">48</th><td>23 nov</td><td>3.4 Derde wet van Newton</td><td>3.5 Weerstandskrachten</td><td>Werkles + PO afronden</td><td>Definitief inleveren PO vr 27/11 (daarna geen feedback meer)</td></tr>
-            <tr><th class="week" scope="row">49</th><td>30 nov</td><td>Verwerking H1</td><td>Verwerking H3</td><td>Oefenen</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">50</th><td>7 dec</td><td>Herhaling H1</td><td>Herhaling H3</td><td>Toetsvoorbereiding</td><td>Laatste lesweek P2</td></tr>
+            <tr><th class="week" scope="row">44</th><td>26 okt</td><td data-les="1">1.1 Plaats en snelheid</td><td data-les="2">1.2 Rekenen aan snelheid</td><td data-les="3">Werkles + start PO luchtweerstand</td><td>Start P2</td></tr>
+            <tr><th class="week" scope="row">45</th><td>2 nov</td><td data-les="1">1.3 Plaats-tijddiagram</td><td data-les="2">1.4 Versnelling</td><td data-les="3">Werkles</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">46</th><td>9 nov</td><td data-les="1">1.5 Snelheid-tijddiagram</td><td data-les="2">3.1 Eigenschappen van krachten</td><td data-les="3">Werkles</td><td>Didactische week</td></tr>
+            <tr><th class="week" scope="row">47</th><td>16 nov</td><td data-les="1">3.2 Eerste wet van Newton</td><td data-les="2">3.3 Tweede wet van Newton</td><td data-les="3">Werkles + PO</td><td>PO voor feedback inleveren t/m vr 20/11</td></tr>
+            <tr><th class="week" scope="row">48</th><td>23 nov</td><td data-les="1">3.4 Derde wet van Newton</td><td data-les="2">3.5 Weerstandskrachten</td><td data-les="3">Werkles + PO afronden</td><td>Definitief inleveren PO vr 27/11 (daarna geen feedback meer)</td></tr>
+            <tr><th class="week" scope="row">49</th><td>30 nov</td><td data-les="1">Verwerking H1</td><td data-les="2">Verwerking H3</td><td data-les="3">Oefenen</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">50</th><td>7 dec</td><td data-les="1">Herhaling H1</td><td data-les="2">Herhaling H3</td><td data-les="3">Toetsvoorbereiding</td><td>Laatste lesweek P2</td></tr>
             <tr class="exam"><th class="week" scope="row">51</th><td>14 dec</td><td class="center" colspan="4">Toetsweek 2 — H1 + H3</td></tr>
             <tr class="vac"><th class="week" scope="row">52-53</th><td colspan="5">Kerstvakantie (21 december t/m 1 januari)</td></tr>
           </tbody>
@@ -126,15 +126,15 @@ nav: natuurkunde
         <table>
           <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
-            <tr><th class="week" scope="row">1</th><td>4 jan</td><td>4.1 Trillingen</td><td>4.1 Trillingen (verwerken)</td><td>4.1 Trillingen (afronden)</td><td>Ma 4/1 studiedag (vrij) · start P3</td></tr>
-            <tr><th class="week" scope="row">2</th><td>11 jan</td><td>4.2 Massa-veersysteem</td><td>4.2 Massa-veersysteem (verwerken)</td><td>4.2 Massa-veersysteem (afronden)</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">3</th><td>18 jan</td><td>4.3 Fase en snelheid</td><td>4.3 Fase en snelheid (verwerken)</td><td>4.3 Fase en snelheid (afronden)</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">4</th><td>25 jan</td><td>4.4 Lopende golven</td><td>4.4 Lopende golven (verwerken)</td><td>Projectles (Sk/Bio)</td><td>Vakoverstijgend project loopt</td></tr>
-            <tr><th class="week" scope="row">5</th><td>1 feb</td><td>4.5 Staande golven</td><td>4.5 Staande golven (verwerken)</td><td>Projectles</td><td>Project loopt</td></tr>
-            <tr><th class="week" scope="row">6</th><td>8 feb</td><td>Practicum golven</td><td>Projectles</td><td>Projectles</td><td>Didactische week</td></tr>
-            <tr><th class="week" scope="row">7</th><td>15 feb</td><td>Afronding project</td><td>Afronding project</td><td>Oefenen H4</td><td>Inleveren projectproduct</td></tr>
+            <tr><th class="week" scope="row">1</th><td>4 jan</td><td data-les="1">4.1 Trillingen</td><td data-les="2">4.1 Trillingen (verwerken)</td><td data-les="3">4.1 Trillingen (afronden)</td><td>Ma 4/1 studiedag (vrij) · start P3</td></tr>
+            <tr><th class="week" scope="row">2</th><td>11 jan</td><td data-les="1">4.2 Massa-veersysteem</td><td data-les="2">4.2 Massa-veersysteem (verwerken)</td><td data-les="3">4.2 Massa-veersysteem (afronden)</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">3</th><td>18 jan</td><td data-les="1">4.3 Fase en snelheid</td><td data-les="2">4.3 Fase en snelheid (verwerken)</td><td data-les="3">4.3 Fase en snelheid (afronden)</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">4</th><td>25 jan</td><td data-les="1">4.4 Lopende golven</td><td data-les="2">4.4 Lopende golven (verwerken)</td><td data-les="3">Projectles (Sk/Bio)</td><td>Vakoverstijgend project loopt</td></tr>
+            <tr><th class="week" scope="row">5</th><td>1 feb</td><td data-les="1">4.5 Staande golven</td><td data-les="2">4.5 Staande golven (verwerken)</td><td data-les="3">Projectles</td><td>Project loopt</td></tr>
+            <tr><th class="week" scope="row">6</th><td>8 feb</td><td data-les="1">Practicum golven</td><td data-les="2">Projectles</td><td data-les="3">Projectles</td><td>Didactische week</td></tr>
+            <tr><th class="week" scope="row">7</th><td>15 feb</td><td data-les="1">Afronding project</td><td data-les="2">Afronding project</td><td data-les="3">Oefenen H4</td><td>Inleveren projectproduct</td></tr>
             <tr class="vac"><th class="week" scope="row">8</th><td colspan="5">Voorjaarsvakantie (22 t/m 26 februari)</td></tr>
-            <tr><th class="week" scope="row">9</th><td>1 mrt</td><td>Herhaling H4</td><td>Herhaling H4</td><td>Toetsvoorbereiding</td><td>Laatste lesweek P3</td></tr>
+            <tr><th class="week" scope="row">9</th><td>1 mrt</td><td data-les="1">Herhaling H4</td><td data-les="2">Herhaling H4</td><td data-les="3">Toetsvoorbereiding</td><td>Laatste lesweek P3</td></tr>
             <tr class="exam"><th class="week" scope="row">10</th><td>8 mrt</td><td class="center" colspan="4">Toetsweek 3 — H4 (4.1–4.5)</td></tr>
           </tbody>
         </table>
@@ -166,20 +166,20 @@ nav: natuurkunde
         <table>
           <thead><tr><th class="sticky" scope="col">Week</th><th scope="col">Week van</th><th scope="col" data-les="1">Les 1</th><th scope="col" data-les="2">Les 2</th><th scope="col" data-les="3">Les 3</th><th scope="col">Opmerkingen</th></tr></thead>
           <tbody>
-            <tr><th class="week" scope="row">11</th><td>15 mrt</td><td>5.1 Het atoommodel</td><td>5.1 Het atoommodel (verwerken)</td><td>Modelleren 1</td><td>Start P4 · start PO modelleeropdracht</td></tr>
-            <tr><th class="week" scope="row">12</th><td>22 mrt</td><td>5.2 Radioactief verval</td><td>5.2 Radioactief verval (verwerken)</td><td>Modelleren 2</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">13</th><td>29 mrt</td><td>5.3 Halveringstijd</td><td>5.3 Halveringstijd (verwerken)</td><td>Modelleren 3</td><td>Ma 29/3 Tweede Paasdag (geen 4v-lesdag)</td></tr>
-            <tr><th class="week" scope="row">14</th><td>5 apr</td><td>5.4 Activiteit</td><td>5.4 Activiteit (verwerken)</td><td>Modelleren 4</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">15</th><td>12 apr</td><td>5.5 Doordringend vermogen en dracht</td><td>5.5 Doordringend vermogen en dracht (verwerken)</td><td>Modelleren 5</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">16</th><td>19 apr</td><td>Medische beeldvorming</td><td>Medische beeldvorming</td><td>Modelleren 6</td><td>Verslag voor feedback inleveren t/m vr 23/4</td></tr>
+            <tr><th class="week" scope="row">11</th><td>15 mrt</td><td data-les="1">5.1 Het atoommodel</td><td data-les="2">5.1 Het atoommodel (verwerken)</td><td data-les="3">Modelleren 1</td><td>Start P4 · start PO modelleeropdracht</td></tr>
+            <tr><th class="week" scope="row">12</th><td>22 mrt</td><td data-les="1">5.2 Radioactief verval</td><td data-les="2">5.2 Radioactief verval (verwerken)</td><td data-les="3">Modelleren 2</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">13</th><td>29 mrt</td><td data-les="1">5.3 Halveringstijd</td><td data-les="2">5.3 Halveringstijd (verwerken)</td><td data-les="3">Modelleren 3</td><td>Ma 29/3 Tweede Paasdag (geen 4v-lesdag)</td></tr>
+            <tr><th class="week" scope="row">14</th><td>5 apr</td><td data-les="1">5.4 Activiteit</td><td data-les="2">5.4 Activiteit (verwerken)</td><td data-les="3">Modelleren 4</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">15</th><td>12 apr</td><td data-les="1">5.5 Doordringend vermogen en dracht</td><td data-les="2">5.5 Doordringend vermogen en dracht (verwerken)</td><td data-les="3">Modelleren 5</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">16</th><td>19 apr</td><td data-les="1">Medische beeldvorming</td><td data-les="2">Medische beeldvorming</td><td data-les="3">Modelleren 6</td><td>Verslag voor feedback inleveren t/m vr 23/4</td></tr>
             <tr class="vac"><th class="week" scope="row">17-18</th><td colspan="5">Meivakantie (26 april t/m 7 mei)</td></tr>
-            <tr><th class="week" scope="row">19</th><td>10 mei</td><td>Medische beeldvorming (vervolg)</td><td>Medische beeldvorming (vervolg)</td><td>Werkles + PO afronden</td><td>Definitief inleveren PO-verslag vr 14/5 (meivakantie telt niet mee · daarna geen feedback meer)</td></tr>
-            <tr><th class="week" scope="row">20</th><td>17 mei</td><td>Verwerking H5</td><td>Verwerking medische beeldvorming</td><td>Werkles</td><td>Ma 17/5 Tweede Pinksterdag (geen 4v-lesdag)</td></tr>
-            <tr><th class="week" scope="row">21</th><td>24 mei</td><td>Oefenen radioactiviteit</td><td>Oefenen radioactiviteit</td><td>Werkles</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">22</th><td>31 mei</td><td>Examengerichte opgaven</td><td>Examengerichte opgaven</td><td>Werkles</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">23</th><td>7 jun</td><td>Herhaling H5</td><td>Herhaling H5</td><td>Oefentoets</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">24</th><td>14 jun</td><td>Herhaling P4-stof</td><td>Herhaling P4-stof</td><td>Werkles</td><td class="empty">–</td></tr>
-            <tr><th class="week" scope="row">25</th><td>21 jun</td><td>Toetsvoorbereiding</td><td>Toetsvoorbereiding</td><td>Vragenuur</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">19</th><td>10 mei</td><td data-les="1">Medische beeldvorming (vervolg)</td><td data-les="2">Medische beeldvorming (vervolg)</td><td data-les="3">Werkles + PO afronden</td><td>Definitief inleveren PO-verslag vr 14/5 (meivakantie telt niet mee · daarna geen feedback meer)</td></tr>
+            <tr><th class="week" scope="row">20</th><td>17 mei</td><td data-les="1">Verwerking H5</td><td data-les="2">Verwerking medische beeldvorming</td><td data-les="3">Werkles</td><td>Ma 17/5 Tweede Pinksterdag (geen 4v-lesdag)</td></tr>
+            <tr><th class="week" scope="row">21</th><td>24 mei</td><td data-les="1">Oefenen radioactiviteit</td><td data-les="2">Oefenen radioactiviteit</td><td data-les="3">Werkles</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">22</th><td>31 mei</td><td data-les="1">Examengerichte opgaven</td><td data-les="2">Examengerichte opgaven</td><td data-les="3">Werkles</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">23</th><td>7 jun</td><td data-les="1">Herhaling H5</td><td data-les="2">Herhaling H5</td><td data-les="3">Oefentoets</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">24</th><td>14 jun</td><td data-les="1">Herhaling P4-stof</td><td data-les="2">Herhaling P4-stof</td><td data-les="3">Werkles</td><td class="empty">–</td></tr>
+            <tr><th class="week" scope="row">25</th><td>21 jun</td><td data-les="1">Toetsvoorbereiding</td><td data-les="2">Toetsvoorbereiding</td><td data-les="3">Vragenuur</td><td class="empty">–</td></tr>
             <tr class="exam"><th class="week" scope="row">26</th><td>28 jun</td><td class="center" colspan="4">Toetsweek 4 (voorlopig) — H5 + medische beeldvorming</td></tr>
             <tr><th class="week" scope="row">27</th><td>5 jul</td><td class="muted" colspan="3">Laatste schooldagen</td><td class="empty">–</td></tr>
           </tbody>
@@ -208,17 +208,62 @@ nav: natuurkunde
   {% include site-footer-nk.html %}
   <script>
     (function () {
+      // nat1 heeft drie losse lessen; nat2 heeft er twee plus een blokuur op vrijdag,
+      // dat als één kolom wordt getoond. Per cel kan de inhoud per cluster verschillen
+      // via data-nat1 / data-nat2; zonder die attributen delen beide clusters de tekst.
       var labels = {
         nat1: ['Di (6e uur, KOO)', 'Wo (3e uur, KOO)', 'Do (7e uur, WIN)'],
-        nat2: ['Do (2e uur, WIN)', 'Vr (1e uur, WIN)', 'Vr (2e uur, WIN)']
+        nat2: ['Do (2e uur, WIN)', 'Vr (1e + 2e uur, WIN)', '']
       };
       var btns = document.querySelectorAll('.switcher__btn');
+      var heads = document.querySelectorAll('thead th[data-les]');
+      var rows = [];
+      document.querySelectorAll('tbody tr').forEach(function (tr) {
+        var cells = tr.querySelectorAll('td[data-les]');
+        if (cells.length === 3) { rows.push(cells); }
+      });
+      document.querySelectorAll('td[data-les]').forEach(function (td) {
+        td.dataset.base = td.textContent;
+      });
+
+      function textFor(td, group) {
+        return td.dataset[group] !== undefined ? td.dataset[group] : td.dataset.base;
+      }
+      // Een blokuurcel bevat twee lesuren; die krijgen elk een eigen regel,
+      // zodat er geen scheidingsteken nodig is en de + binnen een les eenduidig blijft.
+      function fill(td, parts) {
+        var lessen = parts.filter(function (t) { return t !== '–'; });
+        td.textContent = '';
+        td.classList.toggle('empty', lessen.length === 0);
+        if (lessen.length === 0) { td.textContent = '–'; return; }
+        if (lessen.length === 1) { td.textContent = lessen[0]; return; }
+        lessen.forEach(function (t) {
+          var regel = document.createElement('span');
+          regel.className = 'lesregel';
+          regel.textContent = t;
+          td.appendChild(regel);
+        });
+      }
       function apply(group) {
+        var blokuur = group === 'nat2';
         btns.forEach(function (b) { b.classList.toggle('is-active', b.dataset.group === group); });
-        [1, 2, 3].forEach(function (i) {
-          document.querySelectorAll('[data-les="' + i + '"]').forEach(function (th) {
-            th.textContent = labels[group][i - 1];
-          });
+        heads.forEach(function (th) {
+          th.textContent = labels[group][th.dataset.les - 1];
+          if (th.dataset.les === '2') { th.colSpan = blokuur ? 2 : 1; }
+          if (th.dataset.les === '3') { th.style.display = blokuur ? 'none' : ''; }
+        });
+        rows.forEach(function (cells) {
+          fill(cells[0], [textFor(cells[0], group)]);
+          if (blokuur) {
+            fill(cells[1], [textFor(cells[1], group), textFor(cells[2], group)]);
+            cells[1].colSpan = 2;
+            cells[2].style.display = 'none';
+          } else {
+            fill(cells[1], [textFor(cells[1], group)]);
+            cells[1].colSpan = 1;
+            fill(cells[2], [textFor(cells[2], group)]);
+            cells[2].style.display = '';
+          }
         });
         try { localStorage.setItem('4v-lesgroep', group); } catch (e) {}
       }

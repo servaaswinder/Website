@@ -363,6 +363,13 @@ img { max-width: 100%; display: block; }
 }
 .plan td.muted { color: #8a91ad; font-style: italic; }
 .plan td.empty { color: #c2c7db; }
+/* blokuur: twee lesuren in een cel, elk op een eigen regel */
+.plan td .lesregel { display: block; }
+.plan td .lesregel + .lesregel {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px dotted var(--line);
+}
 /* bannerrij: vakantie */
 .plan tr.vac th.week { background: var(--row-vac); }
 .plan tr.vac td {
