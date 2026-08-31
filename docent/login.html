@@ -13,9 +13,16 @@ sitemap: false
 
 	<main class="main" style="max-width: 480px; padding-bottom: 60px;">
 		<section class="card">
-			<form id="login-form">
-				<div class="card__eyebrow">PRIVÉ · DOCENT</div>
-				<h1 class="card__title">Docent-login</h1>
+			<div class="card__eyebrow">PRIVÉ · DOCENT</div>
+			<h1 class="card__title" id="card-title">Docent-login</h1>
+			<div id="google-block">
+				<p class="login-uitleg">Log in met je Northgo-account.</p>
+				<div class="btns" style="margin-top: 18px;">
+					<button id="btn-google" type="button" class="btn btn--submit">Inloggen met Google</button>
+				</div>
+				<button id="btn-wachtwoord" type="button" class="link-knop">Inloggen met e-mailadres en wachtwoord</button>
+			</div>
+			<form id="login-form" class="hidden">
 				<label class="field-label" for="email">E-mailadres</label>
 				<input class="field" type="email" id="email" autocomplete="username" required />
 				<label class="field-label" for="password">Wachtwoord</label>
@@ -25,8 +32,6 @@ sitemap: false
 				</div>
 			</form>
 			<div id="mfa-form" class="hidden">
-				<div class="card__eyebrow">PRIVÉ · DOCENT</div>
-				<h1 class="card__title">2FA-verificatie</h1>
 				<label class="field-label" for="mfa-code">6-cijferige code uit je authenticator-app</label>
 				<input class="field" type="text" id="mfa-code" inputmode="numeric" placeholder="123456" autocomplete="one-time-code" />
 				<div class="btns" style="margin-top: 20px;">
@@ -71,6 +76,20 @@ sitemap: false
 		.btn--submit:hover, .btn--submit:focus-visible { color: #fff; border-color: var(--accent); background: var(--accent); }
 		.btn--submit:disabled { opacity: .6; cursor: wait; transform: none; }
 		.error-msg { margin-top: 14px; color: #b3261e; font-size: 14px; }
+		.login-uitleg { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: var(--muted); }
+		.link-knop {
+			display: block;
+			margin-top: 16px;
+			padding: 0;
+			border: none;
+			background: none;
+			color: var(--muted);
+			font-family: var(--font-body);
+			font-size: 14px;
+			text-decoration: underline;
+			cursor: pointer;
+		}
+		.link-knop:hover, .link-knop:focus-visible { color: var(--accent); }
 		.hidden { display: none; }
 	</style>
 
@@ -79,7 +98,8 @@ sitemap: false
 		import {
 			getAuth, signInWithEmailAndPassword, onAuthStateChanged,
 			getMultiFactorResolver, TotpMultiFactorGenerator,
-			setPersistence, browserLocalPersistence
+			setPersistence, browserLocalPersistence,
+			GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
 		} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 		const app = initializeApp({
@@ -104,6 +124,39 @@ sitemap: false
 			if (user) window.location.replace(target);
 		});
 
+		// Google-login. De echte toegangscontrole zit in de Firestore-regels; het
+		// domein afdwingen scheelt alleen een verwarrende "geen toegang" verderop.
+		const provider = new GoogleAuthProvider();
+		provider.setCustomParameters({ hd: "northgo-college.nl", prompt: "select_account" });
+
+		// Bij een redirect-login (popup geblokkeerd) landt de fout hier.
+		getRedirectResult(auth).catch(() => {
+			errorDiv.textContent = "Inloggen met Google is niet gelukt. Probeer het opnieuw.";
+		});
+
+		document.getElementById("btn-google").addEventListener("click", async () => {
+			errorDiv.textContent = "";
+			const btn = document.getElementById("btn-google");
+			btn.disabled = true;
+			try {
+				await signInWithPopup(auth, provider);
+				// onAuthStateChanged stuurt door
+			} catch (error) {
+				btn.disabled = false;
+				if (error.code === "auth/popup-blocked" || error.code === "auth/operation-not-supported-in-this-environment") {
+					await signInWithRedirect(auth, provider);
+				} else if (error.code !== "auth/popup-closed-by-user" && error.code !== "auth/cancelled-popup-request") {
+					errorDiv.textContent = "Inloggen met Google is niet gelukt. Probeer het opnieuw.";
+				}
+			}
+		});
+
+		document.getElementById("btn-wachtwoord").addEventListener("click", () => {
+			document.getElementById("google-block").classList.add("hidden");
+			document.getElementById("login-form").classList.remove("hidden");
+			document.getElementById("email").focus();
+		});
+
 		document.getElementById("login-form").addEventListener("submit", async (e) => {
 			e.preventDefault();
 			errorDiv.textContent = "";
@@ -119,7 +172,9 @@ sitemap: false
 				if (error.code === "auth/multi-factor-auth-required") {
 					mfaResolver = getMultiFactorResolver(auth, error);
 					document.getElementById("login-form").classList.add("hidden");
+					document.getElementById("google-block").classList.add("hidden");
 					document.getElementById("mfa-form").classList.remove("hidden");
+					document.getElementById("card-title").textContent = "2FA-verificatie";
 					document.getElementById("mfa-code").focus();
 				} else {
 					errorDiv.textContent = "Inloggen mislukt. Controleer je e-mailadres en wachtwoord.";

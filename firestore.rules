@@ -7,9 +7,26 @@ service cloud.firestore {
     // voor de privé docent-pagina's (docent/demos.html op servaaswinder.nl).
     // Alles wat hieronder niet expliciet gematcht wordt, is dicht.
 
-    match /docent/{docId} {
-      allow read, write: if request.auth != null &&
+    // Wie mag meelezen. Inloggen kan via Google of e-mail+wachtwoord; de toegang
+    // hangt alleen aan het geverifieerde e-mailadres, niet aan de inlogmethode.
+    function isBeheerder() {
+      return request.auth != null &&
+        request.auth.token.email_verified == true &&
         request.auth.token.email == 'servaas.winder@northgo-college.nl';
+    }
+
+    function magLezen() {
+      return request.auth != null &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email in [
+          'servaas.winder@northgo-college.nl',
+          'janneke.koomen@northgo-college.nl'
+        ];
+    }
+
+    match /docent/{docId} {
+      allow read: if magLezen();
+      allow write: if isBeheerder();
     }
   }
 }
