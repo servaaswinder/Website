@@ -10,7 +10,7 @@ nav: natuurkunde
   {% include site-header-nk.html %}
   <section class="hero"><div class="hero__inner">
     <h1 class="hero__title">4 vwo</h1>
-    <p class="hero__sub">Schooljaar 2026-2027. De twee clusters hebben verschillende lesdagen en lopen in periode 1 daardoor niet gelijk. Kies hieronder je lesgroep, dan tonen de tabellen jouw lesdagen en jouw planning. Bij 4v.nat1 krijg je de lessen op dinsdag en woensdag van mw. Koomen.</p>
+    <p class="hero__sub">Schooljaar 2026-2027. De twee clusters hebben verschillende lesdagen en lopen in periode 1 daardoor niet gelijk. Kies hieronder je lesgroep, dan tonen de tabellen jouw lesdagen en jouw planning. Bij 4v.nat1 krijg je de woensdagles en de eerste donderdagles van mw. Koomen.</p>
     <div class="pills"><a class="pill" href="#p1">Periode 1</a> <a class="pill" href="#p2">Periode 2</a> <a class="pill" href="#p3">Periode 3</a> <a class="pill" href="#p4">Periode 4</a></div>
     <div class="switcher">
       <div class="switcher__label">LESGROEP</div>
@@ -208,12 +208,15 @@ nav: natuurkunde
   {% include site-footer-nk.html %}
   <script>
     (function () {
+      // Rooster gewijzigd per week 37: de les van mw. Koomen ging van di-6 naar do-7,
+      // waardoor nat1 op donderdag twee aansluitende uren heeft (7e KOO, 8e WIN) en
+      // nat2 van do-2 naar do-7 verhuisde. De lesnummers en hun inhoud blijven gelijk.
       // nat1 heeft drie losse lessen; nat2 heeft er twee plus een blokuur op vrijdag,
       // dat als één kolom wordt getoond. Per cel kan de inhoud per cluster verschillen
       // via data-nat1 / data-nat2; zonder die attributen delen beide clusters de tekst.
       var labels = {
-        nat1: ['Di (6e uur, KOO)', 'Wo (3e uur, KOO)', 'Do (7e uur, WIN)'],
-        nat2: ['Do (2e uur, WIN)', 'Vr (1e + 2e uur, WIN)', '']
+        nat1: ['Wo (3e uur, KOO)', 'Do (7e uur, KOO)', 'Do (8e uur, WIN)'],
+        nat2: ['Do (7e uur, WIN)', 'Vr (1e + 2e uur, WIN)', '']
       };
       var btns = document.querySelectorAll('.switcher__btn');
       var heads = document.querySelectorAll('thead th[data-les]');
