@@ -73,8 +73,13 @@
 	.ts__meter { font-family: var(--font-mono); font-size: 13px; color: var(--ink-cell); }
 	.ts__note { font-size: 13px; color: var(--muted-2); }
 
+	/* invulvakken (lijnen, rooster) alleen op papier, niet op het scherm */
+	.alleen-print { display: none !important; }
+	.printversie .alleen-print { display: block !important; }
+	.printversie .invul.alleen-print { display: flex !important; }
+
 	/* printopmaak: bij Ctrl/Cmd+P en voor de PDF (?print, zie scripts/practicum-pdfs.sh) */
-	.print-link { display: flex; justify-content: center; }
+	.print-link { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 	.printversie body { background: #fff; }
 	.printversie .site-header, .printversie .photoband, .printversie .print-link, .printversie .ts__bar,
 	.printversie .mallen-preview, .printversie .card .btn, .printversie .reslist, .printversie .print-verberg { display: none !important; }
@@ -91,6 +96,11 @@
 		@page { size: A4 portrait; margin: 14mm; }
 		.printversie .ts, .printversie .invultabel, .printversie .formules > div, .printversie .stappen > li, .printversie .card__title { break-inside: avoid; }
 		.printversie .card__title { break-after: avoid; }
+		.printversie .card__eyebrow { break-after: avoid; }
+		.printversie .invultabel tbody td { height: 22px; padding-top: 4px; padding-bottom: 4px; }
+		.printversie .invultabel tbody th.week { padding-top: 4px; padding-bottom: 4px; }
 		.printversie .hero { padding-top: 0; }
+		.printversie .card p, .printversie .card ol, .printversie .card dl, .printversie .card ul { font-size: 13.5px; line-height: 1.5; }
+		.printversie .card { padding: 12px 0; }
 	}
 </style>

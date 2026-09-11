@@ -11,4 +11,6 @@ pdf() { # $1 = pagina (zonder .html), $2 = uitvoerbestand, $3 = querystring
 }
 pdf Natuurkunde/4V/luchtweerstand-deel1     Natuurkunde/4V/luchtweerstand-deel1.pdf "?print"
 pdf Natuurkunde/4V/luchtweerstand           Natuurkunde/4V/luchtweerstand-deel2.pdf "?print"
+pdf Natuurkunde/4V/nichroom                 Natuurkunde/4V/nichroom.pdf "?print"
+pdf Natuurkunde/4V/diode-karakteristiek     Natuurkunde/4V/diode-karakteristiek.pdf "?print"
 pdf Natuurkunde/4V/luchtweerstand-vouwmallen Natuurkunde/4V/vouwmallen-luchtweerstand.pdf ""

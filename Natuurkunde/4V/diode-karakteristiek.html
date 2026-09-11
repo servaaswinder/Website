@@ -1,0 +1,130 @@
+---
+title: Practicum diode-karakteristiek
+description: "Meet de (U,I)-karakteristiek van een LED met een schuifweerstand en twee meters. Geen cijfer. Natuurkunde 4 vwo."
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">4 VWO · PRACTICUM · GEEN CIJFER</div>
+			<h1 class="hero__title">Diode-karakteristiek van een LED</h1>
+			<p class="hero__sub">Hoe hangt de stroom door een LED af van de spanning? Je meet het en tekent de (U,I)-karakteristiek. Je levert je grafiek of je ingevulde practicumwerkblad in.</p>
+		</div>
+	</section>
+
+	{% include practicum-css.html %}
+	<style>
+		.schema { display: flex; flex-wrap: wrap; gap: 18px 40px; margin: 18px 0 6px; }
+		.schema figure { margin: 0; }
+		.schema svg { width: 300px; max-width: 100%; height: auto; display: block; }
+		.schema figcaption { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+		.schema .draad { fill: none; stroke: var(--night-2); stroke-width: 2; stroke-linejoin: round; }
+		.schema .comp { fill: #fff; stroke: var(--night-2); stroke-width: 2; }
+		.schema .vol { fill: var(--night-2); }
+		.schema text { font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; font-weight: 600; fill: var(--night-2); }
+		.invul { display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 14px 0 0; }
+		.invul label { display: flex; align-items: baseline; gap: 8px; font-size: 15.5px; color: var(--ink-cell); }
+		.invul .lijn { display: inline-block; min-width: 150px; border-bottom: 1.5px solid var(--btn-border-hover); height: 1.3em; }
+		.invul .lijn--lang { min-width: 420px; max-width: 100%; }
+		.schrijfregels { margin: 12px 0 0; }
+		.schrijfregels span { display: block; height: 34px; border-bottom: 1.5px solid var(--btn-border); }
+		.rooster { width: 100%; max-width: 680px; height: auto; display: block; margin: 16px 0 0; }
+		.werkblad-kop { display: none; }
+		.printversie .werkblad-kop { display: flex; gap: 40px; margin: 0 0 8px; font-size: 11pt; }
+		.printversie .werkblad-kop span { flex: 1; border-bottom: 1px solid #555; padding-bottom: 2px; }
+		.printversie .rooster { max-width: 150mm; }
+		.printversie .schema svg { width: 250px; }
+	</style>
+
+	<main class="main">
+
+		<div class="werkblad-kop"><span>Namen:</span><span>Klas:</span></div>
+
+		<section class="card" aria-labelledby="voorbereiding-heading">
+			<div class="card__eyebrow">VOORBEREIDING</div>
+			<h2 class="card__title" id="voorbereiding-heading">Wat je nodig hebt</h2>
+			<ul class="stappen stappen--bullets">
+				<li><p>Spanningsbron, ingesteld op 6 V</p></li>
+				<li><p>LED en weerstand <em>R</em><sub>1</sub></p></li>
+				<li><p>Schuifweerstand <em>R</em><sub>2</sub> van 100 &Omega;</p></li>
+				<li><p>Twee multimeters en snoeren</p></li>
+			</ul>
+			<p style="margin-top:14px">Werk in groepjes.</p>
+			<dl class="formules">
+				<div><dt>Inleveren</dt><dd>Per groepje bij je docent: de grafiek van de (<em>U</em>,<em>I</em>)-karakteristiek van de LED, of een ingevuld <a href="https://drive.google.com/file/d/1nWKTK19QmI0spQuT-UVeIqXgGxnMpBUs/view?usp=sharing" target="_blank" rel="noopener">practicumwerkblad algemeen</a>.</dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="karakteristiek-heading">
+			<div class="card__eyebrow">EXPERIMENT</div>
+			<h2 class="card__title" id="karakteristiek-heading">De karakteristiek meten</h2>
+
+			<figure class="schema" style="display:block">
+				<svg viewBox="0 0 320 300" role="img" aria-label="Schakeling met schuifweerstand R2 van 100 ohm als spanningsdeler, stroommeter in serie met R1 en de LED, spanningsmeter over de LED">
+					<path class="draad" d="M154 30 H40 V148 M40 188 V220 H70 M120 220 H175 M203 220 H250 V124 M166 30 H300 V110 H285 M215 110 H40 M140 220 V262 H170 M200 262 H230 V220" />
+					<line x1="154" y1="16" x2="154" y2="44" stroke="#141b40" stroke-width="3" />
+					<line x1="166" y1="23" x2="166" y2="37" stroke="#141b40" stroke-width="6" />
+					<text x="142" y="18" text-anchor="middle">+</text>
+					<text x="160" y="62" text-anchor="middle">6 V</text>
+					<rect class="comp" x="215" y="102" width="70" height="16" />
+					<text x="250" y="94" text-anchor="middle">R2 · 100 &Omega;</text>
+					<path class="vol" d="M244 130 L250 119 L256 130 Z" />
+					<circle class="comp" cx="40" cy="168" r="20" /><text x="40" y="173" text-anchor="middle">A</text>
+					<rect class="comp" x="70" y="212" width="50" height="16" />
+					<text x="95" y="247" text-anchor="middle">R1</text>
+					<path class="vol" d="M175 208 L199 220 L175 232 Z" />
+					<line x1="201" y1="208" x2="201" y2="232" stroke="#141b40" stroke-width="3" />
+					<path class="draad" d="M185 202 l10 -12 M193 204 l10 -12" />
+					<path class="vol" d="M198 187 l-1 7 l-5 -4 Z M206 189 l-1 7 l-5 -4 Z" />
+					<text x="168" y="200" text-anchor="end">LED</text>
+					<circle class="comp" cx="185" cy="262" r="16" /><text x="185" y="267" text-anchor="middle">V</text>
+					<circle class="vol" cx="40" cy="110" r="3.5" /><circle class="vol" cx="140" cy="220" r="3.5" /><circle class="vol" cx="230" cy="220" r="3.5" />
+				</svg>
+				<figcaption>Figuur 1 · Schakeling met schuifweerstand <em>R</em><sub>2</sub> en twee meters</figcaption>
+			</figure>
+
+			<ol class="stappen">
+				<li><p>Bouw de schakeling van figuur 1, met de schuifweerstand als spanningsdeler, een stroommeter in serie met de LED en een spanningsmeter over de LED.</p></li>
+				<li><p>Laat je schakeling controleren door de docent voordat je de spanningsbron aanzet.</p></li>
+				<li><p>Zet de bron op 6 V en verschuif de schuifweerstand. Verandert de lichtsterkte? Brandt de LED helemaal niet, draai hem dan om. Noteer bij welke spanning de LED net begint te branden.</p>
+					<div class="invul alleen-print"><label>Drempelspanning, eerste schatting &asymp; <span class="lijn"></span> V</label></div></li>
+				<li><p>Meet rond de drempelspanning minstens tien punten en daarna nog vijf punten bij hogere spanningen. Zet de stroommeter zo nodig op &micro;A en reken om naar mA. Noteer de waarden in de tabel.</p>
+					<div class="plan invultabel">
+						<table>
+							<thead><tr><th class="sticky" scope="col">Meting</th><th scope="col"><em>U</em> (V)</th><th scope="col"><em>I</em> (mA)</th><th class="sticky" scope="col">Meting</th><th scope="col"><em>U</em> (V)</th><th scope="col"><em>I</em> (mA)</th></tr></thead>
+							<tbody>
+								{% for i in (1..8) %}{% assign j = i | plus: 8 %}
+								<tr><th class="week" scope="row">{{ i }}</th><td></td><td></td><th class="week" scope="row">{% if j <= 15 %}{{ j }}{% endif %}</th><td></td><td></td></tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div></li>
+				<li><p>Teken op millimeterpapier de (<em>U</em>,<em>I</em>)-karakteristiek van de LED. Zet grootheden en eenheden bij de assen, kies een handige schaalverdeling en teken de meetpunten duidelijk.</p>
+					<svg class="rooster alleen-print" viewBox="0 0 176 116" role="img" aria-label="Leeg millimeterrooster met een I-as en een U-as">
+						<defs>
+							<pattern id="mm" width="2" height="2" patternUnits="userSpaceOnUse"><path d="M2 0 H0 V2" fill="none" stroke="#f0c9b4" stroke-width=".15" /></pattern>
+							<pattern id="cm" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="url(#mm)" /><path d="M10 0 H0 V10" fill="none" stroke="#e39a78" stroke-width=".3" /></pattern>
+						</defs>
+						<rect x="14" y="6" width="160" height="100" fill="url(#cm)" stroke="#e39a78" stroke-width=".3" />
+						<path d="M14 106 V3 M14 106 H175" fill="none" stroke="#141b40" stroke-width=".6" />
+						<text x="4" y="10" font-size="4.5" font-family="IBM Plex Sans, system-ui, sans-serif" font-style="italic" fill="#141b40">I (mA)</text>
+						<text x="174" y="113" font-size="4.5" text-anchor="end" font-family="IBM Plex Sans, system-ui, sans-serif" font-style="italic" fill="#141b40">U (V)</text>
+						<text x="11" y="110" font-size="4" text-anchor="end" font-family="IBM Plex Sans, system-ui, sans-serif" fill="#141b40">0</text>
+					</svg></li>
+				<li><p>Wat valt je op aan het diagram dat je hebt getekend?</p>
+					<div class="schrijfregels alleen-print"><span></span><span></span><span></span></div></li>
+			</ol>
+		</section>
+
+		{% include practicum-print.html pdf="diode-karakteristiek.pdf" %}
+
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>

@@ -1,0 +1,166 @@
+---
+title: Practicum soortelijke weerstand nichroom
+description: "PO: bepaal de soortelijke weerstand van nichroom door de weerstand van vier draden bij verschillende lengtes te meten. Natuurkunde 4 vwo."
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">4 VWO · PRACTICUM · PO VOOR EEN CIJFER</div>
+			<h1 class="hero__title">Soortelijke weerstand van nichroom</h1>
+			<p class="hero__sub">Je meet de weerstand van vier nichroomdraden bij verschillende lengtes en bepaalt daaruit de soortelijke weerstand van nichroom. Je levert een verslag in voor een cijfer.</p>
+		</div>
+	</section>
+
+	{% include practicum-css.html %}
+	<style>
+		.invultabel tbody tr.nieuwe-draad th, .invultabel tbody tr.nieuwe-draad td { border-top: 2px solid var(--btn-border); }
+		.transformatie { margin: 20px 0 6px; }
+		.transformatie svg { width: 100%; max-width: 620px; height: auto; display: block; }
+		.kolommen { margin: 12px 0; }
+		.kolommen table { min-width: 620px; }
+		.kolommen tbody td { height: auto; }
+		.kolommen code { font-family: var(--font-mono); font-size: 13px; background: var(--row-vac); padding: 2px 6px; border-radius: 6px; }
+		.let-op { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+	</style>
+
+	<main class="main">
+
+		<section class="card" aria-labelledby="opdracht-heading">
+			<div class="card__eyebrow">DE OPDRACHT</div>
+			<h2 class="card__title" id="opdracht-heading">Wat is de soortelijke weerstand van nichroom?</h2>
+			<p class="card__intro">Metalen geleiden goed: hun soortelijke weerstand is klein. Een uitzondering is nichroom, een legering van ongeveer 80% nikkel en 20% chroom. Jij bepaalt hoe groot de soortelijke weerstand van nichroom is.</p>
+			<dl class="formules">
+				<div><dt>Onderzoeksvraag</dt><dd>Wat is de soortelijke weerstand van nichroom?</dd></div>
+				<div><dt>Inleveren</dt><dd>Een verslag per groepje. Voor feedback t/m vrijdag 25 september, definitief uiterlijk vrijdag 2 oktober.</dd></div>
+				<div><dt>Beoordeling</dt><dd>Volgens het <a href="/Natuurkunde/Verslagen/beoordelingsmodel.html">beoordelingsmodel verslagen</a>.</dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="theorie-heading">
+			<div class="card__eyebrow">THEORIE</div>
+			<h2 class="card__title" id="theorie-heading">Weerstand van een draad</h2>
+			<p class="card__intro">De weerstand van een draad hangt af van het materiaal, de lengte en de dikte van de draad.</p>
+			<dl class="formules">
+				<div><dt>R = &rho; &middot; &ell; / A</dt><dd><ul class="legenda"><li><i>R</i><span>weerstand van de draad</span><span>&Omega;</span></li><li><i>&rho;</i><span>soortelijke weerstand van het materiaal (zie Binas)</span><span>&Omega;&middot;m</span></li><li><i>&ell;</i><span>lengte van de draad</span><span>m</span></li><li><i>A</i><span>oppervlakte van de doorsnede</span><span>m<sup>2</sup></span></li></ul></dd></div>
+				<div><dt>A = &frac14; &middot; &pi; &middot; d<sup>2</sup></dt><dd><ul class="legenda"><li><i>A</i><span>oppervlakte van de doorsnede</span><span>m<sup>2</sup></span></li><li><i>d</i><span>diameter van de draad</span><span>m</span></li></ul></dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="voorbereiding-heading">
+			<div class="card__eyebrow">VOORBEREIDING</div>
+			<h2 class="card__title" id="voorbereiding-heading">Opstelling</h2>
+			<p class="card__intro">Op een plankje zijn vier nichroomdraden van ongeveer 70 cm gespannen, met een diameter van 0,2 mm, 0,3 mm, 0,4 mm en 0,5 mm. Je meet de weerstand met een digitale multimeter: die zet een vaste spanning over de draad, meet de stroom en rekent zo direct de weerstand uit.</p>
+		</section>
+
+		<section class="card" aria-labelledby="werkwijze-heading">
+			<div class="card__eyebrow">WERKWIJZE</div>
+			<h2 class="card__title" id="werkwijze-heading">Weerstand meten</h2>
+			<ol class="stappen">
+				<li><p>Sluit de rode probe aan op de V&Omega;-ingang en de zwarte op de COM-ingang van de multimeter. Zet de draaiknop op 200 &Omega;.</p></li>
+				<li><p>Duw de probes van onderaf tegen een draad. Je mag de draad met je vingers een klein beetje opspannen, maar buig of breek hem niet.</p></li>
+				<li><p>Varieer de druk tot de multimeter een stabiele waarde geeft.</p></li>
+				<li><p>Meet de lengte van de draad tussen de probes en noteer lengte en weerstand in de tabel.</p></li>
+				<li><p>Meet zo elke draad bij vijf verschillende lengtes tussen 10 en 60 cm.</p></li>
+			</ol>
+
+			<div class="plan invultabel">
+				<table>
+					<thead><tr><th class="sticky" scope="col">Diameter <em>d</em> (mm)</th><th scope="col">Lengte &ell; (cm)</th><th scope="col">Weerstand <em>R</em> (&Omega;)</th></tr></thead>
+					<tbody>
+						{% assign diameters = "0,2|0,3|0,4|0,5" | split: "|" %}
+						{% for d in diameters %}{% for i in (1..5) %}
+						<tr{% if i == 1 %} class="nieuwe-draad"{% endif %}><th class="week" scope="row">{{ d }}</th><td></td><td></td></tr>
+						{% endfor %}{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="card" aria-labelledby="verwerking-heading">
+			<div class="card__eyebrow">VERWERKING</div>
+			<h2 class="card__title" id="verwerking-heading">Van metingen naar &rho;</h2>
+
+			<h3>Waarom een coördinatentransformatie?</h3>
+			<p>Als je de weerstand uitzet tegen de lengte, krijg je voor elke draad een andere lijn: een dunne draad heeft bij dezelfde lengte een grotere weerstand. Uit vier verschillende lijnen haal je niet één waarde voor &rho;. Daarom kies je andere grootheden op de assen, zodat <strong>alle metingen op één rechte lijn door de oorsprong</strong> komen. Dat heet een <em>co&ouml;rdinatentransformatie</em>.</p>
+			<p>Vergelijk de formule met de vergelijking van een rechte lijn door de oorsprong:</p>
+			<dl class="formules">
+				<div><dt><em>y</em> = <em>a</em> &middot; <em>x</em></dt><dd><ul class="legenda"><li><i>y</i><span>wat je op de verticale as zet</span><span></span></li><li><i>a</i><span>de helling (richtingsco&euml;ffici&euml;nt)</span><span></span></li><li><i>x</i><span>wat je op de horizontale as zet</span><span></span></li></ul></dd></div>
+				<div><dt>R = &rho; &middot; (&ell; / A)</dt><dd><ul class="legenda"><li><i>R</i><span>op de verticale as</span><span>&Omega;</span></li><li><i>&rho;</i><span>de helling: de soortelijke weerstand</span><span>&Omega;&middot;m</span></li><li><i>&ell;/A</i><span>op de horizontale as</span><span>m<sup>&minus;1</sup></span></li></ul></dd></div>
+			</dl>
+
+			<figure class="transformatie" aria-label="Links: weerstand tegen lengte geeft vier lijnen, voor elke draad één. Rechts: weerstand tegen lengte gedeeld door oppervlakte geeft één rechte lijn door de oorsprong.">
+				<svg viewBox="0 0 520 190" role="img" xmlns="http://www.w3.org/2000/svg">
+					<g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="12" fill="#565f80">
+						<path d="M40 160 H230 M40 160 V20" stroke="#141b40" stroke-width="1.5" fill="none" />
+						<text x="230" y="178" text-anchor="end" font-style="italic">&#8467; (m)</text>
+						<text x="34" y="26" text-anchor="end" font-style="italic">R</text>
+						<path d="M40 160 L200 28" stroke="#2a34b8" stroke-width="2" /><path d="M40 160 L220 90" stroke="#2a34b8" stroke-width="2" opacity=".75" />
+						<path d="M40 160 L220 120" stroke="#2a34b8" stroke-width="2" opacity=".55" /><path d="M40 160 L220 136" stroke="#2a34b8" stroke-width="2" opacity=".4" />
+						<text x="135" y="14" text-anchor="middle" fill="#141b40" font-weight="600">R tegen &#8467;: vier lijnen</text>
+
+						<path d="M300 160 H490 M300 160 V20" stroke="#141b40" stroke-width="1.5" fill="none" />
+						<text x="490" y="178" text-anchor="end" font-style="italic">&#8467;/A (m&#8315;&#185;)</text>
+						<text x="294" y="26" text-anchor="end" font-style="italic">R</text>
+						<path d="M300 160 L480 34" stroke="#c2410c" stroke-width="2" stroke-dasharray="6 4" />
+						<g fill="#141b40">
+							<circle cx="320" cy="146" r="3" /><circle cx="338" cy="134" r="3" /><circle cx="352" cy="123" r="3" /><circle cx="371" cy="111" r="3" /><circle cx="386" cy="99" r="3" />
+							<circle cx="405" cy="88" r="3" /><circle cx="418" cy="76" r="3" /><circle cx="437" cy="65" r="3" /><circle cx="452" cy="54" r="3" /><circle cx="470" cy="42" r="3" />
+						</g>
+						<text x="395" y="14" text-anchor="middle" fill="#141b40" font-weight="600">R tegen &#8467;/A: één lijn, helling = &#961;</text>
+					</g>
+				</svg>
+			</figure>
+
+			<h3>Stap voor stap in een spreadsheet</h3>
+			<ol class="stappen">
+				<li><p>Zet je metingen in een spreadsheet (Excel of Google Spreadsheets), één meting per rij, met deze kolommen:</p>
+					<div class="plan invultabel kolommen">
+						<table>
+							<thead><tr><th class="sticky" scope="col">Kolom</th><th scope="col">Grootheid</th><th scope="col">Eenheid</th><th scope="col">Hoe</th></tr></thead>
+							<tbody>
+								<tr><th class="week" scope="row">A</th><td>diameter <em>d</em></td><td>m</td><td>meting, omgerekend: 0,2 mm = 0,0002 m</td></tr>
+								<tr><th class="week" scope="row">B</th><td>lengte &ell;</td><td>m</td><td>meting, omgerekend: 35 cm = 0,35 m</td></tr>
+								<tr><th class="week" scope="row">C</th><td>weerstand <em>R</em></td><td>&Omega;</td><td>meting</td></tr>
+								<tr><th class="week" scope="row">D</th><td>oppervlakte <em>A</em></td><td>m<sup>2</sup></td><td>formule: <code>=0,25*PI()*A2^2</code></td></tr>
+								<tr><th class="week" scope="row">E</th><td>&ell; / <em>A</em></td><td>m<sup>&minus;1</sup></td><td>formule: <code>=B2/D2</code></td></tr>
+							</tbody>
+						</table>
+					</div>
+					<p>Sleep de formules in kolom D en E omlaag, zodat ze voor alle twintig metingen gelden.</p></li>
+				<li><p>Maak een spreidingsdiagram (xy-diagram) met kolom E (&ell;/<em>A</em>) op de horizontale as en kolom C (<em>R</em>) op de verticale as. Alle twintig metingen, van alle vier de draden, komen in hetzelfde diagram.</p></li>
+				<li><p>Voeg een lineaire trendlijn toe en laat de vergelijking in het diagram zien. Je krijgt dan <em>y</em> = <em>a</em> &middot; <em>x</em> + <em>b</em>.</p></li>
+				<li><p>Het getal <em>a</em> voor <em>x</em> is de helling: dat is de soortelijke weerstand &rho;, in &Omega;&middot;m. Het snijpunt <em>b</em> hoort bijna nul te zijn, want de trendlijn moet vrijwel door de oorsprong gaan. Is <em>b</em> duidelijk niet nul, bespreek dat dan in je discussie.</p></li>
+				<li><p>Vergelijk je waarde met de waarde in Binas.</p></li>
+			</ol>
+
+			<p class="let-op"><strong>Let op:</strong> bereken &rho; niet voor elke meting apart om daarna het gemiddelde te nemen. Gebruik de helling van de grafiek. Dan tellen alle metingen mee en zie je meteen of er een meting afwijkt.</p>
+		</section>
+
+		<section class="card" aria-labelledby="verslag-heading">
+			<div class="card__eyebrow">VERSLAG</div>
+			<h2 class="card__title" id="verslag-heading">Wat er in je verslag moet staan</h2>
+			<p class="card__intro">Gebruik de vaste indeling van een verslag (zie <a href="/Natuurkunde/Verslagen/bovenbouw.html">verslagen bovenbouw</a>). Per onderdeel verwacht ik:</p>
+			<ol class="stappen">
+				<li><h3>Inleiding</h3><p>Beschrijf de aanleiding en het doel van je onderzoek en sluit af met de onderzoeksvraag.</p></li>
+				<li><h3>Theorie</h3><p>Geef de formules voor de weerstand van een draad en de oppervlakte van de doorsnede, gemaakt met de formule-editor, en leg uit wat elke letter betekent.</p></li>
+				<li><h3>Hypothese</h3><p>Welke waarde verwacht je voor de soortelijke weerstand? Onderbouw dat met Binas.</p></li>
+				<li><h3>Methode</h3><p>Beschrijf de meting zo dat een klasgenoot hem kan herhalen, met een tekening van de opstelling.</p></li>
+				<li><h3>Resultaten en verwerking</h3><p>Een tabel met alle metingen en het diagram van <em>R</em> tegen &ell;/<em>A</em> met trendlijn. Zet grootheden en eenheden bij de assen en geef de helling met eenheid.</p></li>
+				<li><h3>Conclusie</h3><p>Beantwoord de onderzoeksvraag met de waarde uit je diagram en vergelijk die met Binas.</p></li>
+				<li><h3>Discussie</h3><p>Noem concrete meetonzekerheden en wat ze met je uitkomst doen, verklaar afwijkende metingen en doe een concreet verbetervoorstel. Gaat je trendlijn niet door de oorsprong, leg dan uit waar dat door kan komen. Een terugblik op de samenwerking is geen discussie.</p></li>
+			</ol>
+		</section>
+
+		{% include practicum-print.html pdf="nichroom.pdf" %}
+
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>
