@@ -42,7 +42,7 @@ dicht. `serviceAccountKey.json` staat alleen lokaal (gitignored).
 - **Taal**: code en commits in het Engels; teksten op de site in het Nederlands
 - **Styling**: alles gebruikt `nk.css` (style.css is in juli 2026 uitgefaseerd); paginaspecifieke stijl in een klein `<style>`-blok met nk-CSS-variabelen
 
-## Practicumpagina's (4V: nichroom, diode-karakteristiek, luchtweerstand deel 1 en 2)
+## Practicumpagina's (4V: nichroom, diode-karakteristiek, luchtweerstand deel 1 en 2; 6V: planck)
 
 - Gedeelde opmaak in `_includes/practicum-css.html`, knop "Printbare versie" in `_includes/practicum-print.html`, animatie eindsnelheid in `_includes/terminale-snelheid.html`.
 - De knop linkt naar een vaste PDF naast de pagina. Na elke inhoudelijke wijziging de PDF's opnieuw maken: `scripts/practicum-pdfs.sh` (met `jekyll serve` op poort 4000) en meecommitten.

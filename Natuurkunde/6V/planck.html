@@ -1,0 +1,190 @@
+---
+title: Practicum constante van Planck
+description: "Verslag voor een cijfer: bepaal de constante van Planck uit de drempelspanning en de golflengte van vier LED's. Natuurkunde 6 vwo."
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">6 VWO · PRACTICUM · VERSLAG VOOR EEN CIJFER</div>
+			<h1 class="hero__title">Bepalen van de constante van Planck</h1>
+			<p class="hero__sub">Je meet van vier LED's de drempelspanning en de golflengte van het licht, en bepaalt daaruit de constante van Planck. Je levert een verslag in voor een cijfer.</p>
+		</div>
+	</section>
+
+	{% include practicum-css.html %}
+	<style>
+		.schema { display: flex; flex-wrap: wrap; gap: 18px 40px; margin: 18px 0 6px; }
+		.schema figure { margin: 0; }
+		.schema svg { width: 440px; max-width: 100%; height: auto; display: block; }
+		.schema figcaption { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+		.schema .draad { fill: none; stroke: var(--night-2); stroke-width: 2; stroke-linejoin: round; }
+		.schema .comp { fill: #fff; stroke: var(--night-2); stroke-width: 2; }
+		.schema .vol { fill: var(--night-2); }
+		.schema text { font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; font-weight: 600; fill: var(--night-2); }
+		.schema text.lbl { font-style: italic; fill: var(--accent); font-size: 15px; }
+		.printversie .schema svg { width: 260px; }
+	</style>
+
+	<main class="main">
+
+		<section class="card" aria-labelledby="opdracht-heading">
+			<div class="card__eyebrow">DE OPDRACHT</div>
+			<h2 class="card__title" id="opdracht-heading">Wat is de waarde van de constante van Planck?</h2>
+			<p class="card__intro">Een LED zendt bijna monochromatisch licht uit: licht van één kleur, en dus van één golflengte. Uit de spanning waarbij een LED net licht geeft en de golflengte van dat licht bepaal je de constante van Planck.</p>
+			<dl class="formules">
+				<div><dt>Onderzoeksvraag</dt><dd>Wat is de waarde van de constante van Planck?</dd></div>
+				<div><dt>Inleveren</dt><dd>Een verslag per groepje. Voor feedback t/m vrijdag 12 februari, definitief uiterlijk vrijdag 19 februari.</dd></div>
+				<div><dt>Beoordeling</dt><dd>Volgens het <a href="/Natuurkunde/Verslagen/beoordelingsmodel.html">beoordelingsmodel verslagen</a>.</dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="theorie-heading">
+			<div class="card__eyebrow">THEORIE</div>
+			<h2 class="card__title" id="theorie-heading">Van meting naar de constante van Planck</h2>
+			<p class="card__intro">Je meet twee dingen per LED: de golflengte van het licht en de energie van de fotonen. Samen leveren ze de constante van Planck op.</p>
+
+			<h3>1 · De golflengte, met een tralie</h3>
+			<p>Een tralie buigt licht af onder een hoek die van de golflengte afhangt. Hoe een tralie werkt, zie je op <a href="https://nl.wikipedia.org/wiki/Tralie_(natuurkunde)" target="_blank" rel="noopener">Wikipedia</a> of in dit <a href="https://www.youtube.com/watch?v=x-WLVo2wCrQ" target="_blank" rel="noopener">filmpje</a>; de tralieformule staat in Binas. De tralie in dit practicum heeft 300 lijnen per mm. Daaruit volgt de tralieconstante <em>d</em>, de afstand tussen twee spleten.</p>
+			<p>Kijk je door de tralie naar de LED, dan lijkt de eerste orde naast de LED op de liniaal te staan (figuur 1). De hoek &alpha; volgt uit de afstanden <em>s</em> en <em>x</em> die je meet.</p>
+			<figure class="schema" style="display:block">
+				<svg viewBox="0 0 400 270" role="img" aria-label="Bovenaanzicht: liniaal met in het midden de LED en rechts de eerste orde op afstand x. Onder de LED staat de tralie op afstand s. Bij de tralie de hoek alfa tussen de lijn naar de LED en de lijn naar de eerste orde.">
+					<text x="20" y="20" font-weight="400">liniaal</text>
+					<rect class="comp" x="20" y="30" width="360" height="26" />
+					<g stroke="#141b40" stroke-width="1.2">
+						<line x1="40" y1="56" x2="40" y2="46" /><line x1="60" y1="56" x2="60" y2="50" /><line x1="80" y1="56" x2="80" y2="46" /><line x1="100" y1="56" x2="100" y2="50" /><line x1="120" y1="56" x2="120" y2="46" /><line x1="140" y1="56" x2="140" y2="50" /><line x1="160" y1="56" x2="160" y2="46" />
+						<line x1="200" y1="56" x2="200" y2="46" /><line x1="220" y1="56" x2="220" y2="50" /><line x1="240" y1="56" x2="240" y2="46" /><line x1="260" y1="56" x2="260" y2="50" /><line x1="280" y1="56" x2="280" y2="46" /><line x1="320" y1="56" x2="320" y2="46" /><line x1="340" y1="56" x2="340" y2="50" /><line x1="360" y1="56" x2="360" y2="46" />
+					</g>
+					<circle class="comp" cx="180" cy="43" r="7" />
+					<text x="180" y="20" text-anchor="middle">LED</text>
+					<circle cx="300" cy="43" r="6" fill="#c2410c" />
+					<text x="300" y="20" text-anchor="middle">eerste orde</text>
+
+					<path d="M180 56 V214" fill="none" stroke="#141b40" stroke-width="1.5" stroke-dasharray="6 5" />
+					<path d="M180 214 L300 50" fill="none" stroke="#c2410c" stroke-width="2" />
+					<path d="M180 164 A50 50 0 0 0 209.5 173.6" fill="none" stroke="#2a34b8" stroke-width="2" />
+					<text class="lbl" x="195" y="150" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="4">&alpha;</text>
+
+					<path d="M180 72 H300 M180 66 V78 M300 66 V78" fill="none" stroke="#2a34b8" stroke-width="1.5" />
+					<text class="lbl" x="240" y="92" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="4">x</text>
+					<path d="M150 56 V214 M144 56 H156 M144 214 H156" fill="none" stroke="#2a34b8" stroke-width="1.5" />
+					<text class="lbl" x="140" y="140" text-anchor="end">s</text>
+
+					<rect class="comp" x="160" y="214" width="40" height="28" /><rect x="168" y="221" width="24" height="12" fill="#c9cfdf" />
+					<text x="212" y="234">tralie</text>
+				</svg>
+				<figcaption>Figuur 1 · Bovenaanzicht van de opstelling</figcaption>
+			</figure>
+
+			<h3>2 · De fotonenergie, met de drempelspanning</h3>
+			<p>In een LED zitten een n-type en een p-type halfgeleider tegen elkaar. Een elektron dat van het n-type naar het p-type materiaal gaat, valt terug naar een lager energieniveau en zendt een foton uit. Dat lukt pas vanaf de <strong>drempelspanning</strong>: de kleinste spanning waarbij de LED licht geeft. De energie die het elektron dan krijgt, is de energie van het foton:</p>
+			<dl class="formules">
+				<div><dt>E<sub>el</sub> = E<sub>f</sub></dt><dd><ul class="legenda"><li><i>E<sub>el</sub></i><span>elektrische energie van het elektron</span><span>J</span></li><li><i>E<sub>f</sub></i><span>fotonenergie</span><span>J</span></li></ul></dd></div>
+				<div><dt>U = E<sub>f</sub> / q</dt><dd><ul class="legenda"><li><i>U</i><span>drempelspanning</span><span>V</span></li><li><i>E<sub>f</sub></i><span>fotonenergie</span><span>eV</span></li><li><i>q</i><span>lading van een elektron</span><span>e</span></li></ul></dd></div>
+			</dl>
+			<p style="margin-top:14px">Een drempelspanning van 1,7 V hoort dus bij een fotonenergie van 1,7 eV.</p>
+
+			<h3>3 · De constante van Planck</h3>
+			<p>De fotonenergie hangt samen met de frequentie van het licht, en de frequentie met de golflengte. Zoek beide formules op in Binas: daarin zit de constante van Planck.</p>
+
+			<h3>4 · De onzekerheid, met de min-max-methode</h3>
+			<p>Je meetwaarden hebben een onzekerheid. Reken je uitkomst uit met de uiterste waarden die nog binnen de onzekerheid vallen: één keer zo dat de uitkomst zo klein mogelijk wordt en één keer zo dat hij zo groot mogelijk wordt. Het verschil met je gewone uitkomst is de onzekerheid.</p>
+		</section>
+
+		<section class="card" aria-labelledby="uitvoering-heading">
+			<div class="card__eyebrow">UITVOERING</div>
+			<h2 class="card__title" id="uitvoering-heading">Drempelspanning en golflengte meten</h2>
+			<p class="card__intro">Je meet aan een rode, gele, groene en blauwe LED. Van elke LED bepaal je de drempelspanning en de afstand tot de eerste orde.</p>
+
+			<h3>Benodigdheden</h3>
+			<ul class="stappen stappen--bullets">
+				<li><p>Spanningsbron (12 V) en een schuifweerstand</p></li>
+				<li><p>Vier LED's (rood, geel, groen en blauw) en een voorschakelweerstand van 680 &Omega;</p></li>
+				<li><p>Digitale voltmeter en snoeren</p></li>
+				<li><p>Tralie, liniaal en meetlint of rolmaat</p></li>
+				<li><p>Eventueel twee statieven met klemmen</p></li>
+			</ul>
+
+			<figure class="schema" style="display:block">
+				<svg viewBox="0 0 400 240" role="img" aria-label="Schakeling: spanningsbron van 12 V over een schuifweerstand. Tussen de schuif en de onderkant van de schuifweerstand staan een voorschakelweerstand en de LED in serie. De voltmeter staat parallel over de LED.">
+					<path class="draad" d="M40 110 V30 H170 V70 M170 150 V220 H360 V110 H340 M40 124 V220 H170 M184 110 H240 M285 110 H310 M334 110 H340 M300 110 V185 H306 M334 185 H340 V110" />
+					<line x1="22" y1="110" x2="58" y2="110" stroke="#141b40" stroke-width="2.5" />
+					<line x1="30" y1="124" x2="50" y2="124" stroke="#141b40" stroke-width="7" />
+					<text x="66" y="106">+</text>
+					<text x="66" y="128">12 V</text>
+					<rect class="comp" x="159" y="70" width="22" height="80" />
+					<path class="vol" d="M183 110 L195 104 L195 116 Z" />
+					<rect class="comp" x="240" y="103" width="45" height="14" />
+					<path class="vol" d="M310 98 L330 110 L310 122 Z" />
+					<line x1="332" y1="98" x2="332" y2="122" stroke="#141b40" stroke-width="3" />
+					<path class="draad" d="M316 92 l9 -12 M325 94 l9 -12" />
+					<path class="vol" d="M327 76 l0 7 l-5 -3 Z M336 78 l0 7 l-5 -3 Z" />
+					<text x="320" y="146" text-anchor="middle">LED</text>
+					<circle class="comp" cx="320" cy="185" r="14" /><text x="320" y="190" text-anchor="middle">V</text>
+					<circle class="vol" cx="300" cy="110" r="3.5" /><circle class="vol" cx="340" cy="110" r="3.5" /><circle class="vol" cx="170" cy="220" r="3.5" />
+				</svg>
+				<figcaption>Figuur 2 · De spanningsbron staat over de schuifweerstand. De voorschakelweerstand en de LED staan in serie tussen de schuif en de onderkant van de schuifweerstand; de voltmeter meet de spanning over de LED.</figcaption>
+			</figure>
+
+			<h3>Werkwijze</h3>
+			<ol class="stappen">
+				<li><p>Bouw de schakeling van figuur 2 en zet de spanningsbron op 12 V.</p></li>
+				<li><p>Verduister het lokaal. Verschuif de schuifweerstand langzaam tot de LED n&egrave;t licht geeft, en noteer de spanning over de LED: de drempelspanning.</p></li>
+				<li><p>Leg de liniaal met het midden bij de LED en zet de tralie op ongeveer 35 cm van de LED (figuur 1). Houd die afstand gelijk als je van LED wisselt.</p></li>
+				<li><p>Laat de LED helder branden. Kijk door de tralie en lees op de liniaal de afstand af tussen de twee eerste-orde-maxima: links en rechts de eerste stip naast het midden.</p></li>
+				<li><p>Laat de tweede meting door een groepsgenoot doen. Noteer de afstand pas als jullie het allebei eens zijn over de waarde.</p></li>
+				<li><p>Herhaal dit voor alle vier de LED's.</p></li>
+			</ol>
+
+			<div class="plan invultabel">
+				<table>
+					<thead><tr><th class="sticky" scope="col">LED</th><th scope="col">Drempelspanning <em>U</em> (V)</th><th scope="col">Afstand <em>s</em> (m)</th><th scope="col">Afstand tussen de eerste ordes (m)</th></tr></thead>
+					<tbody>
+						<tr><th class="week" scope="row">Rood</th><td></td><td></td><td></td></tr>
+						<tr><th class="week" scope="row">Geel</th><td></td><td></td><td></td></tr>
+						<tr><th class="week" scope="row">Groen</th><td></td><td></td><td></td></tr>
+						<tr><th class="week" scope="row">Blauw</th><td></td><td></td><td></td></tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="card" aria-labelledby="verwerking-heading">
+			<div class="card__eyebrow">VERWERKING</div>
+			<h2 class="card__title" id="verwerking-heading">Van metingen naar de constante van Planck</h2>
+			<ol class="stappen">
+				<li><p>Bereken voor elke LED de golflengte, de frequentie en de fotonenergie.</p></li>
+				<li><p>Verwerk de metingen in een diagram waaruit je de constante van Planck bepaalt.</p></li>
+				<li><p>Bepaal met de min-max-methode de onzekerheid in je waarde voor de constante van Planck.</p></li>
+				<li><p>Vergelijk je waarde met de waarde in Binas.</p></li>
+			</ol>
+			<p class="let-op"><strong>Let op:</strong> bereken de constante van Planck niet voor elke LED apart om daarna het gemiddelde te nemen. Bepaal hem uit het diagram. Dan tellen alle metingen mee en zie je meteen of er een LED afwijkt.</p>
+		</section>
+
+		<section class="card" aria-labelledby="verslag-heading">
+			<div class="card__eyebrow">VERSLAG</div>
+			<h2 class="card__title" id="verslag-heading">Wat er in je verslag moet staan</h2>
+			<p class="card__intro">Gebruik de vaste indeling van een verslag (zie <a href="/Natuurkunde/Verslagen/bovenbouw.html">verslagen bovenbouw</a>). Per onderdeel verwacht ik:</p>
+			<ol class="stappen">
+				<li><h3>Inleiding</h3><p>Beschrijf de aanleiding en het doel van je onderzoek en sluit af met de onderzoeksvraag.</p></li>
+				<li><h3>Theorie</h3><p>Leg uit hoe een tralie werkt en hoe je de fotonenergie uit de drempelspanning bepaalt. Geef de formules, gemaakt met de formule-editor, en leg uit wat elke letter betekent.</p></li>
+				<li><h3>Hypothese</h3><p>Welke waarde verwacht je voor de constante van Planck, en welk verband verwacht je in je diagram? Onderbouw dat met de theorie.</p></li>
+				<li><h3>Methode</h3><p>Beschrijf de meting zo dat een klasgenoot hem kan herhalen, met een tekening van de opstelling.</p></li>
+				<li><h3>Resultaten en verwerking</h3><p>Een tabel met je metingen en de berekende golflengte, frequentie en fotonenergie per LED, en het diagram met trendlijn. Zet grootheden en eenheden bij de assen.</p></li>
+				<li><h3>Conclusie</h3><p>Beantwoord de onderzoeksvraag met je waarde voor de constante van Planck, met onzekerheid, en vergelijk die met Binas.</p></li>
+				<li><h3>Discussie</h3><p>Noem concrete meetonzekerheden en wat ze met je uitkomst doen, verklaar afwijkende metingen en doe een concreet verbetervoorstel. Een terugblik op de samenwerking is geen discussie.</p></li>
+			</ol>
+		</section>
+
+		{% include practicum-print.html pdf="planck.pdf" %}
+
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>
