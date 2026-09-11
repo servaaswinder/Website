@@ -1,0 +1,191 @@
+---
+title: Beoordelingsmodel verslagen
+nav: natuurkunde
+description: "Beoordelingsmodel voor practicumverslagen natuurkunde in de bovenbouw: acht onderdelen van 0 tot 3 punten en de omzettabel naar een cijfer."
+---
+
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<style>
+	.rubric table { min-width: 860px; table-layout: fixed; }
+	.rubric col.onderdeel { width: 130px; }
+	.rubric thead th { white-space: normal; }
+	.rubric thead th .pt { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; }
+	.rubric tbody th.week { font-family: var(--font-head); }
+	.rubric tbody td { vertical-align: top; border-top: 1px solid var(--line); hyphens: auto; overflow-wrap: break-word; }
+	.rubric tbody td + td { border-left: 1px solid var(--line); }
+
+	.omzet {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.omzet li {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		padding: 9px 12px;
+		border: 1px solid var(--card-border);
+		border-radius: 10px;
+		background: var(--row-vac);
+		font-size: 14.5px;
+	}
+	.omzet .p { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted-2); }
+	.omzet .c { font-weight: 600; color: var(--ink); }
+	.omzet li.voldoende { background: var(--accent-soft); border-color: var(--btn-border); }
+	.omzet li.voldoende .c { color: var(--accent); }
+
+	.print-btn { margin-top: 18px; }
+	.print-title { display: none; }
+
+	@media print {
+		@page { size: A4 landscape; margin: 10mm; }
+		.photoband, .hero, footer, header, .print-btn { display: none !important; }
+		body { background: #fff; }
+		.main { padding: 0; gap: 10px; }
+		.card { border: 0; box-shadow: none; padding: 0; break-inside: avoid; }
+		.card__intro, .card__eyebrow { display: none; }
+		.card__title { font-size: 15pt; margin: 0 0 6px; }
+		#rubric-heading { display: none; }
+		.print-title { display: block; font-family: var(--font-head); font-size: 16pt; margin: 0 0 8px; }
+		.plan { overflow: visible; border-color: #ccc; }
+		.rubric table { min-width: 0; }
+		.rubric col.onderdeel { width: 90px; }
+		.plan thead th { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; padding: 5px 8px; }
+		.plan tbody th.week, .plan tbody td { padding: 3px 7px; font-size: 8.5pt; line-height: 1.25; }
+		.omzet { grid-template-columns: repeat(13, 1fr); gap: 4px; }
+		.omzet li { padding: 3px 6px; font-size: 9.5pt; }
+		.card + .card { margin-top: 6px; }
+	}
+</style>
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<h1 class="hero__title">Beoordelingsmodel verslagen</h1>
+			<p class="hero__sub">Zo wordt je practicumverslag in de bovenbouw beoordeeld: acht onderdelen van 0 tot 3 punten, samen maximaal 24 punten.</p>
+		</div>
+	</section>
+
+	<main class="main">
+		<section class="card" aria-labelledby="rubric-heading">
+			<h1 class="print-title">Beoordelingsmodel verslagen</h1>
+			<div class="card__eyebrow">RUBRIC</div>
+			<h2 class="card__title" id="rubric-heading">Onderdelen</h2>
+			<div class="plan rubric">
+				<table>
+					<colgroup><col class="onderdeel" /><col /><col /><col /><col /></colgroup>
+					<thead>
+						<tr>
+							<th class="sticky" scope="col">Onderdeel</th>
+							<th scope="col"><span class="pt">0 PUNTEN</span></th>
+							<th scope="col"><span class="pt">1 PUNT</span></th>
+							<th scope="col"><span class="pt">2 PUNTEN</span></th>
+							<th scope="col"><span class="pt">3 PUNTEN</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th class="week" scope="row">Inleiding</th>
+							<td>Er is geen onderzoeksvraag.</td>
+							<td>Er is een vraag, maar aanleiding of doel ontbreekt. Of de vraag is niet met een meting te beantwoorden.</td>
+							<td>Aanleiding, doel en vraag staan erin. De vraag is nog te breed of noemt niet precies wat je meet.</td>
+							<td>Aanleiding, doel en vraag staan erin. De vraag is afgebakend en meetbaar: bij een verbandsonderzoek noemt hij beide variabelen, bij een bepaling de grootheid en het voorwerp of materiaal.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Theorie</th>
+							<td>Er staat geen relevante theorie of formule in.</td>
+							<td>Er worden begrippen of formules genoemd, maar in platte tekst, of met fouten.</td>
+							<td>Relevante formules staan erin, gemaakt met de formule-editor. De betekenis van de symbolen of de eenheden ontbreekt, of er zit een fout in.</td>
+							<td>Elke formule die je gebruikt staat erin, gemaakt met de formule-editor, met de betekenis van de symbolen en de eenheden, zonder fouten. Je legt uit hoe deze theorie je vraag beantwoordt.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Hypothese</th>
+							<td>Er is geen hypothese.</td>
+							<td>Er is een verwachting zonder onderbouwing.</td>
+							<td>Er is een verwachting met theorie erbij, maar het is alleen een richting (“wordt groter”) of de redenering sluit niet.</td>
+							<td>Er is een concrete verwachting (bijv. “recht evenredig”, “twee keer zo snel geeft vier keer zo groot”), beredeneerd met de theorie.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Methode</th>
+							<td>Er is geen beschrijving.</td>
+							<td>De beschrijving zegt alleen in grote lijnen wat je deed.</td>
+							<td>Materialen en stappen staan erin, maar een klasgenoot mist iets om het na te doen. Of de tekening ontbreekt of heeft geen labels.</td>
+							<td>Een klasgenoot kan het precies nadoen: materialen, stappen, meetbereik en aantal herhalingen staan erin. Er is een tekening met benoemde onderdelen en minstens één keuze is uitgelegd.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Resultaten</th>
+							<td>Er zijn geen resultaten.</td>
+							<td>Er zijn losse meetwaarden, maar niet in een tabel of zonder eenheden.</td>
+							<td>Alle metingen staan in een tabel of grafiek met eenheden.</td>
+							<td>Alle metingen staan in een tabel of grafiek met eenheden. In de tekst beschrijf je wat je ziet (trend, opvallende metingen), zonder al een conclusie te trekken.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Verwerking</th>
+							<td>Er is geen verwerking.</td>
+							<td>Van de drie eisen (voorbeeldberekening uitgewerkt, grafiek met grootheden en eenheden op de assen, passende trendlijn) is er maar één in orde.</td>
+							<td>Eén van de drie eisen ontbreekt of bevat een fout.</td>
+							<td>Alle drie de eisen zijn in orde.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Conclusie</th>
+							<td>Er is geen conclusie.</td>
+							<td>De conclusie herhaalt de resultaten, maar beantwoordt de vraag niet.</td>
+							<td>De conclusie beantwoordt de vraag, maar zonder getallen uit de resultaten of zonder terug te komen op de hypothese.</td>
+							<td>De conclusie beantwoordt de vraag met verwijzing naar de resultaten én zegt of de hypothese klopt.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Discussie</th>
+							<td>Er is geen discussie, of alleen een reflectie op het samenwerken en hoe het werken ging (dat is geen discussie).</td>
+							<td>Er staan alleen algemene opmerkingen (“we hebben niet nauwkeurig gemeten”, “menselijke fout”).</td>
+							<td>Minstens één concrete meetonzekerheid wordt genoemd, met wat die met de uitkomst doet.</td>
+							<td>De concrete meetonzekerheden staan erin met hun invloed op de uitkomst. Afwijkende metingen worden verklaard en er is een concreet verbetervoorstel.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<button class="btn print-btn" type="button" onclick="window.print()">Afdrukken of opslaan als PDF</button>
+		</section>
+
+		<section class="card" aria-labelledby="omzet-heading">
+			<div class="card__eyebrow">OMZETTABEL</div>
+			<h2 class="card__title" id="omzet-heading">Van punten naar cijfer</h2>
+			<p class="card__intro">Met 15 van de 24 punten (62,5%) haal je een 5,5.</p>
+			<ol class="omzet">
+				<li><span class="p">0</span><span class="c">1,0</span></li>
+				<li><span class="p">1</span><span class="c">1,3</span></li>
+				<li><span class="p">2</span><span class="c">1,6</span></li>
+				<li><span class="p">3</span><span class="c">1,9</span></li>
+				<li><span class="p">4</span><span class="c">2,2</span></li>
+				<li><span class="p">5</span><span class="c">2,5</span></li>
+				<li><span class="p">6</span><span class="c">2,8</span></li>
+				<li><span class="p">7</span><span class="c">3,1</span></li>
+				<li><span class="p">8</span><span class="c">3,4</span></li>
+				<li><span class="p">9</span><span class="c">3,7</span></li>
+				<li><span class="p">10</span><span class="c">4,0</span></li>
+				<li><span class="p">11</span><span class="c">4,3</span></li>
+				<li><span class="p">12</span><span class="c">4,6</span></li>
+				<li><span class="p">13</span><span class="c">4,9</span></li>
+				<li><span class="p">14</span><span class="c">5,2</span></li>
+				<li class="voldoende"><span class="p">15</span><span class="c">5,5</span></li>
+				<li class="voldoende"><span class="p">16</span><span class="c">6,0</span></li>
+				<li class="voldoende"><span class="p">17</span><span class="c">6,5</span></li>
+				<li class="voldoende"><span class="p">18</span><span class="c">7,0</span></li>
+				<li class="voldoende"><span class="p">19</span><span class="c">7,5</span></li>
+				<li class="voldoende"><span class="p">20</span><span class="c">8,0</span></li>
+				<li class="voldoende"><span class="p">21</span><span class="c">8,5</span></li>
+				<li class="voldoende"><span class="p">22</span><span class="c">9,0</span></li>
+				<li class="voldoende"><span class="p">23</span><span class="c">9,5</span></li>
+				<li class="voldoende"><span class="p">24</span><span class="c">10,0</span></li>
+			</ol>
+		</section>
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>
