@@ -1,0 +1,39 @@
+---
+title: Vouwmallen luchtweerstand
+description: "Vouwmallen op ware grootte voor het practicum luchtweerstand deel 1 (4 vwo). Bron van vouwmallen-luchtweerstand.pdf."
+sitemap: false
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<!-- Bronpagina voor vouwmallen-luchtweerstand.pdf. Opnieuw maken: Chrome headless met print-to-pdf op deze pagina. Maten in mm. -->
+<body style="background:#fff">
+	<style>
+		@page { size: A4 portrait; margin: 10mm; }
+		.vel { width: 190mm; margin: 0 auto; }
+		.vel h1 { font-family: var(--font-head); font-size: 13pt; margin: 0 0 2mm; color: var(--ink); }
+		.vel p { font-family: var(--font-body); font-size: 9.5pt; margin: 0 0 4mm; color: #333; }
+		.vel svg { display: block; margin: 0 auto 6mm; }
+		.vel + .vel { break-before: page; page-break-before: always; }
+		.mal .rand { fill: #fff; stroke: var(--night-2); stroke-width: .4; }
+		.mal .lijm { fill: #c9cfdf; }
+		.mal text { font-family: 'IBM Plex Sans', system-ui, sans-serif; fill: var(--muted); }
+	</style>
+	{% assign vellen = "A:25|C:50,B:37.5|D:75" | split: "," %}
+	{% for vel in vellen %}
+	<section class="vel">
+		<h1>Vouwmallen luchtweerstand &ndash; vel {{ forloop.index }}</h1>
+		<p>Druk af op 100% (ware grootte). Knip langs de lijnen, vouw tot een kegel en plak de andere snijrand precies op de grijze rand.</p>
+		{% assign mallen = vel | split: "|" %}
+		{% for m in mallen %}{% assign d = m | split: ":" %}{% assign r = d[1] | plus: 0 %}{% assign s = r | times: 2 | plus: 8 %}
+		<svg class="mal" width="{{ s }}mm" height="{{ s }}mm" viewBox="{{ r | plus: 4 | times: -1 }} {{ r | plus: 4 | times: -1 }} {{ s }} {{ s }}">
+			<path class="rand" d="M0 0 L0 -{{ r }} A{{ r }} {{ r }} 0 1 0 {{ r }} 0 Z" />
+			<path class="lijm" d="M0 0 L{{ r }} 0 L{{ r }} 4 L0 4 Z" />
+			<text x="{{ r | times: -0.45 }}" y="{{ r | times: 0.1 }}" font-size="5">{{ d[0] }}</text>
+			<text x="{{ r | times: -0.45 }}" y="{{ r | times: 0.1 | plus: 5 }}" font-size="3">r = {{ d[1] | replace: ".", "," }} mm</text>
+		</svg>
+		{% endfor %}
+	</section>
+	{% endfor %}
+</body>
+</html>

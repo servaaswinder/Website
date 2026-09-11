@@ -1,0 +1,18 @@
+<div class="print-link">
+	<a class="btn" href="{{ include.pdf }}" target="_blank" rel="noopener">Printbare versie <span class="btn__suffix btn__suffix--pdf">PDF</span></a>
+</div>
+
+<script>
+/* Printopmaak: bij Cmd/Ctrl+P, en met ?print (zo maakt scripts/practicum-pdfs.sh de PDF). */
+(function () {
+	var html = document.documentElement;
+	var vast = /[?&]print\b/.test(location.search);
+	function aan() {
+		html.classList.add('printversie');
+		if (window.tsToonEind) window.tsToonEind();
+	}
+	if (vast) aan();
+	window.addEventListener('beforeprint', aan);
+	window.addEventListener('afterprint', function () { if (!vast) html.classList.remove('printversie'); });
+})();
+</script>

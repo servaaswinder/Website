@@ -1,0 +1,96 @@
+<style>
+	/* Gedeelde opmaak voor practicumpagina's: één stijl voor tekst, formules, stappen en tabellen. */
+	.card p, .card ol, .card dl {
+		font-size: 15.5px;
+		line-height: 1.6;
+		color: var(--ink-cell);
+		max-width: 840px;
+	}
+	.card h3 {
+		font-family: var(--font-head);
+		font-weight: 600;
+		font-size: 18px;
+		color: var(--ink);
+		margin: 26px 0 6px;
+	}
+	.card a:not(.btn) { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+	.hero__sub a { color: var(--accent-on-dark); text-decoration: underline; text-underline-offset: 3px; }
+
+	/* formules: regel voor regel, geen kader */
+	.formules { margin: 18px 0 0; padding: 0; }
+	.formules > div {
+		display: grid;
+		grid-template-columns: 170px minmax(0, 560px);
+		gap: 4px 24px;
+		padding: 14px 0;
+		border-top: 1px solid var(--line);
+	}
+	.formules > div:last-child { border-bottom: 1px solid var(--line); }
+	.formules dt { font-family: var(--font-head); font-size: 20px; font-weight: 600; color: var(--night-2); }
+	.formules dd { margin: 0; }
+	.legenda { list-style: none; margin: 0; padding: 0; }
+	.legenda li { display: grid; grid-template-columns: 44px minmax(0, 1fr) 64px; gap: 16px; padding: 2px 0; color: var(--ink-cell); }
+	.legenda i { font-family: var(--font-head); font-style: italic; font-weight: 600; color: var(--night-2); }
+	.legenda li span:last-child { color: var(--muted); font-family: var(--font-mono); font-size: 13.5px; }
+	@media (max-width: 560px) { .formules > div { grid-template-columns: 1fr; } }
+
+	/* genummerde stappen: alleen een nummer, geen kaartjes */
+	.stappen { list-style: none; counter-reset: stap; padding: 0; margin: 12px 0 0; }
+	.stappen > li { counter-increment: stap; position: relative; padding: 0 0 0 44px; margin: 0 0 14px; }
+	.stappen > li::before {
+		content: counter(stap);
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		background: var(--accent-soft);
+		color: var(--accent);
+		font-family: var(--font-mono);
+		font-size: 13px;
+		font-weight: 600;
+	}
+	.stappen h3 { margin: 2px 0 2px; font-size: 16px; }
+	.stappen--bullets > li { padding-left: 24px; margin-bottom: 6px; }
+	.stappen--bullets > li::before { content: ""; width: 7px; height: 7px; top: 10px; left: 4px; background: var(--accent); }
+	.stappen p { margin: 0; }
+
+	/* invultabel: rustige kop in plaats van de donkere planningskop */
+	.invultabel { margin-top: 22px; }
+	.invultabel table { min-width: 560px; }
+	.invultabel thead th { background: var(--row-head); color: var(--ink); border-bottom: 1px solid var(--line); }
+	.invultabel tbody th.week { background: #fff; }
+	.invultabel tbody td { height: 44px; border-left: 1px solid var(--line); }
+
+	/* animatie eindsnelheid */
+	.ts { margin: 18px 0 0; }
+	.ts__svg { width: 100%; max-width: 720px; height: auto; display: block; }
+	.ts__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 12px; font-size: 14.5px; color: var(--muted); }
+	.ts__meter { font-family: var(--font-mono); font-size: 13px; color: var(--ink-cell); }
+	.ts__note { font-size: 13px; color: var(--muted-2); }
+
+	/* printopmaak: bij Ctrl/Cmd+P en voor de PDF (?print, zie scripts/practicum-pdfs.sh) */
+	.print-link { display: flex; justify-content: center; }
+	.printversie body { background: #fff; }
+	.printversie .site-header, .printversie .photoband, .printversie .print-link, .printversie .ts__bar,
+	.printversie .mallen-preview, .printversie .card .btn, .printversie .reslist, .printversie .print-verberg { display: none !important; }
+	.printversie .hero, .printversie .hero::before, .printversie .hero::after { background: none !important; }
+	.printversie .hero { padding: 28px 0 6px; }
+	.printversie .hero__title { color: var(--ink); font-size: 30px; }
+	.printversie .hero__sub, .printversie .hero__sub a { color: var(--muted); }
+	.printversie .hero__eyebrow { color: var(--accent); }
+	.printversie .main { gap: 0; padding-top: 0; }
+	.printversie .card { border: 0; border-top: 1px solid var(--line); border-radius: 0; box-shadow: none; padding: 18px 0; }
+	.printversie .ts__svg { max-width: 560px; }
+	.printversie .invultabel { overflow: visible; }
+	@media print {
+		@page { size: A4 portrait; margin: 14mm; }
+		.printversie .ts, .printversie .invultabel, .printversie .formules > div, .printversie .stappen > li, .printversie .card__title { break-inside: avoid; }
+		.printversie .card__title { break-after: avoid; }
+		.printversie .hero { padding-top: 0; }
+	}
+</style>

@@ -1,0 +1,122 @@
+---
+title: Practicum luchtweerstand deel 1
+description: "Valt een grotere kegel sneller? Kort proefje zonder cijfer met vier papieren kegels en een stopwatch. Natuurkunde 4 vwo."
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">4 VWO · PRACTICUM · GEEN CIJFER</div>
+			<h1 class="hero__title">Onderzoek naar luchtweerstand &ndash; deel 1</h1>
+			<p class="hero__sub">Valt een grotere kegel sneller? In één les laat je vier papieren kegels van verschillende grootte vallen en vergelijk je hun eindsnelheid. Je levert niets in: we bespreken de uitkomst in de klas.</p>
+		</div>
+	</section>
+
+	{% include practicum-css.html %}
+	<style>
+		/* vouwmallen */
+		.mallen-preview { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; margin: 18px 0; }
+		.mallen-preview figure { margin: 0; text-align: center; }
+		.mallen-preview figcaption { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+		.mal .rand { fill: #fff; stroke: var(--night-2); stroke-width: .4; }
+		.mal .lijm { fill: #c9cfdf; }
+		.mallen-preview .mal .rand { stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+		.mal text { font-family: 'IBM Plex Sans', system-ui, sans-serif; fill: var(--muted); }
+	</style>
+
+	<main class="main">
+
+		<section class="card" aria-labelledby="ts-heading">
+			<div class="card__eyebrow">THEORIE</div>
+			<h2 class="card__title" id="ts-heading">Twee krachten en de eindsnelheid</h2>
+			<p class="card__intro">Op een vallende kegel werken twee krachten: de zwaartekracht omlaag en de luchtweerstand omhoog.</p>
+			<dl class="formules">
+				<div><dt>F<sub>z</sub> = m &middot; g</dt><dd><ul class="legenda"><li><i>F<sub>z</sub></i><span>zwaartekracht</span><span>N</span></li><li><i>m</i><span>massa van de kegel</span><span>kg</span></li><li><i>g</i><span>valversnelling (9,81 m/s<sup>2</sup>)</span><span>m/s<sup>2</sup></span></li></ul></dd></div>
+				<div><dt>F<sub>w</sub> = k &middot; v<sup>2</sup></dt><dd><ul class="legenda"><li><i>F<sub>w</sub></i><span>luchtweerstandskracht</span><span>N</span></li><li><i>k</i><span>constante; hangt af van de vorm en het oppervlak van de kegel (zie lesboek)</span><span>kg/m</span></li><li><i>v</i><span>snelheid</span><span>m/s</span></li></ul></dd></div>
+			</dl>
+			<p style="margin-top:18px">Bij het loslaten is de snelheid nul, dus is er nog geen luchtweerstand. De zwaartekracht blijft de hele val even groot, maar de luchtweerstand groeit met v<sup>2</sup>. Zodra de luchtweerstand even groot is als de zwaartekracht, valt de kegel met een constante snelheid: de <strong>eindsnelheid</strong> <em>v</em><sub>t</sub>.</p>
+			{% include terminale-snelheid.html %}
+			<p style="margin-top:18px">De kegel bereikt zijn eindsnelheid al na enkele tientallen centimeters. Daarom meet je de tijd over de laatste meter van de val: de snelheid die je daaruit berekent, is de eindsnelheid.</p>
+		</section>
+
+		<section class="card" aria-labelledby="voorbereiding-heading">
+			<div class="card__eyebrow">VOORBEREIDING</div>
+			<h2 class="card__title" id="voorbereiding-heading">Wat je nodig hebt</h2>
+			<ul class="stappen stappen--bullets">
+				<li><p>De vier vouwmallen A t/m D, afgedrukt op ware grootte (100%, niet &ldquo;passend maken&rdquo;)</p></li>
+				<li><p>Schaar en lijm</p></li>
+				<li><p>Stopwatch</p></li>
+				<li><p>Rolmaat en een stukje tape</p></li>
+			</ul>
+			<div class="mallen-preview" aria-hidden="true">
+				{% assign mallen = "A:25,B:37.5,C:50,D:75" | split: "," %}
+				{% for m in mallen %}{% assign d = m | split: ":" %}
+				<figure>
+					<svg class="mal" viewBox="-1 -1 2 2" width="{{ d[1] | times: 1.6 }}" height="{{ d[1] | times: 1.6 }}">
+						<path class="rand" d="M0 0 L0 -0.98 A0.98 0.98 0 1 0 0.98 0 Z" stroke-width="0.02" />
+						<path class="lijm" d="M0 0 L0.98 0 L0.98 0.12 L0 0.12 Z" />
+					</svg>
+					<figcaption>Mal {{ d[0] }} · r = {{ d[1] | replace: ".", "," }} mm</figcaption>
+				</figure>
+				{% endfor %}
+			</div>
+			<a class="btn" href="vouwmallen-luchtweerstand.pdf" target="_blank" rel="noopener">Vouwmallen <span class="btn__suffix btn__suffix--pdf">PDF</span></a>
+		</section>
+
+		<section class="card" aria-labelledby="experiment-heading">
+			<div class="card__eyebrow">EXPERIMENT</div>
+			<h2 class="card__title" id="experiment-heading">Valt een grotere kegel sneller?</h2>
+			<p class="card__intro">Je werkt in tweetallen. De vier kegels hebben dezelfde tophoek, maar hoe groter de mal, hoe groter &eacute;n zwaarder de kegel.</p>
+
+			<h3>Hypothese</h3>
+			<p>Valt een grotere kegel sneller, langzamer of even snel als een kleine kegel? Schrijf je verwachting op en leg uit waarom.</p>
+
+			<h3>Werkwijze</h3>
+			<ol class="stappen">
+				<li><p>Knip de mallen uit, vouw ze tot kegels en lijm elke kegel dicht precies op de grijze rand.</p></li>
+				<li><p>Plak met tape een markering op 1,00 m boven de grond, bijvoorbeeld op de muur.</p></li>
+				<li><p>Eén van jullie staat op de tafel en laat de kegel met gestrekte arm los, met de punt naar beneden.</p></li>
+				<li><p>De ander start de stopwatch als de kegel de markering passeert en stopt de tijd als de kegel de grond raakt.</p></li>
+				<li><p>Meet drie keer per kegel en noteer de tijden in de tabel.</p></li>
+			</ol>
+
+			<div class="plan invultabel">
+				<table>
+					<thead>
+						<tr><th class="sticky" scope="col">Kegel</th><th scope="col">Tijd 1 (s)</th><th scope="col">Tijd 2 (s)</th><th scope="col">Tijd 3 (s)</th><th scope="col">Gemiddeld (s)</th><th scope="col"><em>v</em><sub>t</sub> (m/s)</th></tr>
+					</thead>
+					<tbody>
+						<tr><th class="week" scope="row">A · r = 25 mm</th><td></td><td></td><td></td><td></td><td></td></tr>
+						<tr><th class="week" scope="row">B · r = 37,5 mm</th><td></td><td></td><td></td><td></td><td></td></tr>
+						<tr><th class="week" scope="row">C · r = 50 mm</th><td></td><td></td><td></td><td></td><td></td></tr>
+						<tr><th class="week" scope="row">D · r = 75 mm</th><td></td><td></td><td></td><td></td><td></td></tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="card" aria-labelledby="uitwerking-heading">
+			<div class="card__eyebrow">UITWERKING</div>
+			<h2 class="card__title" id="uitwerking-heading">Klopt je hypothese?</h2>
+			<ol class="stappen">
+				<li><p>Bereken voor elke kegel de eindsnelheid: <em>v</em><sub>t</sub> = 1,00 m gedeeld door de gemiddelde tijd.</p></li>
+				<li><p>Hoe nauwkeurig kun je de tijd met een stopwatch meten? Denk aan je reactietijd bij het starten en stoppen.</p></li>
+				<li><p>Vergelijk de eindsnelheden van de vier kegels. Zijn de verschillen groter dan hoe nauwkeurig je kunt meten?</p></li>
+				<li><p>Klopt je hypothese? Verklaar de uitkomst met F<sub>z</sub> = m &middot; g en F<sub>w</sub> = k &middot; v<sup>2</sup>: wat gebeurt er met de massa, en wat met de luchtweerstand, als de kegel groter wordt?</p></li>
+			</ol>
+			<p>Neem je antwoorden mee naar de volgende les. Daar bespreken we de uitkomst.</p>
+		</section>
+
+		{% include practicum-print.html pdf="luchtweerstand-deel1.pdf" %}
+
+	</main>
+
+	{% include site-footer-nk.html %}
+
+</body>
+</html>
