@@ -16,6 +16,7 @@ exclude:
   - "serviceAccountKey.json"
   - "*.log"
   - "bin"
+  - "scripts"
   - "docs"
   - "CLAUDE.md"
   - "AGENTS.md"

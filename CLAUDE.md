@@ -41,6 +41,7 @@ dicht. `serviceAccountKey.json` staat alleen lokaal (gitignored).
 
 - **Taal**: code en commits in het Engels; teksten op de site in het Nederlands
 - **Styling**: alles gebruikt `nk.css` (style.css is in juli 2026 uitgefaseerd); paginaspecifieke stijl in een klein `<style>`-blok met nk-CSS-variabelen
+- **Bestanden verplaatsen/verwijderen** (bv. PDF's naar Drive): eerst `python3 scripts/check_links.py _site` na een build; controleert `href` én `src`. Draait ook als `linkcheck`-job in `pages.yml` (blokkeert de deploy niet, mailt bij rood)
 
 ## Practicumpagina's (4V: nichroom, diode-karakteristiek, luchtweerstand deel 1 en 2; 6V: planck)
 

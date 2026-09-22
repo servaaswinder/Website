@@ -34,6 +34,22 @@ jobs:
         with:
           path: ./_site
 
+  # Losse job: kapotte links blokkeren de deploy niet, maar GitHub mailt wel bij rood.
+  linkcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --destination ./_site
+      - name: Check interne links
+        run: python3 scripts/check_links.py _site
+
   deploy:
     environment:
       name: github-pages
