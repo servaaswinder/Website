@@ -386,6 +386,13 @@ img { max-width: 100%; display: block; }
   font-weight: 600;
 }
 .plan tr.exam td.center { text-align: center; }
+/* extra regels onder de toetsweektitel: toetsmoment, practicum */
+.plan tr.exam td .examregel {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+  font-size: .92em;
+}
 
 /* ===================== RESOURCE-KNOPPEN ===================== */
 .reslist {
