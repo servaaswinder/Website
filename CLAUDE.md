@@ -1,59 +1,36 @@
 # Website — servaaswinder.nl
 
-Schoolwebsite (Jekyll) voor Natuurkunde, Fotografie en Technasium.
-Gehost via GitHub Pages.
+Schoolwebsite (Jekyll, vanilla JS) voor Natuurkunde, Fotografie en Technasium.
+GitHub Pages; `main` is productie, `.github/workflows/pages.yml` bouwt en deployt.
 
-Het vak Informatica is verhuisd naar https://northgo-informatica.nl (juli 2026).
-Alles onder `Informatica/` is nu een redirect-stub daarheen; het oude
-beoordelingssysteem (Firebase submissions/results, Flask-server, private_scripts)
-is verwijderd. De data-backup staat buiten de repo bij de eigenaar.
-
-## Stack
-
-- **Frontend**: Jekyll (Ruby), vanilla JS
-- **CI/CD**: GitHub Actions (`pages.yml` → build + deploy naar GitHub Pages)
-- **Dev**: `bundle exec jekyll serve --livereload` (port 4000)
-
-## Projectstructuur
+## Structuur
 
 ```
-├── Natuurkunde/          # Per klas (3H, 4H, 4V, 5H, 6V) met practica en theorie
-│   ├── archief/2526/     # Planningen van vorig schooljaar
-│   └── simulaties/       # Interactieve simulaties (straling, etmaal, spanning)
-├── Fotografie/           # Fotogalerij en portfolio
-├── Technasium/           # STEM-projecten (Floating Future, Prothese, etc.)
-├── Informatica/          # Alleen redirect-stubs naar northgo-informatica.nl
-├── docent/               # Privépagina's (demos.html + login.html, Firebase Auth)
-├── _includes/            # Gedeelde headers/footers (site-header.html, *-nk.html)
-├── firestore.rules       # Rules van Firebase-project "leerling-accounts" (bijna alles dicht)
-└── docs/                 # Planningsdocumenten
+├── Natuurkunde/          # Per klas (3H, 4H, 4V, 5H, 6V); archief/2526/, simulaties/, Verslagen/
+├── Fotografie/           # Fotogalerij
+├── Technasium/           # Projectpagina's
+├── Informatica/          # Alleen redirect-stubs naar northgo-informatica.nl — niet uitbreiden
+├── docent/               # Privépagina's achter Firebase-login
+├── _includes/            # head-nk, site-header-nk, site-footer-nk, practicum-*
+└── firestore.rules       # Firestore-rules; alles dicht behalve docent/
 ```
-
-## Firebase (restgebruik)
-
-Het Firebase-project "leerling-accounts" wordt alleen nog gebruikt voor
-`docent/demos.html`: Servaas logt in (Firebase Auth + TOTP-2FA via
-`docent/login.html`) en de pagina leest het Firestore-document
-`docent/demonstraties`. Alle overige collecties zijn leeg en de rules staan
-dicht. `serviceAccountKey.json` staat alleen lokaal (gitignored).
 
 ## Conventies
 
-- **Taal**: code en commits in het Engels; teksten op de site in het Nederlands
-- **Styling**: alles gebruikt `nk.css` (style.css is in juli 2026 uitgefaseerd); paginaspecifieke stijl in een klein `<style>`-blok met nk-CSS-variabelen
-- **Bestanden verplaatsen/verwijderen** (bv. PDF's naar Drive): eerst `python3 scripts/check_links.py _site` na een build; controleert `href` én `src`. Draait ook als `linkcheck`-job in `pages.yml` (blokkeert de deploy niet, mailt bij rood)
+- Dit is een publieke repo: geen namen, e-mailadressen, leerlinggegevens, sleutels of details over beveiliging/inlog in code, commits of docs. Dat hoort in de privé-repo's.
+- Code en commits in het Engels; teksten op de site in het Nederlands.
+- Styling: alleen `nk.css`; paginaspecifiek in een klein `<style>`-blok met nk-CSS-variabelen.
+- `serviceAccountKey.json` nooit committen (staat in .gitignore).
 
 ## Practicumpagina's (4V: nichroom, diode-karakteristiek, luchtweerstand deel 1 en 2; 6V: planck)
 
-- Gedeelde opmaak in `_includes/practicum-css.html`, knop "Printbare versie" in `_includes/practicum-print.html`, animatie eindsnelheid in `_includes/terminale-snelheid.html`.
-- De knop linkt naar een vaste PDF naast de pagina. Na elke inhoudelijke wijziging de PDF's opnieuw maken: `scripts/practicum-pdfs.sh` (met `jekyll serve` op poort 4000) en meecommitten.
+- Opmaak in `_includes/practicum-css.html`, knop "Printbare versie" in `_includes/practicum-print.html`, animatie in `_includes/terminale-snelheid.html`.
+- De knop linkt naar een vaste PDF naast de pagina. Na elke inhoudelijke wijziging: `scripts/practicum-pdfs.sh` (met `jekyll serve` op poort 4000; buiten macOS `CHROME=<pad naar chromium>`) en de PDF's meecommitten.
 - `vouwmallen-luchtweerstand.pdf` komt uit `4V/luchtweerstand-vouwmallen.html` (maten in mm, ware grootte).
 
-## Branches
+## Verificatie — pas "klaar" als dit slaagt
 
-- `main` — productie
-
-## Roadmap
-
-- ~~Themaoverhaul (CSS-consolidatie)~~ — afgerond juli 2026
-- ~~Gamification (XP, opdrachtenboom, badges)~~ — vervallen; Informatica is verhuisd
+1. `bundle exec jekyll build --destination _site` zonder fouten.
+2. `python3 scripts/check_links.py _site` → `0 kapotte interne link(s)` (verplicht bij verplaatsen/verwijderen/hernoemen van bestanden; checkt `href` en `src`).
+3. Pagina gewijzigd: `bundle exec jekyll serve` (poort 4000) en de pagina met Playwright/Chromium openen; screenshot bekijken, ook op telefoonbreedte.
+4. Practicumpagina gewijzigd: PDF's opnieuw gemaakt en de nieuwe PDF bekeken.

@@ -20,6 +20,9 @@ def bestaat(pad):
             or os.path.exists(os.path.join(pad, 'index.html')))
 
 
+if not os.path.isfile(os.path.join(ROOT, 'index.html')):
+    sys.exit(f'Geen gebouwde site in {ROOT}; eerst jekyll build draaien.')
+
 kapot = {}
 for map_, _, bestanden in os.walk(ROOT):
     for naam in bestanden:
