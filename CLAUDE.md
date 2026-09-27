@@ -10,13 +10,14 @@ GitHub Pages; `main` is productie, `.github/workflows/pages.yml` bouwt en deploy
 ├── Fotografie/           # Fotogalerij
 ├── Technasium/           # Projectpagina's
 ├── Informatica/          # Alleen redirect-stubs naar northgo-informatica.nl — niet uitbreiden
-├── docent/               # demos.html + login.html (Firebase Auth + TOTP)
+├── docent/               # Privépagina's achter Firebase-login
 ├── _includes/            # head-nk, site-header-nk, site-footer-nk, practicum-*
-└── firestore.rules       # Firebase "leerling-accounts": alleen collectie docent/ open (lezen: 2 docenten, schrijven: Servaas)
+└── firestore.rules       # Firestore-rules; alles dicht behalve docent/
 ```
 
 ## Conventies
 
+- Dit is een publieke repo: geen namen, e-mailadressen, leerlinggegevens, sleutels of details over beveiliging/inlog in code, commits of docs. Dat hoort in de privé-repo's.
 - Code en commits in het Engels; teksten op de site in het Nederlands.
 - Styling: alleen `nk.css`; paginaspecifiek in een klein `<style>`-blok met nk-CSS-variabelen.
 - `serviceAccountKey.json` nooit committen (staat in .gitignore).
