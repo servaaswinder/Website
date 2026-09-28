@@ -2,26 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Het beoordelingssysteem (submissions/results) is uitgefaseerd; Informatica
-    // draait op northgo-informatica.nl. Dit project wordt alleen nog gebruikt
-    // voor de privé docent-pagina's (docent/demos.html op servaaswinder.nl).
+    // Dit project wordt alleen nog gebruikt voor docent/demos.html.
     // Alles wat hieronder niet expliciet gematcht wordt, is dicht.
 
-    // Wie mag meelezen. Inloggen kan via Google of e-mail+wachtwoord; de toegang
-    // hangt alleen aan het geverifieerde e-mailadres, niet aan de inlogmethode.
-    function isBeheerder() {
-      return request.auth != null &&
-        request.auth.token.email_verified == true &&
-        request.auth.token.email == 'servaas.winder@northgo-college.nl';
-    }
-
+    // Wie toegang heeft staat in de collectie `toegang`: document-id is het
+    // e-mailadres, veld `beheerder: true` geeft schrijfrechten. Die collectie
+    // is zelf dicht voor de browser; beheer via de Firebase-console.
     function magLezen() {
       return request.auth != null &&
         request.auth.token.email_verified == true &&
-        request.auth.token.email in [
-          'servaas.winder@northgo-college.nl',
-          'janneke.koomen@northgo-college.nl'
-        ];
+        exists(/databases/$(database)/documents/toegang/$(request.auth.token.email));
+    }
+
+    function isBeheerder() {
+      return magLezen() &&
+        get(/databases/$(database)/documents/toegang/$(request.auth.token.email)).data.beheerder == true;
     }
 
     match /docent/{docId} {
