@@ -1,0 +1,282 @@
+---
+title: Practicum biofysica
+description: "PO: een thuisonderzoek naar de natuurkunde van je eigen lichaam, over warmte en kleding of over het vermogen van je spieren. Verslag en video voor een cijfer. Natuurkunde 5 havo."
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">5 HAVO · PRACTICUM · PO VOOR EEN CIJFER</div>
+			<h1 class="hero__title">Biofysica: natuurkunde van je lichaam</h1>
+			<p class="hero__sub">Je doet thuis een onderzoek naar je eigen lichaam: hoeveel warmte je kwijtraakt bij het sporten, of hoeveel vermogen je spieren leveren. Je levert een verslag en een video in voor een cijfer.</p>
+		</div>
+	</section>
+
+	{% include practicum-css.html %}
+	<style>
+		.onderwerpen { display: grid; gap: 0; margin: 18px 0 0; }
+		.onderwerp { padding: 16px 0; border-top: 1px solid var(--line); }
+		.onderwerp:last-child { border-bottom: 1px solid var(--line); }
+		.onderwerp h3 { margin-top: 0; }
+		.onderwerp .bron { margin: 4px 0 8px; color: var(--muted); font-size: 14.5px; }
+		.mag-niet { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; margin: 16px 0 0; }
+		.mag-niet h3 { margin-top: 0; }
+		@media (max-width: 640px) { .mag-niet { grid-template-columns: 1fr; gap: 14px; } }
+
+		.rubric table { min-width: 860px; table-layout: fixed; }
+		.rubric col.onderdeel { width: 130px; }
+		.rubric thead th { white-space: normal; }
+		.rubric thead th .pt { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; }
+		.rubric tbody th.week { font-family: var(--font-head); }
+		.rubric tbody td { vertical-align: top; border-top: 1px solid var(--line); hyphens: auto; overflow-wrap: break-word; }
+		.rubric tbody td + td { border-left: 1px solid var(--line); }
+		.rubric tbody tr.nieuw th.week::after { content: " *"; color: var(--accent); }
+		.let-op { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+
+		.omzet { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+		.omzet li { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 12px; border: 1px solid var(--card-border); border-radius: 10px; background: var(--row-vac); font-size: 14.5px; }
+		.omzet .p { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted-2); }
+		.omzet .c { font-weight: 600; color: var(--ink); }
+		.omzet li.voldoende { background: var(--accent-soft); border-color: var(--btn-border); }
+		.omzet li.voldoende .c { color: var(--accent); }
+
+		.printversie .rubric { overflow: visible; }
+		.printversie .rubric table { min-width: 0; }
+		.printversie .rubric col.onderdeel { width: 104px; }
+		.printversie .rubric thead th, .printversie .rubric tbody th.week, .printversie .rubric tbody td { padding: 6px 7px; font-size: 11px; line-height: 1.35; hyphens: none; }
+		.printversie .rubric tbody th.week { white-space: normal; }
+		@media print {
+			.printversie .rubric tr, .printversie .omzet { break-inside: avoid; }
+			.printversie .card--beoordeling { break-before: page; }
+		}
+	</style>
+
+	<main class="main">
+
+		<section class="card" aria-labelledby="opdracht-heading">
+			<div class="card__eyebrow">DE OPDRACHT</div>
+			<h2 class="card__title" id="opdracht-heading">Een eigen onderzoek naar je lichaam</h2>
+			<p class="card__intro">Je kiest onderwerp A, B of C en doet daar thuis een onderzoek naar. Je werkt met z'n tweeën; alleen mag ook, met z'n drieën alleen in overleg met je docent. Geef je groepje en je onderwerp op tijd door aan je docent.</p>
+			<dl class="formules">
+				<div><dt>Inleveren</dt><dd>Eén verslag en één video per groepje, digitaal via Som.<br>Voor feedback t/m vrijdag 11 december, definitief uiterlijk vrijdag 18 december.</dd></div>
+				<div><dt>Achtergrond</dt><dd>Polaris, keuzekatern <em>K4 Menselijk lichaam</em> (havo). Dit boek heb je thuis.</dd></div>
+				<div><dt>Beoordeling</dt><dd>Volgens het <a href="#beoordeling-heading">beoordelingsmodel onderaan deze pagina</a>: het gewone beoordelingsmodel voor verslagen, met twee extra onderdelen voor de video en voor bronnen en AI. Dit is een schoolexamenonderdeel: het examenreglement is van toepassing.</dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="onderwerpen-heading">
+			<div class="card__eyebrow">ONDERWERPEN</div>
+			<h2 class="card__title" id="onderwerpen-heading">Kies A, B of C</h2>
+			<div class="onderwerpen">
+				<div class="onderwerp">
+					<h3>A. Warmtetransport en sportkleding</h3>
+					<p class="bron">Achtergrond: K4.5 Temperatuur van het lichaam, blz. 28 en 29.</p>
+					<ol class="stappen stappen--bullets">
+						<li><p>Kies vier sporten die op het gebied van kleding veel van elkaar verschillen.</p></li>
+						<li><p>Onderzoek de materialen van de kleding en leg uit waarom die passen bij wat de kleding bij die sport moet doen.</p></li>
+						<li><p>Bedenk zelf een zinvol proefje met de kleding en voer het uit.</p></li>
+						<li><p>Leg het verband met de drie vormen van warmtetransport: straling, geleiding en stroming, en met verdamping van zweet.</p></li>
+						<li><p>Schat voor elke sport de warmtestroom. Gebruik daarvoor de formules hieronder.</p></li>
+						<li><p>Neem foto's van de kleding op in je verslag. Neem als het kan ook veiligheid en mode mee in je analyse.</p></li>
+					</ol>
+				</div>
+				<div class="onderwerp">
+					<h3>B. Vermogen van je spieren</h3>
+					<p class="bron">Achtergrond: K4.1 Spierkracht en energie, blz. 4 tot en met 9.</p>
+					<ol class="stappen stappen--bullets">
+						<li><p>Kies vier verschillende spieren of spiergroepen en bepaal van elk het vermogen, bijvoorbeeld door een gewicht een gemeten hoogte op te tillen en de tijd te meten.</p></li>
+						<li><p>Bepaal het vermogen bij minstens twee verschillende belastingen.</p></li>
+						<li><p>Zoek vermogens uit de sport op, bijvoorbeeld bij gewichtheffen of wielrennen, en vergelijk ze met jouw uitkomsten. Vermeld waar je ze vandaan hebt.</p></li>
+						<li><p>Werk veilig: begin licht, til niets wat je niet onder controle hebt en overleg bij twijfel met je ouders of je huisarts.</p></li>
+					</ol>
+				</div>
+				<div class="onderwerp">
+					<h3>C. Eigen onderwerp</h3>
+					<p class="bron">Achtergrond: de paragraaf van K4 die bij je onderwerp past.</p>
+					<p>Een ander onderzoek binnen de biofysica, bijvoorbeeld over het oog, het gehoor of de bloedsomloop. Je docent moet je onderwerp vooraf goedkeuren. Samen spreek je af wat je meet en berekent.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="card" aria-labelledby="theorie-heading">
+			<div class="card__eyebrow">THEORIE</div>
+			<h2 class="card__title" id="theorie-heading">Formules die je nodig hebt</h2>
+			<p class="card__intro">De uitleg staat in K4. Gebruik in je verslag alleen de formules die je echt nodig hebt.</p>
+			<h3>Onderwerp A: warmtestroom</h3>
+			<dl class="formules">
+				<div><dt>P = A &middot; &Delta;T / R</dt><dd><ul class="legenda"><li><i>P</i><span>warmtestroom door de huid (en kleding)</span><span>W</span></li><li><i>A</i><span>lichaamsoppervlak</span><span>m<sup>2</sup></span></li><li><i>&Delta;T</i><span>temperatuurverschil met de omgeving</span><span>K</span></li><li><i>R</i><span>thermische weerstand; die van huid, vet en kleding mag je optellen</span><span>m<sup>2</sup>&middot;K/W</span></li></ul></dd></div>
+				<div><dt>Q = m &middot; r<sub>v</sub></dt><dd><ul class="legenda"><li><i>Q</i><span>warmte die nodig is om het zweet te laten verdampen</span><span>J</span></li><li><i>m</i><span>massa van het verdampte zweet</span><span>kg</span></li><li><i>r<sub>v</sub></i><span>verdampingswarmte van water: 2,3 &middot; 10<sup>6</sup> J/kg</span><span>J/kg</span></li></ul></dd></div>
+			</dl>
+			<h3>Onderwerp B: vermogen</h3>
+			<dl class="formules">
+				<div><dt>P = E / t</dt><dd><ul class="legenda"><li><i>P</i><span>vermogen</span><span>W</span></li><li><i>E</i><span>geleverde energie (arbeid)</span><span>J</span></li><li><i>t</i><span>tijd</span><span>s</span></li></ul></dd></div>
+				<div><dt>E<sub>z</sub> = m &middot; g &middot; h</dt><dd><ul class="legenda"><li><i>E<sub>z</sub></i><span>zwaarte-energie die je het gewicht geeft</span><span>J</span></li><li><i>m</i><span>massa van het gewicht</span><span>kg</span></li><li><i>g</i><span>valversnelling: 9,81 m/s<sup>2</sup></span><span>m/s<sup>2</sup></span></li><li><i>h</i><span>hoogte waarover je het gewicht tilt</span><span>m</span></li></ul></dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="video-heading">
+			<div class="card__eyebrow">VIDEO</div>
+			<h2 class="card__title" id="video-heading">Eén video van hooguit 2 minuten</h2>
+			<p class="card__intro">In de video laat je zien dat je het onderzoek zelf hebt gedaan, en leg je uit wat je hebt gevonden. Vaak kun je iets beter vertellen dan opschrijven: dat telt mee.</p>
+			<ol class="stappen stappen--bullets">
+				<li><p>De opstelling en minstens één meting zijn in beeld.</p></li>
+				<li><p>Iedereen uit het groepje is te zien en vertelt een deel.</p></li>
+				<li><p>Je legt in eigen woorden uit wat je hebt gemeten, hoe je daaruit de warmtestroom of het vermogen berekent en wat je conclusie is.</p></li>
+			</ol>
+		</section>
+
+		<section class="card" aria-labelledby="ai-heading">
+			<div class="card__eyebrow">BRONNEN EN AI</div>
+			<h2 class="card__title" id="ai-heading">Bronnen vermelden en AI goed gebruiken</h2>
+			<p class="card__intro">Gebruik naast K4 minstens twee andere bronnen. Noem ze achteraan in je verslag volgens APA en verwijs ernaar in de tekst. Bij internetbronnen voeg je een schermafdruk of pdf van de pagina toe.</p>
+			<p>Je mag AI (zoals ChatGPT, Gemini of Copilot) gebruiken om iets beter te begrijpen. Het werk zelf doe je zelf.</p>
+			<div class="mag-niet">
+				<div>
+					<h3>Wel</h3>
+					<ol class="stappen stappen--bullets">
+						<li><p>&ldquo;Leg uit wat thermische weerstand is.&rdquo;</p></li>
+						<li><p>&ldquo;Waarom geeft een natte trui meer warmte af?&rdquo;</p></li>
+						<li><p>&ldquo;Klopt mijn eenheid in deze berekening?&rdquo;</p></li>
+					</ol>
+				</div>
+				<div>
+					<h3>Niet</h3>
+					<ol class="stappen stappen--bullets">
+						<li><p>&ldquo;Schrijf mijn inleiding.&rdquo;</p></li>
+						<li><p>&ldquo;Maak de berekeningen voor deze metingen.&rdquo;</p></li>
+						<li><p>&ldquo;Verzin een conclusie bij dit onderzoek.&rdquo;</p></li>
+					</ol>
+				</div>
+			</div>
+			<p class="let-op"><strong>Deel elke chat.</strong> Heb je AI gebruikt, zet dan in een bijlage van je verslag de gedeelde link naar elke chat (in de chat: Delen &rarr; link kopi&euml;ren). AI is geen bron: wat je leert, zoek je op in K4 of een andere bron en die vermeld je. Heb je AI gebruikt zonder de chat te delen, dan krijg je 0 punten voor bronnen en AI.</p>
+		</section>
+
+		<section class="card" aria-labelledby="verslag-heading">
+			<div class="card__eyebrow">VERSLAG</div>
+			<h2 class="card__title" id="verslag-heading">Wat er in je verslag moet staan</h2>
+			<p class="card__intro">Gebruik de vaste indeling van een verslag (zie <a href="/Natuurkunde/Verslagen/bovenbouw.html">verslagen bovenbouw</a>), in eigen woorden en in correct Nederlands. Zet de namen, de klas en de datum bovenaan. Per onderdeel verwacht ik:</p>
+			<ol class="stappen">
+				<li><h3>Inleiding</h3><p>Waarom dit onderzoek, wat je wilt weten, en de onderzoeksvraag.</p></li>
+				<li><h3>Theorie</h3><p>De formules die je gebruikt, gemaakt met de formule-editor, met de betekenis van elke letter en de eenheden. Verwijs naar K4 met paragraaf en bladzijde.</p></li>
+				<li><h3>Hypothese</h3><p>Wat verwacht je, en waarom? Bij A bijvoorbeeld welke sportkleding de meeste warmte doorlaat, bij B welke spiergroep het grootste vermogen levert.</p></li>
+				<li><h3>Methode</h3><p>Zo beschreven dat een klasgenoot het kan nadoen, met een tekening of foto van de opstelling.</p></li>
+				<li><h3>Resultaten</h3><p>Al je metingen in een tabel of grafiek, met grootheden en eenheden.</p></li>
+				<li><h3>Verwerking</h3><p>Eén berekening helemaal uitgewerkt, de uitkomst voor alle vier de sporten of spiergroepen, en een vergelijking met een waarde uit een bron.</p></li>
+				<li><h3>Conclusie</h3><p>Het antwoord op je onderzoeksvraag, met getallen uit je resultaten, en of je hypothese klopt.</p></li>
+				<li><h3>Discussie</h3><p>Concrete meetonzekerheden en wat ze met je uitkomst doen, en een verbetervoorstel.</p></li>
+				<li><h3>Bronnen en bijlagen</h3><p>Je bronnenlijst volgens APA, schermafdrukken van internetbronnen en de links naar je AI-chats.</p></li>
+			</ol>
+		</section>
+
+		<section class="card card--beoordeling" aria-labelledby="beoordeling-heading">
+			<div class="card__eyebrow">BEOORDELING</div>
+			<h2 class="card__title" id="beoordeling-heading">Beoordelingsmodel</h2>
+			<p class="card__intro">Tien onderdelen van 0 tot 3 punten, samen maximaal 30 punten. De onderdelen met een * horen speciaal bij dit practicum, de rest is gelijk aan het <a href="/Natuurkunde/Verslagen/beoordelingsmodel.html">beoordelingsmodel verslagen</a>.</p>
+			<div class="plan rubric">
+				<table>
+					<colgroup><col class="onderdeel" /><col /><col /><col /><col /></colgroup>
+					<thead>
+						<tr>
+							<th class="sticky" scope="col">Onderdeel</th>
+							<th scope="col"><span class="pt">0 PUNTEN</span></th>
+							<th scope="col"><span class="pt">1 PUNT</span></th>
+							<th scope="col"><span class="pt">2 PUNTEN</span></th>
+							<th scope="col"><span class="pt">3 PUNTEN</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th class="week" scope="row">Inleiding</th>
+							<td>Er is geen onderzoeksvraag.</td>
+							<td>Er is een vraag, maar aanleiding of doel ontbreekt. Of de vraag is niet met een meting te beantwoorden.</td>
+							<td>Aanleiding, doel en vraag staan erin. De vraag is nog te breed of noemt niet precies wat je meet.</td>
+							<td>Aanleiding, doel en vraag staan erin. De vraag is afgebakend en meetbaar: bij een verbandsonderzoek noemt hij beide variabelen, bij een bepaling de grootheid en het voorwerp of materiaal.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Theorie</th>
+							<td>Er staat geen relevante theorie of formule in.</td>
+							<td>Er worden begrippen of formules genoemd, maar in platte tekst, of met fouten.</td>
+							<td>Relevante formules staan erin, gemaakt met de formule-editor. De betekenis van de symbolen of de eenheden ontbreekt, of er zit een fout in.</td>
+							<td>Elke formule die je gebruikt staat erin, gemaakt met de formule-editor, met de betekenis van de symbolen en de eenheden, zonder fouten. Je legt uit hoe deze theorie je vraag beantwoordt.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Hypothese</th>
+							<td>Er is geen hypothese.</td>
+							<td>Er is een verwachting zonder onderbouwing.</td>
+							<td>Er is een verwachting met theorie erbij, maar het is alleen een richting (“wordt groter”) of de redenering sluit niet.</td>
+							<td>Er is een concrete verwachting (bijv. “recht evenredig”, “twee keer zo snel geeft vier keer zo groot”), beredeneerd met de theorie.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Methode</th>
+							<td>Er is geen beschrijving.</td>
+							<td>De beschrijving zegt alleen in grote lijnen wat je deed.</td>
+							<td>Materialen en stappen staan erin, maar een klasgenoot mist iets om het na te doen. Of de tekening ontbreekt of heeft geen labels.</td>
+							<td>Een klasgenoot kan het precies nadoen: materialen, stappen, meetbereik en aantal herhalingen staan erin. Er is een tekening met benoemde onderdelen en minstens één keuze is uitgelegd.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Resultaten</th>
+							<td>Er zijn geen resultaten.</td>
+							<td>Er zijn losse meetwaarden, maar niet in een tabel of zonder eenheden.</td>
+							<td>Alle metingen staan in een tabel of grafiek met eenheden.</td>
+							<td>Alle metingen staan in een tabel of grafiek met eenheden. In de tekst beschrijf je wat je ziet (trend, opvallende metingen), zonder al een conclusie te trekken.</td>
+						</tr>
+						<tr class="nieuw">
+							<th class="week" scope="row">Verwerking</th>
+							<td>Er is geen verwerking.</td>
+							<td>Van de drie eisen (voorbeeldberekening helemaal uitgewerkt met eenheden; uitkomst voor alle vier de sporten of spiergroepen, bij B voor minstens twee belastingen; vergelijking met een waarde uit een bron) is er maar één in orde.</td>
+							<td>Eén van de drie eisen ontbreekt of bevat een fout.</td>
+							<td>Alle drie de eisen zijn in orde. Bij A is de warmtestroom geschat met P = A·ΔT/R of de verdampingswarmte; bij B is het vermogen bepaald met P = E/t of P = F·v. Bij C gelden de eisen die met de docent zijn afgesproken.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Conclusie</th>
+							<td>Er is geen conclusie.</td>
+							<td>De conclusie herhaalt de resultaten, maar beantwoordt de vraag niet.</td>
+							<td>De conclusie beantwoordt de vraag, maar zonder getallen uit de resultaten of zonder terug te komen op de hypothese.</td>
+							<td>De conclusie beantwoordt de vraag met verwijzing naar de resultaten én zegt of de hypothese klopt.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Discussie</th>
+							<td>Er is geen discussie, of alleen een reflectie op het samenwerken en hoe het werken ging (dat is geen discussie).</td>
+							<td>Er staan alleen algemene opmerkingen (“we hebben niet nauwkeurig gemeten”, “menselijke fout”).</td>
+							<td>Minstens één concrete meetonzekerheid wordt genoemd, met wat die met de uitkomst doet.</td>
+							<td>De concrete meetonzekerheden staan erin met hun invloed op de uitkomst. Afwijkende metingen worden verklaard en er is een concreet verbetervoorstel.</td>
+						</tr>
+						<tr class="nieuw">
+							<th class="week" scope="row">Video</th>
+							<td>Er is geen video, of de opstelling en een meting zijn niet in beeld.</td>
+							<td>De opstelling en een meting zijn in beeld, maar de natuurkunde wordt niet uitgelegd.</td>
+							<td>De opstelling en een meting zijn in beeld en de natuurkunde wordt uitgelegd, maar niet door iedereen, of met een fout.</td>
+							<td>De opstelling en een meting zijn in beeld. Iedereen legt in eigen woorden uit wat jullie maten, hoe je de warmtestroom of het vermogen berekent en wat de conclusie is. De video duurt hooguit 2 minuten.</td>
+						</tr>
+						<tr class="nieuw">
+							<th class="week" scope="row">Bronnen en AI</th>
+							<td>Er zijn geen bronnen, of er is AI gebruikt zonder dat de gedeelde chatlink in het verslag staat.</td>
+							<td>Er staan bronnen in, maar het katern ontbreekt of minder dan twee andere bronnen.</td>
+							<td>Het katern en twee andere bronnen staan erin, maar de APA-notatie of de verwijzingen in de tekst zijn niet in orde.</td>
+							<td>Polaris K4 (met paragraaf en pagina) en minstens twee andere bronnen staan erin volgens APA, met een verwijzing in de tekst. Elke gebruikte AI-chat staat als gedeelde link in de bijlage.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h3>Van punten naar cijfer</h3>
+			<p>Met 19 van de 30 punten haal je een 5,5.</p>
+			<ol class="omzet">
+				{% assign cijfers = "1,0|1,2|1,5|1,7|1,9|2,2|2,4|2,7|2,9|3,1|3,4|3,6|3,8|4,1|4,3|4,6|4,8|5,0|5,3|5,5|5,9|6,3|6,7|7,1|7,5|8,0|8,4|8,8|9,2|9,6|10,0" | split: "|" %}
+				{% for c in cijfers %}<li{% if forloop.index0 >= 19 %} class="voldoende"{% endif %}><span class="p">{{ forloop.index0 }}</span><span class="c">{{ c }}</span></li>
+				{% endfor %}
+			</ol>
+		</section>
+
+		{% include practicum-print.html pdf="biofysica.pdf" %}
+
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>

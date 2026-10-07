@@ -22,7 +22,7 @@ GitHub Pages; `main` is productie, `.github/workflows/pages.yml` bouwt en deploy
 - Styling: alleen `nk.css`; paginaspecifiek in een klein `<style>`-blok met nk-CSS-variabelen.
 - `serviceAccountKey.json` nooit committen (staat in .gitignore).
 
-## Practicumpagina's (4V: nichroom, diode-karakteristiek, luchtweerstand deel 1 en 2; 6V: planck)
+## Practicumpagina's (4V: nichroom, diode-karakteristiek, luchtweerstand deel 1 en 2; 5H: biofysica; 6V: planck)
 
 - Opmaak in `_includes/practicum-css.html`, knop "Printbare versie" in `_includes/practicum-print.html`, animatie in `_includes/terminale-snelheid.html`.
 - De knop linkt naar een vaste PDF naast de pagina. Na elke inhoudelijke wijziging: `scripts/practicum-pdfs.sh` (met `jekyll serve` op poort 4000; buiten macOS `CHROME=<pad naar chromium>`) en de PDF's meecommitten.
