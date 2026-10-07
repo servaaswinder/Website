@@ -13,5 +13,6 @@ pdf Natuurkunde/4V/luchtweerstand-deel1     Natuurkunde/4V/luchtweerstand-deel1.
 pdf Natuurkunde/4V/luchtweerstand           Natuurkunde/4V/luchtweerstand-deel2.pdf "?print"
 pdf Natuurkunde/4V/nichroom                 Natuurkunde/4V/nichroom.pdf "?print"
 pdf Natuurkunde/4V/diode-karakteristiek     Natuurkunde/4V/diode-karakteristiek.pdf "?print"
+pdf Natuurkunde/5H/biofysica                Natuurkunde/5H/biofysica.pdf "?print"
 pdf Natuurkunde/6V/planck                   Natuurkunde/6V/planck.pdf "?print"
 pdf Natuurkunde/4V/luchtweerstand-vouwmallen Natuurkunde/4V/vouwmallen-luchtweerstand.pdf ""
