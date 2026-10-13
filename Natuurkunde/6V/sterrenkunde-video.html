@@ -1,0 +1,315 @@
+---
+title: Practicum sterrenkunde
+description: "PO: maak in een duo een explainer-video van 3 tot 5 minuten over een onderwerp uit de sterrenkunde, voor een 4 vwo-leerling. Natuurkunde 6 vwo."
+nav: natuurkunde
+---
+<!DOCTYPE html>
+<html lang="nl">
+{% include head-nk.html %}
+<body>
+	{% include site-header-nk.html %}
+
+	<section class="hero">
+		<div class="hero__inner">
+			<div class="hero__eyebrow">6 VWO · PRACTICUM · PO VOOR EEN CIJFER</div>
+			<h1 class="hero__title">Sterrenkunde: maak een explainer-video</h1>
+			<p class="hero__sub">Je kiest een vraag uit de sterrenkunde en legt het antwoord in een video van 3 tot 5 minuten zo uit, dat een 4 vwo-leerling het snapt. Met minstens één berekening in beeld.</p>
+		</div>
+	</section>
+
+	{% include practicum-css.html %}
+	<style>
+		.onderwerpen { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; margin: 18px 0 0; }
+		.onderwerp { padding: 14px 0; border-top: 1px solid var(--line); }
+		.onderwerp h3 { margin: 0 0 4px; }
+		.onderwerp p { margin: 0; }
+		.onderwerp .bron { margin: 6px 0 0; color: var(--muted); font-size: 14.5px; }
+		@media (max-width: 640px) { .onderwerpen { grid-template-columns: 1fr; } }
+		.mag-niet { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; margin: 16px 0 0; }
+		.mag-niet h3 { margin-top: 0; }
+		@media (max-width: 640px) { .mag-niet { grid-template-columns: 1fr; gap: 14px; } }
+
+		.rubric table { min-width: 860px; table-layout: fixed; }
+		.rubric col.onderdeel { width: 130px; }
+		.rubric thead th { white-space: normal; }
+		.rubric thead th .pt { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; }
+		.rubric tbody th.week { font-family: var(--font-head); white-space: normal; }
+		.rubric tbody td { vertical-align: top; border-top: 1px solid var(--line); hyphens: auto; overflow-wrap: break-word; }
+		.rubric tbody td + td { border-left: 1px solid var(--line); }
+		.rubric tbody tr.extra th.week::after { content: " +"; color: var(--accent); }
+		.rubric tbody td.nvt { color: var(--muted-2); }
+		.let-op { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+
+		.omzet { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+		.omzet li { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 12px; border: 1px solid var(--card-border); border-radius: 10px; background: var(--row-vac); font-size: 14.5px; }
+		.omzet .p { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted-2); }
+		.omzet .c { font-weight: 600; color: var(--ink); }
+		.omzet li.voldoende { background: var(--accent-soft); border-color: var(--btn-border); }
+		.omzet li.voldoende .c { color: var(--accent); }
+
+		.printversie .onderwerp { padding: 8px 0; }
+		.printversie .rubric { overflow: visible; }
+		.printversie .rubric table { min-width: 0; }
+		.printversie .rubric col.onderdeel { width: 104px; }
+		.printversie .rubric thead th, .printversie .rubric tbody th.week, .printversie .rubric tbody td { padding: 6px 7px; font-size: 11px; line-height: 1.35; hyphens: none; }
+		.printversie .rubric tbody th.week { white-space: normal; }
+		@media print {
+			.printversie .rubric tr, .printversie .omzet, .printversie .onderwerp { break-inside: avoid; }
+			.printversie .card--beoordeling { break-before: page; }
+		}
+	</style>
+
+	<main class="main">
+
+		<section class="card" aria-labelledby="opdracht-heading">
+			<div class="card__eyebrow">DE OPDRACHT</div>
+			<h2 class="card__title" id="opdracht-heading">Leg één vraag uit het heelal goed uit</h2>
+			<p class="card__intro">Een goede explainer beantwoordt één vraag, en neemt de kijker stap voor stap mee naar het antwoord. Jouw kijker is een nieuwsgierige 4 vwo-leerling: die kent kracht, energie en golven, maar heeft H13 en H14 nog niet gehad. Wat die niet weet, leg je uit.</p>
+			<dl class="formules">
+				<div><dt>Groepje</dt><dd>Je werkt met z'n tweeën. Met z'n drieën alleen als de klas oneven is, in overleg met je docent.</dd></div>
+				<div><dt>Inleveren</dt><dd>Eén video en één verantwoording per groepje, via Som.<br>Voor feedback t/m vrijdag 4 december, definitief uiterlijk vrijdag 11 december.</dd></div>
+				<div><dt>Achtergrond</dt><dd>Je boek, H13 Gravitatie en H14 Astrofysica, plus minstens twee andere bronnen.</dd></div>
+				<div><dt>Beoordeling</dt><dd>Volgens het <a href="#beoordeling-heading">beoordelingsmodel onderaan deze pagina</a>. Dit is een schoolexamenonderdeel: het examenreglement is van toepassing.</dd></div>
+			</dl>
+		</section>
+
+		<section class="card" aria-labelledby="onderwerpen-heading">
+			<div class="card__eyebrow">ONDERWERPEN</div>
+			<h2 class="card__title" id="onderwerpen-heading">Kies een vraag</h2>
+			<p class="card__intro">Elke vraag mag maar door één groepje gekozen worden: wie het eerst zijn keuze aan de docent doorgeeft, krijgt hem. Een eigen vraag mag ook, als je docent hem vooraf goedkeurt. De berekening is een voorbeeld; een andere mag ook, als hij bij je vraag past.</p>
+			<div class="onderwerpen">
+				<div class="onderwerp">
+					<h3>Hoe weeg je de zon?</h3>
+					<p>De massa van de zon volgt uit hoe de aarde eromheen draait.</p>
+					<p class="bron">Berekening: de massa van de zon uit de straal en de omlooptijd van de aardbaan. &middot; 13.2, 13.3</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Waarom valt een satelliet niet naar beneden?</h3>
+					<p>Over vallen en toch nooit de grond raken, en waarom tv-satellieten stil lijken te staan.</p>
+					<p class="bron">Berekening: de hoogte van een geostationaire baan. &middot; 13.3</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Hoe snel moet je zijn om de aarde te verlaten?</h3>
+					<p>Ontsnappingssnelheid, en wat er gebeurt als die groter wordt dan de lichtsnelheid.</p>
+					<p class="bron">Berekening: de ontsnappingssnelheid van de aarde, of hoe klein de zon moet zijn om een zwart gat te worden. &middot; 13.4</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Waarom schijnt de zon?</h3>
+					<p>Kernfusie in de kern van de zon, en waarom de zon niet in één keer opbrandt.</p>
+					<p class="bron">Berekening: hoeveel massa de zon elke seconde kwijtraakt. &middot; 14.1</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Hoe vind je een planeet die je niet kunt zien?</h3>
+					<p>Een planeet laat zijn ster een beetje heen en weer bewegen. Dat zie je aan het licht.</p>
+					<p class="bron">Berekening: de snelheid van een ster uit de verschuiving van een spectraallijn. &middot; 14.2</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Hoe weten we dat het heelal uitdijt?</h3>
+					<p>Roodverschuiving van sterrenstelsels en de wet van Hubble.</p>
+					<p class="bron">Berekening: de snelheid en de afstand van een sterrenstelsel uit zijn roodverschuiving. &middot; 14.2</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Waarom heeft een ster een kleur?</h3>
+					<p>Wat de kleur van een ster zegt over zijn temperatuur.</p>
+					<p class="bron">Berekening: de temperatuur van een rode en een blauwe ster met de wet van Wien. &middot; 14.3</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Hoe groot is Betelgeuze?</h3>
+					<p>De grootte van een ster bepalen zonder er ooit te kunnen komen.</p>
+					<p class="bron">Berekening: de straal van Betelgeuze uit zijn temperatuur en lichtkracht. &middot; 14.3, 14.4</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Hoe leeft en sterft een ster?</h3>
+					<p>De levensloop van een ster als route door het HR-diagram.</p>
+					<p class="bron">Berekening: hoe lang de zon nog op de hoofdreeks blijft. &middot; 14.1, 14.4</p>
+				</div>
+				<div class="onderwerp">
+					<h3>Eigen vraag</h3>
+					<p>Een andere vraag over H13 of H14, bijvoorbeeld over getijden, zwaartekrachtgolven of lichtvervuiling.</p>
+					<p class="bron">Je spreekt de berekening af met je docent.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="card" aria-labelledby="video-heading">
+			<div class="card__eyebrow">DE VIDEO</div>
+			<h2 class="card__title" id="video-heading">Waar je video aan moet voldoen</h2>
+			<ol class="stappen stappen--bullets">
+				<li><p><strong>3 tot 5 minuten.</strong> Korter is te weinig uitleg, langer houdt geen kijker vol.</p></li>
+				<li><p><strong>Eén vraag.</strong> Je stelt hem aan het begin en beantwoordt hem aan het eind.</p></li>
+				<li><p><strong>Een berekening in beeld.</strong> Stap voor stap: formule, gegevens met waar je ze vandaan hebt, invullen, uitkomst met eenheid. En wat die uitkomst betekent.</p></li>
+				<li><p><strong>Jullie eigen stemmen.</strong> Iedereen uit het groepje vertelt een deel. Je hoeft niet zelf in beeld.</p></li>
+				<li><p><strong>Zelfgemaakt beeld.</strong> Minstens één visualisatie maak je zelf: een schets, een animatie, een model, een tekening op een whiteboard. Beelden van anderen mag je gebruiken (NASA en ESA zijn vrij te gebruiken), met de bron in beeld of in de aftiteling.</p></li>
+				<li><p><strong>Verstaanbaar.</strong> Neem je stem op in een stille ruimte, dicht bij de microfoon. Achtergrondmuziek zacht of niet.</p></li>
+			</ol>
+			<p class="let-op"><strong>Extra: een eigen meting of simulatie.</strong> Niet verplicht, maar het levert tot 2 punten extra op (met 30 als maximum). Bijvoorbeeld: sterren tellen rond Cassiopeia om de lichtvervuiling bij je huis te bepalen, het spectrum van een lamp bekijken met een cd, de maan fotograferen, of een baan of ster nabootsen in een simulatie zoals PhET of Stellarium. Laat in de video zien wat je deed en wat het zegt over je vraag.</p>
+		</section>
+
+		<section class="card" aria-labelledby="aanpak-heading">
+			<div class="card__eyebrow">AANPAK</div>
+			<h2 class="card__title" id="aanpak-heading">Van vraag naar video</h2>
+			<ol class="stappen">
+				<li><h3>Vraag kiezen</h3><p>Geef in week 48 je groepje en je vraag door aan je docent.</p></li>
+				<li><h3>Uitzoeken</h3><p>Lees de paragraaf in je boek en zoek minstens twee andere bronnen. Maak de berekening eerst op papier.</p></li>
+				<li><h3>Script</h3><p>Schrijf op wat er gezegd wordt, in de volgorde van de video. Lees het hardop: wat lang duurt of moeilijk klinkt, maak je korter en eenvoudiger.</p></li>
+				<li><h3>Storyboard</h3><p>Schets per stukje tekst wat er in beeld is. Hier zie je waar je een zelfgemaakte visualisatie nodig hebt.</p></li>
+				<li><h3>Opnemen en monteren</h3><p>Met je telefoon en een gratis programma, zoals CapCut, Clipchamp of iMovie.</p></li>
+				<li><h3>Feedback</h3><p>Lever t/m vrijdag 4 december je video in, of je script en storyboard als de video nog niet af is. Je krijgt feedback.</p></li>
+				<li><h3>Definitief inleveren</h3><p>Uiterlijk vrijdag 11 december: de video en de verantwoording. Daarna krijg je geen feedback meer.</p></li>
+			</ol>
+		</section>
+
+		<section class="card" aria-labelledby="verantwoording-heading">
+			<div class="card__eyebrow">VERANTWOORDING</div>
+			<h2 class="card__title" id="verantwoording-heading">Wat je naast de video inlevert</h2>
+			<p class="card__intro">Een kort document, met de namen, de klas en de datum bovenaan. Lever de video in als bestand, of als link naar je Google Drive van school die je docent kan openen.</p>
+			<ol class="stappen stappen--bullets">
+				<li><p>Je vraag, en het antwoord in één of twee zinnen.</p></li>
+				<li><p>Het script en het storyboard.</p></li>
+				<li><p>De berekening, helemaal uitgewerkt.</p></li>
+				<li><p>Wie wat heeft gedaan.</p></li>
+				<li><p>Minstens één keuze die je hebt gemaakt, met waarom. Bijvoorbeeld waarom je een vergelijking of een visualisatie gebruikt.</p></li>
+				<li><p>Je bronnen volgens APA en de links naar je AI-chats.</p></li>
+			</ol>
+		</section>
+
+		<section class="card" aria-labelledby="ai-heading">
+			<div class="card__eyebrow">BRONNEN EN AI</div>
+			<h2 class="card__title" id="ai-heading">Bronnen vermelden en AI goed gebruiken</h2>
+			<p class="card__intro">Gebruik naast je boek minstens twee andere bronnen en noem ze in je verantwoording volgens APA. Beelden van anderen vermeld je in de video zelf.</p>
+			<p>Je mag AI (zoals ChatGPT, Gemini of Copilot) gebruiken om iets beter te begrijpen. De uitleg, het script en de beelden maak je zelf.</p>
+			<div class="mag-niet">
+				<div>
+					<h3>Wel</h3>
+					<ol class="stappen stappen--bullets">
+						<li><p>&ldquo;Waarom is het spectrum van een ster dat wegbeweegt naar rood verschoven?&rdquo;</p></li>
+						<li><p>&ldquo;Klopt mijn eenheid in deze berekening?&rdquo;</p></li>
+						<li><p>&ldquo;Welk woord in deze zin is te moeilijk voor een 4 vwo-leerling?&rdquo;</p></li>
+					</ol>
+				</div>
+				<div>
+					<h3>Niet</h3>
+					<ol class="stappen stappen--bullets">
+						<li><p>&ldquo;Schrijf een script voor een video over zwarte gaten.&rdquo;</p></li>
+						<li><p>&ldquo;Maak de berekening voor ons.&rdquo;</p></li>
+						<li><p>Een AI-stem, of AI-beelden die je laat doorgaan voor echte foto's van het heelal.</p></li>
+					</ol>
+				</div>
+			</div>
+			<p class="let-op"><strong>Deel elke chat.</strong> Heb je AI gebruikt, zet dan in je verantwoording de gedeelde link naar elke chat (in de chat: Delen &rarr; link kopi&euml;ren). AI is geen bron: wat je leert, zoek je op in je boek of een andere bron en die vermeld je. Heb je AI gebruikt zonder de chat te delen, dan krijg je 0 punten voor bronnen en AI.</p>
+		</section>
+
+		<section class="card card--beoordeling" aria-labelledby="beoordeling-heading">
+			<div class="card__eyebrow">BEOORDELING</div>
+			<h2 class="card__title" id="beoordeling-heading">Beoordelingsmodel</h2>
+			<p class="card__intro">Tien onderdelen van 0 tot 3 punten, samen maximaal 30 punten. Met een eigen meting of simulatie (+) verdien je tot 2 punten extra, maar je komt nooit boven de 30.</p>
+			<div class="plan rubric">
+				<table>
+					<colgroup><col class="onderdeel" /><col /><col /><col /><col /></colgroup>
+					<thead>
+						<tr>
+							<th class="sticky" scope="col">Onderdeel</th>
+							<th scope="col"><span class="pt">0 PUNTEN</span></th>
+							<th scope="col"><span class="pt">1 PUNT</span></th>
+							<th scope="col"><span class="pt">2 PUNTEN</span></th>
+							<th scope="col"><span class="pt">3 PUNTEN</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th class="week" scope="row">Vraag</th>
+							<td>Er is geen vraag, alleen een onderwerp.</td>
+							<td>Er is een vraag, maar die wordt niet beantwoord.</td>
+							<td>De vraag wordt beantwoord, maar is te breed, of komt pas laat in de video.</td>
+							<td>Eén afgebakende vraag aan het begin, en aan het eind een duidelijk antwoord.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Juistheid</th>
+							<td>Meerdere grote fouten.</td>
+							<td>Eén grote fout, of veel kleine.</td>
+							<td>Eén of twee kleine fouten of onnauwkeurige formuleringen.</td>
+							<td>Geen fouten. Begrippen worden precies gebruikt (massa en gewicht, kracht en energie).</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Theorie</th>
+							<td>Er zit geen natuurkunde uit H13 of H14 in.</td>
+							<td>Begrippen en formules worden genoemd, maar niet uitgelegd.</td>
+							<td>De theorie wordt uitgelegd, maar blijft een samenvatting van het boek.</td>
+							<td>De theorie wordt uitgelegd en toegepast op de vraag, en gaat verder dan het boek: met echte waarnemingen, getallen of een recente ontdekking.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Berekening</th>
+							<td>Er is geen berekening.</td>
+							<td>Er wordt een uitkomst genoemd, maar niet uitgewerkt.</td>
+							<td>De berekening staat in beeld, maar er ontbreekt een stap, een bron voor de gegevens of een eenheid, of er zit een fout in.</td>
+							<td>De berekening staat stap voor stap in beeld: formule, gegevens met bron, invullen, uitkomst met eenheid en significante cijfers. De video zegt wat de uitkomst betekent.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Opbouw</th>
+							<td>Losse feiten zonder volgorde.</td>
+							<td>Er is een volgorde, maar met sprongen die de kijker kwijtraken.</td>
+							<td>De opbouw is logisch, maar het begin trekt de kijker niet de video in, of het einde is zwak.</td>
+							<td>Een begin dat nieuwsgierig maakt, daarna stap voor stap, waarbij elke stap voortbouwt op de vorige. Het eind vat samen en beantwoordt de vraag.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Voor 4 vwo</th>
+							<td>Een 4 vwo-leerling kan het niet volgen.</td>
+							<td>Veel vaktermen worden niet uitgelegd, of het tempo is veel te hoog.</td>
+							<td>De meeste vaktermen worden uitgelegd, maar soms gaat het te snel of te moeilijk.</td>
+							<td>Een 4 vwo-leerling kan het volgen: elke nieuwe term wordt uitgelegd, met een voorbeeld of vergelijking uit het dagelijks leven, zonder kinderachtig te worden.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Beeld</th>
+							<td>Alleen een pratend hoofd, of tekst op het scherm die wordt voorgelezen.</td>
+							<td>De beelden hebben weinig met de uitleg te maken, en zijn allemaal van anderen.</td>
+							<td>De beelden ondersteunen de uitleg. Er is een zelfgemaakte visualisatie, maar die maakt het niet duidelijker.</td>
+							<td>Wat je ziet en wat je hoort horen bij elkaar. Minstens één zelfgemaakte visualisatie laat iets zien wat in woorden lastig is.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Uitvoering</th>
+							<td>Slecht verstaanbaar, of korter dan 2 of langer dan 7 minuten.</td>
+							<td>Geluid of beeld stoort, of de video is korter dan 3 of langer dan 5 minuten.</td>
+							<td>Goed verstaanbaar en 3 tot 5 minuten, maar het tempo is soms te hoog of te traag, of niet iedereen vertelt een deel.</td>
+							<td>Goed verstaanbaar, rustig tempo, 3 tot 5 minuten. Iedereen uit het groepje vertelt een deel.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Verantwoording</th>
+							<td>Er is geen verantwoording.</td>
+							<td>Er ontbreken twee of meer van: script, storyboard, berekening, taakverdeling.</td>
+							<td>Script, storyboard, berekening en taakverdeling staan erin, maar er wordt geen keuze uitgelegd.</td>
+							<td>Script, storyboard, berekening en taakverdeling staan erin, en minstens één keuze wordt uitgelegd.</td>
+						</tr>
+						<tr>
+							<th class="week" scope="row">Bronnen en AI</th>
+							<td>Er zijn geen bronnen, of er is AI gebruikt zonder dat de gedeelde chatlink in de verantwoording staat.</td>
+							<td>Er staan bronnen in, maar het boek ontbreekt, of er zijn minder dan twee andere bronnen.</td>
+							<td>Het boek en twee andere bronnen staan erin, maar de APA-notatie is niet in orde, of beelden van anderen staan niet met bron in de video.</td>
+							<td>Het boek (met paragraaf) en minstens twee andere bronnen staan erin volgens APA. Beelden van anderen staan met bron in de video. Elke gebruikte AI-chat staat als gedeelde link in de verantwoording.</td>
+						</tr>
+						<tr class="extra">
+							<th class="week" scope="row">Eigen meting of simulatie</th>
+							<td>Niet gedaan (dat mag).</td>
+							<td>Gedaan en in de video te zien.</td>
+							<td>Gedaan, te zien, en de uitkomst wordt gebruikt om de vraag te beantwoorden of vergeleken met de theorie.</td>
+							<td class="nvt">&ndash;</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h3>Van punten naar cijfer</h3>
+			<p>Met 19 van de 30 punten haal je een 5,5.</p>
+			<ol class="omzet">
+				{% assign cijfers = "1,0|1,2|1,5|1,7|1,9|2,2|2,4|2,7|2,9|3,1|3,4|3,6|3,8|4,1|4,3|4,6|4,8|5,0|5,3|5,5|5,9|6,3|6,7|7,1|7,5|8,0|8,4|8,8|9,2|9,6|10,0" | split: "|" %}
+				{% for c in cijfers %}<li{% if forloop.index0 >= 19 %} class="voldoende"{% endif %}><span class="p">{{ forloop.index0 }}</span><span class="c">{{ c }}</span></li>
+				{% endfor %}
+			</ol>
+		</section>
+
+		{% include practicum-print.html pdf="sterrenkunde-video.pdf" %}
+
+	</main>
+
+	{% include site-footer-nk.html %}
+</body>
+</html>
