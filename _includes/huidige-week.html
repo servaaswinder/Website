@@ -1,0 +1,23 @@
+<script>
+/* Highlight the current school week in every planning table (.plan).
+   Uses the ISO week number; on Saturday and Sunday the coming week is shown. */
+(function () {
+  var d = new Date();
+  var day = d.getDay(); // 0 = Sunday, 6 = Saturday
+  if (day === 6) d.setDate(d.getDate() + 2);
+  if (day === 0) d.setDate(d.getDate() + 1);
+  var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  var yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  var week = Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
+  document.querySelectorAll('.plan tbody th.week').forEach(function (th) {
+    var m = th.textContent.trim().match(/^(\d+)(?:\s*-\s*(\d+))?$/); // "45" or "52-53"
+    if (!m || week < +m[1] || week > +(m[2] || m[1])) return;
+    th.parentNode.classList.add('nu');
+    var label = document.createElement('span');
+    label.className = 'nu-label';
+    label.textContent = 'deze week';
+    th.appendChild(label);
+  });
+})();
+</script>
