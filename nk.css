@@ -394,6 +394,21 @@ img { max-width: 100%; display: block; }
   font-size: .92em;
 }
 
+/* huidige week (gezet door _includes/huidige-week.html) */
+.plan tr.nu th.week {
+  background: var(--accent);
+  color: #fff;
+}
+.plan tr.nu > * {
+  box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent);
+}
+.plan tr.nu .nu-label {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
 /* ===================== RESOURCE-KNOPPEN ===================== */
 .reslist {
   margin-top: 24px;
