@@ -1,0 +1,18 @@
+<script>
+  // Keep at most one button menu open; close it on an outside click or Escape.
+  (function () {
+    var menus = document.querySelectorAll('details.btnmenu');
+    menus.forEach(function (d) {
+      d.addEventListener('toggle', function () {
+        if (!d.open) { return; }
+        menus.forEach(function (o) { if (o !== d) { o.open = false; } });
+      });
+    });
+    document.addEventListener('click', function (e) {
+      menus.forEach(function (d) { if (d.open && !d.contains(e.target)) { d.open = false; } });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { menus.forEach(function (d) { d.open = false; }); }
+    });
+  })();
+</script>

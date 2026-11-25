@@ -449,6 +449,37 @@ img { max-width: 100%; display: block; }
 .btn__suffix--pdf { font-size: 12px; font-family: var(--font-mono); }
 .btn__note { color: var(--faint); font-size: 11.5px; font-weight: 500; }
 
+/* Button that unfolds a short list of links (e.g. explainer videos per chapter) */
+.btnmenu { position: relative; }
+.btnmenu > summary { cursor: pointer; list-style: none; }
+.btnmenu > summary::-webkit-details-marker { display: none; }
+.btnmenu[open] > summary { border-color: var(--btn-border-hover); color: var(--accent); }
+.btnmenu__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  min-width: 260px;
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--btn-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-hover);
+}
+.btnmenu__list a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--night-2);
+}
+.btnmenu__list a:hover, .btnmenu__list a:focus-visible { background: var(--accent-soft); color: var(--accent); }
+.btnmenu__nr { font-weight: 700; margin-right: 4px; }
+
 /* ===================== HOMEPAGE ===================== */
 .home-hero {
   background: var(--night);
